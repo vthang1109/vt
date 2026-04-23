@@ -2,15 +2,16 @@
 /* Dùng kèm với style.css (chứa reset, body, canvas, orb, modal, button chung) */
 
 body {
-  /* Đảm bảo không scroll ngang trên mobile */
   overflow: hidden;
+  /* dvh = dynamic viewport height, co lại khi bàn phím ảo bật */
+  height: 100dvh;
 }
 
 /* Bao ngoài toàn màn hình */
 .chat-page-wrap {
   display: flex;
-  height: 100vh;
-  max-height: 100vh;  /* FIX: đảm bảo không vượt quá viewport */
+  height: 100dvh;
+  max-height: 100dvh;
   overflow: hidden;
   position: relative;
   z-index: 1;
@@ -289,8 +290,22 @@ body {
     inset: 0;
     z-index: 5;
     display: none;
+    /* Đảm bảo layout column đúng để input luôn ở dưới cùng */
+    flex-direction: column;
   }
   .chat-window.active { display: flex; }
   .chat-win-back { display: block; }
   .chat-page-wrap { position: relative; }
+
+  /* Đảm bảo input row không bị đẩy xuống */
+  .chat-window-input-row {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Messages co lại để nhường chỗ cho input */
+  .chat-window-messages {
+    flex: 1;
+    min-height: 0;
+  }
 }
