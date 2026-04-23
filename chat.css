@@ -286,26 +286,29 @@ body {
   }
   .chat-sidebar.mobile-hidden { transform: translateX(-100%); }
   .chat-window {
-    position: absolute;
-    inset: 0;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    bottom: 0;
     z-index: 5;
     display: none;
-    /* Đảm bảo layout column đúng để input luôn ở dưới cùng */
     flex-direction: column;
   }
   .chat-window.active { display: flex; }
   .chat-win-back { display: block; }
   .chat-page-wrap { position: relative; }
 
-  /* Đảm bảo input row không bị đẩy xuống */
-  .chat-window-input-row {
-    position: relative;
-    z-index: 1;
-  }
-
-  /* Messages co lại để nhường chỗ cho input */
   .chat-window-messages {
     flex: 1;
     min-height: 0;
+    overflow-y: auto;
+  }
+
+  .chat-window-input-row {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    background: rgba(4, 20, 40, 0.95);
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
   }
 }
