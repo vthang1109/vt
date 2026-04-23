@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Đoán Số</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="guess.css"/>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+  <nav>
+    <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
+      <span class="logo-vt">VT</span><span class="logo-world">World</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700"></span>
+      <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="location.href='games.html'">← Games</button>
+    </div>
+  </nav>
+
+  <div class="g-container">
+    <div class="g-card">
+      <div class="g-title">🔢 Đoán Số Bí Mật</div>
+      <p class="g-sub">Số từ <b>1</b> đến <b>100</b> · Tối đa <b>10</b> lần đoán</p>
+
+      <div class="g-range-bar">
+        <span id="range-min">1</span>
+        <div class="g-range-track"><div class="g-range-fill" id="range-fill"></div></div>
+        <span id="range-max">100</span>
+      </div>
+
+      <div class="g-hint" id="g-hint">🤔 Hãy nhập số đầu tiên!</div>
+
+      <div class="g-attempts">
+        <span id="attempts-left">10</span> lần còn lại
+        <div class="g-dots" id="g-dots"></div>
+      </div>
+
+      <div class="g-input-row">
+        <input id="g-input" class="g-input" type="number" min="1" max="100" placeholder="Nhập số..." onkeydown="if(event.key==='Enter')doGuess()"/>
+        <button class="g-btn" onclick="doGuess()">Đoán</button>
+      </div>
+
+      <div class="g-history" id="g-history"></div>
+
+      <div class="g-result hidden" id="g-result">
+        <div class="g-result-emoji" id="res-emoji">🎉</div>
+        <div class="g-result-text" id="res-text">Bạn thắng!</div>
+        <div class="g-result-pts" id="res-pts"></div>
+        <button class="g-btn" onclick="newGame()">🔄 Chơi lại</button>
+      </div>
+
+      <div class="g-difficulty">
+        <span>Độ khó:</span>
+        <select id="g-diff" onchange="newGame()">
+          <option value="100">Dễ (1-100)</option>
+          <option value="500">Trung bình (1-500)</option>
+          <option value="1000">Khó (1-1000)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="guess.js"></script>
+</body>
+</html>

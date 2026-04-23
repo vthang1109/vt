@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Memory Card</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="memory.css"/>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+
+  <nav>
+    <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
+      <span class="logo-vt">VT</span><span class="logo-world">World</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700"></span>
+      <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="location.href='games.html'">← Games</button>
+    </div>
+  </nav>
+
+  <div class="mem-container">
+
+    <!-- MENU -->
+    <div id="screen-menu" class="mem-screen active">
+      <div style="font-size:56px;text-align:center;margin-bottom:12px">🧠</div>
+      <h2 class="mem-title">Memory Card</h2>
+      <p class="mem-sub">Lật thẻ tìm cặp giống nhau · Lưới 5×5</p>
+      <div class="mem-mode-list">
+        <div class="mem-mode-card" onclick="Memory.start('solo')">
+          <span class="mem-mode-icon">👤</span>
+          <div>
+            <div class="mem-mode-name">Chơi đơn</div>
+            <div class="mem-mode-desc">1 người · Đua với thời gian</div>
+          </div>
+        </div>
+        <div class="mem-mode-card" onclick="Memory.start('local')">
+          <span class="mem-mode-icon">👥</span>
+          <div>
+            <div class="mem-mode-name">2 người cùng máy</div>
+            <div class="mem-mode-desc">Thay nhau chơi · Ai nhiều cặp hơn thắng</div>
+          </div>
+        </div>
+        <div class="mem-mode-card" onclick="Memory.startOnline()">
+          <span class="mem-mode-icon">🌐</span>
+          <div>
+            <div class="mem-mode-name">Online</div>
+            <div class="mem-mode-desc">Tạo phòng · Mời bạn bè</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONLINE LOBBY -->
+    <div id="screen-online" class="mem-screen">
+      <h2 class="mem-title">🌐 Online</h2>
+      <div class="mem-online-box">
+        <button class="btn-primary" onclick="Memory.createRoom()" style="width:100%;margin-bottom:12px">+ Tạo phòng mới</button>
+        <div style="text-align:center;color:#7dd3fc;margin-bottom:12px;font-size:13px">— hoặc —</div>
+        <input id="room-input" class="mem-input" placeholder="Nhập mã phòng 6 số..." maxlength="6" type="number"/>
+        <button class="btn-secondary" onclick="Memory.joinRoom()" style="width:100%;margin-top:8px">Vào phòng</button>
+        <p id="online-msg" style="color:#f87171;font-size:13px;margin-top:12px;text-align:center"></p>
+      </div>
+      <div id="room-waiting" class="mem-waiting hidden">
+        <div class="mem-room-id">Mã phòng: <span id="room-id-display">------</span></div>
+        <p style="color:#7dd3fc;font-size:14px">Đợi đối thủ vào phòng...</p>
+        <div class="mem-spinner"></div>
+      </div>
+      <button class="btn-secondary" onclick="Memory.showMenu()" style="margin-top:16px">← Quay lại</button>
+    </div>
+
+    <!-- GAME -->
+    <div id="screen-game" class="mem-screen">
+      <!-- Header info -->
+      <div class="mem-header">
+        <div id="p1-info" class="mem-player p1 active">
+          <span id="p1-name">Người chơi 1</span>
+          <span id="p1-score" class="mem-pscore">0</span>
+        </div>
+        <div class="mem-center-info">
+          <div id="mem-timer" class="mem-timer">00:00</div>
+          <div id="mem-pairs" style="font-size:12px;color:#7dd3fc">0/12 cặp</div>
+        </div>
+        <div id="p2-info" class="mem-player p2">
+          <span id="p2-name">Người chơi 2</span>
+          <span id="p2-score" class="mem-pscore">0</span>
+        </div>
+      </div>
+
+      <!-- Turn indicator -->
+      <div id="turn-indicator" class="mem-turn hidden">🎮 Lượt của <span id="turn-name">Người chơi 1</span></div>
+
+      <!-- Board 5x5 -->
+      <div class="mem-board" id="mem-board"></div>
+    </div>
+
+    <!-- RESULT -->
+    <div id="screen-result" class="mem-screen">
+      <div id="res-emoji" style="font-size:72px;text-align:center;margin-bottom:12px">🏆</div>
+      <div id="res-title" class="mem-title"></div>
+      <div class="mem-res-stats" id="mem-res-stats"></div>
+      <button class="btn-primary" onclick="Memory.showMenu()" style="margin:8px">🔄 Chơi lại</button>
+      <button class="btn-secondary" onclick="location.href='games.html'" style="margin:8px">← Games</button>
+    </div>
+
+  </div>
+
+  <script type="module" src="memory.js"></script>
+</body>
+</html>

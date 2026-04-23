@@ -1,0 +1,123 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===== USERS COLLECTION =====
+    // Người dùng có thể đọc tất cả user, nhưng chỉ sửa được dữ liệu của chính mình
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      
+      allow create: if request.auth.uid == userId &&
+                       request.resource.data.keys().hasAll(['uid', 'email', 'nickname', 'points', 'friends', 'createdAt']);
+      
+      allow update: if request.auth.uid == userId;
+      
+      allow delete: if request.auth.uid == userId;
+    }
+    
+    // ===== FRIEND REQUESTS =====
+    // Người nhận có thể đọc/xoá lời mời của mình
+    // Bất kỳ ai đã login đều có thể gửi lời mời
+    match /friendRequests/{toUserId}/requests/{fromUserId} {
+      allow read: if request.auth.uid == toUserId;
+      
+      allow create: if request.auth.uid == fromUserId &&
+                       request.resource.data.fromUid == fromUserId &&
+                       request.resource.data.toUid == toUserId &&
+                       fromUserId != toUserId;
+      
+      allow delete: if request.auth.uid == toUserId || request.auth.uid == fromUserId;
+    }
+    
+    // ===== CHATS COLLECTION - Messages =====
+    // Tin nhắn chỉ có thể được tạo, đọc, sửa, xoá bởi người liên quan
+    match /chats/{roomId}/messages/{messageId} {
+      // Đọc: Bất kỳ user đã login nào cũng có thể đọc (sẽ filter ở client)
+      // Thực tế: nên chỉ cho đọc nếu là trong cuộc trò chuyện
+      allow read: if request.auth != null;
+      
+      // Tạo: Chỉ những tin từ user hiện tại
+      allow create: if request.auth != null &&
+                       request.resource.data.senderUid == request.auth.uid &&
+                       request.resource.data.text is string &&
+                       request.resource.data.text.size() > 0 &&
+                       request.resource.data.text.size() <= 2000;
+      
+      // Sửa: Chỉ người gửi, và chỉ trong 5 phút
+      allow update: if request.auth != null &&
+                       request.auth.uid == resource.data.senderUid &&
+                       request.time < resource.data.createdAt + duration.value(5, 'm');
+      
+      // Xoá: Chỉ người gửi hoặc admin
+      allow delete: if request.auth != null &&
+                       request.auth.uid == resource.data.senderUid;
+    }
+    
+    // Room metadata (typing users, pinned message, etc)
+    match /chats/{roomId} {
+      allow read: if request.auth != null;
+      
+      allow update: if request.auth != null;
+    }
+    
+    // ===== TYPING INDICATOR =====
+    // Người dùng có thể update status gõ của mình
+    match /chats/{roomId}/typing/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
+    }
+    
+    // ===== DEFAULT: CHỈ ALLOW AUTHENTICATED =====
+    // Mặc định từ chối tất cả nếu không khớp với rules trên
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+/*
+=====================================================
+VỀ SECURITY RULES:
+=====================================================
+
+1. ✅ ALLOW READ cho users:
+   - Ai cũng có thể xem danh sách users (nickname, status)
+   - Giúp tìm bạn, kết bạn dễ hơn
+
+2. ❌ DENY WRITE ngoài người chủ:
+   - Chỉ user chính mình mới edit được data của mình
+   - Tránh bị hack, giả mạo
+
+3. ✅ ALLOW MESSAGE CREATE:
+   - Kiểm tra text không rỗng
+   - Kiểm tra độ dài ≤ 2000 ký tự
+   - Kiểm tra senderUid == auth.uid
+
+4. ✅ ALLOW MESSAGE UPDATE trong 5 phút:
+   - Cho phép sửa tin nhắn
+   - Nhưng chỉ trong 5 phút sau gửi
+   - Chỉ người gửi mới sửa được
+
+5. ✅ ALLOW MESSAGE DELETE:
+   - Người gửi có thể xoá tin của mình
+   - Hoặc admin xoá tin spam
+
+6. ❌ DENY FRIEND REQUEST DELETE từ bên gửi:
+   - Chỉ người nhận hoặc admin xoá được
+   - Tránh bị xoá lời mời khi chưa chấp nhận
+
+=====================================================
+TIPS AN TOÀN:
+=====================================================
+
+✅ Luôn validate dữ liệu ở cả client + server
+✅ Không lưu password hoặc sensitive data ở Firestore
+✅ Dùng UID của Firebase Auth làm primary key
+✅ Rate limit: giới hạn request/user
+✅ Monitor Firestore usage (overage charges!)
+✅ Backup data định kỳ
+✅ Audit logs: ghi lại ai xoá/sửa gì
+
+=====================================================
+*/

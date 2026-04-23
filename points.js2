@@ -1,0 +1,116 @@
+import { 
+    getFirestore, doc, getDoc, updateDoc, setDoc, serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+const db = getFirestore();
+const auth = getAuth();
+
+/**
+ * Lấy số điểm hiện tại của người dùng từ Firestore
+ */
+export async function getPoints() {
+    const user = auth.currentUser;
+    if (!user) {
+        console.warn("Chưa đăng nhập, không thể lấy điểm.");
+        return 0;
+    }
+
+    try {
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            // Nếu đã có trường points thì trả về, không thì mặc định 0
+            return userSnap.data().points || 0;
+        } else {
+            // Nếu User chưa tồn tại trong Firestore (lần đầu login)
+            // Khởi tạo user mới với 10,000 điểm tặng kèm
+            const initialPoints = 10000;
+            await setDoc(userRef, {
+                uid: user.uid,
+                email: user.email,
+                points: initialPoints,
+                createdAt: serverTimestamp()
+            }, { merge: true });
+            
+            return initialPoints;
+        }
+    } catch (e) {
+        console.error("Lỗi khi lấy điểm từ Firestore:", e);
+        return 0;
+    }
+}
+
+/**
+ * Cộng hoặc trừ điểm người dùng
+ * @param {string} source - Nguồn (ví dụ: 'BauCua', 'MiniGame')
+ * @param {string} reason - Lý do (ví dụ: 'Thắng cược', 'Nhận quà')
+ * @param {number} amount - Số lượng điểm (số âm để trừ, số dương để cộng)
+ */
+export async function addPoints(source, reason, amount) {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Yêu cầu đăng nhập để thực hiện giao dịch.");
+
+    try {
+        const userRef = doc(db, 'users', user.uid);
+        
+        // Lấy số điểm hiện tại
+        const currentPoints = await getPoints();
+        let newTotal = currentPoints + amount;
+
+        // Không cho phép điểm âm
+        if (newTotal < 0) newTotal = 0;
+
+        // Cập nhật lên Firestore
+        await updateDoc(userRef, {
+            points: newTotal,
+            lastUpdate: serverTimestamp()
+        });
+
+        console.log(`[${source}] ${reason}: ${amount > 0 ? '+' : ''}${amount} => Tổng: ${newTotal}`);
+        
+        // Cập nhật hiển thị trên UI nếu có phần tử user-points-home
+        const pointsEl = document.getElementById('user-points-home');
+        if (pointsEl) pointsEl.textContent = newTotal.toLocaleString();
+
+        return newTotal;
+    } catch (e) {
+        console.error("Lỗi khi cập nhật điểm:", e);
+        throw e;
+    }
+}
+
+/**
+ * Nhận quà đăng nhập hàng ngày
+ */
+export async function claimDailyLogin() {
+    const user = auth.currentUser;
+    if (!user) return { claimed: false, message: "Chưa đăng nhập" };
+
+    try {
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+        const userData = userSnap.data();
+
+        const today = new Date().toDateString();
+        const lastClaim = userData?.lastClaimDate;
+
+        if (lastClaim === today) {
+            return { claimed: false, message: "Hôm nay bạn đã nhận quà rồi!" };
+        }
+
+        const bonus = 1000;
+        await addPoints('Hệ thống', 'Quà hàng ngày', bonus);
+        
+        // Lưu ngày nhận quà
+        await updateDoc(userRef, {
+            lastClaimDate: today
+        });
+
+        return { claimed: true, points: bonus };
+    } catch (e) {
+        console.error("Lỗi nhận quà:", e);
+        return { claimed: false, message: "Lỗi hệ thống" };
+    }
+}

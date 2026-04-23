@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Flappy Bird Soft Classic</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="bird.css"/>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <nav>
+    <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
+      <span class="logo-vt">VT</span><span class="logo-world">World</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700">⭐ --</span>
+      <button class="btn-secondary" onclick="location.href='games.html'">← Games</button>
+    </div>
+  </nav>
+
+  <div class="bird-container">
+    <div id="screen-menu" class="bird-screen active">
+      <div class="bird-logo">🐤</div>
+      <h1 class="bird-title main-title">Flappy Bird</h1>
+      <p style="color:#e0f2fe; margin-bottom:10px; font-weight:600">Bay qua ống nước để nhận sao thưởng</p>
+      <div class="score-tag" style="display:inline-block; margin-bottom:24px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.1); padding:5px 15px; color:#fff; font-weight:700">🏆 Đạt 2 điểm = 1 ⭐</div>
+      <button class="start-btn" id="btn-start">Chơi Ngay</button>
+    </div>
+
+    <div id="screen-game" class="bird-screen">
+      <div class="game-ui">
+        <div class="score-tag">⭐ <span id="current-score">0</span></div>
+        <button id="btn-pause" class="pause-btn">⏸️</button>
+      </div>
+      <div class="canvas-wrapper">
+        <canvas id="bird-canvas"></canvas>
+      </div>
+      <div class="tap-hint" id="game-hint">Chạm để bắt đầu bay</div>
+    </div>
+
+    <div id="screen-result" class="bird-screen">
+      <div class="res-emoji">😿</div>
+      <h2 class="bird-title">Kết Thúc!</h2>
+      <div class="res-stats">
+        <div class="res-stat"><span class="res-val" id="final-score">0</span><span class="res-label">Điểm số</span></div>
+        <div class="res-stat"><span class="res-val" id="earned-pts">+0</span><span class="res-label">Thưởng</span></div>
+      </div>
+      <button class="start-btn" id="btn-restart" style="margin-bottom:12px">Chơi lại</button>
+      <button class="speed-btn" id="btn-home" style="width:100%">Về menu</button>
+    </div>
+
+    <div id="pause-overlay" class="overlay">
+      <h2 class="bird-title">Đã Tạm Dừng</h2>
+      <button class="start-btn" id="btn-resume">Tiếp tục</button>
+    </div>
+  </div>
+
+  <script type="module" src="bird.js"></script>
+</body>
+</html>

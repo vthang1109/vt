@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <!-- ===== LANDING PAGE ===== -->
+  <div id="page-landing" class="page active">
+    <nav>
+      <div class="logo">
+        <span class="logo-vt">VT</span><span class="logo-world">World</span>
+      </div>
+      <div class="nav-links">
+        <span onclick="window.location.href='games.html'">Games</span>
+        <span onclick="window.location.href='chat.html'">Chat</span>
+        <span>Rank</span>
+      </div>
+    </nav>
+    <div class="hero">
+      <div class="badge">🎮 Nền tảng game giải trí</div>
+      <h1 class="hero-title">Chào mừng đến<br/><span>VTWorld</span></h1>
+      <p class="hero-sub">Mini games · Liên Quân · Bài · Quiz · Chat toàn server</p>
+
+      <div class="owner-card">
+        <img src="https://avatars.githubusercontent.com/vthang1109" alt="VTWorld Owner" class="owner-avatar"/>
+        <div class="owner-info">
+          <span class="owner-name">VanThang</span>
+          <span class="owner-role">👑 Chủ web</span>
+        </div>
+      </div>
+
+      <!-- USER INFO BAR -->
+      <div id="user-info-bar" style="display:none;align-items:center;gap:14px;padding:12px 22px;border-radius:50px;background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.25);margin-bottom:20px;animation:fadeUp 0.6s both">
+        <div id="user-avatar-char" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#38bdf8);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:#fff;flex-shrink:0">U</div>
+        <div style="display:flex;flex-direction:column;text-align:left">
+          <span id="user-display-name" style="font-weight:800;font-size:14px;color:#e0f2fe">Game thủ</span>
+          <span style="font-size:12px;color:#38bdf8;font-weight:700">⭐ <span id="user-points-home">0</span> điểm</span>
+        </div>
+        <button onclick="showPage('profile')" style="margin-left:4px;padding:6px 14px;border-radius:50px;border:1px solid rgba(56,189,248,0.3);background:rgba(56,189,248,0.08);color:#38bdf8;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">Hồ sơ</button>
+        <button onclick="doLogout()" style="padding:6px 14px;border-radius:50px;border:1px solid rgba(248,113,113,0.3);background:rgba(248,113,113,0.08);color:#f87171;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">Đăng xuất</button>
+      </div>
+
+      <div class="quick-btns">
+        <div class="qbtn-wrap">
+          <button class="qbtn owner-btn" onclick="toggleOwner(event)">
+            <span class="qbtn-icon">👑</span><span>Chủ sở hữu</span><span class="qbtn-arrow">▾</span>
+          </button>
+          <div class="owner-dropdown" id="ownerDropdown">
+            <a href="https://facebook.com/vthang.1109" target="_blank" class="social-link fb">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>Facebook
+            </a>
+            <a href="https://zalo.me/0123456789" target="_blank" class="social-link zl">
+              <svg width="20" height="20" viewBox="0 0 48 48" fill="currentColor"><rect width="48" height="48" rx="10" fill="#0068ff"/><text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-size="18" font-weight="bold" fill="white" font-family="Arial">Z</text></svg>Zalo
+            </a>
+            <a href="https://tiktok.com/@vthang1109" target="_blank" class="social-link tt">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.97a8.24 8.24 0 004.83 1.55V7.07a4.85 4.85 0 01-1.06-.38z"/></svg>TikTok
+            </a>
+            <a href="https://instagram.com/vthang1109" target="_blank" class="social-link ig">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>Instagram
+            </a>
+          </div>
+        </div>
+        <div class="qbtn-wrap">
+          <button class="qbtn game-btn" onclick="window.location.href='games.html'">
+            <span class="qbtn-icon">🎮</span><span>Game</span>
+          </button>
+        </div>
+        <div class="qbtn-wrap">
+          <button class="qbtn chat-btn" onclick="window.location.href='chat.html'">
+            <span class="qbtn-icon">💬</span><span>Chat</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="btn-row" id="auth-btn-row">
+        <button class="btn-primary" onclick="showPage('register')">Tạo tài khoản</button>
+        <button class="btn-secondary" onclick="showPage('login')">Đăng nhập</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GAME MODAL ===== -->
+  <div id="gameModal" class="modal-overlay" onclick="closeGameModal(event)">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>🎮 Danh sách Game</span>
+        <button class="modal-close" onclick="toggleGameModal()">✕</button>
+      </div>
+      <div class="modal-game-grid">
+        <div class="modal-game-card" onclick="alert('Sắp ra mắt!')"><span class="mgc-icon">⚔️</span><span class="mgc-name">Liên Quân</span><span class="mgc-tag coming">Sắp ra mắt</span></div>
+        <div class="modal-game-card" onclick="alert('Game đang phát triển!')"><span class="mgc-icon">♟️</span><span class="mgc-name">Caro</span><span class="mgc-tag ready">Chơi ngay</span></div>
+        <div class="modal-game-card" onclick="alert('Game đang phát triển!')"><span class="mgc-icon">🐍</span><span class="mgc-name">Rắn săn mồi</span><span class="mgc-tag ready">Chơi ngay</span></div>
+        <div class="modal-game-card" onclick="alert('Sắp ra mắt!')"><span class="mgc-icon">🃏</span><span class="mgc-name">Tiến lên</span><span class="mgc-tag coming">Sắp ra mắt</span></div>
+        <div class="modal-game-card" onclick="alert('Sắp ra mắt!')"><span class="mgc-icon">🃏</span><span class="mgc-name">Poker</span><span class="mgc-tag coming">Sắp ra mắt</span></div>
+        <div class="modal-game-card" onclick="alert('Game đang phát triển!')"><span class="mgc-icon">❓</span><span class="mgc-name">Quiz</span><span class="mgc-tag ready">Chơi ngay</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL ĐẶT TÊN NHÂN VẬT (lần đầu đăng ký) ===== -->
+  <div id="nicknameModal" class="modal-overlay">
+    <div class="modal-box" style="max-width:400px">
+      <div class="modal-header"><span>🎭 Đặt tên nhân vật</span></div>
+      <p style="color:#7dd3fc;font-size:13px;margin-bottom:18px;line-height:1.6">Tên này sẽ hiển thị với mọi người trong VTWorld. Chọn thật ngầu nhé! 😎</p>
+      <input id="nicknameInput" class="input" placeholder="Tên nhân vật (2–20 ký tự)" maxlength="20" onkeydown="if(event.key==='Enter')saveNickname()" style="margin-bottom:8px"/>
+      <p id="nicknameErr" class="err-msg"></p>
+      <button class="btn-primary" style="width:100%" onclick="saveNickname()">✅ Xác nhận</button>
+    </div>
+  </div>
+
+  <!-- ===== MODAL XEM PROFILE NGƯỜI KHÁC ===== -->
+  <div id="viewProfileModal" class="modal-overlay" onclick="closeViewProfile(event)">
+    <div class="modal-box" style="max-width:360px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+        <div id="vp-avatar" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;color:#fff;flex-shrink:0">?</div>
+        <div>
+          <div id="vp-name" style="font-weight:800;font-size:18px;color:#e0f2fe"></div>
+          <div id="vp-email" style="font-size:11px;color:#4a7a9b;margin-top:2px"></div>
+        </div>
+      </div>
+      <div id="vp-action-area"></div>
+      <button onclick="closeViewProfile()" style="margin-top:12px;width:100%;padding:9px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#7dd3fc;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700">Đóng</button>
+    </div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
+
+  <!-- ===== CHAT PAGE ===== -->
+  <div id="page-chat" class="page">
+    <div class="chat-page-wrap">
+
+      <!-- SIDEBAR -->
+      <div class="chat-sidebar" id="chatSidebar">
+        <div class="chat-sidebar-header">
+          <button class="chat-back-btn" onclick="showPage('landing')">← Trang chủ</button>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+            <h2 style="font-size:17px;font-weight:800;color:#e0f2fe">💬 Tin nhắn</h2>
+            <button id="tab-toggle-btn" onclick="switchTab('friends')" style="font-size:11px;padding:5px 11px;border-radius:20px;border:1px solid rgba(52,211,153,0.35);background:rgba(52,211,153,0.07);color:#34d399;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700">👥 Bạn bè</button>
+          </div>
+        </div>
+
+        <!-- TAB: CHAT LIST -->
+        <div id="tab-chat-panel" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+          <div class="chat-search-wrap">
+            <input class="chat-search-input" id="chatSearchInput" placeholder="🔍 Tìm người..." oninput="filterContacts()"/>
+          </div>
+          <div class="chat-contact-list" id="chatContactList">
+            <div class="chat-contact active" onclick="openConvo('__server__','🌐 Chat toàn server',null,'server')" id="contact-__server__">
+              <div class="chat-contact-avatar" style="background:linear-gradient(135deg,#38bdf8,#0ea5e9);font-size:18px">🌐</div>
+              <div class="chat-contact-info">
+                <span class="chat-contact-name">Chat toàn server</span>
+                <span class="chat-contact-preview">Mọi người đều thấy</span>
+              </div>
+            </div>
+            <div id="friendsInChat"></div>
+            <div id="allUsersInChat"></div>
+          </div>
+        </div>
+
+        <!-- TAB: FRIENDS -->
+        <div id="tab-friends-panel" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+          <div style="padding:10px 14px 4px;font-size:11px;color:#fbbf24;font-weight:700;text-transform:uppercase;letter-spacing:.5px">📨 Lời mời đến</div>
+          <div id="friendRequestsList" style="padding:0 8px 4px;max-height:180px;overflow-y:auto;scrollbar-width:thin"></div>
+          <div style="padding:10px 14px 4px;font-size:11px;color:#34d399;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-top:1px solid rgba(255,255,255,0.05)">✅ Bạn bè của bạn</div>
+          <div id="myFriendsList" style="padding:0 8px;flex:1;overflow-y:auto;scrollbar-width:thin"></div>
+        </div>
+      </div>
+
+      <!-- CỬA SỔ CHAT -->
+      <div class="chat-window" id="chatWindow">
+        <div class="chat-window-header">
+          <button class="chat-win-back" onclick="backToSidebar()">←</button>
+          <div class="chat-win-avatar" id="chatWinAvatar" style="background:linear-gradient(135deg,#38bdf8,#0ea5e9);font-size:18px;cursor:pointer" onclick="viewCurrentProfile()">🌐</div>
+          <div class="chat-win-info" style="cursor:pointer" onclick="viewCurrentProfile()">
+            <span class="chat-win-name" id="chatWinName">Chat toàn server</span>
+            <span class="chat-win-status">● Online</span>
+          </div>
+        </div>
+        <div class="chat-window-messages" id="chatWindowMessages">
+          <div class="cwm-msg system-msg">👋 Chào mừng! Chọn cuộc trò chuyện để bắt đầu.</div>
+        </div>
+        <div class="chat-window-input-row">
+          <input class="chat-window-input" id="chatWindowInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key==='Enter')sendWindowChat()"/>
+          <button class="chat-window-send" onclick="sendWindowChat()">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PROFILE PAGE ===== -->
+  <div id="page-profile" class="page">
+    <div class="auth-center">
+      <div class="auth-box" style="max-width:440px">
+        <button onclick="showPage('landing')" style="background:none;border:none;color:#38bdf8;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;margin-bottom:18px;padding:0;display:block">← Trang chủ</button>
+
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px;padding:18px;background:rgba(56,189,248,0.05);border:1px solid rgba(56,189,248,0.15);border-radius:16px">
+          <div id="profile-big-avatar" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#38bdf8);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px;color:#fff;flex-shrink:0">U</div>
+          <div>
+            <div id="profile-nickname-display" style="font-weight:800;font-size:19px;color:#e0f2fe">—</div>
+            <div id="profile-email-display" style="font-size:12px;color:#4a7a9b;margin-top:3px"></div>
+            <div style="font-size:12px;color:#34d399;margin-top:3px;font-weight:600">● Đang online</div>
+          </div>
+        </div>
+
+        <h3 style="color:#e0f2fe;font-weight:800;font-size:14px;margin-bottom:10px">🎭 Đổi tên nhân vật</h3>
+        <input id="profileNicknameInput" class="input" placeholder="Nhập tên nhân vật mới..." maxlength="20" onkeydown="if(event.key==='Enter')updateNicknameFromProfile()" style="margin-bottom:8px"/>
+        <p id="profileNicknameErr" class="err-msg"></p>
+        <button class="btn-primary" style="width:100%;margin-bottom:24px" onclick="updateNicknameFromProfile()">💾 Lưu tên mới</button>
+
+        <div style="border-top:1px solid rgba(56,189,248,0.1);padding-top:18px">
+          <h3 style="color:#e0f2fe;font-weight:800;font-size:14px;margin-bottom:12px">👥 Bạn bè (<span id="profile-friend-count">0</span>)</h3>
+          <div id="profile-friends-list" style="display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;scrollbar-width:thin"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LOGIN PAGE ===== -->
+  <div id="page-login" class="page">
+    <div class="auth-center">
+      <div class="auth-box">
+        <div class="logo" style="justify-content:center;margin-bottom:16px">
+          <span class="logo-vt">VT</span><span class="logo-world">World</span>
+        </div>
+        <h2 class="auth-title">Đăng nhập</h2>
+        <p class="auth-sub">Chào mừng trở lại!</p>
+        <input id="login-email" class="input" type="email" placeholder="Email"/>
+        <input id="login-pass" class="input" type="password" placeholder="Mật khẩu"/>
+        <p id="login-err" class="err-msg"></p>
+        <button class="btn-primary" style="width:100%" onclick="doLogin()">Đăng nhập</button>
+        <p class="auth-switch">Chưa có tài khoản? <span onclick="showPage('register')">Đăng ký</span></p>
+        <p class="auth-switch"><span onclick="showPage('landing')">← Về trang chủ</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== REGISTER PAGE ===== -->
+  <div id="page-register" class="page">
+    <div class="auth-center">
+      <div class="auth-box">
+        <div class="logo" style="justify-content:center;margin-bottom:16px">
+          <span class="logo-vt">VT</span><span class="logo-world">World</span>
+        </div>
+        <h2 class="auth-title">Tạo tài khoản</h2>
+        <p class="auth-sub">Gia nhập VTWorld ngay hôm nay!</p>
+        <input id="reg-email" class="input" type="email" placeholder="Email"/>
+        <input id="reg-pass" class="input" type="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)"/>
+        <p id="reg-err" class="err-msg"></p>
+        <button class="btn-primary" style="width:100%" onclick="doRegister()">Tạo tài khoản</button>
+        <p class="auth-switch">Đã có tài khoản? <span onclick="showPage('login')">Đăng nhập</span></p>
+        <p class="auth-switch"><span onclick="showPage('landing')">← Về trang chủ</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module" src="app.js"></script>
+
+  <script>
+    // ===== UTILS =====
+    function escHtml(s) {
+      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function showToast(msg, type = 'info') {
+      const colors = { info:'#38bdf8', success:'#34d399', warn:'#fbbf24', error:'#f87171' };
+      const t = document.createElement('div');
+      t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${colors[type]||'#38bdf8'};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:fadeUp 0.3s both;max-width:280px`;
+      t.innerHTML = msg;
+      document.getElementById('toastContainer').appendChild(t);
+      setTimeout(() => t.remove(), 3800);
+    }
+
+    // ===== OWNER DROPDOWN =====
+    function toggleOwner(e) {
+      e.stopPropagation();
+      document.getElementById('ownerDropdown').classList.toggle('open');
+    }
+    document.addEventListener('click', () => {
+      document.getElementById('ownerDropdown').classList.remove('open');
+    });
+    function toggleGameModal() { document.getElementById('gameModal').classList.toggle('open'); }
+    function closeGameModal(e) { if (e.target===document.getElementById('gameModal')) toggleGameModal(); }
+
+    // ===== CHAT STATE =====
+    let currentConvoId = '__server__';
+    let currentConvoName = '🌐 Chat toàn server';
+    let currentConvoUid = null;
+
+    // ===== SHOW PAGE (override sau khi app.js load) =====
+    window.showPage = function(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + name).classList.add('active');
+      if (name === 'chat') {
+        renderFriendsInChat();
+        renderAllUsersInChat();
+        openConvo('__server__', '🌐 Chat toàn server', null, 'server');
+      }
+      if (name === 'profile') renderProfilePage();
+    };
+
+    // ===== TABS =====
+    let _currentTab = 'chat';
+    function switchTab(tab) {
+      _currentTab = tab;
+      const btn = document.getElementById('tab-toggle-btn');
+      if (tab === 'friends') {
+        document.getElementById('tab-chat-panel').style.display = 'none';
+        document.getElementById('tab-friends-panel').style.display = 'flex';
+        btn.textContent = '💬 Chat';
+        btn.onclick = () => switchTab('chat');
+        renderFriendRequestsList();
+        renderMyFriendsList();
+      } else {
+        document.getElementById('tab-chat-panel').style.display = 'flex';
+        document.getElementById('tab-friends-panel').style.display = 'none';
+        btn.textContent = '👥 Bạn bè';
+        btn.onclick = () => switchTab('friends');
+      }
+    }
+
+    // ===== OPEN CONVO =====
+    function openConvo(uid, name, avatarChar, type) {
+      currentConvoId = uid;
+      currentConvoName = name;
+      currentConvoUid = (type === 'server') ? null : uid;
+
+      document.querySelectorAll('.chat-contact').forEach(c => c.classList.remove('active'));
+      const el = document.getElementById('contact-' + uid);
+      if (el) el.classList.add('active');
+
+      const av = document.getElementById('chatWinAvatar');
+      document.getElementById('chatWinName').textContent = name;
+      if (avatarChar) {
+        av.textContent = avatarChar;
+        av.style.fontSize = '15px';
+        av.style.background = 'linear-gradient(135deg,#a78bfa,#7c3aed)';
+      } else {
+        av.textContent = '🌐';
+        av.style.fontSize = '18px';
+        av.style.background = 'linear-gradient(135deg,#38bdf8,#0ea5e9)';
+      }
+
+      const box = document.getElementById('chatWindowMessages');
+      box.innerHTML = '<div class="cwm-msg system-msg">Đang tải...</div>';
+
+      if (window._chatUnsubscribe) { window._chatUnsubscribe(); window._chatUnsubscribe = null; }
+
+      if (window.listenMessages) {
+        window._chatUnsubscribe = window.listenMessages(uid, (msgs) => {
+          box.innerHTML = '';
+          if (!msgs.length) {
+            box.innerHTML = '<div class="cwm-msg system-msg">Chưa có tin nhắn nào 👋</div>';
+          }
+          msgs.forEach(m => {
+            const div = document.createElement('div');
+            const isMe = window._currentUser && m.senderUid === window._currentUser.uid;
+            div.className = 'cwm-msg ' + (isMe ? 'mine-msg' : 'other-msg');
+            div.innerHTML = isMe
+              ? `<span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time}</span>`
+              : `<span class="cwm-user">${escHtml(m.senderName)}</span><span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time}</span>`;
+            box.appendChild(div);
+          });
+          box.scrollTop = box.scrollHeight;
+        });
+      }
+
+      document.getElementById('chatWindow').classList.add('active');
+      document.getElementById('chatSidebar').classList.add('mobile-hidden');
+    }
+
+    function backToSidebar() {
+      document.getElementById('chatWindow').classList.remove('active');
+      document.getElementById('chatSidebar').classList.remove('mobile-hidden');
+    }
+
+    function sendWindowChat() {
+      const input = document.getElementById('chatWindowInput');
+      const val = input.value.trim();
+      if (!val) return;
+      if (!window._currentUser) { showToast('⚠️ Đăng nhập để chat!', 'warn'); return; }
+      if (window.sendMessage) window.sendMessage(currentConvoId, val);
+      input.value = '';
+    }
+
+    function filterContacts() {
+      const q = document.getElementById('chatSearchInput').value.toLowerCase();
+      document.querySelectorAll('#chatContactList .chat-contact').forEach(c => {
+        const nm = c.querySelector('.chat-contact-name');
+        c.style.display = nm && nm.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    // ===== VIEW PROFILE =====
+    function viewCurrentProfile() {
+      if (!currentConvoUid) return;
+      viewUserProfile(currentConvoUid);
+    }
+
+    function viewUserProfile(uid) {
+      if (!window._currentUser) { showToast('⚠️ Hãy đăng nhập!', 'warn'); return; }
+      if (!window.getUserData) return;
+      window.getUserData(uid, (data) => {
+        if (!data) { showToast('Không tìm thấy người dùng.', 'error'); return; }
+        const nickname = data.nickname || data.email?.split('@')[0] || '?';
+        document.getElementById('vp-avatar').textContent = nickname[0].toUpperCase();
+        document.getElementById('vp-name').textContent = nickname;
+        document.getElementById('vp-email').textContent = data.email || '';
+        renderViewProfileActions(uid, { ...data, nickname });
+        document.getElementById('viewProfileModal').classList.add('open');
+      });
+    }
+
+    function renderViewProfileActions(uid, data) {
+      const area = document.getElementById('vp-action-area');
+      if (uid === window._currentUser.uid) {
+        area.innerHTML = '<p style="color:#7dd3fc;font-size:13px;text-align:center;padding:8px 0">✨ Đây là bạn!</p>';
+        return;
+      }
+      if (!window.getFriendStatus) return;
+      window.getFriendStatus(window._currentUser.uid, uid, (status) => {
+        if (status === 'friends') {
+          area.innerHTML = `<div style="display:flex;gap:8px">
+            <button onclick="openConvoWithUid('${uid}','${escHtml(data.nickname)}')" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#34d399,#059669);border:none;color:#fff;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">💬 Nhắn tin</button>
+            <button onclick="unfriend('${uid}')" style="flex:1;padding:10px;border-radius:10px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#f87171;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">Hủy kết bạn</button>
+          </div>`;
+        } else if (status === 'pending_sent') {
+          area.innerHTML = `<div style="text-align:center;padding:10px;border-radius:10px;background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);color:#7dd3fc;font-weight:700;font-size:13px">⏳ Đã gửi lời mời kết bạn</div>`;
+        } else if (status === 'pending_received') {
+          area.innerHTML = `<div style="display:flex;gap:8px">
+            <button onclick="acceptFriend('${uid}')" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#34d399,#059669);border:none;color:#fff;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">✅ Chấp nhận</button>
+            <button onclick="declineFriend('${uid}')" style="flex:1;padding:10px;border-radius:10px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#f87171;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">❌ Từ chối</button>
+          </div>`;
+        } else {
+          area.innerHTML = `<button onclick="sendFriendRequest('${uid}')" style="width:100%;padding:10px;border-radius:10px;background:linear-gradient(135deg,#0ea5e9,#38bdf8);border:none;color:#fff;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">➕ Kết bạn</button>`;
+        }
+      });
+    }
+
+    function openConvoWithUid(uid, name) {
+      closeViewProfile();
+      showPage('chat');
+      setTimeout(() => openConvo(uid, name, name[0].toUpperCase(), 'dm'), 150);
+    }
+
+    function closeViewProfile(e) {
+      if (!e || e.target === document.getElementById('viewProfileModal')) {
+        document.getElementById('viewProfileModal').classList.remove('open');
+      }
+    }
+
+    // ===== NICKNAME =====
+    window.showNicknameModal = function() {
+      document.getElementById('nicknameModal').classList.add('open');
+      setTimeout(() => document.getElementById('nicknameInput').focus(), 200);
+    };
+
+    async function saveNickname() {
+      const val = document.getElementById('nicknameInput').value.trim();
+      const err = document.getElementById('nicknameErr');
+      if (val.length < 2) { err.textContent = 'Tên ít nhất 2 ký tự!'; return; }
+      if (val.length > 20) { err.textContent = 'Tên tối đa 20 ký tự!'; return; }
+      err.textContent = '';
+      try {
+        await window._saveNickname(val);
+        document.getElementById('nicknameModal').classList.remove('open');
+        showToast('🎭 Tên nhân vật: <strong>' + escHtml(val) + '</strong>', 'success');
+        _applyNicknameToUI(val);
+      } catch(e) { err.textContent = 'Lưu thất bại, thử lại!'; }
+    }
+
+    async function updateNicknameFromProfile() {
+      const val = document.getElementById('profileNicknameInput').value.trim();
+      const err = document.getElementById('profileNicknameErr');
+      if (val.length < 2) { err.textContent = 'Tên ít nhất 2 ký tự!'; return; }
+      err.textContent = '';
+      try {
+        await window._saveNickname(val);
+        showToast('✅ Đổi tên thành: <strong>' + escHtml(val) + '</strong>', 'success');
+        _applyNicknameToUI(val);
+        document.getElementById('profileNicknameInput').value = '';
+      } catch(e) { err.textContent = 'Lưu thất bại!'; }
+    }
+
+    function _applyNicknameToUI(name) {
+      const letter = name[0].toUpperCase();
+      const ids = ['user-display-name','profile-nickname-display'];
+      ids.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = name; });
+      ['user-avatar-char','profile-big-avatar'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = letter; });
+    }
+
+    // ===== FRIEND ACTIONS =====
+    async function sendFriendRequest(toUid) {
+      if (!window._sendFriendRequest) return;
+      try {
+        await window._sendFriendRequest(toUid);
+        showToast('📨 Đã gửi lời mời kết bạn!', 'success');
+        closeViewProfile();
+      } catch(e) { showToast('❌ Gửi thất bại!', 'error'); }
+    }
+
+    async function acceptFriend(fromUid) {
+      if (!window._acceptFriendRequest) return;
+      try {
+        await window._acceptFriendRequest(fromUid);
+        showToast('🎉 Đã kết bạn thành công!', 'success');
+        closeViewProfile();
+        renderFriendRequestsList();
+        renderMyFriendsList();
+        renderFriendsInChat();
+      } catch(e) { showToast('❌ Lỗi!', 'error'); }
+    }
+
+    async function declineFriend(fromUid) {
+      if (!window._declineFriendRequest) return;
+      try {
+        await window._declineFriendRequest(fromUid);
+        showToast('Đã từ chối.', 'info');
+        closeViewProfile();
+        renderFriendRequestsList();
+      } catch(e) {}
+    }
+
+    async function unfriend(uid) {
+      if (!window._unfriend) return;
+      try {
+        await window._unfriend(uid);
+        showToast('Đã hủy kết bạn.', 'info');
+        closeViewProfile();
+        renderMyFriendsList();
+        renderFriendsInChat();
+        renderProfilePage();
+      } catch(e) {}
+    }
+
+    // ===== RENDER: FRIENDS IN CHAT SIDEBAR =====
+    function renderFriendsInChat() {
+      if (!window._currentUser || !window._getMyFriends) return;
+      window._getMyFriends(window._currentUser.uid, (friends) => {
+        const el = document.getElementById('friendsInChat');
+        el.innerHTML = '';
+        if (!friends.length) return;
+        const label = document.createElement('div');
+        label.className = 'contact-section-label';
+        label.textContent = '👥 Bạn bè';
+        el.appendChild(label);
+        friends.forEach(f => {
+          const div = document.createElement('div');
+          div.className = 'chat-contact';
+          div.id = 'contact-' + f.uid;
+          const name = f.nickname || '?';
+          div.onclick = () => openConvo(f.uid, name, name[0].toUpperCase(), 'dm');
+          div.innerHTML = `
+            <div class="chat-contact-avatar" style="background:linear-gradient(135deg,#34d399,#059669)">${name[0].toUpperCase()}</div>
+            <div class="chat-contact-info">
+              <span class="chat-contact-name">${escHtml(name)} <span class="chat-online-dot"></span></span>
+              <span class="chat-contact-preview">Nhấn để nhắn tin</span>
+            </div>`;
+          el.appendChild(div);
+        });
+      });
+    }
+
+    // ===== RENDER: ALL USERS IN CHAT SIDEBAR =====
+    function renderAllUsersInChat() {
+      if (!window._currentUser || !window._getAllUsers) return;
+      window._getAllUsers((users) => {
+        const el = document.getElementById('allUsersInChat');
+        el.innerHTML = '';
+        const others = users.filter(u => u.uid !== window._currentUser.uid);
+        if (!others.length) return;
+        const label = document.createElement('div');
+        label.className = 'contact-section-label';
+        label.textContent = '🌐 Tất cả người dùng';
+        el.appendChild(label);
+        others.forEach(u => {
+          const name = u.nickname || u.email?.split('@')[0] || '?';
+          const div = document.createElement('div');
+          div.className = 'chat-contact';
+          div.onclick = () => viewUserProfile(u.uid);
+          div.innerHTML = `
+            <div class="chat-contact-avatar" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)">${name[0].toUpperCase()}</div>
+            <div class="chat-contact-info">
+              <span class="chat-contact-name">${escHtml(name)}</span>
+              <span class="chat-contact-preview" style="color:#a78bfa">Nhấn để xem profile</span>
+            </div>`;
+          el.appendChild(div);
+        });
+      });
+    }
+
+    // ===== RENDER: FRIEND REQUESTS LIST =====
+    function renderFriendRequestsList() {
+      if (!window._currentUser || !window._getFriendRequests) return;
+      window._getFriendRequests(window._currentUser.uid, (reqs) => {
+        const el = document.getElementById('friendRequestsList');
+        if (!reqs.length) {
+          el.innerHTML = '<p style="color:#4a7a9b;font-size:12px;padding:8px 6px">Không có lời mời nào.</p>';
+          return;
+        }
+        el.innerHTML = '';
+        reqs.forEach(r => {
+          const name = r.nickname || '?';
+          const div = document.createElement('div');
+          div.style.cssText = 'display:flex;align-items:center;gap:8px;padding:9px 8px;border-radius:10px;background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.15);margin-bottom:6px';
+          div.innerHTML = `
+            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:flex;align-items:center;justify-content:center;font-weight:800;color:#1a0a00;font-size:13px;flex-shrink:0">${name[0].toUpperCase()}</div>
+            <div style="flex:1;min-width:0;font-weight:700;font-size:13px;color:#e0f2fe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(name)}</div>
+            <button onclick="acceptFriend('${r.uid}')" style="padding:5px 9px;border-radius:8px;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);color:#34d399;cursor:pointer;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif">✅</button>
+            <button onclick="declineFriend('${r.uid}')" style="padding:5px 9px;border-radius:8px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);color:#f87171;cursor:pointer;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif">❌</button>`;
+          el.appendChild(div);
+        });
+      });
+    }
+
+    // ===== RENDER: MY FRIENDS LIST (friends tab) =====
+    function renderMyFriendsList() {
+      if (!window._currentUser || !window._getMyFriends) return;
+      window._getMyFriends(window._currentUser.uid, (friends) => {
+        const el = document.getElementById('myFriendsList');
+        if (!friends.length) {
+          el.innerHTML = '<p style="color:#4a7a9b;font-size:12px;padding:8px 6px">Chưa có bạn bè. Thêm ai đó nhé!</p>';
+          return;
+        }
+        el.innerHTML = '';
+        friends.forEach(f => {
+          const name = f.nickname || '?';
+          const div = document.createElement('div');
+          div.style.cssText = 'display:flex;align-items:center;gap:8px;padding:9px 8px;border-radius:10px;background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.1);margin-bottom:6px;cursor:pointer';
+          div.onclick = () => viewUserProfile(f.uid);
+          div.innerHTML = `
+            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#34d399,#059669);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:13px;flex-shrink:0">${name[0].toUpperCase()}</div>
+            <div style="flex:1;min-width:0;font-weight:700;font-size:13px;color:#e0f2fe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(name)} <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#34d399;vertical-align:middle;margin-left:4px"></span></div>
+            <button onclick="event.stopPropagation();openConvoWithUid('${f.uid}','${escHtml(name)}')" style="padding:5px 9px;border-radius:8px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);color:#34d399;cursor:pointer;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif">💬</button>`;
+          el.appendChild(div);
+        });
+      });
+    }
+
+    // ===== RENDER: PROFILE PAGE =====
+    function renderProfilePage() {
+      if (!window._currentUser) return;
+      document.getElementById('profile-email-display').textContent = window._currentUser.email || '';
+      if (!window._getMyFriends) return;
+      window._getMyFriends(window._currentUser.uid, (friends) => {
+        const countEl = document.getElementById('profile-friend-count');
+        if (countEl) countEl.textContent = friends.length;
+        const pfl = document.getElementById('profile-friends-list');
+        if (!pfl) return;
+        if (!friends.length) { pfl.innerHTML = '<p style="color:#4a7a9b;font-size:13px;text-align:center;padding:12px">Chưa có bạn bè nào.</p>'; return; }
+        pfl.innerHTML = '';
+        friends.forEach(f => {
+          const name = f.nickname || '?';
+          const div = document.createElement('div');
+          div.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.1)';
+          div.innerHTML = `
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#34d399,#059669);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:14px">${name[0].toUpperCase()}</div>
+            <span style="flex:1;font-weight:700;font-size:13px;color:#e0f2fe">${escHtml(name)}</span>
+            <button onclick="openConvoWithUid('${f.uid}','${escHtml(name)}')" style="padding:5px 10px;border-radius:8px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);color:#34d399;cursor:pointer;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif">💬</button>`;
+          pfl.appendChild(div);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

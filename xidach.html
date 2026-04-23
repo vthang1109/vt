@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>VTWorld — Xì Dách Online</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="cards.css">
+    <link rel="stylesheet" href="xidach.css">
+</head>
+<body>
+    <nav class="casino-nav">
+        <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
+            <span style="color:#0ea5e9">VT</span><span>World</span>
+        </div>
+        <div class="nav-right">
+            <div id="nav-pts">⭐ --</div>
+            <button class="nav-btn mode-toggle" onclick="game.showModes()">CHẾ ĐỘ</button>
+            <button class="nav-btn exit-btn" onclick="location.href='games.html'">SẢNH</button>
+        </div>
+    </nav>
+
+    <div id="mode-selector" class="overlay active">
+        <div class="glass-panel">
+            <h2 class="title" style="color:#0ea5e9; font-family:'Orbitron'; margin-bottom: 20px;">XÌ DÁCH CASINO</h2>
+            <button class="mode-btn" onclick="game.setMode('solo')">CHƠI ĐƠN (OFFLINE)</button>
+            
+            <hr style="opacity: 0.1; margin: 20px 0; border: none; border-top: 1px solid #fff;">
+            <h3 style="font-size: 14px; color: #64748b; margin-bottom: 15px; font-family:'Orbitron'">CHẾ ĐỘ ONLINE</h3>
+            
+            <button class="mode-btn" style="background: #059669; border-color: #10b981;" onclick="game.createOnlineRoom()">TẠO PHÒNG (NHÀ CÁI)</button>
+            
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <input type="number" id="room-id-input" placeholder="Nhập ID phòng..." 
+                       style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; font-family:'Orbitron'">
+                <button class="game-btn primary" style="padding: 0 20px;" onclick="game.joinOnlineRoom(document.getElementById('room-id-input').value)">VÀO</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="bet-selector" class="overlay">
+        <div class="glass-panel">
+            <h2 class="title" style="color:#facc15; font-family:'Orbitron'">ĐẶT CƯỢC</h2>
+            <p id="current-balance" style="margin-bottom: 20px; font-size: 1.1rem; color: #94a3b8;">Số dư: ⭐ --</p>
+            <div class="bet-grid">
+                <button class="bet-btn bet-opt" data-amount="100">100</button>
+                <button class="bet-btn bet-opt" data-amount="500">500</button>
+                <button class="bet-btn bet-opt" data-amount="1000">1000</button>
+                <button class="bet-btn all-in bet-opt" data-amount="all">TẤT TAY</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="casino-table">
+        <div class="dealer-section">
+            <div id="dealer-container">
+                <div class="badge dealer">NHÀ CÁI <span id="dealer-score-label"></span></div>
+                <div id="dealer-hand" class="hand"></div>
+            </div>
+        </div>
+
+        <div id="game-table" class="hands-container">
+            </div>
+
+        <div class="controls">
+            <div id="status-msg">CHỌN CHẾ ĐỘ ĐỂ CHƠI</div>
+            <div class="btn-group">
+                <button id="btn-deal" class="game-btn primary" onclick="game.startDeal()">VÁN MỚI</button>
+                <button id="btn-hit" class="game-btn" onclick="game.hit()" disabled>RÚT BÀI</button>
+                <button id="btn-stand" class="game-btn" onclick="game.stand()" disabled>DẰN BÀI</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="xidach.js"></script>
+</body>
+</html>

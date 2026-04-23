@@ -1,0 +1,134 @@
+.mem-container {
+  max-width: 620px; margin: 0 auto; padding: 16px;
+  min-height: calc(100vh - 60px);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.mem-screen { display: none; width: 100%; animation: fadeUp 0.4s both; }
+.mem-screen.active { display: block; }
+
+.mem-title {
+  font-family: 'Orbitron', monospace; font-size: 24px; font-weight: 900;
+  color: #e0f2fe; text-align: center; margin-bottom: 8px;
+}
+.mem-sub { color: #7dd3fc; font-size: 14px; text-align: center; margin-bottom: 24px; }
+
+/* MODE LIST */
+.mem-mode-list { display: flex; flex-direction: column; gap: 12px; }
+.mem-mode-card {
+  display: flex; align-items: center; gap: 16px; padding: 18px 20px;
+  border-radius: 16px; cursor: pointer;
+  background: rgba(56,189,248,0.06); border: 2px solid rgba(56,189,248,0.2);
+  transition: all 0.25s;
+}
+.mem-mode-card:hover { border-color: #38bdf8; background: rgba(56,189,248,0.13); transform: translateX(4px); }
+.mem-mode-icon { font-size: 32px; flex-shrink: 0; }
+.mem-mode-name { font-weight: 800; font-size: 16px; color: #e0f2fe; margin-bottom: 2px; }
+.mem-mode-desc { font-size: 13px; color: #7dd3fc; }
+
+/* ONLINE */
+.mem-online-box { background: rgba(4,20,40,0.8); border: 1px solid rgba(56,189,248,0.2); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+.mem-input {
+  width: 100%; padding: 12px 16px; border-radius: 10px;
+  border: 1px solid rgba(56,189,248,0.25); background: rgba(56,189,248,0.05);
+  color: #e0f2fe; font-size: 16px; outline: none; font-family: 'Nunito', sans-serif;
+  text-align: center; letter-spacing: 4px;
+}
+.mem-input:focus { border-color: rgba(56,189,248,0.6); }
+.mem-waiting { text-align: center; padding: 20px; }
+.mem-room-id {
+  font-family: 'Orbitron', monospace; font-size: 14px; color: #7dd3fc;
+  margin-bottom: 12px;
+}
+.mem-room-id span { color: #38bdf8; font-size: 22px; letter-spacing: 4px; }
+.mem-spinner {
+  width: 36px; height: 36px; border: 3px solid rgba(56,189,248,0.2);
+  border-top-color: #38bdf8; border-radius: 50%; animation: spin 1s linear infinite;
+  margin: 16px auto 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.hidden { display: none !important; }
+
+/* GAME HEADER */
+.mem-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; gap: 8px;
+}
+.mem-player {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 10px 14px; border-radius: 12px; border: 2px solid rgba(56,189,248,0.15);
+  background: rgba(56,189,248,0.04); transition: all 0.3s; flex: 1; min-width: 0;
+}
+.mem-player.active { border-color: #38bdf8; background: rgba(56,189,248,0.12); }
+.mem-player span:first-child { font-size: 12px; color: #7dd3fc; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.mem-pscore { font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 900; color: #38bdf8; }
+.p1 .mem-pscore { color: #38bdf8; }
+.p2 .mem-pscore { color: #f472b6; }
+.mem-center-info { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.mem-timer { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 900; color: #e0f2fe; }
+
+.mem-turn {
+  text-align: center; font-size: 13px; font-weight: 700; color: #38bdf8;
+  padding: 6px; margin-bottom: 10px;
+}
+
+/* BOARD */
+.mem-board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px; margin-bottom: 16px;
+}
+
+.mem-card {
+  aspect-ratio: 1; border-radius: 10px; cursor: pointer;
+  perspective: 600px; position: relative;
+}
+.mem-card-inner {
+  width: 100%; height: 100%; position: relative;
+  transform-style: preserve-3d; transition: transform 0.4s;
+}
+.mem-card.flipped .mem-card-inner,
+.mem-card.matched .mem-card-inner { transform: rotateY(180deg); }
+
+.mem-card-front, .mem-card-back {
+  position: absolute; inset: 0; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  backface-visibility: hidden;
+}
+.mem-card-front {
+  background: linear-gradient(135deg, #0c2a45, #0e3a5e);
+  border: 1.5px solid rgba(56,189,248,0.25);
+  font-size: 22px; color: #1a4a6e;
+}
+.mem-card-front::after { content: '?'; font-family: 'Orbitron', monospace; font-size: 18px; color: rgba(56,189,248,0.4); font-weight: 900; }
+.mem-card-back {
+  background: rgba(56,189,248,0.1);
+  border: 1.5px solid rgba(56,189,248,0.4);
+  font-size: 28px; transform: rotateY(180deg);
+}
+.mem-card.matched .mem-card-back {
+  background: rgba(52,211,153,0.15);
+  border-color: #34d399;
+}
+.mem-card:not(.flipped):not(.matched):hover .mem-card-front {
+  background: linear-gradient(135deg, #0e3355, #113d6e);
+  border-color: rgba(56,189,248,0.5);
+}
+
+/* RESULT */
+.mem-res-stats {
+  display: flex; justify-content: center; gap: 20px;
+  flex-wrap: wrap; margin-bottom: 24px;
+}
+.mem-res-stat {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 14px 20px; border-radius: 12px;
+  background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.2);
+}
+.mem-res-stat-val { font-family: 'Orbitron', monospace; font-size: 24px; font-weight: 900; color: #38bdf8; }
+.mem-res-stat-label { font-size: 12px; color: #7dd3fc; font-weight: 600; }
+
+@media (max-width: 400px) {
+  .mem-board { gap: 5px; }
+  .mem-card-back { font-size: 20px; }
+}

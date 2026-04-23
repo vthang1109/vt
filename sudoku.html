@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Sudoku</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="sudoku.css"/>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav>
+    <div class="logo" onclick="window.location.href='games.html'" style="cursor:pointer">
+      <span class="logo-vt">VT</span><span class="logo-world">World</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700"></span>
+      <span id="nav-coins" style="font-family:'Orbitron',monospace;font-size:13px;color:#fbbf24;font-weight:700"></span>
+      <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="window.location.href='games.html'">← Games</button>
+    </div>
+  </nav>
+
+  <div class="sudoku-container">
+
+    <!-- CHỌN ĐỘ KHÓ -->
+    <div id="screen-diff" class="sdk-screen">
+      <h2 class="sdk-title">🔢 Sudoku</h2>
+      <p class="sdk-sub">Điền số 1–9 vào mỗi hàng, cột và ô 3×3 — không trùng lặp</p>
+      <div class="diff-grid">
+        <div class="diff-card easy" onclick="startGame('easy')">
+          <span class="diff-emoji">😊</span>
+          <span class="diff-name">Dễ</span>
+          <span class="diff-desc">36 ô trống</span>
+          <div class="diff-reward">
+            <span class="rw-pts">+60 điểm</span>
+            <span class="rw-coins">+15 🪙</span>
+          </div>
+        </div>
+        <div class="diff-card medium" onclick="startGame('medium')">
+          <span class="diff-emoji">😤</span>
+          <span class="diff-name">Trung bình</span>
+          <span class="diff-desc">46 ô trống</span>
+          <div class="diff-reward">
+            <span class="rw-pts">+100 điểm</span>
+            <span class="rw-coins">+25 🪙</span>
+          </div>
+        </div>
+        <div class="diff-card hard" onclick="startGame('hard')">
+          <span class="diff-emoji">😈</span>
+          <span class="diff-name">Khó</span>
+          <span class="diff-desc">52 ô trống</span>
+          <div class="diff-reward">
+            <span class="rw-pts">+150 điểm</span>
+            <span class="rw-coins">+40 🪙</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- THỐNG KÊ -->
+      <div class="sdk-stats">
+        <div class="stat-item">
+          <span class="stat-val" id="stat-played">0</span>
+          <span class="stat-lbl">Ván đã chơi</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-val" id="stat-won">0</span>
+          <span class="stat-lbl">Ván thắng</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-val gold" id="stat-coins">0 🪙</span>
+          <span class="stat-lbl">Xu tích lũy</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME BOARD -->
+    <div id="screen-game" class="sdk-screen hidden">
+      <!-- HEADER -->
+      <div class="sdk-header">
+        <div class="sdk-info-row">
+          <div class="sdk-badge" id="diff-badge">Dễ</div>
+          <div class="sdk-timer" id="sdk-timer">00:00</div>
+          <div class="sdk-lives">
+            <span id="life1">❤️</span>
+            <span id="life2">❤️</span>
+            <span id="life3">❤️</span>
+          </div>
+        </div>
+        <div class="sdk-progress-wrap">
+          <div class="sdk-progress-bar" id="sdk-progress"></div>
+        </div>
+      </div>
+
+      <!-- BOARD -->
+      <div class="sdk-board-wrap">
+        <table class="sdk-board" id="sdk-board"></table>
+      </div>
+
+      <!-- NUMPAD -->
+      <div class="sdk-numpad">
+        <button class="num-btn" onclick="inputNum(1)">1</button>
+        <button class="num-btn" onclick="inputNum(2)">2</button>
+        <button class="num-btn" onclick="inputNum(3)">3</button>
+        <button class="num-btn" onclick="inputNum(4)">4</button>
+        <button class="num-btn" onclick="inputNum(5)">5</button>
+        <button class="num-btn" onclick="inputNum(6)">6</button>
+        <button class="num-btn" onclick="inputNum(7)">7</button>
+        <button class="num-btn" onclick="inputNum(8)">8</button>
+        <button class="num-btn" onclick="inputNum(9)">9</button>
+        <button class="num-btn erase" onclick="inputNum(0)">⌫</button>
+        <button class="num-btn hint-btn" onclick="useHint()" id="hint-btn">💡 Gợi ý</button>
+        <button class="num-btn note-btn" onclick="toggleNoteMode()" id="note-btn">✏️ Nháp</button>
+      </div>
+
+      <div class="sdk-controls">
+        <button class="caro-btn" onclick="goToDiffSelect()">🏠 Đổi độ khó</button>
+        <button class="caro-btn" onclick="restartSame()">🔄 Ván mới</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RESULT MODAL -->
+  <div id="result-modal" class="result-modal hidden">
+    <div class="result-box">
+      <div class="result-emoji" id="result-emoji">🏆</div>
+      <div class="result-title" id="result-title">Hoàn thành!</div>
+      <div class="result-time" id="result-time"></div>
+      <div class="result-rewards" id="result-rewards"></div>
+      <button class="caro-btn green" onclick="restartSame()">🔄 Chơi lại</button>
+      <button class="caro-btn" onclick="goToDiffSelect()">🏠 Chọn độ khó</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="caro-toast"></div>
+
+  <script type="module" src="sudoku.js"></script>
+</body>
+</html>

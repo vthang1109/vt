@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VTWorld — Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #0f172a; color: white; font-family: 'Nunito', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+    .admin-card { background: #1e293b; padding: 30px; border-radius: 20px; border: 1px solid #0ea5e9; box-shadow: 0 0 20px rgba(14, 165, 233, 0.2); width: 350px; text-align: center; }
+    h2 { font-family: 'Orbitron'; color: #0ea5e9; margin-bottom: 20px; }
+    .stats { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #facc15; }
+    .points-val { font-size: 24px; font-weight: 800; color: #facc15; }
+    input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; box-sizing: border-box; }
+    .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.2s; width: 100%; }
+    .btn-add { background: #10b981; color: white; }
+    .btn-sub { background: #ef4444; color: white; }
+    .btn-reset { background: #64748b; color: white; grid-column: span 2; margin-top: 10px; }
+    button:hover { opacity: 0.8; transform: scale(0.98); }
+    #admin-content { display: none; }
+    .status-msg { font-size: 12px; color: #94a3b8; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <div class="admin-card">
+    <h2>VTWorld Admin</h2>
+
+    <div id="login-form">
+      <input type="password" id="pass-input" placeholder="Mật khẩu Admin...">
+      <button class="btn-add" onclick="checkPass()">Xác nhận</button>
+    </div>
+
+    <div id="admin-content">
+      <div class="stats">
+        <div style="font-size: 14px; color: #94a3b8;">Số dư tài khoản đang đăng nhập</div>
+        <div class="points-val" id="current-points">0</div>
+      </div>
+
+      <input type="number" id="points-amount" placeholder="Nhập số điểm...">
+      
+      <div class="btn-group">
+        <button class="btn-add" onclick="adjustPoints(1)">+ CỘNG ĐIỂM</button>
+        <button class="btn-sub" onclick="adjustPoints(-1)">- TRỪ ĐIỂM</button>
+        <button class="btn-reset" onclick="resetPoints()">RESET VỀ 0</button>
+      </div>
+      <p class="status-msg" id="db-status">Đang kết nối Firebase...</p>
+    </div>
+  </div>
+
+  <script type="module">
+    // 1. TỰ IMPORT FIREBASE TRONG FILE NÀY LUÔN
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
+      authDomain: "lienquan-fake.firebaseapp.com",
+      projectId: "lienquan-fake",
+      storageBucket: "lienquan-fake.firebasestorage.app",
+      messagingSenderId: "782694799992",
+      appId: "1:782694799992:web:2d8e4a28626c3bbae8ab8d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const ADMIN_PASS = "123";
+
+    // 2. GẮN HÀM VÀO WINDOW ĐỂ NÚT BẤM GỌI ĐƯỢC
+    window.checkPass = () => {
+      const pass = document.getElementById('pass-input').value;
+      if (pass === ADMIN_PASS) {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('admin-content').style.display = 'block';
+        window.updateDisplay();
+      } else {
+        alert('Sai mật khẩu!');
+      }
+    };
+
+    window.updateDisplay = async () => {
+      const user = auth.currentUser;
+      const status = document.getElementById('db-status');
+      if (!user) {
+        status.textContent = "Chưa đăng nhập! Hãy đăng nhập ở trang chủ.";
+        status.style.color = "#ef4444";
+        return;
+      }
+
+      try {
+        const userRef = doc(db, 'users', user.uid);
+        const snap = await getDoc(userRef);
+        if (snap.exists()) {
+          const pts = snap.data().points || 0;
+          document.getElementById('current-points').textContent = Number(pts).toLocaleString();
+          status.textContent = "Đã kết nối: " + user.email;
+          status.style.color = "#10b981";
+        }
+      } catch (e) {
+        console.error(e);
+        status.textContent = "Lỗi kết nối Database!";
+      }
+    };
+
+    window.adjustPoints = async (multiplier) => {
+      const user = auth.currentUser;
+      const input = document.getElementById('points-amount');
+      const amt = parseInt(input.value);
+
+      if (!user) return alert("Bạn phải đăng nhập ở trang chủ trước!");
+      if (isNaN(amt) || amt <= 0) return alert("Nhập số điểm hợp lệ!");
+
+      try {
+        const userRef = doc(db, 'users', user.uid);
+        const snap = await getDoc(userRef);
+        let current = snap.exists() ? (snap.data().points || 0) : 0;
+        
+        let newTotal = current + (amt * multiplier);
+        if (newTotal < 0) newTotal = 0;
+
+        await updateDoc(userRef, {
+          points: newTotal,
+          lastAdminUpdate: serverTimestamp()
+        });
+
+        await window.updateDisplay();
+        input.value = '';
+        alert("Thành công!");
+      } catch (e) {
+        alert("Lỗi: " + e.message);
+      }
+    };
+
+    window.resetPoints = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      if (confirm("Reset điểm về 0?")) {
+        try {
+          await updateDoc(doc(db, 'users', user.uid), { points: 0 });
+          await window.updateDisplay();
+        } catch (e) { alert("Lỗi!"); }
+      }
+    };
+
+    // Theo dõi trạng thái login
+    onAuthStateChanged(auth, () => {
+      if (document.getElementById('admin-content').style.display === 'block') {
+        window.updateDisplay();
+      }
+    });
+
+    // Enter để xác nhận
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        if (document.getElementById('login-form').style.display !== 'none') window.checkPass();
+      }
+    });
+  </script>
+</body>
+</html>

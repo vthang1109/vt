@@ -1,0 +1,150 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getPoints } from './points.js';
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
+  authDomain: "lienquan-fake.firebaseapp.com",
+  projectId: "lienquan-fake",
+  storageBucket: "lienquan-fake.firebasestorage.app",
+  messagingSenderId: "782694799992",
+  appId: "1:782694799992:web:2d8e4a28626c3bbae8ab8d"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// ===== PARTICLE CANVAS =====
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+for (let i = 0; i < 40; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    r: Math.random() * 1.5 + 0.5,
+  });
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(56,189,248,0.5)';
+    ctx.fill();
+  });
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 100) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(56,189,248,${0.07 * (1 - d/100)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ===== PAGE NAVIGATION =====
+window.showPage = function(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+}
+
+// ===== AUTH =====
+window.doLogin = async function() {
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-err');
+  err.textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    // onAuthStateChanged sẽ tự xử lý chuyển về landing
+  } catch(e) {
+    if (e.code === 'auth/user-not-found') err.textContent = 'Tài khoản không tồn tại';
+    else if (e.code === 'auth/wrong-password') err.textContent = 'Sai mật khẩu';
+    else if (e.code === 'auth/invalid-email') err.textContent = 'Email không hợp lệ';
+    else err.textContent = 'Đăng nhập thất bại, thử lại!';
+  }
+}
+
+window.doRegister = async function() {
+  const email = document.getElementById('reg-email').value;
+  const pass = document.getElementById('reg-pass').value;
+  const err = document.getElementById('reg-err');
+  err.textContent = '';
+  try {
+    await createUserWithEmailAndPassword(auth, email, pass);
+    // onAuthStateChanged sẽ tự xử lý
+  } catch(e) {
+    if (e.code === 'auth/email-already-in-use') err.textContent = 'Email đã được dùng';
+    else if (e.code === 'auth/invalid-email') err.textContent = 'Email không hợp lệ';
+    else if (e.code === 'auth/weak-password') err.textContent = 'Mật khẩu tối thiểu 6 ký tự';
+    else err.textContent = 'Đăng ký thất bại, thử lại!';
+  }
+}
+
+window.doLogout = async function() {
+  await signOut(auth);
+}
+
+// ===== AUTH STATE =====
+onAuthStateChanged(auth, async (user) => {
+  const infoBar   = document.getElementById('user-info-bar');
+  const authBtns  = document.getElementById('auth-btn-row');
+  const nameEl    = document.getElementById('user-display-name');
+  const avatarEl  = document.getElementById('user-avatar-char');
+  const pointsEl  = document.getElementById('user-points-home');
+
+  if (user) {
+    // Về trang chủ landing
+    showPage('landing');
+
+    // Hiện user info bar, ẩn nút đăng nhập/đăng ký
+    if (infoBar)  infoBar.style.display  = 'flex';
+    if (authBtns) authBtns.style.display = 'none';
+
+    // Điền tên + avatar chữ cái
+    const name = user.displayName || user.email.split('@')[0];
+    if (nameEl)   nameEl.textContent   = name;
+    if (avatarEl) avatarEl.textContent = name[0].toUpperCase();
+
+    // Lấy điểm từ Firestore
+    try {
+      const pts = await getPoints();
+      if (pointsEl) pointsEl.textContent = pts.toLocaleString();
+    } catch(e) {
+      if (pointsEl) pointsEl.textContent = '0';
+    }
+
+  } else {
+    // Chưa đăng nhập — hiện nút auth, ẩn user bar
+    if (infoBar)  infoBar.style.display  = 'none';
+    if (authBtns) authBtns.style.display = 'flex';
+    showPage('landing');
+  }
+});

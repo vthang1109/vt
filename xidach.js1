@@ -1,0 +1,228 @@
+import { createDeck, renderCardUI } from './cards.js';
+import { addPoints, getPoints } from './points.js';
+
+class XiDach {
+    constructor() {
+        this.deck = [];
+        this.mode = 'solo';
+        this.dealer = { hand: [], score: 0 };
+        this.players = [];
+        this.activeIdx = 0;
+        this.isBusy = false;
+        this.currentBet = 0;
+        this.balance = 0;
+        
+        this.init();
+    }
+
+    async init() { 
+        await this.refreshPts(); 
+        this.bindEvents(); // Gán sự kiện cho các nút
+        window.game = this; // Vẫn giữ để dự phòng
+    }
+
+    // Gán sự kiện thủ công thay vì dùng onclick trong HTML
+    bindEvents() {
+        // Sự kiện cho các nút cược
+        document.querySelectorAll('.bet-opt').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const amt = btn.getAttribute('data-amount');
+                this.placeBet(amt === 'all' ? 'all' : parseInt(amt));
+            });
+        });
+    }
+
+    async refreshPts() {
+        this.balance = await getPoints();
+        const el = document.getElementById('nav-pts');
+        if (el) el.textContent = '⭐ ' + this.balance.toLocaleString();
+    }
+
+    showModes() {
+        document.getElementById('mode-selector').classList.add('active');
+        document.getElementById('bet-selector').classList.remove('active');
+        this.resetTable();
+    }
+
+    setMode(m) {
+        this.mode = m;
+        document.getElementById('mode-selector').classList.remove('active');
+        this.showBetting();
+    }
+
+    async showBetting() {
+        await this.refreshPts();
+        document.getElementById('current-balance').textContent = `Số dư: ⭐ ${this.balance.toLocaleString()}`;
+        document.getElementById('bet-selector').classList.add('active');
+        this.resetTable();
+    }
+
+    async placeBet(amount) {
+        if (amount === 'all') amount = this.balance;
+        if (amount <= 0 || amount > this.balance) {
+            alert("Tiền không đủ hoặc không hợp lệ!");
+            return;
+        }
+        this.currentBet = amount;
+        document.getElementById('bet-selector').classList.remove('active');
+        this.startDeal();
+    }
+
+    resetTable() {
+        this.players = [];
+        this.dealer.hand = [];
+        this.isBusy = false;
+        this.render(false);
+    }
+
+    async startDeal() {
+        if (this.isBusy) return;
+        this.isBusy = true;
+        this.deck = createDeck();
+        this.dealer.hand = [this.deck.pop(), this.deck.pop()];
+        const count = this.mode === 'online' ? 3 : 1;
+        this.players = Array.from({length: count}, () => ({ 
+            hand: [this.deck.pop(), this.deck.pop()], 
+            status: 'playing', 
+            result: '' 
+        }));
+        this.activeIdx = 0;
+        document.getElementById('btn-deal').disabled = true;
+        this.checkEarlyWins();
+    }
+
+    async checkEarlyWins() {
+        const dType = this.checkSpecials(this.dealer.hand);
+        let anyActive = false;
+        for (let p of this.players) {
+            const pType = this.checkSpecials(p.hand);
+            if (pType || dType) {
+                p.status = 'done';
+                if (pType === 'AA' && dType !== 'AA') p.result = 'AA';
+                else if (pType === 'XD' && !dType) p.result = 'XD';
+                else if (pType === dType && pType) p.result = 'HÒA';
+                else if (dType) p.result = 'THUA';
+            } else anyActive = true;
+        }
+        this.render(false);
+        if (!anyActive) this.dealerTurn();
+        else { this.isBusy = false; this.findNext(); }
+    }
+
+    updateUI() {
+        const p = this.players[this.activeIdx];
+        if (!p) return;
+        const sc = this.getScore(p.hand);
+        const canStand = sc >= 16;
+        document.getElementById('btn-hit').disabled = (sc >= 21 || p.hand.length >= 5);
+        document.getElementById('btn-stand').disabled = !canStand;
+        document.getElementById('status-msg').textContent = `CƯỢC: ⭐${this.currentBet.toLocaleString()}`;
+        this.render(false);
+    }
+
+    hit() {
+        if (this.isBusy) return;
+        const p = this.players[this.activeIdx];
+        p.hand.push(this.deck.pop());
+        if (this.getScore(p.hand) > 21) { p.status = 'done'; this.next(); }
+        else if (p.hand.length === 5) { p.status = 'done'; p.result = 'NGŨ LINH'; this.next(); }
+        else this.updateUI();
+    }
+
+    stand() { if (this.isBusy) return; this.players[this.activeIdx].status = 'done'; this.next(); }
+    next() { this.activeIdx++; this.findNext(); }
+    
+    findNext() {
+        while (this.activeIdx < this.players.length && this.players[this.activeIdx].status === 'done') this.activeIdx++;
+        if (this.activeIdx >= this.players.length) this.dealerTurn();
+        else this.updateUI();
+    }
+
+    async dealerTurn() {
+        this.isBusy = true;
+        this.render(true);
+        await new Promise(r => setTimeout(r, 800));
+        while (this.getScore(this.dealer.hand) < 17) {
+            this.dealer.hand.push(this.deck.pop());
+            this.render(true);
+            await new Promise(r => setTimeout(r, 800));
+        }
+        this.endGame();
+    }
+
+    async endGame() {
+        const dS = this.getScore(this.dealer.hand);
+        for (let p of this.players) {
+            if (p.result && p.result !== 'THUA') continue;
+            const pS = this.getScore(p.hand);
+            if (pS > 21 && dS > 21) p.result = 'HÒA';
+            else if (pS > 21) p.result = 'THUA';
+            else if (dS > 21) p.result = 'THẮNG';
+            else if (pS > dS) p.result = 'THẮNG';
+            else if (pS === dS) p.result = 'HÒA';
+            else p.result = 'THUA';
+        }
+        this.render(true);
+        document.getElementById('btn-deal').disabled = false;
+        this.isBusy = false;
+        this.processPayouts();
+    }
+
+    async processPayouts() {
+        let totalChange = 0;
+        for (let p of this.players) {
+            if (['AA', 'XD', 'NGŨ LINH', 'THẮNG'].includes(p.result)) totalChange += this.currentBet;
+            else if (p.result === 'THUA') totalChange -= this.currentBet;
+        }
+        if (totalChange !== 0) await addPoints('Casino', 'Xì Dách', totalChange);
+        await this.refreshPts();
+    }
+
+    getScore(hand) {
+        let score = 0, aces = 0;
+        for (let c of hand) {
+            if (c.v === 'A') { aces++; score += 11; }
+            else if (['J', 'Q', 'K'].includes(c.v)) score += 10;
+            else score += parseInt(c.v);
+        }
+        while (score > 21 && aces > 0) { score -= 10; aces--; }
+        return score;
+    }
+
+    checkSpecials(hand) {
+        if (hand.length !== 2) return null;
+        const v = [hand[0].v, hand[1].v];
+        if (v[0] === 'A' && v[1] === 'A') return 'AA';
+        if (v.includes('A') && (v.includes('10') || v.includes('J') || v.includes('Q') || v.includes('K'))) return 'XD';
+        return null;
+    }
+
+    render(showDealer = false) {
+        const dH = document.getElementById('dealer-hand');
+        if (dH) {
+            dH.innerHTML = this.dealer.hand.map((c, i) => renderCardUI(c, !showDealer)).join('');
+            document.getElementById('dealer-score-label').textContent = showDealer && this.dealer.hand.length > 0 ? `(${this.getScore(this.dealer.hand)})` : '';
+        }
+        const container = document.getElementById('game-table');
+        if (container) {
+            container.innerHTML = this.players.map((p, i) => {
+                let ovClass = '', ovText = '';
+                const isFinal = showDealer || ['AA', 'XD'].includes(p.result);
+                if (p.result && isFinal) {
+                    if (['AA', 'XD', 'NGŨ LINH'].includes(p.result)) { ovClass = 'result-special'; ovText = p.result; }
+                    else if (p.result === 'HÒA') { ovClass = 'result-draw'; ovText = 'HÒA'; }
+                    else if (p.result === 'THẮNG') { ovClass = 'result-win'; ovText = `+${this.currentBet}`; }
+                    else { ovClass = 'result-lose'; ovText = `-${this.currentBet}`; }
+                }
+                return `<div class="player-hand ${i === this.activeIdx && p.status === 'playing' ? 'active' : ''}">
+                        ${ovText ? `<div class="result-overlay ${ovClass}">${ovText}</div>` : ''}
+                        <div class="hand">${p.hand.map(c => renderCardUI(c)).join('')}</div>
+                        <div class="badge">${this.getScore(p.hand)}</div>
+                    </div>`;
+            }).join('');
+        }
+    }
+}
+
+// Khởi tạo
+const game = new XiDach();

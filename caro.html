@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Caro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="caro.css"/>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav>
+    <div class="logo" onclick="window.location.href='games.html'" style="cursor:pointer">
+      <span class="logo-vt">VT</span><span class="logo-world">World</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700"></span>
+      <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="window.location.href='games.html'">← Games</button>
+    </div>
+  </nav>
+
+  <div class="caro-container">
+
+    <!-- CHỌN CHẾ ĐỘ -->
+    <div id="screen-mode" class="caro-screen">
+      <h2 class="caro-screen-title">♟️ Chọn chế độ chơi</h2>
+      <div class="mode-grid">
+        <div class="mode-card" onclick="selectMode('tictactoe')">
+          <span class="mode-emoji">⭕</span>
+          <span class="mode-name">TicTacToe</span>
+          <span class="mode-desc">Bàn 3×3 · Thắng 3 ô</span>
+        </div>
+        <div class="mode-card" onclick="selectMode('caro')">
+          <span class="mode-emoji">♟️</span>
+          <span class="mode-name">Caro</span>
+          <span class="mode-desc">Bàn 15×15 · Thắng 5 ô</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHỌN KIỂU CHƠI -->
+    <div id="screen-type" class="caro-screen hidden">
+      <h2 class="caro-screen-title" id="type-title">Chọn kiểu chơi</h2>
+      <div class="mode-grid">
+        <div class="mode-card" onclick="selectType('bot')">
+          <span class="mode-emoji">🤖</span>
+          <span class="mode-name">vs Máy</span>
+          <span class="mode-desc">Chơi một mình</span>
+        </div>
+        <div class="mode-card" onclick="selectType('local')">
+          <span class="mode-emoji">👥</span>
+          <span class="mode-name">2 Người</span>
+          <span class="mode-desc">Cùng 1 màn hình</span>
+        </div>
+        <div class="mode-card" onclick="selectType('online')">
+          <span class="mode-emoji">🌐</span>
+          <span class="mode-name">Online</span>
+          <span class="mode-desc">Chơi với bạn bè</span>
+        </div>
+      </div>
+      <button class="caro-back-btn" onclick="goBack('screen-mode')">← Quay lại</button>
+    </div>
+
+    <!-- CHỌN ĐỘ KHÓ (vs Bot) -->
+    <div id="screen-difficulty" class="caro-screen hidden">
+      <h2 class="caro-screen-title">Chọn độ khó</h2>
+      <div class="mode-grid">
+        <div class="mode-card" onclick="startGame('easy')">
+          <span class="mode-emoji">😊</span>
+          <span class="mode-name">Dễ</span>
+          <span class="mode-desc">Máy đánh ngẫu nhiên</span>
+        </div>
+        <div class="mode-card" onclick="startGame('medium')">
+          <span class="mode-emoji">😤</span>
+          <span class="mode-name">Trung bình</span>
+          <span class="mode-desc">Máy biết chặn</span>
+        </div>
+        <div class="mode-card" onclick="startGame('hard')">
+          <span class="mode-emoji">😈</span>
+          <span class="mode-name">Khó</span>
+          <span class="mode-desc">AI thông minh</span>
+        </div>
+      </div>
+      <button class="caro-back-btn" onclick="goBack('screen-type')">← Quay lại</button>
+    </div>
+
+    <!-- ONLINE ROOM -->
+    <div id="screen-online" class="caro-screen hidden">
+      <h2 class="caro-screen-title">🌐 Chơi Online</h2>
+      <div class="online-box">
+        <button class="caro-btn green" onclick="doCreateRoom()">➕ Tạo phòng mới</button>
+        <div class="online-divider">hoặc</div>
+        <div class="online-join-row">
+          <input id="room-input" class="caro-input" placeholder="Nhập Room ID (6 số)..." maxlength="6" type="number"/>
+          <button class="caro-btn" onclick="doJoinRoom()">Vào phòng</button>
+        </div>
+        <p id="online-err" class="caro-err"></p>
+      </div>
+      <button class="caro-back-btn" onclick="goBack('screen-type')">← Quay lại</button>
+    </div>
+
+    <!-- PHÒNG CHỜ -->
+    <div id="screen-waiting" class="caro-screen hidden">
+      <h2 class="caro-screen-title">⏳ Chờ đối thủ...</h2>
+      <div class="waiting-box">
+        <div class="room-id-display">
+          <span class="room-id-label">Room ID</span>
+          <span class="room-id-val" id="waiting-room-id">------</span>
+          <button class="copy-btn" onclick="copyRoomId()">📋 Copy</button>
+        </div>
+        <p style="color:#7dd3fc;font-size:13px;margin-top:8px">Gửi Room ID cho bạn bè để vào phòng</p>
+        <div class="waiting-spinner"></div>
+      </div>
+      <button class="caro-back-btn" onclick="cancelRoom()">✕ Huỷ phòng</button>
+    </div>
+
+    <!-- GAME BOARD -->
+    <div id="screen-game" class="caro-screen hidden">
+      <div class="caro-header">
+        <div class="caro-players">
+          <div class="player-tag" id="player1-tag">
+            <span class="player-symbol x">✕</span>
+            <span id="player1-name">Bạn</span>
+          </div>
+          <div class="caro-score">
+            <span id="score-p1">0</span>
+            <span class="score-sep">:</span>
+            <span id="score-p2">0</span>
+          </div>
+          <div class="player-tag right" id="player2-tag">
+            <span id="player2-name">Máy</span>
+            <span class="player-symbol o">○</span>
+          </div>
+        </div>
+        <div class="caro-status" id="caro-status">⚔️ Lượt của bạn</div>
+      </div>
+
+      <div class="caro-board-wrap">
+        <canvas id="caro-canvas"></canvas>
+      </div>
+
+      <div class="caro-controls">
+        <button class="caro-btn" onclick="restartGame()">🔄 Ván mới</button>
+        <button class="caro-btn" onclick="goToModeSelect()">🏠 Đổi chế độ</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RESULT MODAL -->
+  <div id="result-modal" class="result-modal hidden">
+    <div class="result-box">
+      <div class="result-emoji" id="result-emoji">🏆</div>
+      <div class="result-title" id="result-title">Bạn thắng!</div>
+      <div class="result-pts" id="result-pts"></div>
+      <button class="caro-btn green" onclick="restartGame()">🔄 Chơi lại</button>
+      <button class="caro-btn" onclick="goToModeSelect()">🏠 Đổi chế độ</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="caro-toast"></div>
+
+  <script type="module" src="caro.js"></script>
+</body>
+</html>

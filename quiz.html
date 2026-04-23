@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="quiz.css"/>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+
+  <nav>
+    <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
+      <span class="logo-vt">VT</span><span class="logo-world">World</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700"></span>
+      <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="location.href='games.html'">← Games</button>
+    </div>
+  </nav>
+
+  <div class="qz-container">
+
+    <!-- MENU -->
+    <div id="screen-menu" class="qz-screen active">
+      <div class="qz-logo">❓</div>
+      <h2 class="qz-title">Quiz VTWorld</h2>
+      <p class="qz-sub">200 câu hỏi · Mix chủ đề · 45 giây/câu · 4 quyền trợ giúp</p>
+      <div class="qz-help-preview">
+        <span title="50/50">✂️</span>
+        <span title="Hỏi khán giả">👥</span>
+        <span title="Thêm thời gian">⏰</span>
+        <span title="Bỏ qua câu">⏭️</span>
+      </div>
+      <p style="color:#7dd3fc;font-size:13px;margin-bottom:20px">✂️ 50/50 &nbsp;👥 Hỏi khán giả &nbsp;⏰ +15s &nbsp;⏭️ Bỏ qua</p>
+      <div class="qz-mode-grid">
+        <div class="qz-mode-card" onclick="Quiz.start(15)">
+          <span class="qz-mode-num">15</span>
+          <span>câu hỏi</span>
+          <span class="qz-mode-pts">+60đ max</span>
+        </div>
+        <div class="qz-mode-card" onclick="Quiz.start(30)">
+          <span class="qz-mode-num">30</span>
+          <span>câu hỏi</span>
+          <span class="qz-mode-pts">+120đ max</span>
+        </div>
+        <div class="qz-mode-card" onclick="Quiz.start(50)">
+          <span class="qz-mode-num">50</span>
+          <span>câu hỏi</span>
+          <span class="qz-mode-pts">+200đ max</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME -->
+    <div id="screen-game" class="qz-screen">
+      <div class="qz-top">
+        <div class="qz-progress-wrap"><div class="qz-progress-bar" id="qz-prog"></div></div>
+        <div class="qz-meta">
+          <span id="qz-count">1/15</span>
+          <div class="qz-timer-wrap">
+            <svg class="qz-timer-svg" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(56,189,248,0.15)" stroke-width="3"/>
+              <circle id="qz-ring" cx="18" cy="18" r="15.9" fill="none" stroke="#38bdf8" stroke-width="3"
+                stroke-dasharray="100 100" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+            </svg>
+            <span id="qz-timer">45</span>
+          </div>
+          <span id="qz-score-live">⭐ 0</span>
+        </div>
+      </div>
+
+      <!-- Lifelines -->
+      <div class="qz-lifelines">
+        <button id="ll-5050" class="qz-ll" onclick="Quiz.use5050()" title="Loại 2 đáp án sai">✂️ 50/50</button>
+        <button id="ll-audience" class="qz-ll" onclick="Quiz.useAudience()" title="Xem gợi ý">👥 Khán giả</button>
+        <button id="ll-time" class="qz-ll" onclick="Quiz.useTime()" title="Thêm 15 giây">⏰ +15s</button>
+        <button id="ll-skip" class="qz-ll" onclick="Quiz.useSkip()" title="Bỏ qua câu này">⏭️ Bỏ qua</button>
+      </div>
+
+      <!-- Audience hint -->
+      <div id="qz-audience" class="qz-audience hidden"></div>
+
+      <div class="qz-question" id="qz-question">Câu hỏi...</div>
+      <div class="qz-options" id="qz-options"></div>
+      <div id="qz-feedback" class="qz-feedback hidden"></div>
+    </div>
+
+    <!-- RESULT -->
+    <div id="screen-result" class="qz-screen">
+      <div id="res-emoji" class="qz-res-emoji">🏆</div>
+      <div id="res-title" class="qz-res-title">Hoàn thành!</div>
+      <div class="qz-res-stats">
+        <div class="qz-res-stat"><span id="res-correct" class="qz-res-val green">0</span><span>Đúng</span></div>
+        <div class="qz-res-stat"><span id="res-wrong" class="qz-res-val red">0</span><span>Sai</span></div>
+        <div class="qz-res-stat"><span id="res-pts" class="qz-res-val">0</span><span>Điểm</span></div>
+      </div>
+      <button class="btn-primary" onclick="Quiz.showMenu()" style="margin:8px">🔄 Chơi lại</button>
+      <button class="btn-secondary" onclick="location.href='games.html'" style="margin:8px">← Games</button>
+    </div>
+
+  </div>
+
+  <script type="module" src="quiz.js"></script>
+</body>
+</html>

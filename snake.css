@@ -1,0 +1,58 @@
+.snake-container {
+  max-width: 500px; margin: 0 auto; padding: 20px 16px;
+  min-height: calc(100vh - 80px);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 10;
+}
+
+/* Quan trọng: Ẩn/Hiện dứt khoát */
+.snake-screen { display: none; width: 100%; opacity: 0; }
+.snake-screen.active { display: block !important; opacity: 1; }
+
+.snake-logo { font-size: 64px; text-align: center; margin-bottom: 10px; }
+.snake-title { font-family: 'Orbitron', monospace; font-size: 28px; font-weight: 900; color: #e0f2fe; text-align: center; margin-bottom: 24px; }
+
+.speed-select { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+.speed-btn {
+  padding: 12px; border-radius: 12px; border: 1px solid rgba(56,189,248,0.2);
+  background: rgba(255,255,255,0.03); color: #7dd3fc; font-family: 'Orbitron', monospace;
+  font-weight: 700; cursor: pointer; transition: all 0.2s;
+}
+.speed-btn.active { background: rgba(56,189,248,0.2); border-color: #38bdf8; color: #38bdf8; }
+
+.start-btn {
+  width: 100%; padding: 18px; border-radius: 16px; border: none;
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+  color: #fff; font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(14,165,233,0.3);
+}
+
+.canvas-wrapper {
+  width: 100%; aspect-ratio: 1/1; background: #041428;
+  border-radius: 16px; border: 2px solid rgba(56,189,248,0.2);
+  overflow: hidden; margin-bottom: 20px;
+}
+#snake-canvas { width: 100%; height: 100%; display: block; }
+
+.game-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
+.score-box {
+  background: rgba(4,20,40,0.6); padding: 8px 16px; border-radius: 12px;
+  border: 1px solid rgba(56,189,248,0.2); font-family: 'Orbitron', monospace;
+  font-weight: 800; color: #e0f2fe;
+}
+
+.mobile-controls { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ctrl-row { display: flex; gap: 8px; }
+.ctrl-btn {
+  width: 60px; height: 60px; border-radius: 12px; border: 1px solid rgba(56,189,248,0.2);
+  background: rgba(56,189,248,0.1); color: #e0f2fe; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.res-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.res-stat {
+  background: rgba(56,189,248,0.06); padding: 16px; border-radius: 16px;
+  border: 1px solid rgba(56,189,248,0.15); text-align: center;
+}
+.res-val { display: block; font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900; color: #38bdf8; }
+.res-label { font-size: 11px; color: #7dd3fc; font-weight: 700; text-transform: uppercase; }

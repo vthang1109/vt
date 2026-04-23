@@ -1,0 +1,50 @@
+// points.js
+
+// Lấy điểm từ localStorage
+export async function getPoints() {
+    try {
+        const pts = localStorage.getItem('vtworld_points');
+        // Nếu chưa có điểm thì trả về 0 thay vì null/undefined
+        return pts ? parseInt(pts) : 0;
+    } catch (e) {
+        console.error("Lỗi getPoints:", e);
+        return 0;
+    }
+}
+
+// Thêm hoặc trừ điểm
+export async function addPoints(source, reason, amount) {
+    try {
+        let current = await getPoints();
+        let newTotal = current + amount;
+        
+        // Không cho phép điểm âm (tùy mày, nếu muốn cho nợ thì bỏ dòng này)
+        if (newTotal < 0) newTotal = 0;
+        
+        localStorage.setItem('vtworld_points', newTotal);
+        
+        // Lưu lịch sử (optional)
+        console.log(`[${source}] ${reason}: ${amount > 0 ? '+' : ''}${amount} => Tổng: ${newTotal}`);
+        
+        return newTotal;
+    } catch (e) {
+        console.error("Lỗi addPoints:", e);
+        throw e;
+    }
+}
+
+// Nhận quà hàng ngày
+export async function claimDailyLogin() {
+    const lastClaim = localStorage.getItem('vtworld_last_claim');
+    const today = new Date().toDateString();
+
+    if (lastClaim === today) {
+        return { claimed: false, points: 0 };
+    }
+
+    const bonus = 1000; // Tặng 1000 điểm mỗi ngày
+    await addPoints('Hệ thống', 'Đăng nhập hàng ngày', bonus);
+    localStorage.setItem('vtworld_last_claim', today);
+    
+    return { claimed: true, points: bonus };
+}

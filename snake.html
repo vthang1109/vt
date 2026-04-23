@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Snake</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="snake.css"/>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+
+  <nav>
+    <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
+      <span class="logo-vt">VT</span><span class="logo-world">World</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700">⭐ --</span>
+      <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="location.href='games.html'">← Games</button>
+    </div>
+  </nav>
+
+  <div class="snake-container">
+    <div id="screen-menu" class="snake-screen active">
+      <div class="snake-logo">🐍</div>
+      <h1 class="snake-title">Rắn Săn Mồi</h1>
+      <div class="speed-select">
+        <button class="speed-btn" data-speed="150">Dễ</button>
+        <button class="speed-btn active" data-speed="100">Vừa</button>
+        <button class="speed-btn" data-speed="60">Khó</button>
+      </div>
+      <button class="start-btn" id="btn-start">Bắt đầu chơi</button>
+    </div>
+
+    <div id="screen-game" class="snake-screen">
+      <div class="game-header">
+        <div class="score-box">🍎 <span id="current-score">0</span></div>
+        <div class="score-box">🏆 <span id="best-score">0</span></div>
+      </div>
+      <div class="canvas-wrapper"><canvas id="snake-canvas"></canvas></div>
+      <div class="mobile-controls">
+        <div class="ctrl-row"><button class="ctrl-btn" id="btn-up">▲</button></div>
+        <div class="ctrl-row">
+          <button class="ctrl-btn" id="btn-left">◀</button>
+          <button class="ctrl-btn" id="btn-down">▼</button>
+          <button class="ctrl-btn" id="btn-right">▶</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-result" class="snake-screen">
+      <div class="res-emoji">💀</div>
+      <h2 class="snake-title">Game Over!</h2>
+      <div class="res-stats">
+        <div class="res-stat"><span class="res-val" id="final-score">0</span><span class="res-label">Điểm số</span></div>
+        <div class="res-stat"><span class="res-val" id="earned-pts">+0</span><span class="res-label">Thưởng</span></div>
+      </div>
+      <button class="start-btn" id="btn-restart" style="margin-bottom:12px">Chơi lại</button>
+      <button class="speed-btn" id="btn-home" style="width:100%">Về menu</button>
+    </div>
+  </div>
+
+  <script type="module" src="snake.js"></script>
+</body>
+</html>

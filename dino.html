@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Dino Sunset 🦖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/> <link rel="stylesheet" href="dino.css"/>  </head>
+<body>
+  <nav>
+    <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
+      <span class="logo-vt">VT</span><span class="logo-world">World</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700">⭐ --</span>
+      <button class="btn-secondary" onclick="location.href='games.html'">← Thoát</button>
+    </div>
+  </nav>
+
+  <div class="dino-container">
+    <div id="screen-menu" class="dino-screen active">
+      <div class="dino-logo">🦖</div>
+      <h1 class="dino-title main-title">Dino Run</h1>
+      <p style="color:#e0f2fe; margin-bottom:10px; font-weight:600">Vượt xương rồng lúc hoàng hôn</p>
+      <div class="score-tag-info">🏆 100 điểm = 1 ⭐</div>
+      <button class="start-btn" id="btn-start">CHẠY NGAY</button>
+    </div>
+
+    <div id="screen-game" class="dino-screen">
+      <div class="game-ui">
+        <div class="score-tag">⭐ <span id="current-score">0</span></div>
+        <button id="btn-pause" class="pause-btn">⏸️</button>
+      </div>
+      <div class="canvas-wrapper">
+        <canvas id="dino-canvas"></canvas>
+      </div>
+      <div class="tap-hint" id="game-hint">Chạm để nhảy</div>
+    </div>
+
+    <div id="screen-result" class="dino-screen">
+      <div class="res-emoji">☠️</div>
+      <h2 class="dino-title">THẤT BẠI</h2>
+      <div class="res-stats">
+        <div class="res-stat"><span class="res-val" id="final-score">0</span><span class="res-label">Điểm</span></div>
+        <div class="res-stat"><span class="res-val" id="earned-pts">+0</span><span class="res-label">Thưởng</span></div>
+      </div>
+      <button class="start-btn" id="btn-restart" style="margin-bottom:12px">THỬ LẠI</button>
+      <button class="speed-btn" id="btn-home" style="width:100%">VỀ MENU</button>
+    </div>
+
+    <div id="pause-overlay" class="overlay">
+      <h2 class="dino-title">TẠM DỪNG</h2>
+      <button class="start-btn" id="btn-resume">TIẾP TỤC</button>
+    </div>
+  </div>
+
+  <script type="module" src="dino.js"></script>
+</body>
+</html>
