@@ -67,39 +67,61 @@ window.showToast = function(msg, type = 'info') {
 };
 
 // ===== CHAT STATE =====
-let currentConvoId   = '__server__';
+let currentConvoId   = 'server';
 let currentConvoName = '🌐 Chat toàn server';
 let currentConvoUid  = null;
 let _chatUnsubscribe = null;
 let _currentUser     = null;
 
-// ===== AUTH GUARD – chuyển hướng nếu chưa đăng nhập =====
+// ===== AUTH GUARD =====
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = 'index.html';
-    return;
-  }
+  if (!user) { window.location.href = 'index.html'; return; }
   _currentUser = user;
   await _initChat();
 });
 
-// ===== FIX 1: onSnapshot realtime trên doc user để re-render bạn bè tự động =====
+// ===== INIT =====
 async function _initChat() {
+  // FIX 1: onSnapshot lời mời → tự re-render khi lời mời bị xóa (sau accept/decline)
   _listenFriendRequests(_currentUser.uid);
 
-  // Lắng nghe realtime khi friends array thay đổi (cả 2 phía đều tự re-render)
-  onSnapshot(doc(db, 'users', _currentUser.uid), (snap) => {
-    if (snap.exists()) {
-      renderFriendsInChat();
+  // FIX 2: onSnapshot doc user của mình → khi phía kia accept → friends array thay đổi
+  // → snapshot bắn → fetch fresh data → re-render sidebar ngay, không dùng cache
+  onSnapshot(doc(db, 'users', _currentUser.uid), async (snap) => {
+    if (!snap.exists()) return;
+    const friendUids = snap.data().friends || [];
+    const friends = [];
+    for (const fuid of friendUids) {
+      const fs = await getDoc(doc(db, 'users', fuid));
+      if (fs.exists()) friends.push({ uid: fuid, ...fs.data() });
     }
+    _renderFriendsInChatFromList(friends);
   });
 
   renderAllUsersInChat();
-
-  // FIX 2: Lắng nghe DM đến từ bạn bè
   _listenIncomingDMs();
 
-  openConvo('__server__', '🌐 Chat toàn server', null, 'server');
+  // Đảm bảo room __server__ tồn tại (chat.html không load app.js)
+  try {
+    const serverRef = doc(db, 'chats', 'server');
+    const serverSnap = await getDoc(serverRef);
+    if (!serverSnap.exists()) {
+      console.log('Tạo room __server__...');
+      await setDoc(serverRef, { createdAt: serverTimestamp(), name: 'Global Chat', members: [] });
+      console.log('✅ Room __server__ đã tạo');
+    } else {
+      console.log('✅ Room __server__ đã tồn tại');
+    }
+  } catch(e) { 
+    console.error('❌ Lỗi tạo server room:', e);
+    window.showToast('❌ Lỗi tạo room chat: ' + e.message, 'error');
+  }
+
+  // Chỉ tự mở server chat trên desktop, mobile thì để user tự chọn
+  const isMobile = window.innerWidth <= 640;
+  if (!isMobile) {
+    openConvo('server', '🌐 Chat toàn server', null, 'server');
+  }
 }
 
 // ===== FIRESTORE HELPERS =====
@@ -122,8 +144,8 @@ async function getAllUsers(callback) {
 }
 
 function listenMessages(convoId, callback) {
-  const roomId = convoId === '__server__'
-    ? '__server__'
+  const roomId = convoId === 'server'
+    ? 'server'
     : getDmId(_currentUser.uid, convoId);
   const q = query(
     collection(db, 'chats', roomId, 'messages'),
@@ -145,15 +167,16 @@ function listenMessages(convoId, callback) {
 }
 
 async function sendMessage(convoId, text) {
-  if (!_currentUser) return;
-  const roomId = convoId === '__server__'
-    ? '__server__'
+  if (!_currentUser) throw new Error('Not logged in');
+  const roomId = convoId === 'server'
+    ? 'server'
     : getDmId(_currentUser.uid, convoId);
   const snap = await getDoc(doc(db, 'users', _currentUser.uid));
   const senderName = snap.exists() && snap.data().nickname
     ? snap.data().nickname
     : (_currentUser.displayName || _currentUser.email.split('@')[0]);
-  await addDoc(collection(db, 'chats', roomId, 'messages'), {
+  console.log('Gửi vào roomId:', roomId, 'senderName:', senderName);
+  return await addDoc(collection(db, 'chats', roomId, 'messages'), {
     text,
     senderUid:  _currentUser.uid,
     senderName,
@@ -204,8 +227,14 @@ async function getFriendStatus(myUid, otherUid, callback) {
   } catch(e) { callback('none'); }
 }
 
+// FIX 1: onSnapshot lời mời → gọi renderFriendRequestsList() mỗi khi có thay đổi
+// Khi deleteDoc lời mời sau accept/decline → snapshot fire → list tự xóa lời mời đó
 function _listenFriendRequests(uid) {
   onSnapshot(collection(db, 'friendRequests', uid, 'requests'), (snap) => {
+    // Luôn re-render danh sách lời mời
+    renderFriendRequestsList();
+
+    // Chỉ toast khi có lời mời MỚI
     snap.docChanges().forEach(async change => {
       if (change.type === 'added') {
         const fromUid  = change.doc.data().fromUid;
@@ -217,7 +246,7 @@ function _listenFriendRequests(uid) {
   });
 }
 
-// ===== FIX 2: Lắng nghe DM đến – toast + badge đỏ =====
+// Lắng nghe DM đến – toast + badge đỏ
 function _listenIncomingDMs() {
   getMyFriends(_currentUser.uid, (friends) => {
     friends.forEach(f => {
@@ -231,11 +260,9 @@ function _listenIncomingDMs() {
         snap.docChanges().forEach(change => {
           if (change.type === 'added') {
             const msg = change.doc.data();
-            // Chỉ notify nếu không phải mình gửi và không đang mở chat đó
             if (msg.senderUid !== _currentUser.uid && currentConvoId !== f.uid) {
               const name = f.nickname || '?';
               window.showToast(`💬 <strong>${escHtml(name)}</strong>: ${escHtml((msg.text||'').slice(0,40))}`, 'info');
-              // Hiện badge đỏ trên contact sidebar
               const contactEl = document.getElementById('contact-' + f.uid);
               if (contactEl) {
                 let badge = contactEl.querySelector('.dm-badge');
@@ -261,12 +288,9 @@ window.openConvo = function(uid, name, avatarChar, type) {
   currentConvoName = name;
   currentConvoUid  = (type === 'server') ? null : uid;
 
-  // FIX 3: Xóa badge khi mở chat
-  const contactEl = document.getElementById('contact-' + uid);
-  if (contactEl) {
-    const badge = contactEl.querySelector('.dm-badge');
-    if (badge) badge.remove();
-  }
+  // Xóa badge khi mở chat
+  const badgeEl = document.getElementById('contact-' + uid);
+  if (badgeEl) { const b = badgeEl.querySelector('.dm-badge'); if (b) b.remove(); }
 
   document.querySelectorAll('.chat-contact').forEach(c => c.classList.remove('active'));
   const el = document.getElementById('contact-' + uid);
@@ -320,7 +344,11 @@ window.sendWindowChat = function() {
   const val   = input.value.trim();
   if (!val) return;
   if (!_currentUser) { window.showToast('⚠️ Đăng nhập để chat!', 'warn'); return; }
-  sendMessage(currentConvoId, val);
+  console.log('Gửi tin vào:', currentConvoId, 'Text:', val);
+  sendMessage(currentConvoId, val).catch(e => {
+    console.error('Lỗi gửi tin:', e);
+    window.showToast('❌ Gửi thất bại: ' + e.message, 'error');
+  });
   input.value = '';
 };
 
@@ -354,31 +382,35 @@ window.switchTab = function(tab) {
 };
 
 // ===== RENDER: FRIENDS IN SIDEBAR =====
+// FIX 2: Nhận list trực tiếp từ onSnapshot data (không dùng cache getDoc cũ)
+function _renderFriendsInChatFromList(friends) {
+  const el = document.getElementById('friendsInChat');
+  if (!el) return;
+  el.innerHTML = '';
+  if (!friends.length) return;
+  const label = document.createElement('div');
+  label.className = 'contact-section-label';
+  label.textContent = '👥 Bạn bè';
+  el.appendChild(label);
+  friends.forEach(f => {
+    const name = f.nickname || '?';
+    const div  = document.createElement('div');
+    div.className = 'chat-contact';
+    div.id        = 'contact-' + f.uid;
+    div.onclick   = () => window.openConvo(f.uid, name, name[0].toUpperCase(), 'dm');
+    div.innerHTML = `
+      <div class="chat-contact-avatar" style="background:linear-gradient(135deg,#34d399,#059669)">${name[0].toUpperCase()}</div>
+      <div class="chat-contact-info">
+        <span class="chat-contact-name">${escHtml(name)} <span class="chat-online-dot"></span></span>
+        <span class="chat-contact-preview">Nhấn để nhắn tin</span>
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
 function renderFriendsInChat() {
   if (!_currentUser) return;
-  getMyFriends(_currentUser.uid, (friends) => {
-    const el = document.getElementById('friendsInChat');
-    el.innerHTML = '';
-    if (!friends.length) return;
-    const label = document.createElement('div');
-    label.className = 'contact-section-label';
-    label.textContent = '👥 Bạn bè';
-    el.appendChild(label);
-    friends.forEach(f => {
-      const name = f.nickname || '?';
-      const div  = document.createElement('div');
-      div.className = 'chat-contact';
-      div.id        = 'contact-' + f.uid;
-      div.onclick   = () => window.openConvo(f.uid, name, name[0].toUpperCase(), 'dm');
-      div.innerHTML = `
-        <div class="chat-contact-avatar" style="background:linear-gradient(135deg,#34d399,#059669)">${name[0].toUpperCase()}</div>
-        <div class="chat-contact-info">
-          <span class="chat-contact-name">${escHtml(name)} <span class="chat-online-dot"></span></span>
-          <span class="chat-contact-preview">Nhấn để nhắn tin</span>
-        </div>`;
-      el.appendChild(div);
-    });
-  });
+  getMyFriends(_currentUser.uid, (friends) => _renderFriendsInChatFromList(friends));
 }
 
 // ===== RENDER: ALL USERS IN SIDEBAR =====
@@ -410,10 +442,12 @@ function renderAllUsersInChat() {
 }
 
 // ===== RENDER: FRIEND REQUESTS =====
+// FIX 1: Được gọi từ onSnapshot → tự xóa lời mời khỏi UI sau khi accept/decline
 function renderFriendRequestsList() {
   if (!_currentUser) return;
   getFriendRequests(_currentUser.uid, (reqs) => {
     const el = document.getElementById('friendRequestsList');
+    if (!el) return;
     if (!reqs.length) {
       el.innerHTML = '<p style="color:#4a7a9b;font-size:12px;padding:8px 6px">Không có lời mời nào.</p>';
       return;
@@ -433,11 +467,12 @@ function renderFriendRequestsList() {
   });
 }
 
-// ===== RENDER: MY FRIENDS LIST =====
+// ===== RENDER: MY FRIENDS LIST (tab bạn bè) =====
 function renderMyFriendsList() {
   if (!_currentUser) return;
   getMyFriends(_currentUser.uid, (friends) => {
     const el = document.getElementById('myFriendsList');
+    if (!el) return;
     if (!friends.length) {
       el.innerHTML = '<p style="color:#4a7a9b;font-size:12px;padding:8px 6px">Chưa có bạn bè. Thêm ai đó nhé!</p>';
       return;
@@ -510,7 +545,12 @@ window.closeViewProfile = function(e) {
 // ===== FRIEND ACTIONS =====
 window.openConvoWithUid = function(uid, name) {
   window.closeViewProfile();
-  setTimeout(() => window.openConvo(uid, name, name[0].toUpperCase(), 'dm'), 150);
+  // Về tab chat trước
+  window.switchTab('chat');
+  // Mở convo sau khi tab đã switch
+  setTimeout(() => {
+    window.openConvo(uid, name, name[0].toUpperCase(), 'dm');
+  }, 200);
 };
 
 window.sendFriendRequest = async function(toUid) {
@@ -529,23 +569,22 @@ window.acceptFriend = async function(fromUid) {
   try {
     await updateDoc(doc(db, 'users', myUid), { friends: arrayUnion(fromUid) });
     await updateDoc(doc(db, 'users', fromUid), { friends: arrayUnion(myUid) });
+    // FIX 1: deleteDoc → onSnapshot friendRequests tự fire → renderFriendRequestsList() tự chạy
     await deleteDoc(doc(db, 'friendRequests', myUid, 'requests', fromUid));
     window.showToast('🎉 Đã kết bạn thành công!', 'success');
     window.closeViewProfile();
-    renderFriendRequestsList();
     renderMyFriendsList();
-    renderFriendsInChat();
-    _listenIncomingDMs(); // FIX 4: listen DM room mới với bạn vừa accept
+    _listenIncomingDMs();
   } catch(e) { window.showToast('❌ Lỗi!', 'error'); }
 };
 
 window.declineFriend = async function(fromUid) {
   const myUid = _currentUser.uid;
   try {
+    // FIX 1: deleteDoc → onSnapshot friendRequests tự fire → renderFriendRequestsList() tự chạy
     await deleteDoc(doc(db, 'friendRequests', myUid, 'requests', fromUid));
     window.showToast('Đã từ chối.', 'info');
     window.closeViewProfile();
-    renderFriendRequestsList();
   } catch(e) {}
 };
 
@@ -557,6 +596,5 @@ window.unfriend = async function(uid) {
     window.showToast('Đã hủy kết bạn.', 'info');
     window.closeViewProfile();
     renderMyFriendsList();
-    renderFriendsInChat();
   } catch(e) {}
 };

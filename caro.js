@@ -6,8 +6,11 @@
 
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { addPoints, POINTS, updateMission, getPoints } from './points.js';
+import { addPoints, getPoints } from './points.js';
 import { createRoom, joinRoom, listenRoom, updateRoomState, deleteRoom } from './room.js';
+
+const POINTS = { WIN_CARO: 100 }; // fallback vì points.js chưa export POINTS
+const updateMission = async () => {}; // stub vì points.js chưa export updateMission
 
 const firebaseConfig = {
   apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",

@@ -157,7 +157,7 @@ onAuthStateChanged(auth, async (user) => {
 
     // --- TẠO ROOM SERVER MẶC ĐỊNH ---
     try {
-      const serverRef = doc(db, 'chats', '__server__');
+      const serverRef = doc(db, 'chats', 'server');
       const serverSnap = await getDoc(serverRef);
       if (!serverSnap.exists()) {
         await setDoc(serverRef, {
@@ -257,7 +257,7 @@ window._getAllUsers = async function(callback) {
 function getDmId(uid1, uid2) { return [uid1, uid2].sort().join('_'); }
 
 window.listenMessages = function(convoId, callback) {
-  const roomId = convoId === '__server__' ? '__server__' : getDmId(window._currentUser.uid, convoId);
+  const roomId = convoId === 'server' ? 'server' : getDmId(window._currentUser.uid, convoId);
   const q = query(collection(db, 'chats', roomId, 'messages'), orderBy('createdAt'), limit(80));
   const unsub = onSnapshot(q, (snap) => {
     const msgs = [];
@@ -274,7 +274,7 @@ window.listenMessages = function(convoId, callback) {
 
 window.sendMessage = async function(convoId, text) {
   if (!window._currentUser) return;
-  const roomId = convoId === '__server__' ? '__server__' : getDmId(window._currentUser.uid, convoId);
+  const roomId = convoId === 'server' ? 'server' : getDmId(window._currentUser.uid, convoId);
   const snap = await getDoc(doc(db, 'users', window._currentUser.uid));
   const senderName = snap.exists() && snap.data().nickname ? snap.data().nickname : (window._currentUser.displayName || window._currentUser.email.split('@')[0]);
   await addDoc(collection(db, 'chats', roomId, 'messages'), { text, senderUid: window._currentUser.uid, senderName, createdAt: serverTimestamp() });
@@ -359,80 +359,4 @@ function listenFriendRequests(uid) {
 }
 
 // ===== GLOBAL CHAT LOGIC =====
-
-/**
- * Gửi tin nhắn lên Firestore
- */
-window.sendMessage = async function() {
-    const input = document.getElementById('chat-input');
-    const user = auth.currentUser;
-    
-    if (!user) return alert("Bạn cần đăng nhập để chat!");
-    if (!input.value.trim()) return;
-
-    try {
-        const msgText = input.value.trim();
-        input.value = ''; // Xoá input ngay để tránh bấm liên tục
-
-        await addDoc(collection(db, 'messages'), {
-            uid: user.uid,
-            userName: user.displayName || user.email.split('@')[0],
-            text: msgText,
-            createdAt: serverTimestamp()
-        });
-    } catch (e) {
-        console.error("Lỗi gửi tin nhắn:", e);
-    }
-};
-
-/**
- * Lắng nghe tin nhắn mới và hiển thị
- */
-window.listenChat = function() {
-    const chatBox = document.getElementById('chat-messages');
-    if (!chatBox) return;
-
-    const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(50));
-
-    onSnapshot(q, (snapshot) => {
-        const messages = [];
-        snapshot.forEach(doc => messages.push(doc.data()));
-        
-        // Đảo ngược lại để tin mới nhất nằm dưới cùng
-        messages.reverse();
-
-        chatBox.innerHTML = messages.map(msg => {
-            const time = msg.createdAt ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
-            const isMe = msg.uid === auth.currentUser?.uid;
-            
-            return `
-                <div class="chat-msg ${isMe ? 'msg-me' : ''}">
-                    <div class="cwm-info">
-                        <span class="cwm-name">${msg.userName}</span>
-                        <span class="cwm-time">${time}</span>
-                    </div>
-                    <div class="cwm-text">${escapeHTML(msg.text)}</div>
-                </div>
-            `;
-        }).join('');
-
-        // Tự động cuộn xuống cuối
-        chatBox.scrollTop = chatBox.scrollHeight;
-    });
-};
-
-/**
- * Hàm chống XSS (bắt buộc phải có)
- */
-function escapeHTML(str) {
-    const p = document.createElement('p');
-    p.textContent = str;
-    return p.innerHTML;
-}
-
-// Khởi chạy lắng nghe khi user đã login
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        window.listenChat();
-    }
-});
+// sendMessage và listenChat được xử lý bởi chat.js — không định nghĩa lại ở đây

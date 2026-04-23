@@ -10,6 +10,7 @@ body {
 .chat-page-wrap {
   display: flex;
   height: 100vh;
+  max-height: 100vh;  /* FIX: đảm bảo không vượt quá viewport */
   overflow: hidden;
   position: relative;
   z-index: 1;
@@ -25,6 +26,8 @@ body {
   flex-direction: column;
   backdrop-filter: blur(16px);
   transition: transform 0.3s ease;
+  min-height: 0;      /* FIX: cho phép sidebar co đúng chiều cao */
+  overflow: hidden;
 }
 
 .chat-sidebar-header {
@@ -146,6 +149,9 @@ body {
   display: flex;
   flex-direction: column;
   background: rgba(2, 11, 24, 0.5);
+  min-width: 0;       /* FIX: tránh flex child tràn ra ngoài */
+  min-height: 0;      /* FIX: cho phép flex co lại đúng chiều cao */
+  overflow: hidden;   /* FIX: clip nội dung thừa */
 }
 
 .chat-window-header {
