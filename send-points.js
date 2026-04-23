@@ -5,14 +5,24 @@
 //   <script type="module" src="send-points.js"></script>
 // Sau đó gọi: window.openSendPointsModal(toUid, toName)
 
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
   getFirestore, doc, getDoc, runTransaction,
   collection, addDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-const db   = getFirestore();
-const auth = getAuth();
+const firebaseConfig = {
+  apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
+  authDomain: "lienquan-fake.firebaseapp.com",
+  projectId: "lienquan-fake",
+  storageBucket: "lienquan-fake.firebasestorage.app",
+  messagingSenderId: "782694799992",
+  appId: "1:782694799992:web:2d8e4a28626c3bbae8ab8d"
+};
+const app  = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
