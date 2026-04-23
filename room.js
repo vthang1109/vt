@@ -39,25 +39,30 @@ export async function createRoom(gameName, initialState) {
   const user = auth.currentUser;
   if (!user) return { error: "Chưa đăng nhập" };
 
-  const roomId = generateRoomId();
-  const roomRef = doc(db, "rooms", roomId);
+  try {
+    const roomId = generateRoomId();
+    const roomRef = doc(db, "rooms", roomId);
 
-  await setDoc(roomRef, {
-    game: gameName,
-    roomId,
-    host: {
-      uid: user.uid,
-      name: user.displayName || user.email.split('@')[0],
-    },
-    guest: null,
-    status: "waiting",   // waiting | playing | finished
-    turn: "host",        // host | guest
-    state: initialState,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
+    await setDoc(roomRef, {
+      game: gameName,
+      roomId,
+      host: {
+        uid: user.uid,
+        name: user.displayName || user.email.split('@')[0],
+      },
+      guest: null,
+      status: "waiting",
+      turn: "host",
+      state: initialState,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
 
-  return { roomId, role: "host" };
+    return { roomId, role: "host" };
+  } catch(e) {
+    console.error("Lỗi tạo phòng:", e);
+    return { error: "Tạo phòng thất bại: " + e.message };
+  }
 }
 
 // ============================================================
