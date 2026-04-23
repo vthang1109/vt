@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Phòng chơi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="rooms.css"/>
+  <link rel="stylesheet" href="quests.css"/>
+  <script type="module" src="quests.js"></script>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav>
+    <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer">
+      <span class="logo-vt">VT</span><span class="logo-world">World</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="color:#7dd3fc;font-weight:700;font-size:13px">👤 <span id="me-name">...</span></span>
+      <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="window.location.href='games.html'">← Game Center</button>
+    </div>
+  </nav>
+
+  <!-- ===== LIST VIEW ===== -->
+  <div id="listView" class="rooms-page">
+    <div class="rooms-hero">
+      <h1>👥 <span>Phòng chơi</span> nhiều người</h1>
+      <p>Tạo phòng riêng · Mời bạn bè · Chiến đấu thật</p>
+    </div>
+
+    <div class="rooms-toolbar">
+      <button class="btn-primary" onclick="openCreateModal()">➕ Tạo phòng mới</button>
+      <button class="btn-secondary" onclick="openJoinByCode()">🔑 Vào bằng mã</button>
+    </div>
+
+    <div class="rooms-section">
+      <div class="rs-label"><span class="rs-name">PHÒNG ĐANG MỞ</span><div class="rs-line"></div></div>
+      <div id="rooms-list" class="rooms-list">
+        <div class="rm-empty">Đang tải...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LOBBY VIEW ===== -->
+  <div id="lobbyView" class="lobby-page" style="display:none">
+    <div class="lobby-card">
+      <div class="lobby-head">
+        <button class="lobby-back" onclick="leaveLobby()">← Rời phòng</button>
+        <span class="lobby-code" id="lobby-code">#------</span>
+      </div>
+      <div class="lobby-title-wrap">
+        <h2 id="lobby-title">Phòng</h2>
+        <div class="lobby-meta">
+          <span id="lobby-game">🎮</span>
+          <span class="lobby-dot">·</span>
+          <span id="lobby-count">0/0</span>
+        </div>
+      </div>
+
+      <div class="lobby-members" id="lobby-members"></div>
+
+      <div class="lobby-actions">
+        <button class="btn-ready" id="btn-ready" onclick="toggleReady()">✅ Sẵn sàng</button>
+        <button class="btn-start" id="btn-start" onclick="startGame()" style="display:none">🚀 Bắt đầu</button>
+      </div>
+    </div>
+
+    <div class="lobby-chat">
+      <div class="lc-head">💬 Chat trong phòng</div>
+      <div class="lc-msgs" id="lobby-chat-msgs"></div>
+      <div class="lc-input-row">
+        <input id="lobby-chat-input" placeholder="Nhập tin nhắn..." onkeydown="if(event.key==='Enter')sendLobbyChat()"/>
+        <button onclick="sendLobbyChat()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CREATE MODAL ===== -->
+  <div id="createModal" class="modal-overlay" onclick="if(event.target===this)closeCreateModal()">
+    <div class="modal-box" style="max-width:420px">
+      <div class="modal-header"><span>➕ Tạo phòng mới</span><button class="modal-close" onclick="closeCreateModal()">✕</button></div>
+      <label class="rm-label">Game</label>
+      <select id="cr-game" class="input"></select>
+      <label class="rm-label">Tên phòng</label>
+      <input id="cr-name" class="input" maxlength="40" placeholder="VD: Caro tối thứ 7"/>
+      <label class="rm-label">Số người tối đa</label>
+      <input id="cr-max" class="input" type="number" min="2" max="8" value="2"/>
+      <label class="rm-label">Mật khẩu (tuỳ chọn)</label>
+      <input id="cr-pw" class="input" maxlength="20" placeholder="Để trống nếu phòng công khai"/>
+      <button class="btn-primary" style="width:100%;margin-top:14px" onclick="doCreateRoom()">🎮 Tạo & Vào phòng</button>
+    </div>
+  </div>
+
+  <!-- ===== JOIN MODAL ===== -->
+  <div id="joinModal" class="modal-overlay" onclick="if(event.target===this)closeJoinModal()">
+    <div class="modal-box" style="max-width:380px">
+      <div class="modal-header"><span>🔑 Vào bằng mã</span><button class="modal-close" onclick="closeJoinModal()">✕</button></div>
+      <label class="rm-label">Mã phòng (6 ký tự)</label>
+      <input id="jc-code" class="input" maxlength="6" placeholder="VD: AB23CD" style="text-transform:uppercase;font-family:'Orbitron',monospace;letter-spacing:3px;font-size:18px;text-align:center"/>
+      <label class="rm-label">Mật khẩu (nếu có)</label>
+      <input id="jc-pw" class="input" maxlength="20" placeholder="Để trống nếu phòng không khoá"/>
+      <button class="btn-primary" style="width:100%;margin-top:14px" onclick="doJoinByCode()">Vào phòng</button>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
+
+  <script>
+    // Particle background
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    for (let i = 0; i < 40; i++) particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-.5)*.4, vy: (Math.random()-.5)*.4, r: Math.random()*1.5+.5 });
+    function drawParticles() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p => { p.x+=p.vx; p.y+=p.vy; if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0; if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba(56,189,248,0.5)'; ctx.fill(); });
+      for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) { const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy); if(d<100){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(56,189,248,${0.07*(1-d/100)})`; ctx.lineWidth=.5; ctx.stroke(); } }
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+
+    function showToast(msg, type='info'){
+      const colors = { info:'#38bdf8', success:'#34d399', warn:'#fbbf24', error:'#f87171' };
+      const t = document.createElement('div');
+      t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${colors[type]||'#38bdf8'};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;
+      t.innerHTML = msg;
+      document.getElementById('toastContainer').appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    }
+    window.showToast = showToast;
+  </script>
+  <script type="module" src="rooms.js"></script>
+</body>
+</html>

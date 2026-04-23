@@ -79,17 +79,10 @@
       <div class="chat-window-header">
         <button class="chat-win-back" onclick="backToSidebar()">←</button>
         <div class="chat-win-avatar" id="chatWinAvatar" style="background:linear-gradient(135deg,#38bdf8,#0ea5e9);font-size:18px;cursor:pointer" onclick="viewCurrentProfile()">🌐</div>
-        <div class="chat-win-info" style="cursor:pointer;flex:1" onclick="viewCurrentProfile()">
+        <div class="chat-win-info" style="cursor:pointer" onclick="viewCurrentProfile()">
           <span class="chat-win-name" id="chatWinName">Chat toàn server</span>
           <span class="chat-win-status">● Online</span>
         </div>
-        <!-- NÚT GỬI ĐIỂM (chỉ hiện khi chat với bạn bè) -->
-        <button id="sendPointsBtn"
-                onclick="sendPointsToCurrent()"
-                title="Gửi điểm cho bạn này"
-                style="display:none;padding:8px 14px;border-radius:20px;border:1px solid rgba(251,191,36,0.4);background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(245,158,11,0.1));color:#fbbf24;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;transition:all .2s">
-          💸 Gửi điểm
-        </button>
       </div>
       <div class="chat-window-messages" id="chatWindowMessages">
         <div class="cwm-msg system-msg">👋 Chào mừng! Chọn cuộc trò chuyện để bắt đầu.</div>
@@ -104,46 +97,6 @@
 
   <!-- Firebase + Chat Logic -->
   <script type="module" src="chat.js"></script>
-  <!-- Tính năng gửi điểm -->
-  <script type="module" src="send-points.js"></script>
-
-  <!-- Glue: hiển thị nút gửi điểm khi mở DM với bạn bè -->
-  <script>
-    // Bao bọc openConvo gốc để cập nhật trạng thái nút "Gửi điểm"
-    (function () {
-      function refreshBtn() {
-        const btn = document.getElementById('sendPointsBtn');
-        if (!btn) return;
-        // currentConvoUid được set trong chat.js (null nếu là server chat)
-        const uid = window.currentConvoUid || null;
-        const me  = window._currentUser || (window.firebase && firebase.auth && firebase.auth().currentUser);
-        btn.style.display = (uid && (!me || uid !== me.uid)) ? 'inline-block' : 'none';
-      }
-      // Patch openConvo
-      const tryPatch = setInterval(() => {
-        if (typeof window.openConvo === 'function' && !window.openConvo.__patched) {
-          const orig = window.openConvo;
-          window.openConvo = function (uid, name, avatarChar, type) {
-            const r = orig.apply(this, arguments);
-            // Lưu lại vào window cho dễ truy cập
-            window.currentConvoUid  = (type === 'server') ? null : uid;
-            window.currentConvoName = name;
-            refreshBtn();
-            return r;
-          };
-          window.openConvo.__patched = true;
-          clearInterval(tryPatch);
-        }
-      }, 200);
-    })();
-
-    window.sendPointsToCurrent = function () {
-      const uid  = window.currentConvoUid;
-      const name = window.currentConvoName || 'Người nhận';
-      if (!uid) { window.showToast && window.showToast('⚠️ Chỉ gửi điểm khi chat riêng với bạn bè!', 'warn'); return; }
-      window.openSendPointsModal && window.openSendPointsModal(uid, name);
-    };
-  </script>
 
 </body>
 </html>

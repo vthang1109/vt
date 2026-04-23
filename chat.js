@@ -176,12 +176,15 @@ async function sendMessage(convoId, text) {
     ? snap.data().nickname
     : (_currentUser.displayName || _currentUser.email.split('@')[0]);
   console.log('Gửi vào roomId:', roomId, 'senderName:', senderName);
-  return await addDoc(collection(db, 'chats', roomId, 'messages'), {
+  const result = await addDoc(collection(db, 'chats', roomId, 'messages'), {
     text,
     senderUid:  _currentUser.uid,
     senderName,
     createdAt:  serverTimestamp()
   });
+  // Hook nhiệm vụ hằng ngày
+  try { window.VTQuests && window.VTQuests.trackChat(); } catch(e) {}
+  return result;
 }
 
 // ===== FRIEND HELPERS =====

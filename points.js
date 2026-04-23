@@ -58,9 +58,38 @@ export async function addPoints(source, reason, amount) {
         const pointsEl = document.getElementById('user-points-home');
         if (pointsEl) pointsEl.textContent = newTotal.toLocaleString();
 
+        // ====== Hook nhiệm vụ hằng ngày ======
+        try {
+            if (window.VTQuests && amount > 0) {
+                window.VTQuests.trackEarn(amount);
+                const src = String(source || '').toLowerCase();
+                const rsn = String(reason || '').toLowerCase();
+                const isWin = rsn.includes('thắng') || rsn.includes('win') || rsn.includes('đúng') || rsn.includes('hoàn thành');
+                if (isWin && (src.includes('caro') || src.includes('quiz') || src.includes('sudoku'))) {
+                    window.VTQuests.trackWinSmart();
+                }
+            }
+        } catch(e) {}
+
         return newTotal;
     } catch (e) {
         throw e;
+    }
+}
+
+export async function updateMission(missionId, increment = 1) {
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+        const missionRef = doc(db, 'users', user.uid, 'missions', missionId);
+        const snap = await getDoc(missionRef);
+        const current = snap.exists() ? (snap.data().progress || 0) : 0;
+        await setDoc(missionRef, {
+            progress: current + increment,
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+    } catch (e) {
+        console.error('updateMission error:', e);
     }
 }
 

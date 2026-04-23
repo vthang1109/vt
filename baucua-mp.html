@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Bầu Cua Online</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="quests.css"/>
+  <script type="module" src="quests.js"></script>
+  <style>
+    .bc-wrap { min-height:100vh; padding:14px 12px 40px; max-width:760px; margin:0 auto; position:relative; z-index:1; }
+    .bc-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px; }
+    .bc-room { font-family:'Orbitron',monospace; color:#fbbf24; font-weight:900; font-size:14px; padding:6px 14px; border-radius:999px; background:rgba(251,191,36,.1); border:1px solid rgba(251,191,36,.4); }
+    .bc-back { background:none; border:none; color:#fbbf24; font-weight:800; font-size:13px; cursor:pointer; font-family:'Nunito',sans-serif; }
+
+    .bc-bank { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-radius:14px; background:linear-gradient(135deg, rgba(251,191,36,.15), rgba(245,158,11,.05)); border:1px solid rgba(251,191,36,.4); margin-bottom:14px; }
+    .bc-bank-l { color:#fef3c7; font-weight:700; font-size:13px; }
+    .bc-bank-r { color:#fbbf24; font-weight:900; font-size:18px; font-family:'Orbitron',monospace; }
+
+    .bc-phase { text-align:center; padding:12px; border-radius:14px; margin-bottom:12px; font-weight:800; font-size:14px; }
+    .bc-phase.betting { background:linear-gradient(135deg,rgba(56,189,248,.15),rgba(14,165,233,.05)); border:1px solid rgba(56,189,248,.4); color:#7dd3fc; }
+    .bc-phase.rolling { background:linear-gradient(135deg,rgba(251,146,60,.2),rgba(234,88,12,.08)); border:1px solid rgba(251,146,60,.5); color:#fdba74; animation:bcShake .3s infinite; }
+    .bc-phase.result { background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(5,150,105,.05)); border:1px solid rgba(52,211,153,.4); color:#34d399; }
+    @keyframes bcShake { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-3px); } 75% { transform:translateX(3px); } }
+
+    .bc-dice { display:flex; justify-content:center; gap:14px; margin:18px 0; }
+    .bc-die { width:80px; height:80px; border-radius:18px; background:linear-gradient(160deg,#fef3c7,#fbbf24); display:flex; align-items:center; justify-content:center; font-size:46px; box-shadow: 0 8px 24px rgba(251,191,36,.4), inset 0 -3px 8px rgba(0,0,0,.15); transition:all .3s; }
+    .bc-die.rolling { animation: bcRoll .12s infinite linear; }
+    @keyframes bcRoll { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+    .bc-die.win { box-shadow: 0 8px 24px rgba(52,211,153,.6), inset 0 -3px 8px rgba(0,0,0,.15), 0 0 0 3px #34d399; }
+
+    .bc-board { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:14px; }
+    @media (min-width: 600px){ .bc-board { grid-template-columns:repeat(6, 1fr); } }
+    .bc-tile { padding:14px 8px; border-radius:16px; background:rgba(255,255,255,.04); border:2px solid rgba(255,255,255,.08); cursor:pointer; text-align:center; transition:all .2s; position:relative; }
+    .bc-tile:hover { background:rgba(56,189,248,.1); border-color:rgba(56,189,248,.4); transform:translateY(-2px); }
+    .bc-tile.hot { background:linear-gradient(135deg,rgba(52,211,153,.18),rgba(5,150,105,.06)); border-color:rgba(52,211,153,.6); box-shadow: 0 0 24px rgba(52,211,153,.3); }
+    .bc-tile-icon { font-size:42px; margin-bottom:4px; }
+    .bc-tile-name { font-weight:800; color:#e0f2fe; font-size:12px; }
+    .bc-tile-bet { margin-top:6px; min-height:18px; font-family:'Orbitron',monospace; color:#fbbf24; font-weight:900; font-size:13px; }
+    .bc-tile.disabled { opacity:.55; cursor:not-allowed; }
+    .bc-tile.disabled:hover { transform:none; background:rgba(255,255,255,.04); border-color:rgba(255,255,255,.08); }
+    .bc-tile-mult { position:absolute; top:4px; right:6px; font-family:'Orbitron',monospace; font-weight:900; color:#34d399; font-size:13px; text-shadow:0 0 8px rgba(52,211,153,.6); }
+
+    .bc-chips { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+    .bc-chip { padding:8px 14px; border-radius:999px; border:2px solid rgba(255,255,255,.12); background:rgba(255,255,255,.03); color:#e0f2fe; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif; font-size:13px; transition:all .2s; }
+    .bc-chip:hover { border-color:rgba(56,189,248,.5); }
+    .bc-chip.active { background:linear-gradient(135deg,#38bdf8,#0ea5e9); border-color:#38bdf8; color:#fff; }
+
+    .bc-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .bc-actions button { padding:11px 20px; border-radius:12px; border:none; cursor:pointer; font-weight:800; font-family:'Nunito',sans-serif; font-size:13px; }
+    .btn-roll { background:linear-gradient(135deg,#f87171,#dc2626); color:#fff; box-shadow:0 8px 20px rgba(220,38,38,.4); }
+    .btn-roll:disabled { opacity:.5; cursor:not-allowed; box-shadow:none; }
+    .btn-next { background:linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; }
+    .btn-clear { background:rgba(255,255,255,.08); color:#cbd5e1; }
+    .btn-leave-bc { background:rgba(248,113,113,.12); color:#f87171; border:1px solid rgba(248,113,113,.3); }
+
+    .bc-players { display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:8px; margin-bottom:14px; }
+    .bc-pl { padding:9px 12px; border-radius:12px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); }
+    .bc-pl-name { font-weight:800; color:#e0f2fe; font-size:12.5px; }
+    .bc-pl-bet { font-size:11px; color:#fbbf24; font-weight:700; margin-top:2px; }
+    .bc-pl-result { font-size:12px; font-weight:800; margin-top:2px; }
+    .bc-pl-result.win { color:#34d399; }
+    .bc-pl-result.lose { color:#f87171; }
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="bc-wrap">
+    <div class="bc-head">
+      <button class="bc-back" onclick="quitGame()">← Rời phòng</button>
+      <div class="logo" style="cursor:pointer" onclick="location.href='index.html'"><span class="logo-vt">VT</span><span class="logo-world">World</span></div>
+      <span class="bc-room" id="bc-room">#------</span>
+    </div>
+
+    <div class="bc-bank">
+      <span class="bc-bank-l">💰 Số dư của bạn</span>
+      <span class="bc-bank-r" id="bc-balance">0 đ</span>
+    </div>
+
+    <div class="bc-phase betting" id="bc-phase">Đang tải...</div>
+
+    <div class="bc-dice" id="bc-dice">
+      <div class="bc-die">?</div>
+      <div class="bc-die">?</div>
+      <div class="bc-die">?</div>
+    </div>
+
+    <div class="bc-board" id="bc-board"></div>
+
+    <div class="bc-chips" id="bc-chips">
+      <button class="bc-chip" data-v="50">50</button>
+      <button class="bc-chip active" data-v="100">100</button>
+      <button class="bc-chip" data-v="500">500</button>
+      <button class="bc-chip" data-v="1000">1000</button>
+    </div>
+
+    <div class="bc-players" id="bc-players"></div>
+
+    <div class="bc-actions">
+      <button class="btn-clear" onclick="clearMyBets()">🗑 Xoá cược</button>
+      <button class="btn-roll" id="btn-roll" onclick="hostRoll()" style="display:none">🎲 Lắc!</button>
+      <button class="btn-next" id="btn-next" onclick="hostNext()" style="display:none">▶ Vòng mới</button>
+      <button class="btn-leave-bc" onclick="quitGame()">🚪 Rời phòng</button>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
+  <script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(251,191,36,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast=function(msg,type='info'){const c={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};const t=document.createElement('div');t.style.cssText=`pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;t.innerHTML=msg;toastContainer.appendChild(t);setTimeout(()=>t.remove(),3500)};
+  </script>
+  <script type="module" src="baucua-mp.js"></script>
+</body>
+</html>

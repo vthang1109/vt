@@ -26,26 +26,6 @@
     .glc-pts { font-size: 11px; font-weight: 700; color: #38bdf8; opacity: 0.8; }
     .glc-badge { position: absolute; top: 10px; right: 10px; padding: 3px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
     .glc-badge.ready { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
-    .glc-badge.gold  { background: rgba(251,191,36,0.18); color: #fbbf24; border: 1px solid rgba(251,191,36,0.4); }
-
-    /* ====== Bảng xếp hạng – card nổi bật ====== */
-    .lb-feature {
-      display:flex; align-items:center; gap:18px;
-      padding:22px 22px;
-      border-radius:22px;
-      background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06));
-      border:1px solid rgba(251,191,36,0.35);
-      box-shadow: 0 10px 40px rgba(251,191,36,0.10);
-      cursor:pointer; text-decoration:none;
-      transition: all .25s;
-    }
-    .lb-feature:hover { transform: translateY(-4px); border-color: rgba(251,191,36,0.6); box-shadow: 0 14px 50px rgba(251,191,36,0.22); }
-    .lb-feature .ic { font-size:46px; line-height:1; flex-shrink:0; }
-    .lb-feature .body { flex:1; min-width:0; }
-    .lb-feature .ttl { font-family:'Orbitron',monospace; font-weight:900; color:#fbbf24; font-size:18px; }
-    .lb-feature .sub { color:#fcd34d; font-weight:600; font-size:13px; margin-top:4px; }
-    .lb-feature .arr { color:#fbbf24; font-size:24px; font-weight:900; }
-
     .admin-btn-visible { position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: rgba(15, 23, 42, 0.9); border: 2px solid #0ea5e9; color: #0ea5e9; padding: 10px 20px; border-radius: 12px; font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(14, 165, 233, 0.3); transition: all 0.3s; text-transform: uppercase; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
@@ -77,32 +57,6 @@
       <span class="pts-icon">⭐</span>
       <span class="pts-label">Điểm của bạn:</span>
       <span class="pts-val" id="userPoints">0 đ</span>
-    </div>
-
-    <!-- ====== PHÒNG CHƠI ONLINE ====== -->
-    <div class="category-section">
-      <div class="category-label"><span class="cat-icon">👥</span><span class="cat-name">Chơi Cùng Bạn Bè</span><div class="cat-line"></div></div>
-      <a class="lb-feature" href="rooms.html" style="background: linear-gradient(135deg, rgba(167,139,250,0.14), rgba(124,58,237,0.06)); border-color: rgba(167,139,250,0.35); box-shadow: 0 10px 40px rgba(167,139,250,0.10);">
-        <div class="ic">👥</div>
-        <div class="body">
-          <div class="ttl" style="color:#a78bfa">Phòng chơi nhiều người</div>
-          <div class="sub" style="color:#c4b5fd">Tạo phòng riêng, mời bạn bè bằng mã 6 ký tự, chiến đấu real-time!</div>
-        </div>
-        <div class="arr" style="color:#a78bfa">›</div>
-      </a>
-    </div>
-
-    <!-- ====== BẢNG XẾP HẠNG TIỀN ====== -->
-    <div class="category-section">
-      <div class="category-label"><span class="cat-icon">🏆</span><span class="cat-name">Bảng Xếp Hạng</span><div class="cat-line"></div></div>
-      <a class="lb-feature" href="leaderboard.html">
-        <div class="ic">🏆</div>
-        <div class="body">
-          <div class="ttl">Top giàu nhất VTWorld</div>
-          <div class="sub">Xem ai đang dẫn đầu về số điểm — bạn đứng thứ mấy?</div>
-        </div>
-        <div class="arr">›</div>
-      </a>
     </div>
 
     <div class="category-section">

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Bảng xếp hạng tiền</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .lb-page { min-height:100vh; position:relative; z-index:1; padding-bottom:60px; }
+    .lb-hero { text-align:center; padding:48px 20px 24px; animation:fadeUp .7s both; }
+    .lb-hero h1 { font-family:'Orbitron',monospace; font-size:clamp(28px,7vw,52px); font-weight:900; color:#e0f2fe; margin-bottom:8px; }
+    .lb-hero h1 span { color:#fbbf24; text-shadow:0 0 30px rgba(251,191,36,0.7); }
+    .lb-hero p { color:#fcd34d; font-size:14px; font-weight:600; }
+
+    .lb-podium { max-width:780px; margin:24px auto 32px; padding:0 16px; display:grid; grid-template-columns:1fr 1.2fr 1fr; gap:14px; align-items:end; }
+    .pod-card { background:rgba(255,255,255,0.04); border:1px solid rgba(56,189,248,0.18); border-radius:18px; padding:20px 14px; text-align:center; transition:transform .25s; }
+    .pod-card:hover { transform:translateY(-4px); }
+    .pod-card .rank { font-family:'Orbitron',monospace; font-size:22px; font-weight:900; }
+    .pod-card .ava { width:64px; height:64px; border-radius:50%; margin:10px auto; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:900; color:#fff; }
+    .pod-card .nm { font-weight:800; color:#e0f2fe; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pod-card .pts { margin-top:6px; font-family:'Orbitron',monospace; font-weight:900; font-size:15px; color:#fbbf24; }
+    .pod-1 { transform:translateY(-12px); border-color:rgba(251,191,36,0.5); box-shadow:0 0 40px rgba(251,191,36,0.18); }
+    .pod-1 .rank { color:#fbbf24; }
+    .pod-1 .ava { background:linear-gradient(135deg,#fbbf24,#f59e0b); }
+    .pod-2 .rank { color:#cbd5e1; }
+    .pod-2 .ava { background:linear-gradient(135deg,#cbd5e1,#94a3b8); }
+    .pod-3 .rank { color:#fb923c; }
+    .pod-3 .ava { background:linear-gradient(135deg,#fb923c,#c2410c); }
+
+    .lb-tbl-wrap { max-width:780px; margin:0 auto; padding:0 16px; animation:fadeUp .7s .15s both; }
+    .lb-row { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:14px; background:rgba(255,255,255,0.025); border:1px solid rgba(56,189,248,0.08); margin-bottom:8px; transition:background .15s; }
+    .lb-row:hover { background:rgba(56,189,248,0.06); }
+    .lb-row.me { background:linear-gradient(90deg,rgba(52,211,153,0.10),rgba(52,211,153,0.04)); border-color:rgba(52,211,153,0.4); }
+    .lb-rank { width:34px; font-family:'Orbitron',monospace; font-weight:900; color:#7dd3fc; font-size:14px; text-align:center; flex-shrink:0; }
+    .lb-ava { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-size:14px; flex-shrink:0; background:linear-gradient(135deg,#a78bfa,#7c3aed); }
+    .lb-name { flex:1; min-width:0; font-weight:700; color:#e0f2fe; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .lb-pts { font-family:'Orbitron',monospace; font-weight:900; font-size:14px; color:#fbbf24; }
+    .lb-loading { text-align:center; padding:40px; color:#7dd3fc; font-size:14px; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  </style>
+  <link rel="stylesheet" href="quests.css"/>
+  <script type="module" src="quests.js"></script>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div class="lb-page">
+    <nav>
+      <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer">
+        <span class="logo-vt">VT</span><span class="logo-world">World</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="window.location.href='games.html'">← Game Center</button>
+      </div>
+    </nav>
+
+    <div class="lb-hero">
+      <h1>🏆 Bảng <span>Xếp Hạng</span> Tiền</h1>
+      <p>Top những người giàu nhất VTWorld</p>
+    </div>
+
+    <div class="lb-podium" id="podium"></div>
+    <div class="lb-tbl-wrap">
+      <div id="lbList" class="lb-loading">Đang tải bảng xếp hạng…</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
+      authDomain: "lienquan-fake.firebaseapp.com",
+      projectId: "lienquan-fake",
+      storageBucket: "lienquan-fake.firebasestorage.app",
+      messagingSenderId: "782694799992",
+      appId: "1:782694799992:web:2d8e4a28626c3bbae8ab8d"
+    };
+    const app  = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    // Particle bg
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let parts = [];
+    function rs(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+    rs(); addEventListener('resize', rs);
+    for (let i=0;i<40;i++) parts.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function draw(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;
+        ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(251,191,36,0.45)';ctx.fill();});
+      requestAnimationFrame(draw);
+    })();
+
+    function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+    let myUid = null;
+    onAuthStateChanged(auth, (u) => {
+      if (!u) { window.location.href = 'index.html'; return; }
+      myUid = u.uid;
+      subscribeLeaderboard();
+    });
+
+    function subscribeLeaderboard() {
+      const q = query(collection(db, 'users'), orderBy('points', 'desc'), limit(100));
+      onSnapshot(q, (snap) => {
+        const users = [];
+        snap.forEach(d => users.push({ uid: d.id, ...d.data() }));
+        renderPodium(users.slice(0, 3));
+        renderList(users);
+      }, (err) => {
+        document.getElementById('lbList').innerHTML =
+          '<div style="color:#f87171;text-align:center;padding:30px">❌ Lỗi tải bảng xếp hạng: ' + esc(err.message) + '</div>';
+      });
+    }
+
+    function renderPodium(top3) {
+      const order = [1, 0, 2]; // hiển thị: 2 - 1 - 3
+      const pod = document.getElementById('podium');
+      pod.innerHTML = '';
+      order.forEach(idx => {
+        const u = top3[idx];
+        const rank = idx + 1;
+        const div = document.createElement('div');
+        div.className = 'pod-card pod-' + rank;
+        if (!u) { div.innerHTML = `<div class="rank">#${rank}</div><div class="ava">?</div><div class="nm" style="color:#4a7a9b">— Trống —</div><div class="pts">0 đ</div>`; }
+        else {
+          const nm = u.nickname || (u.email||'?').split('@')[0];
+          const medal = rank===1?'👑':(rank===2?'🥈':'🥉');
+          div.innerHTML = `
+            <div class="rank">${medal} #${rank}</div>
+            <div class="ava">${esc(nm[0].toUpperCase())}</div>
+            <div class="nm">${esc(nm)}</div>
+            <div class="pts">${(u.points||0).toLocaleString()} đ</div>`;
+        }
+        pod.appendChild(div);
+      });
+    }
+
+    function renderList(users) {
+      const el = document.getElementById('lbList');
+      el.classList.remove('lb-loading');
+      if (!users.length) { el.innerHTML = '<div style="color:#4a7a9b;text-align:center;padding:30px">Chưa có người chơi nào.</div>'; return; }
+      el.innerHTML = '';
+      users.forEach((u, i) => {
+        const rank = i + 1;
+        const nm = u.nickname || (u.email||'?').split('@')[0];
+        const isMe = u.uid === myUid;
+        const div = document.createElement('div');
+        div.className = 'lb-row' + (isMe ? ' me' : '');
+        div.innerHTML = `
+          <div class="lb-rank">#${rank}</div>
+          <div class="lb-ava">${esc(nm[0].toUpperCase())}</div>
+          <div class="lb-name">${esc(nm)}${isMe ? ' <span style="color:#34d399;font-size:11px">(Bạn)</span>' : ''}</div>
+          <div class="lb-pts">${(u.points||0).toLocaleString()} đ</div>`;
+        el.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>

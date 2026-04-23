@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Tic-Tac-Toe Online</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="quests.css"/>
+  <script type="module" src="quests.js"></script>
+  <style>
+    .ttt-wrap { min-height:100vh; padding: 16px 12px 40px; max-width: 480px; margin: 0 auto; position:relative; z-index:1; }
+    .ttt-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+    .ttt-room { font-family:'Orbitron',monospace; color:#a78bfa; font-weight:900; font-size:14px; padding:6px 14px; border-radius:999px; background: rgba(167,139,250,.1); border:1px solid rgba(167,139,250,.35); }
+    .ttt-back { background:none; border:none; color:#a78bfa; font-weight:800; font-size:13px; cursor:pointer; font-family:'Nunito',sans-serif; }
+    .ttt-players { display:flex; gap:10px; margin-bottom:18px; }
+    .ttt-player { flex:1; padding:11px; border-radius:14px; background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); display:flex; align-items:center; gap:10px; transition: all .3s; }
+    .ttt-player.turn { background: linear-gradient(135deg, rgba(251,191,36,.12), rgba(251,146,60,.06)); border-color: rgba(251,191,36,.5); box-shadow: 0 0 20px rgba(251,191,36,.18); }
+    .ttt-p-sym { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:18px; font-family:'Orbitron',monospace; flex-shrink:0; }
+    .ttt-p-sym.X { background: rgba(56,189,248,.15); color:#38bdf8; border:2px solid #38bdf8; }
+    .ttt-p-sym.O { background: rgba(248,113,113,.15); color:#f87171; border:2px solid #f87171; }
+    .ttt-p-name { font-weight:800; color:#e0f2fe; font-size:13.5px; }
+    .ttt-p-status { font-size:11px; color:#94a3b8; font-weight:600; margin-top:2px; }
+    .ttt-player.turn .ttt-p-status { color:#fbbf24; }
+    .ttt-board { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; padding:12px; border-radius:18px; background: rgba(0,0,0,.25); border:1px solid rgba(56,189,248,.18); aspect-ratio:1; }
+    .ttt-cell { background: #0a1a35; border-radius:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:'Orbitron',monospace; font-weight:900; font-size: 56px; transition: all .2s; user-select:none; }
+    .ttt-cell:hover:not(.filled) { background: rgba(56,189,248,.15); transform: scale(1.03); }
+    .ttt-cell.filled { cursor:default; }
+    .ttt-cell.X { color:#38bdf8; text-shadow: 0 0 16px rgba(56,189,248,.7); }
+    .ttt-cell.O { color:#f87171; text-shadow: 0 0 16px rgba(248,113,113,.7); }
+    .ttt-cell.win { background: rgba(52,211,153,.3) !important; box-shadow: 0 0 20px rgba(52,211,153,.5); }
+    .ttt-status { text-align:center; font-weight:800; padding:14px; border-radius:14px; margin: 14px 0 0; }
+    .ttt-status.wait { background: rgba(56,189,248,.08); color:#7dd3fc; border:1px solid rgba(56,189,248,.25); }
+    .ttt-status.your-turn { background: linear-gradient(135deg, rgba(251,191,36,.18), rgba(251,146,60,.08)); color:#fbbf24; border:1px solid rgba(251,191,36,.4); animation: tttPulse 1.4s infinite; }
+    .ttt-status.win { background: linear-gradient(135deg, rgba(52,211,153,.2), rgba(5,150,105,.08)); color:#34d399; border:1px solid rgba(52,211,153,.5); font-size:18px; }
+    .ttt-status.lose { background: rgba(248,113,113,.1); color:#f87171; border:1px solid rgba(248,113,113,.35); font-size:16px; }
+    @keyframes tttPulse { 0%,100% { opacity:1; } 50% { opacity:.7; } }
+    .ttt-actions { display:flex; gap:10px; margin-top:14px; }
+    .ttt-actions button { flex:1; padding:11px; border-radius:12px; border:none; cursor:pointer; font-weight:800; font-family:'Nunito',sans-serif; font-size:13px; }
+    .btn-rematch { background: linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; }
+    .btn-leave { background: rgba(248,113,113,.12); color:#f87171; border:1px solid rgba(248,113,113,.3); }
+    .ttt-error { text-align:center; padding:60px 20px; color:#94a3b8; font-weight:700; }
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="ttt-wrap">
+    <div class="ttt-head">
+      <button class="ttt-back" onclick="quitGame()">← Rời phòng</button>
+      <div class="logo" style="cursor:pointer" onclick="window.location.href='index.html'"><span class="logo-vt">VT</span><span class="logo-world">World</span></div>
+      <span class="ttt-room" id="ttt-room">#------</span>
+    </div>
+    <div id="ttt-content">
+      <div class="ttt-players" id="ttt-players"></div>
+      <div class="ttt-board" id="ttt-board"></div>
+      <div class="ttt-status wait" id="ttt-status">Đang tải...</div>
+      <div class="ttt-actions" id="ttt-actions" style="display:none">
+        <button class="btn-rematch" onclick="requestRematch()">🔄 Chơi lại</button>
+        <button class="btn-leave" onclick="quitGame()">🚪 Rời phòng</button>
+      </div>
+    </div>
+  </div>
+  <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
+  <script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(56,189,248,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast=function(msg,type='info'){const c={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};const t=document.createElement('div');t.style.cssText=`pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;t.innerHTML=msg;toastContainer.appendChild(t);setTimeout(()=>t.remove(),3500)};
+  </script>
+  <script type="module" src="tictactoe-mp.js"></script>
+</body>
+</html>

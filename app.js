@@ -278,6 +278,7 @@ window.sendMessage = async function(convoId, text) {
   const snap = await getDoc(doc(db, 'users', window._currentUser.uid));
   const senderName = snap.exists() && snap.data().nickname ? snap.data().nickname : (window._currentUser.displayName || window._currentUser.email.split('@')[0]);
   await addDoc(collection(db, 'chats', roomId, 'messages'), { text, senderUid: window._currentUser.uid, senderName, createdAt: serverTimestamp() });
+  try { window.VTQuests && window.VTQuests.trackChat(); } catch(e) {}
 };
 
 window._sendFriendRequest = async function(toUid) {
