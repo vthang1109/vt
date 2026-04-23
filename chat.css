@@ -149,10 +149,10 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   background: rgba(2, 11, 24, 0.5);
-  min-width: 0;       /* FIX: tránh flex child tràn ra ngoài */
-  min-height: 0;      /* FIX: cho phép flex co lại đúng chiều cao */
-  overflow: hidden;   /* FIX: clip nội dung thừa */
+  min-width: 0;
+  overflow: visible;
 }
 
 .chat-window-header {
@@ -190,9 +190,9 @@ body {
 .chat-win-info { display: flex; flex-direction: column; }
 .chat-win-name { font-weight: 800; font-size: 14px; color: #e0f2fe; }
 .chat-win-status { font-size: 11px; color: #34d399; font-weight: 600; }
-
 .chat-window-messages {
   flex: 1;
+  max-height: 260px;
   overflow-y: auto;
   padding: 16px 18px;
   display: flex;
