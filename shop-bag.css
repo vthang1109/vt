@@ -1,0 +1,83 @@
+/* shop-bag.css */
+.bag-wrap {
+  max-width: 1000px; margin: 0 auto; padding: 20px;
+}
+
+.bag-title {
+  font-family: 'Orbitron', monospace; font-size: 32px; font-weight: 900;
+  color: #e0f2fe; text-align: center; margin-bottom: 24px;
+}
+
+.bag-filters {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; justify-content: center;
+}
+
+.filter-btn {
+  padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(56,189,248,0.2);
+  background: rgba(255,255,255,0.02); color: #7dd3fc; font-weight: 700;
+  font-size: 12px; cursor: pointer; transition: all 0.2s; font-family: 'Nunito', sans-serif;
+}
+
+.filter-btn.active {
+  background: rgba(56,189,248,0.2); border-color: #38bdf8; color: #38bdf8;
+}
+
+.bag-stats {
+  display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+  background: rgba(56,189,248,0.05); border: 1px solid rgba(56,189,248,0.1);
+  padding: 12px 16px; border-radius: 12px; margin-bottom: 20px;
+}
+
+.bag-stats span { color: #7dd3fc; font-size: 13px; font-weight: 600; }
+.bag-stats strong { color: #38bdf8; font-weight: 800; }
+
+.bag-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+.bag-pet-card {
+  background: rgba(255,255,255,0.05); border: 2px solid rgba(56,189,248,0.2);
+  border-radius: 12px; padding: 12px; text-align: center; cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bag-pet-card:hover { transform: translateY(-4px); }
+
+.pet-emoji { font-size: 36px; margin-bottom: 4px; }
+.pet-name { color: #e0f2fe; font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+.pet-rarity { color: #7dd3fc; font-size: 10px; }
+
+.rarity-common { border-color: rgba(100,200,150,0.4); }
+.rarity-rare { border-color: rgba(100,150,255,0.4); }
+.rarity-epic { border-color: rgba(200,100,255,0.4); }
+.rarity-legendary { border-color: rgba(255,200,50,0.4); }
+.rarity-mythic { border-color: rgba(255,100,200,0.4); }
+
+@media (max-width: 640px) {
+  .bag-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+  .bag-title { font-size: 24px; }
+}
+/* ===== BAG ACTIONS ===== */
+.pet-qty {
+  color: #38bdf8; font-size: 13px; font-weight: 800; margin: 4px 0 2px;
+}
+.pet-shard {
+  color: #a78bfa; font-size: 11px; font-weight: 600; margin-bottom: 6px;
+}
+.bag-actions { display: flex; flex-direction: column; gap: 4px; }
+.bag-btn {
+  padding: 5px 8px; border-radius: 8px; border: none;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  font-family: 'Nunito', sans-serif; transition: all 0.2s;
+}
+.bag-btn.disassemble {
+  background: rgba(248,113,113,0.15); color: #f87171;
+  border: 1px solid rgba(248,113,113,0.3);
+}
+.bag-btn.disassemble:hover { background: rgba(248,113,113,0.3); }
+.bag-btn.redeem {
+  background: rgba(167,139,250,0.2); color: #a78bfa;
+  border: 1px solid rgba(167,139,250,0.4);
+}
+.bag-btn.redeem:hover { background: rgba(167,139,250,0.35); }

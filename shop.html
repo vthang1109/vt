@@ -1,0 +1,127 @@
+<!-- shop.html -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Cửa Hàng Gacha</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="shop.css"/>
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+
+  <nav>
+    <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">
+      <span class="logo-vt">VT</span><span class="logo-world">World</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn-secondary" onclick="location.href='bag.html'" style="padding:8px 14px;font-size:13px">🎒 Túi</button>
+      <button class="btn-secondary" onclick="history.back()" style="padding:8px 14px;font-size:13px">← Quay lại</button>
+    </div>
+  </nav>
+  <div class="shop-statusbar">
+  <div class="shop-statusbar-item">⭐ Điểm: <strong id="status-pts">0</strong></div>
+  <div class="shop-statusbar-item">🎫 Vé thường: <strong id="status-tickets-normal">0</strong></div>
+  <div class="shop-statusbar-item vip">👑 Vé VIP: <strong id="status-tickets-vip">0</strong></div>
+</div>
+
+  <div class="shop-wrap">
+    <h1 class="shop-title">🎰 Cửa Hàng Gacha</h1>
+
+    <!-- Gacha Thường -->
+    <div class="shop-gacha-section">
+      <h2>⭐ Gacha Thường</h2>
+      <p class="shop-desc">Triệu hồi thú cơ bản. Tỉ lệ: 60% Gà mờ, 30% Tinh anh, 10% Bá sàn</p>
+      <div class="shop-pack-grid">
+        <div class="shop-pack-card" onclick="shopBuyTickets(1, 'normal')">
+          <div class="pack-qty">1 lượt</div>
+          <div class="pack-price">100 ⭐</div>
+        </div>
+        <div class="shop-pack-card" onclick="shopBuyTickets(5, 'normal')">
+          <div class="pack-qty">5 lượt</div>
+          <div class="pack-price">450 ⭐</div>
+        </div>
+        <div class="shop-pack-card" onclick="shopBuyTickets(10, 'normal')">
+          <div class="pack-qty">10 lượt</div>
+          <div class="pack-price">850 ⭐</div>
+        </div>
+      </div>
+      <button class="shop-gacha-btn" onclick="shopRoll(1, 'normal')">×1 Triệu Hồi</button>
+      <button class="shop-gacha-btn" onclick="shopRoll(5, 'normal')">×5 Triệu Hồi</button>
+      <button class="shop-gacha-btn" onclick="shopRoll(10, 'normal')">×10 Triệu Hồi</button>
+    </div>
+
+    <!-- Gacha VIP -->
+    <div class="shop-gacha-section vip">
+      <h2>👑 Gacha VIP</h2>
+      <p class="shop-desc">Triệu hồi cao cấp. Tỉ lệ: 30% Bá sàn, 40% Kiệt tác, 25% Huyền thoại, 5% Ẩn</p>
+      <div class="shop-pack-grid">
+        <div class="shop-pack-card" onclick="shopBuyTickets(1, 'vip')">
+          <div class="pack-qty">1 lượt</div>
+          <div class="pack-price">500 ⭐</div>
+        </div>
+        <div class="shop-pack-card" onclick="shopBuyTickets(5, 'vip')">
+          <div class="pack-qty">5 lượt</div>
+          <div class="pack-price">2200 ⭐</div>
+        </div>
+        <div class="shop-pack-card" onclick="shopBuyTickets(10, 'vip')">
+          <div class="pack-qty">10 lượt</div>
+          <div class="pack-price">4000 ⭐</div>
+        </div>
+      </div>
+      <button class="shop-gacha-btn vip-btn" onclick="shopRoll(1, 'vip')">×1 Triệu Hồi VIP</button>
+      <button class="shop-gacha-btn vip-btn" onclick="shopRoll(5, 'vip')">×5 Triệu Hồi VIP</button>
+      <button class="shop-gacha-btn vip-btn" onclick="shopRoll(10, 'vip')">×10 Triệu Hồi VIP</button>
+    </div>
+  </div>
+
+  <div class="pet-result-overlay" id="shopResultOverlay">
+    <div class="pet-result-box" id="shopResultBox"></div>
+  </div>
+
+  <script type="module">
+    import { buyTickets, rollGacha, syncStatusBar } from './shop.js';
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    const auth = getAuth();
+
+    // sync ngay khi load
+    onAuthStateChanged(auth, user => { if(user) syncStatusBar(); });
+
+    const PRICES = { normal:{ 1:100, 5:450, 10:850 }, vip:{ 1:500, 5:2200, 10:4000 } };
+    const TIER_EMOJI = { 1:'🐔', 2:'🦜', 3:'🐻', 4:'🐉', 5:'✨' };
+
+    window.shopBuyTickets = async (count, type) => {
+      const price = PRICES[type][count];
+      try {
+        await buyTickets(count, type, price / count);
+        syncStatusBar();
+        alert(`✅ Mua ${count} lượt ${type==='vip'?'VIP':'Thường'} thành công!`);
+      } catch(e) { alert('❌ ' + e.message); }
+    };
+
+    window.shopRoll = async (rolls, type) => {
+      try {
+        const results = await rollGacha(rolls, type);
+        syncStatusBar();
+        // Hiện kết quả
+        const box = document.getElementById('shopResultBox');
+        const overlay = document.getElementById('shopResultOverlay');
+        const TIER_COLOR = { 1:'#94a3b8', 2:'#34d399', 3:'#fbbf24', 4:'#f43f5e', 5:'#a78bfa' };
+        const TIER_NAME  = { 1:'Gà mờ', 2:'Tinh anh', 3:'Bá sàn', 4:'Kiệt tác', 5:'Huyền thoại' };
+        box.innerHTML = results.map(r => `
+          <div class="pet-result-item rarity-t${r.tier.id}" style="border-color:${TIER_COLOR[r.tier.id]}66">
+            <div style="font-size:40px">${r.emoji||'🐾'}</div>
+            <div style="color:#e0f2fe;font-size:13px;font-weight:700">${r.name}</div>
+            <div style="color:${TIER_COLOR[r.tier.id]};font-size:11px">${TIER_NAME[r.tier.id]}</div>
+          </div>`).join('');
+        overlay.style.display = 'flex';
+        overlay.onclick = () => overlay.style.display = 'none';
+      } catch(e) { alert('❌ ' + e.message); }
+    };
+  </script>
+</body>
+</html>

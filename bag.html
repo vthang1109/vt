@@ -1,0 +1,53 @@
+<!-- bag.html -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Túi Thú Cưng</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="shop-bag.css"/>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+
+  <nav>
+    <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">
+      <span class="logo-vt">VT</span><span class="logo-world">World</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span style="font-weight:700;color:#fbbf24">🎫 <span id="nav-tickets">0</span></span>
+      <button class="btn-secondary" onclick="location.href='shop.html'" style="padding:8px 14px;font-size:13px">🛍️ Cửa hàng</button>
+      <button class="btn-secondary" onclick="history.back()" style="padding:8px 14px;font-size:13px">← Quay lại</button>
+    </div>
+  </nav>
+
+  <div class="bag-wrap">
+    <h1 class="bag-title">🎒 Túi Thú Cưng</h1>
+    
+    <div class="bag-filters">
+      <button class="filter-btn active" data-rarity="all">Tất cả</button>
+      <button class="filter-btn" data-rarity="common">🐔 Gà mờ</button>
+      <button class="filter-btn" data-rarity="rare">🦜 Tinh anh</button>
+      <button class="filter-btn" data-rarity="epic">🐻 Bá sàn</button>
+      <button class="filter-btn" data-rarity="legendary">🐉 Kiệt tác</button>
+      <button class="filter-btn" data-rarity="mythic">✨ Huyền thoại</button>
+    </div>
+
+    <div class="bag-stats">
+      <span>Tổng: <strong id="bag-total">0</strong></span>
+      <span>Gà mờ: <strong id="bag-common">0</strong></span>
+      <span>Tinh anh: <strong id="bag-rare">0</strong></span>
+      <span>Bá sàn: <strong id="bag-epic">0</strong></span>
+      <span>Kiệt tác: <strong id="bag-legendary">0</strong></span>
+      <span>Huyền thoại: <strong id="bag-mythic">0</strong></span>
+    </div>
+
+    <div class="bag-grid" id="bag-grid"></div>
+  </div>
+
+  <script type="module" src="bag.js"></script>
+</body>
+</html>

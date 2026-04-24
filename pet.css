@@ -1,0 +1,238 @@
+/* ===== PET SYSTEM CSS ===== */
+
+/* ===== Ô thú cưng trong profile - override =====  */
+.pro-card-pet { cursor: pointer; }
+.pro-card-pet:hover { border-color: rgba(52,211,153,0.4); }
+
+/* ===== MODAL CONTAINER ===== */
+.pet-modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(2,8,20,0.88);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: flex-end;
+  justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.pet-modal-overlay.open {
+  opacity: 1; pointer-events: all;
+}
+
+.pet-modal {
+  width: 100%; max-width: 480px;
+  max-height: 92dvh;
+  background: rgba(8,18,36,0.98);
+  border: 1px solid rgba(56,189,248,0.15);
+  border-radius: 24px 24px 0 0;
+  display: flex; flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(.32,1.2,.48,1);
+  overflow: hidden;
+}
+.pet-modal-overlay.open .pet-modal {
+  transform: translateY(0);
+}
+
+/* Tab bar */
+.pet-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(56,189,248,0.1);
+  flex-shrink: 0;
+}
+.pet-tab {
+  flex: 1; padding: 14px 8px;
+  font-size: 12px; font-weight: 800;
+  color: #4a7a9b; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  text-align: center;
+  transition: all 0.2s;
+  font-family: 'Nunito', sans-serif;
+}
+.pet-tab.active {
+  color: #38bdf8;
+  border-bottom-color: #38bdf8;
+}
+
+.pet-tab-content { display: none; flex: 1; overflow-y: auto; padding: 16px; }
+.pet-tab-content.active { display: block; }
+
+/* Header modal */
+.pet-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px 12px; flex-shrink: 0;
+}
+.pet-modal-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px; font-weight: 900; color: #e0f2fe;
+}
+.pet-modal-close {
+  background: none; border: none; color: #4a7a9b;
+  font-size: 20px; cursor: pointer; padding: 0; line-height: 1;
+}
+.pet-modal-close:hover { color: #e0f2fe; }
+
+/* ===== TAB: BỘ SƯU TẬP ===== */
+.pet-collection-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+.pet-card {
+  border-radius: 14px; padding: 12px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  border: 1.5px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+  cursor: pointer; transition: all 0.2s; position: relative;
+}
+.pet-card:hover { transform: translateY(-2px); }
+.pet-card.owned  { border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.05); }
+.pet-card.active-pet { border-color: #fbbf24; background: rgba(251,191,36,0.08); }
+.pet-card.locked { opacity: 0.35; cursor: default; }
+
+.pet-card-emoji { font-size: 32px; line-height: 1; }
+.pet-card-name  { font-size: 11px; font-weight: 700; color: #e0f2fe; text-align: center; }
+.pet-card-tier  {
+  font-size: 9px; font-weight: 800; padding: 2px 7px;
+  border-radius: 999px; text-transform: uppercase; letter-spacing: .4px;
+}
+.pet-active-badge {
+  position: absolute; top: 6px; right: 6px;
+  font-size: 10px; background: #fbbf24;
+  border-radius: 999px; padding: 1px 5px;
+  color: #1a0a00; font-weight: 900;
+}
+.pet-empty-msg {
+  text-align: center; color: #4a7a9b; font-size: 13px;
+  padding: 32px 0; grid-column: 1/-1;
+}
+
+/* ===== TAB: GACHA ===== */
+.pet-gacha-banner {
+  border-radius: 16px; padding: 20px;
+  background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(251,191,36,0.1));
+  border: 1px solid rgba(167,139,250,0.25);
+  text-align: center; margin-bottom: 16px;
+}
+.pet-gacha-banner-icon { font-size: 48px; margin-bottom: 8px; }
+.pet-gacha-banner-title {
+  font-family: 'Orbitron', monospace; font-size: 14px;
+  font-weight: 900; color: #e0f2fe; margin-bottom: 4px;
+}
+.pet-gacha-banner-sub { font-size: 12px; color: #7dd3fc; }
+
+.pet-tickets-row {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-bottom: 16px; padding: 10px 16px;
+  background: rgba(251,191,36,0.07); border: 1px solid rgba(251,191,36,0.2);
+  border-radius: 12px;
+}
+.pet-tickets-icon { font-size: 20px; }
+.pet-tickets-count {
+  font-family: 'Orbitron', monospace; font-size: 20px;
+  font-weight: 900; color: #fbbf24;
+}
+.pet-tickets-label { font-size: 12px; color: #92400e; font-weight: 700; }
+
+.pet-roll-btns { display: flex; gap: 8px; margin-bottom: 20px; }
+.pet-roll-btn {
+  flex: 1; padding: 12px 6px; border-radius: 12px;
+  border: 1.5px solid rgba(167,139,250,0.3);
+  background: rgba(167,139,250,0.08);
+  color: #a78bfa; font-size: 12px; font-weight: 800;
+  cursor: pointer; transition: all 0.2s;
+  font-family: 'Nunito', sans-serif; text-align: center;
+}
+.pet-roll-btn:hover:not(:disabled) {
+  background: rgba(167,139,250,0.18); border-color: #a78bfa;
+  transform: translateY(-2px);
+}
+.pet-roll-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Mua lượt */
+.pet-buy-title {
+  font-size: 12px; font-weight: 800; color: #4a7a9b;
+  text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px;
+}
+.pet-buy-btns { display: flex; flex-direction: column; gap: 8px; }
+.pet-buy-btn {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 14px; border-radius: 12px;
+  border: 1px solid rgba(56,189,248,0.2);
+  background: rgba(56,189,248,0.05);
+  cursor: pointer; transition: all 0.2s;
+  font-family: 'Nunito', sans-serif;
+}
+.pet-buy-btn:hover { background: rgba(56,189,248,0.12); border-color: #38bdf8; }
+.pet-buy-label { font-size: 13px; font-weight: 700; color: #e0f2fe; }
+.pet-buy-price { font-size: 13px; font-weight: 800; color: #fbbf24; }
+
+/* ===== GACHA RESULT ===== */
+.pet-result-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(2,8,20,0.95);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.pet-result-overlay.open { opacity: 1; pointer-events: all; }
+
+.pet-result-cards {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  justify-content: center; max-width: 400px;
+}
+.pet-result-card {
+  width: 90px; border-radius: 16px; padding: 16px 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  border: 2px solid; animation: petCardPop 0.4s both;
+}
+@keyframes petCardPop {
+  from { transform: scale(0.5) rotateY(90deg); opacity: 0; }
+  to   { transform: scale(1) rotateY(0);       opacity: 1; }
+}
+.pet-result-card-emoji { font-size: 36px; }
+.pet-result-card-name  { font-size: 11px; font-weight: 800; color: #e0f2fe; text-align: center; }
+.pet-result-card-tier  { font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 999px; }
+
+.pet-result-title {
+  font-family: 'Orbitron', monospace; font-size: 18px;
+  font-weight: 900; color: #e0f2fe; text-align: center;
+}
+.pet-result-close {
+  padding: 12px 32px; border-radius: 12px;
+  background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3);
+  color: #38bdf8; font-size: 14px; font-weight: 700;
+  cursor: pointer; font-family: 'Nunito', sans-serif;
+  margin-top: 8px;
+}
+
+/* ===== TAB: TỈ LỆ ===== */
+.pet-rates-list { display: flex; flex-direction: column; gap: 10px; }
+.pet-rate-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: 12px;
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+}
+.pet-rate-emoji { font-size: 24px; flex-shrink: 0; }
+.pet-rate-info  { flex: 1; }
+.pet-rate-name  { font-size: 13px; font-weight: 800; }
+.pet-rate-desc  { font-size: 11px; color: #4a7a9b; margin-top: 2px; }
+.pet-rate-pct   {
+  font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 900;
+}
+
+/* ===== ACTIVE PET DISPLAY trong profile ===== */
+.pet-active-display {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  cursor: pointer;
+}
+.pet-active-emoji   { font-size: 40px; animation: petFloat 2.5s ease-in-out infinite; }
+.pet-active-name    { font-size: 12px; font-weight: 800; color: #e0f2fe; }
+.pet-active-buff    { font-size: 11px; font-weight: 700; color: #34d399; }
+.pet-active-tier-badge {
+  font-size: 10px; font-weight: 900; padding: 2px 8px;
+  border-radius: 999px; text-transform: uppercase;
+}
+
+@keyframes petFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}

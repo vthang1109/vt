@@ -1,0 +1,178 @@
+// shop.js
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs, setDoc, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {apiKey:"AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",authDomain:"lienquan-fake.firebaseapp.com",projectId:"lienquan-fake",storageBucket:"lienquan-fake.firebasestorage.app",messagingSenderId:"782694799992",appId:"1:782694799992:web:2d8e4a28626c3bbae8ab8d"};
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const PETS = {
+  common: [
+    {name:"Gà",emoji:"🐔"},
+    {name:"Chó",emoji:"🐕"},
+    {name:"Mèo",emoji:"🐈"},
+    {name:"Hamster",emoji:"🐹"},
+    {name:"Cá Chép",emoji:"🐟"}
+  ],
+  rare: [
+    {name:"Vẹt",emoji:"🦜"},
+    {name:"Sóc",emoji:"🐿️"},
+    {name:"Cú",emoji:"🦉"},
+    {name:"Nhím",emoji:"🦔"},
+    {name:"Bạch tuộc",emoji:"🐙"}
+  ],
+  epic: [
+    {name:"Gấu",emoji:"🐻"},
+    {name:"Miu",emoji:"🐱"},
+    {name:"Cá sấu",emoji:"🐊"},
+    {name:"Cá Voi",emoji:"🐋"},
+    {name:"Hồ Ly",emoji:"🦊"}
+  ],
+  legendary: [
+    {name:"Long",emoji:"🐉"},
+    {name:"Lân",emoji:"🦁"},
+    {name:"Quy",emoji:"🐢"},
+    {name:"Phụng",emoji:"🦅"},
+    {name:"Xà",emoji:"🐍"}
+  ],
+  mythic: [
+    {name:"Thỏ & Cáo (Zootopia)",emoji:"🐰"},
+    {name:"Doraemon",emoji:"🤖"},
+    {name:"Shaun",emoji:"🐑"},
+    {name:"Tom & Jerry",emoji:"🐭"},
+    {name:"Vịt Donald",emoji:"🦆"}
+  ]
+};
+
+let currentUser = null;
+let userTickets = { normal: 0, vip: 0 };
+let userPoints = 0;
+
+onAuthStateChanged(auth, async user => {
+  if(user) {
+    currentUser = user;
+    await loadUserData();
+  } else {
+    location.href = 'index.html';
+  }
+});
+
+async function loadUserData() {
+  const userRef = doc(db, 'users', currentUser.uid);
+  const snap = await getDoc(userRef);
+  if(snap.exists()) {
+    const data = snap.data();
+    userPoints = data.points || 0;
+    userTickets = {
+      normal: data.tickets_normal || 0,
+      vip: data.tickets_vip || 0
+    };
+  }
+  updateUI();
+}
+
+function updateUI() {
+  // update statusbar HTML cố định (dùng id từ shop.html)
+  const sp = document.getElementById('status-pts');
+  const sn = document.getElementById('status-tickets-normal');
+  const sv = document.getElementById('status-tickets-vip');
+  if(sp) sp.textContent = userPoints.toLocaleString('vi');
+  if(sn) sn.textContent = userTickets.normal;
+  if(sv) sv.textContent = userTickets.vip;
+}
+
+window.shopBuyTickets = async function(count, type) {
+  const prices = { normal: { 1: 100, 5: 450, 10: 850 }, vip: { 1: 500, 5: 2200, 10: 4000 } };
+  const price = prices[type][count];
+  
+  if(userPoints < price) {
+    alert('❌ Điểm không đủ!');
+    return;
+  }
+
+  try {
+    const userRef = doc(db, 'users', currentUser.uid);
+    const ticketKey = `tickets_${type}`;
+    await updateDoc(userRef, {
+      points: userPoints - price,
+      [ticketKey]: (userTickets[type] || 0) + count
+    });
+    userPoints -= price;
+    userTickets[type] = (userTickets[type] || 0) + count;
+    updateUI();
+    alert(`✅ Mua ${count} lượt ${type === 'vip' ? 'VIP' : 'Thường'} thành công!`);
+  } catch(e) {
+    alert('❌ Lỗi: ' + e.message);
+  }
+};
+
+window.shopRoll = async function(count, type) {
+  const ticketKey = `tickets_${type}`;
+  
+  if(!userTickets[type] || userTickets[type] < count) {
+    alert(`❌ Lượt ${type === 'vip' ? 'VIP' : 'Thường'} không đủ!`);
+    return;
+  }
+
+  const results = [];
+  const typeRarity = type === 'vip' 
+    ? { epic: 0.30, legendary: 0.40, mythic: 0.25, hidden: 0.05 }
+    : { common: 0.60, rare: 0.30, epic: 0.10 };
+
+  for(let i = 0; i < count; i++) {
+    const rnd = Math.random();
+    let rarity;
+    let cumul = 0;
+    for(const [r, pct] of Object.entries(typeRarity)) {
+      cumul += pct;
+      if(rnd <= cumul) { rarity = r; break; }
+    }
+    const pets = PETS[rarity];
+    const pet = pets[Math.floor(Math.random() * pets.length)];
+    results.push({ ...pet, rarity });
+  }
+
+  // Lưu pet vào bag
+  try {
+    const userRef = doc(db, 'users', currentUser.uid);
+    const bagRef = collection(db, 'pets');
+    
+    for(const pet of results) {
+      await setDoc(doc(bagRef), {
+        uid: currentUser.uid,
+        name: pet.name,
+        emoji: pet.emoji,
+        rarity: pet.rarity,
+        createdAt: serverTimestamp()
+      });
+    }
+
+    await updateDoc(userRef, {
+      [ticketKey]: userTickets[type] - count
+    });
+    
+    userTickets[type] -= count;
+    updateUI();
+    showResults(results);
+  } catch(e) {
+    alert('❌ Lỗi: ' + e.message);
+  }
+};
+
+function showResults(pets) {
+  const overlay = document.getElementById('shopResultOverlay');
+  const box = document.getElementById('shopResultBox');
+  
+  box.innerHTML = pets.map(p => `
+    <div class="pet-result-item rarity-${p.rarity}">
+      <div style="font-size:48px">${p.emoji}</div>
+      <div>${p.name}</div>
+      <div style="font-size:12px;color:#7dd3fc">${p.rarity}</div>
+    </div>
+  `).join('');
+  
+  overlay.style.display = 'flex';
+  setTimeout(() => overlay.style.display = 'none', 3000);
+}

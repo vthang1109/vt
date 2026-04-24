@@ -20,17 +20,38 @@
   <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
 
   <!-- ===== MODAL XEM PROFILE NGƯỜI KHÁC ===== -->
-  <div id="viewProfileModal" class="modal-overlay" onclick="closeViewProfile(event)">
-    <div class="modal-box" style="max-width:360px">
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
-        <div id="vp-avatar" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;color:#fff;flex-shrink:0">?</div>
-        <div>
-          <div id="vp-name" style="font-weight:800;font-size:18px;color:#e0f2fe"></div>
-          <div id="vp-email" style="font-size:11px;color:#4a7a9b;margin-top:2px"></div>
+ <div id="viewProfileModal" class="modal-overlay" onclick="closeViewProfile(event)">
+    <div class="modal-box" style="max-width:380px;padding:0;overflow:hidden">
+
+      <!-- Banner + Avatar nhân vật -->
+      <div style="background:linear-gradient(135deg,rgba(56,189,248,0.15),rgba(124,58,237,0.2));padding:24px 20px 16px;text-align:center;border-bottom:1px solid rgba(56,189,248,0.1)">
+        <!-- Khung nhân vật (placeholder, sau này gắn hệ thống thay đồ) -->
+        <div id="vp-character-frame" style="width:80px;height:80px;border-radius:50%;margin:0 auto 12px;border:3px solid rgba(56,189,248,0.4);background:linear-gradient(135deg,#a78bfa,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#fff;position:relative">
+          <span id="vp-avatar">?</span>
+          <!-- Badge "avatar" sau này replace bằng ảnh nhân vật -->
+          <div style="position:absolute;bottom:-2px;right:-2px;width:22px;height:22px;border-radius:50%;background:#0f172a;border:2px solid rgba(56,189,248,0.3);display:flex;align-items:center;justify-content:center;font-size:11px">🎮</div>
+        </div>
+        <div id="vp-name" style="font-weight:900;font-size:20px;color:#e0f2fe;margin-bottom:4px"></div>
+        <div id="vp-email" style="font-size:11px;color:#4a7a9b"></div>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:flex;border-bottom:1px solid rgba(56,189,248,0.08)">
+        <div style="flex:1;padding:14px;text-align:center;border-right:1px solid rgba(56,189,248,0.08)">
+          <div id="vp-points" style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#fbbf24">—</div>
+          <div style="font-size:11px;color:#4a7a9b;font-weight:700;margin-top:3px">⭐ Điểm</div>
+        </div>
+        <div style="flex:1;padding:14px;text-align:center">
+          <div id="vp-friends-count" style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#34d399">—</div>
+          <div style="font-size:11px;color:#4a7a9b;font-weight:700;margin-top:3px">👥 Bạn bè</div>
         </div>
       </div>
-      <div id="vp-action-area"></div>
-      <button onclick="closeViewProfile()" style="margin-top:12px;width:100%;padding:9px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#7dd3fc;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700">Đóng</button>
+
+      <!-- Actions -->
+      <div style="padding:16px">
+        <div id="vp-action-area"></div>
+        <button onclick="closeViewProfile()" style="margin-top:10px;width:100%;padding:9px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#7dd3fc;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700">Đóng</button>
+      </div>
     </div>
   </div>
 
@@ -78,8 +99,8 @@
     <div class="chat-window" id="chatWindow">
       <div class="chat-window-header">
         <button class="chat-win-back" onclick="backToSidebar()">←</button>
-        <div class="chat-win-avatar" id="chatWinAvatar" style="background:linear-gradient(135deg,#38bdf8,#0ea5e9);font-size:18px;cursor:pointer" onclick="viewCurrentProfile()">🌐</div>
-        <div class="chat-win-info" style="cursor:pointer;flex:1" onclick="viewCurrentProfile()">
+        <div class="chat-win-avatar" id="chatWinAvatar" style="background:linear-gradient(135deg,#38bdf8,#0ea5e9);font-size:18px;cursor:pointer" onclick="goToProfile()">🌐</div>
+        <div class="chat-win-info" style="cursor:pointer;flex:1" onclick="goToProfile()">
           <span class="chat-win-name" id="chatWinName">Chat toàn server</span>
           <span class="chat-win-status">● Online</span>
         </div>
@@ -109,6 +130,13 @@
 
   <!-- Glue: hiển thị nút gửi điểm khi mở DM với bạn bè -->
   <script>
+    // Đi đến trang profile
+    window.goToProfile = function() {
+      const uid = window.currentConvoUid || null;
+      if (!uid) return; // server chat, không có profile
+      location.href = 'profile.html?uid=' + uid;
+    };
+
     // Bao bọc openConvo gốc để cập nhật trạng thái nút "Gửi điểm"
     (function () {
       function refreshBtn() {

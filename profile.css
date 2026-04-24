@@ -1,0 +1,441 @@
+/* ===== PROFILE PAGE ===== */
+
+.pro-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 0 40px;
+  min-height: calc(100vh - 60px);
+}
+
+/* ===== BANNER ===== */
+.pro-banner {
+  position: relative;
+  height: 130px;
+  margin-bottom: 52px;
+  overflow: visible;
+}
+
+.pro-banner-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    rgba(56,189,248,0.18) 0%,
+    rgba(124,58,237,0.22) 50%,
+    rgba(52,211,153,0.12) 100%);
+  border-bottom: 1px solid rgba(56,189,248,0.15);
+}
+
+.pro-banner-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 40px,
+    rgba(56,189,248,0.04) 40px,
+    rgba(56,189,248,0.04) 41px
+  ),
+  repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 40px,
+    rgba(56,189,248,0.04) 40px,
+    rgba(56,189,248,0.04) 41px
+  );
+}
+
+.pro-avatar-ring {
+  position: absolute;
+  bottom: -44px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, #38bdf8, #a78bfa, #34d399);
+  animation: rotateRing 4s linear infinite;
+}
+
+@keyframes rotateRing {
+  0%   { background: linear-gradient(0deg,   #38bdf8, #a78bfa, #34d399); }
+  100% { background: linear-gradient(360deg, #38bdf8, #a78bfa, #34d399); }
+}
+
+.pro-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 3px solid #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 32px;
+  font-weight: 900;
+  color: #e0f2fe;
+}
+
+/* ===== IDENTITY ===== */
+.pro-identity {
+  text-align: center;
+  padding: 0 20px 20px;
+}
+
+.pro-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 22px;
+  font-weight: 900;
+  color: #e0f2fe;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.pro-points-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(251,191,36,0.1);
+  border: 1px solid rgba(251,191,36,0.25);
+  border-radius: 999px;
+  padding: 6px 16px;
+}
+
+.pro-points-icon { font-size: 16px; }
+.pro-points-val  {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  font-weight: 900;
+  color: #fbbf24;
+}
+.pro-points-label {
+  font-size: 12px;
+  color: #92400e;
+  font-weight: 700;
+}
+
+/* ===== GRID 3 Ô ===== */
+.pro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 12px;
+  padding: 0 16px 12px;
+}
+
+.pro-card {
+  background: rgba(15,23,42,0.7);
+  border: 1px solid rgba(56,189,248,0.12);
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.pro-card:hover {
+  border-color: rgba(56,189,248,0.3);
+  transform: translateY(-2px);
+}
+
+/* Danh hiệu chiếm full width */
+.pro-card-title {
+  grid-column: 1 / -1;
+}
+
+.pro-card-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #4a7a9b;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  align-self: flex-start;
+}
+
+.pro-card-sub {
+  font-size: 12px;
+  color: #4a7a9b;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* --- Ô NHÂN VẬT --- */
+.pro-card-character {
+  border-color: rgba(56,189,248,0.2);
+}
+
+.pro-character-frame {
+  width: 80px;
+  height: 100px;
+  border-radius: 12px;
+  background: rgba(56,189,248,0.05);
+  border: 1px dashed rgba(56,189,248,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pro-character-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Hình nhân vật đơn giản bằng CSS */
+.pro-char-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  opacity: 0.3;
+}
+.pro-char-head {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #38bdf8;
+}
+.pro-char-torso {
+  width: 22px; height: 24px;
+  border-radius: 4px;
+  background: #38bdf8;
+}
+.pro-char-legs {
+  width: 22px; height: 14px;
+  background: linear-gradient(to right, #38bdf8 48%, transparent 48%, transparent 52%, #38bdf8 52%);
+  border-radius: 0 0 4px 4px;
+}
+
+/* --- Ô THÚ CƯNG --- */
+.pro-card-pet {
+  border-color: rgba(52,211,153,0.2);
+  transition: border-color 0.4s, box-shadow 0.4s;
+  position: relative;
+  overflow: visible;
+}
+
+/* Nhãn tier — góc trên phải, chéo */
+.pro-card-pet .pet-tier-badge {
+  position: absolute;
+  top: 10px; right: -4px;
+  font-size: 9px; font-weight: 900;
+  padding: 3px 10px;
+  border-radius: 4px 0 0 4px;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  border: 1px solid;
+  white-space: nowrap;
+  z-index: 2;
+  /* hiệu ứng chéo */
+  transform: rotate(0deg);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* Màu neon theo tier */
+.pro-card-pet.pet-tier-1 {
+  border-color: #94a3b8;
+  box-shadow: 0 0 12px #94a3b8aa, 0 0 28px #94a3b855;
+}
+.pro-card-pet.pet-tier-1 .pet-tier-badge {
+  color: #cbd5e1; background: rgba(148,163,184,0.18); border-color: #94a3b8;
+  text-shadow: 0 0 8px #94a3b8;
+}
+
+.pro-card-pet.pet-tier-2 {
+  border-color: #34d399;
+  box-shadow: 0 0 14px #34d399cc, 0 0 32px #34d39966;
+}
+.pro-card-pet.pet-tier-2 .pet-tier-badge {
+  color: #6ee7b7; background: rgba(52,211,153,0.15); border-color: #34d399;
+  text-shadow: 0 0 8px #34d399;
+}
+
+.pro-card-pet.pet-tier-3 {
+  border-color: #38bdf8;
+  box-shadow: 0 0 14px #38bdf8cc, 0 0 32px #38bdf866;
+}
+.pro-card-pet.pet-tier-3 .pet-tier-badge {
+  color: #7dd3fc; background: rgba(56,189,248,0.15); border-color: #38bdf8;
+  text-shadow: 0 0 8px #38bdf8;
+}
+
+.pro-card-pet.pet-tier-4 {
+  border-color: #f43f5e;
+  box-shadow: 0 0 14px #f43f5ecc, 0 0 32px #f43f5e66;
+}
+.pro-card-pet.pet-tier-4 .pet-tier-badge {
+  color: #fda4af; background: rgba(244,63,94,0.15); border-color: #f43f5e;
+  text-shadow: 0 0 8px #f43f5e;
+}
+
+.pro-card-pet.pet-tier-5 {
+  border-color: #fbbf24;
+  box-shadow: 0 0 18px #fbbf24cc, 0 0 40px #fbbf2466;
+  animation: petGoldPulse 2s ease-in-out infinite;
+}
+.pro-card-pet.pet-tier-5 .pet-tier-badge {
+  color: #fde68a; background: rgba(251,191,36,0.15); border-color: #fbbf24;
+  text-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24;
+}
+
+@keyframes petGoldPulse {
+  0%,100% { box-shadow: 0 0 18px #fbbf24cc, 0 0 40px #fbbf2444; }
+  50%     { box-shadow: 0 0 28px #fbbf24ff, 0 0 60px #fbbf2477; }
+}
+
+.pro-pet-frame {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(52,211,153,0.05);
+  border: 2px solid rgba(52,211,153,0.25);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+.pet-tier-1 .pro-pet-frame { border-color: #94a3b8; box-shadow: inset 0 0 14px #94a3b855; }
+.pet-tier-2 .pro-pet-frame { border-color: #34d399; box-shadow: inset 0 0 14px #34d39955; }
+.pet-tier-3 .pro-pet-frame { border-color: #38bdf8; box-shadow: inset 0 0 14px #38bdf855; }
+.pet-tier-4 .pro-pet-frame { border-color: #f43f5e; box-shadow: inset 0 0 14px #f43f5e55; }
+.pet-tier-5 .pro-pet-frame { border-color: #fbbf24; box-shadow: inset 0 0 20px #fbbf2466; }
+
+.pro-pet-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.pro-pet-emoji {
+  font-size: 28px;
+  opacity: 0.4;
+  animation: petFloat 2.5s ease-in-out infinite;
+}
+
+@keyframes petFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-4px); }
+}
+
+.pro-coming-soon {
+  font-size: 9px;
+  color: #4a7a9b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+/* --- Ô DANH HIỆU --- */
+.pro-card-title {
+  border-color: rgba(251,191,36,0.15);
+}
+
+.pro-titles-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+  min-height: 40px;
+  align-items: center;
+}
+
+.pro-title-badge {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  border: 1px solid;
+}
+
+.pro-title-badge.gold {
+  background: rgba(251,191,36,0.12);
+  border-color: rgba(251,191,36,0.35);
+  color: #fbbf24;
+}
+
+.pro-title-badge.blue {
+  background: rgba(56,189,248,0.1);
+  border-color: rgba(56,189,248,0.3);
+  color: #38bdf8;
+}
+
+.pro-title-badge.green {
+  background: rgba(52,211,153,0.1);
+  border-color: rgba(52,211,153,0.3);
+  color: #34d399;
+}
+
+.pro-title-badge.purple {
+  background: rgba(167,139,250,0.1);
+  border-color: rgba(167,139,250,0.3);
+  color: #a78bfa;
+}
+
+.pro-title-empty {
+  font-size: 12px;
+  color: #4a7a9b;
+  font-weight: 600;
+}
+
+/* ===== STATS ROW ===== */
+.pro-stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin: 0 16px;
+  background: rgba(15,23,42,0.6);
+  border: 1px solid rgba(56,189,248,0.1);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.pro-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 8px;
+  gap: 4px;
+  border-right: 1px solid rgba(56,189,248,0.08);
+}
+
+.pro-stat:last-child { border-right: none; }
+
+.pro-stat-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 18px;
+  font-weight: 900;
+  color: #38bdf8;
+}
+
+.pro-stat-label {
+  font-size: 11px;
+  color: #4a7a9b;
+  font-weight: 700;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 400px) {
+  .pro-name { font-size: 18px; }
+  .pro-grid { grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 12px 10px; }
+}
+
+/* Avatar upload button */
+.pro-avatar-upload {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 28px; height: 28px;
+  background: #6366f1;
+  border-radius: 50%;
+  display: none; /* JS bật nếu là owner */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  border: 2px solid #0f172a;
+  z-index: 10;
+}
+.pro-avatar-ring { position: relative; }

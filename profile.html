@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Hồ Sơ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="profile.css"/>
+  <link rel="stylesheet" href="pet.css"/>
+  <link rel="stylesheet" href="shop-bag.css"/>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav>
+    <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">
+      <span class="logo-vt">VT</span><span class="logo-world">World</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="openBagModal()" style="padding:7px 14px;border-radius:50px;border:1px solid rgba(52,211,153,0.35);background:rgba(52,211,153,0.08);color:#34d399;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">🎒 Túi đồ</button>
+      <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="history.back()">← Quay lại</button>
+    </div>
+  </nav>
+
+  <div class="pro-wrap">
+
+    <!-- BANNER + AVATAR -->
+    <div class="pro-banner">
+      <div class="pro-banner-bg"></div>
+      <div class="pro-avatar-ring">
+  <div class="pro-avatar" id="pro-avatar">?</div>
+  <!-- Thêm: nút upload, chỉ hiện nếu là profile của mình -->
+  <label class="pro-avatar-upload" id="pro-avatar-upload-btn" title="Đổi ảnh">
+    📷
+    <input type="file" id="pro-avatar-input" accept="image/*" style="display:none"/>
+  </label>
+</div>
+
+    <!-- TÊN + ĐIỂM -->
+    <div class="pro-identity">
+      <h1 class="pro-name" id="pro-name">Đang tải...</h1>
+      <div class="pro-points-row">
+        <span class="pro-points-icon">⭐</span>
+        <span class="pro-points-val" id="pro-points">0</span>
+        <span class="pro-points-label">điểm</span>
+      </div>
+    </div>
+
+    <!-- GRID: 3 Ô chính -->
+    <div class="pro-grid">
+
+      <!-- Ô NHÂN VẬT -->
+      <div class="pro-card pro-card-character">
+        <div class="pro-card-label">⚔️ Nhân vật</div>
+        <div class="pro-character-frame" id="pro-character-frame">
+          <div class="pro-character-placeholder">
+            <div class="pro-char-body">
+              <div class="pro-char-head"></div>
+              <div class="pro-char-torso"></div>
+              <div class="pro-char-legs"></div>
+            </div>
+            <span class="pro-coming-soon">Sắp có</span>
+          </div>
+        </div>
+        <div class="pro-card-sub" id="pro-char-name">Chưa có nhân vật</div>
+      </div>
+
+      <!-- Ô THÚ CƯNG -->
+      <div class="pro-card pro-card-pet" onclick="openPetModal()">
+        <div class="pro-card-label">🐾 Thú cưng</div>
+        <div class="pro-pet-frame" id="pro-pet-frame">
+          <div class="pro-pet-placeholder">
+            <span class="pro-pet-emoji">🥚</span>
+            <span class="pro-coming-soon">Bấm để gacha</span>
+          </div>
+        </div>
+        <div class="pro-card-sub" id="pro-card-pet-sub">Chưa có thú cưng</div>
+      </div>
+
+      <!-- Ô DANH HIỆU -->
+      <div class="pro-card pro-card-title">
+        <div class="pro-card-label">🏅 Danh hiệu</div>
+        <div class="pro-titles-list" id="pro-titles-list">
+          <!-- render bằng JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="pro-stats-row">
+      <div class="pro-stat">
+        <span class="pro-stat-val" id="pro-stat-friends">—</span>
+        <span class="pro-stat-label">Bạn bè</span>
+      </div>
+      <div class="pro-stat">
+        <span class="pro-stat-val" id="pro-stat-rank">—</span>
+        <span class="pro-stat-label">Xếp hạng</span>
+      </div>
+      <div class="pro-stat">
+        <span class="pro-stat-val" id="pro-stat-joined">—</span>
+        <span class="pro-stat-label">Tham gia</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="profile.js"></script>
+<script type="module">
+  // bag.js mới không có modal — chuyển thẳng sang trang bag.html
+  window.openBagModal = function() { location.href = 'bag.html'; };
+</script>
+</body>
+</html>

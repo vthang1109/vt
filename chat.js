@@ -506,13 +506,29 @@ function viewUserProfile(uid) {
   getUserData(uid, (data) => {
     if (!data) { window.showToast('Không tìm thấy người dùng.', 'error'); return; }
     const nickname = data.nickname || data.email?.split('@')[0] || '?';
+
+    // Avatar / nhân vật
     document.getElementById('vp-avatar').textContent = nickname[0].toUpperCase();
-    document.getElementById('vp-name').textContent   = nickname;
-    document.getElementById('vp-email').textContent  = data.email || '';
+    // Màu avatar theo uid
+    const colors = ['#a78bfa,#7c3aed','#38bdf8,#0ea5e9','#34d399,#059669','#fbbf24,#f59e0b','#f87171,#ef4444'];
+    const colorIdx = uid.charCodeAt(0) % colors.length;
+    document.getElementById('vp-character-frame').style.background = `linear-gradient(135deg,${colors[colorIdx]})`;
+
+    document.getElementById('vp-name').textContent  = nickname;
+    document.getElementById('vp-email').textContent = data.email || '';
+
+    // Điểm
+    document.getElementById('vp-points').textContent = (data.points ?? 0).toLocaleString('vi');
+
+    // Số bạn bè
+    const friendsArr = data.friends || [];
+    document.getElementById('vp-friends-count').textContent = friendsArr.length;
+
     renderViewProfileActions(uid, { ...data, nickname });
     document.getElementById('viewProfileModal').classList.add('open');
   });
 }
+
 
 function renderViewProfileActions(uid, data) {
   const area = document.getElementById('vp-action-area');
