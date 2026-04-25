@@ -2,6 +2,7 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, updateDoc, getDocs, collection, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { renderAvatar } from './avatar.js';
 import { renderProfilePet, mountPetModal } from './pet-ui.js';
 
 const firebaseConfig = {
@@ -73,20 +74,7 @@ function listenProfile(uid) {
       ? new Date(d.createdAt.seconds * 1000).toLocaleDateString('vi-VN')
       : 'Mới tham gia';
 
-    // avatar + tên
-    // dòng 61-62 — sửa render avatar
-const av = document.getElementById('pro-avatar');
-if (av) {
-  if (d.avatarUrl) {
-    av.style.backgroundImage = `url(${d.avatarUrl})`;
-    av.style.backgroundSize = 'cover';
-    av.style.backgroundPosition = 'center';
-    av.textContent = '';
-  } else {
-    av.style.backgroundImage = '';
-    av.textContent = (d.nickname || 'V').charAt(0).toUpperCase();
-  }
-}
+renderAvatar(document.getElementById('pro-avatar'), d, '80px');
     const nm = document.getElementById('pro-name');
     if(nm) nm.textContent = d.nickname || 'Người dùng VT';
 

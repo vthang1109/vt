@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VTWorld — Forgotten Warrior</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="warrior.css">
+  <link rel="stylesheet" href="quests.css"/>
+  <script type="module" src="quests.js"></script>
+</head>
+<body>
+  <div id="game-wrapper">
+    <nav id="top-bar">
+      <div class="logo" onclick="location.href='games.html'"><span>VT</span>World</div>
+      <div id="nav-pts">⭐ 0</div>
+      <div class="bar-right">
+        <button class="nav-btn" onclick="location.href='games.html'">SẢNH</button>
+        <button class="nav-btn fullscreen-btn" id="btnFullscreen" title="Toàn màn hình">⛶</button>
+      </div>
+    </nav>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="hud">
+      <div class="hud-bar"><span class="hud-label">HP</span><div class="hud-bg"><div id="hpFill" class="hud-fill hp"></div></div><span id="hpText">100</span></div>
+      <div class="hud-bar"><span class="hud-label">MP</span><div class="hud-bg"><div id="mpFill" class="hud-fill mp"></div></div><span id="mpText">50</span></div>
+      <div class="hud-gold">🪙 <span id="goldDisplay">0</span></div>
+    </div>
+
+    <div id="touchControls">
+      <div class="touch-group"><button class="t-btn" id="btnLeft">◀</button><button class="t-btn" id="btnRight">▶</button></div>
+      <div class="touch-group"><button class="t-btn magic-btn" id="btnMagic">✨</button><button class="t-btn jump-btn" id="btnJump">▲</button><button class="t-btn atk-btn" id="btnAttack">⚔️</button></div>
+    </div>
+
+    <!-- Shop Modal -->
+    <div class="modal-overlay" id="shopModal">
+      <div class="modal-box"><h2>🛒 CỬA HÀNG</h2><p>💰 Vàng: <span id="shopGold">0</span></p><div id="shopItems"></div><button class="modal-btn" id="btnCloseShop">▶ TIẾP TỤC</button></div>
+    </div>
+
+    <!-- Dialog -->
+    <div class="modal-overlay" id="dialogModal">
+      <div class="modal-box"><p id="dialogText"></p><button class="modal-btn" id="btnCloseDialog">▶</button></div>
+    </div>
+
+    <!-- Start Screen -->
+    <div class="modal-overlay" id="startScreen" style="display:flex">
+      <div class="modal-box start-box">
+        <h1>⚔️ FORGOTTEN WARRIOR</h1>
+        <p>Trong lúc Hoàng tử ngủ say, công chúa đã bị thế lực hắc ám bắt cóc! Hãy vượt qua mọi thử thách để giải cứu nàng!</p>
+        <button class="modal-btn start-btn" id="btnStart">▶ BẮT ĐẦU</button>
+        <div class="ctrl-hint">⌨️ A/D ← → : Di chuyển &nbsp;|&nbsp; W/↑ : Nhảy &nbsp;|&nbsp; J : Đánh &nbsp;|&nbsp; K : Phép</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="warrior.js"></script>
+</body>
+</html>

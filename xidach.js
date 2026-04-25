@@ -15,7 +15,7 @@ class XiDach {
         this.dealerDone = false;
         this.unsubscribe = null;
         this.isBusy = false;
-        this.isPlayerFlipped = false; // Trạng thái lật bài người chơi
+        this.isPlayerFlipped = false;
 
         this.init();
     }
@@ -44,6 +44,20 @@ class XiDach {
                 this.placeBet(amt === 'all' ? 'all' : parseInt(amt));
             });
         });
+
+        // Đóng overlay khi click ra ngoài
+        const betOverlay = document.getElementById('bet-selector');
+        if (betOverlay) {
+            betOverlay.addEventListener('click', (e) => {
+                if (e.target === betOverlay) betOverlay.classList.remove('active');
+            });
+        }
+        const modeOverlay = document.getElementById('mode-selector');
+        if (modeOverlay) {
+            modeOverlay.addEventListener('click', (e) => {
+                if (e.target === modeOverlay) modeOverlay.classList.remove('active');
+            });
+        }
     }
 
     async refreshPts() {
@@ -119,7 +133,6 @@ class XiDach {
         this.players[0].result = state.result || '';
         this.currentBet = state.bet || 0;
 
-        // Online mode mặc định lật bài khi game chạy
         if (state.gameStarted) this.isPlayerFlipped = true;
 
         this.render(this.dealerDone);
@@ -155,7 +168,7 @@ class XiDach {
 
         this.isBusy = true;
         this.dealerDone = false;
-        this.isPlayerFlipped = false; // Reset trạng thái úp bài cho ván mới
+        this.isPlayerFlipped = false;
 
         const deck = createDeck();
         const dH = [deck.pop(), deck.pop()];
@@ -181,7 +194,7 @@ class XiDach {
 
             if (this.checkSpecials(dH) || this.checkSpecials(pH)) {
                 this.dealerDone = true;
-                this.isPlayerFlipped = true; // Hiện bài ngay nếu có xì dách/xì bàn
+                this.isPlayerFlipped = true;
                 this.endGame();
             } else {
                 this.render(false);
@@ -211,7 +224,6 @@ class XiDach {
     }
 
     async hit() {
-        // --- ĐÃ THÊM: LOGIC MỞ BÀI XONG MỚI RÚT ---
         if (!this.isPlayerFlipped) {
             this.isPlayerFlipped = true;
             this.render(false);
@@ -253,7 +265,7 @@ class XiDach {
 
     async dealerTurnSolo() {
         this.isBusy = true;
-        this.isPlayerFlipped = true; // Đảm bảo bài người chơi lật khi nhà cái đi
+        this.isPlayerFlipped = true;
         this.render(true);
         while (this.getScore(this.dealer.hand) < 15 && this.dealer.hand.length < 5) {
             await new Promise(r => setTimeout(r, 800));
@@ -329,8 +341,6 @@ class XiDach {
 
         const hitBtn = document.getElementById('btn-hit');
         hitBtn.disabled = !canPlay || (this.isPlayerFlipped && (pS >= 21 || pL >= 5));
-        
-        // --- ĐÃ THÊM: ĐỔI TÊN NÚT ---
         hitBtn.textContent = this.isPlayerFlipped ? "RÚT BÀI" : "MỞ BÀI";
 
         const hasEnough = (pS >= 16 || pL === 5);
@@ -363,7 +373,7 @@ class XiDach {
                 <div class="hand">
                     ${this.dealer.hand.map(c => {
                         const html = renderCardUI(c, !showDealer);
-                        const finalHtml = (c.isNew) ? html.replace('class=\"card', 'class=\"card card-new') : html;
+                        const finalHtml = (c.isNew) ? html.replace('class="card', 'class="card card-new') : html;
                         delete c.isNew;
                         return finalHtml;
                     }).join('')}
@@ -387,9 +397,8 @@ class XiDach {
                 ${pTxt ? `<div class="result-overlay ${pCls}">${pTxt}</div>` : ''}
                 <div class="hand">
                     ${p.hand.map(c => {
-                        // --- ĐÃ THÊM: KIỂM SOÁT ÚP BÀI NGƯỜI CHƠI ---
                         const html = renderCardUI(c, !this.isPlayerFlipped);
-                        const finalHtml = (c.isNew) ? html.replace('class=\"card', 'class=\"card card-new') : html;
+                        const finalHtml = (c.isNew) ? html.replace('class="card', 'class="card card-new') : html;
                         delete c.isNew;
                         return finalHtml;
                     }).join('')}

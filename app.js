@@ -188,14 +188,36 @@ onAuthStateChanged(auth, async (user) => {
         if(pointsEl) pointsEl.textContent = currentPoints.toLocaleString();
         
         // Cập nhật tên và avatar
-        if(nameEl)   nameEl.textContent   = displayName;
-        if(avatarEl) avatarEl.textContent = displayName[0].toUpperCase();
+        if(nameEl) nameEl.textContent = displayName;
 
-        // Cập nhật Profile page
-        const profileNick = document.getElementById('profile-nickname-display');
+        // Avatar index (user-info-bar)
+        if(avatarEl) {
+          if(userData.avatarUrl) {
+            avatarEl.style.backgroundImage = `url(${userData.avatarUrl})`;
+            avatarEl.style.backgroundSize = 'cover';
+            avatarEl.style.backgroundPosition = 'center';
+            avatarEl.textContent = '';
+          } else {
+            avatarEl.style.backgroundImage = '';
+            avatarEl.textContent = displayName[0].toUpperCase();
+          }
+        }
+
+        // Avatar + tên profile page
+        const profileNick  = document.getElementById('profile-nickname-display');
         const profileBigAv = document.getElementById('profile-big-avatar');
         if(profileNick) profileNick.textContent = displayName;
-        if(profileBigAv) profileBigAv.textContent = displayName[0].toUpperCase();
+        if(profileBigAv) {
+          if(userData.avatarUrl) {
+            profileBigAv.style.backgroundImage = `url(${userData.avatarUrl})`;
+            profileBigAv.style.backgroundSize = 'cover';
+            profileBigAv.style.backgroundPosition = 'center';
+            profileBigAv.textContent = '';
+          } else {
+            profileBigAv.style.backgroundImage = '';
+            profileBigAv.textContent = displayName[0].toUpperCase();
+          }
+        }
 
         // Đồng bộ vào localStorage để các game khác vẫn lấy được điểm mới
         localStorage.setItem('userPoints', currentPoints);

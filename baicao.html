@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>VTWorld — Xì Dách Online</title>
+    <title>VTWorld — Bài Cào Online</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="cards.css">
-    <link rel="stylesheet" href="xidach.css">
+    <link rel="stylesheet" href="baicao.css">
     <link rel="stylesheet" href="quests.css"/>
     <script type="module" src="quests.js"></script>
 </head>
@@ -26,15 +26,15 @@
     <div id="mode-selector" class="overlay active">
         <div class="glass-panel">
             <button class="close-btn" onclick="document.getElementById('mode-selector').classList.remove('active')">✕</button>
-            <h2 class="title" style="color:#0ea5e9; font-family:'Orbitron'; margin-bottom: 20px;">XÌ DÁCH CASINO</h2>
+            <h2 class="title" style="color:#0ea5e9; font-family:'Orbitron'; margin-bottom: 20px;">BÀI CÀO CASINO</h2>
             <button class="mode-btn" onclick="game.setMode('solo')">CHƠI ĐƠN (OFFLINE)</button>
             <hr style="opacity: 0.1; margin: 20px 0; border: none; border-top: 1px solid #fff;">
-            <h3 style="font-size: 14px; color: #64748b; margin-bottom: 15px; font-family:'Orbitron'">CHẾ ĐỘ ONLINE</h3>
-            <button class="mode-btn" style="background: #059669; border-color: #10b981;" onclick="game.createOnlineRoom()">TẠO PHÒNG (NHÀ CÁI)</button>
+            <h3 style="font-size: 14px; color: #64748b; margin-bottom: 15px; font-family:'Orbitron'">CHẾ ĐỘ ONLINE (Sắp ra mắt)</h3>
+            <button class="mode-btn" disabled style="opacity:0.5;">TẠO PHÒNG</button>
             <div style="display: flex; gap: 8px; margin-top: 12px;">
-                <input type="number" id="room-id-input" placeholder="Nhập ID phòng..." 
+                <input type="number" id="room-id-input" placeholder="Nhập ID phòng..." disabled
                        style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; font-family:'Orbitron'">
-                <button class="game-btn primary" style="padding: 0 20px;" onclick="game.joinOnlineRoom(document.getElementById('room-id-input').value)">VÀO</button>
+                <button class="game-btn primary" style="padding: 0 20px;" disabled>VÀO</button>
             </div>
         </div>
     </div>
@@ -54,24 +54,19 @@
         </div>
     </div>
 
+    <!-- Bàn chơi -->
     <div class="casino-table">
-        <div class="dealer-section">
-            <div id="dealer-container">
-                <div class="badge dealer">NHÀ CÁI <span id="dealer-score-label"></span></div>
-                <div id="dealer-hand" class="hand"></div>
-            </div>
-        </div>
+        <div class="dealer-section" id="dealer-section"></div>
         <div id="game-table" class="hands-container"></div>
         <div class="controls">
             <div id="status-msg">CHỌN CHẾ ĐỘ ĐỂ CHƠI</div>
             <div class="btn-group">
-                <button id="btn-deal" class="game-btn primary" onclick="game.startDeal()">VÁN MỚI</button>
-                <button id="btn-hit" class="game-btn" onclick="game.hit()" disabled>RÚT BÀI</button>
-                <button id="btn-stand" class="game-btn" onclick="game.stand()" disabled>DẰN BÀI</button>
+                <button id="btn-flip" class="game-btn" style="display:none; background:#f59e0b; color:#000;">🃏 MỞ BÀI</button>
+                <button id="btn-deal" class="game-btn primary" disabled>VÁN MỚI</button>
             </div>
         </div>
     </div>
 
-    <script type="module" src="xidach.js"></script>
+    <script type="module" src="baicao.js"></script>
 </body>
 </html>

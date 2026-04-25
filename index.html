@@ -506,6 +506,10 @@
       const ids = ['user-display-name','profile-nickname-display'];
       ids.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = name; });
       ['user-avatar-char','profile-big-avatar'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = letter; });
+      import { renderAvatar } from './avatar.js';
+// trong onSnapshot hoặc onAuthStateChanged, sau khi có userData:
+renderAvatar(document.getElementById('user-avatar-char'), userData, '38px');
+renderAvatar(document.getElementById('profile-big-avatar'), userData, '60px');
     }
 
     // ===== FRIEND ACTIONS =====

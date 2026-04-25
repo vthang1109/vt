@@ -1,4 +1,4 @@
-/* ===== BẦU CUA — CASINO UI (ĐỒNG BỘ XÌ DÁCH) ===== */
+/* ===== TÀI XỈU — CASINO UI (ĐỒNG BỘ) ===== */
 body {
     background: radial-gradient(circle at center, #1e293b, #070b14);
     min-height: 100vh;
@@ -8,7 +8,7 @@ body {
     color: white;
 }
 
-/* ---- Navbar chuẩn casino ---- */
+/* Navbar */
 .casino-nav {
     display: flex;
     justify-content: space-between;
@@ -17,10 +17,10 @@ body {
     background: rgba(0,0,0,0.6);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(14, 165, 233, 0.2);
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: 100;
 }
-
 .logo {
     cursor: pointer;
     font-family: 'Orbitron', sans-serif;
@@ -30,27 +30,14 @@ body {
 }
 .logo span:first-child { color: #0ea5e9; }
 
-.nav-center {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-}
-
+.nav-center { flex: 1; display: flex; justify-content: center; }
 #nav-pts {
     font-family: 'Orbitron';
     color: #38bdf8;
     font-weight: 700;
     font-size: 18px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
 }
-
-.nav-right {
-    display: flex;
-    gap: 10px;
-}
-
+.nav-right { display: flex; gap: 10px; }
 .nav-btn {
     padding: 6px 12px;
     border-radius: 8px;
@@ -64,46 +51,56 @@ body {
     color: #ef4444;
     font-weight: 700;
 }
-.nav-btn:hover {
-    background: rgba(239, 68, 68, 0.35);
-}
+.nav-btn:hover { background: rgba(239, 68, 68, 0.35); }
 
-/* ---- Khu vực game ---- */
+/* Game container */
 .game-container {
-    max-width: 600px;
+    max-width: 550px;
     margin: 0 auto;
     padding: 20px;
     box-sizing: border-box;
-}
-
-/* Bát đựng xúc xắc */
-.bowl-container {
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 25px 15px 20px;
-    margin-bottom: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* Bát */
+.bowl-wrapper {
+    width: 220px;
+    height: 220px;
     position: relative;
+    margin-bottom: 20px;
 }
 
 .bowl {
-    width: 220px;
-    height: 220px;
-    background: radial-gradient(circle at 40% 40%, #1e293b, #0f172a);
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 40% 40%, #1e293b, #0b1220);
     border: 4px solid #38bdf8;
     border-radius: 50%;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
+    box-shadow: 0 0 30px rgba(14,165,233,0.4), inset 0 0 40px rgba(0,0,0,0.8);
     overflow: hidden;
-    box-shadow: 0 0 20px rgba(14,165,233,0.3), inset 0 0 30px rgba(0,0,0,0.8);
-    transition: border-color 0.3s;
+    transition: transform 0.1s;
 }
 
+/* Rung khi lắc */
+.bowl.shaking {
+    animation: bowlShake 0.08s infinite;
+}
+
+@keyframes bowlShake {
+    0% { transform: translate(2px, 2px); }
+    25% { transform: translate(-2px, -1px); }
+    50% { transform: translate(-1px, 2px); }
+    75% { transform: translate(1px, -2px); }
+    100% { transform: translate(2px, 2px); }
+}
+
+/* Nắp */
 .bowl-lid {
     position: absolute;
     top: 0; left: 0;
@@ -119,7 +116,7 @@ body {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 36px; height: 36px;
+    width: 30px; height: 30px;
     background: #0f172a;
     border: 2px solid #38bdf8;
     border-radius: 50%;
@@ -129,115 +126,121 @@ body {
     opacity: 0;
 }
 
-.bowl.rolling {
-    animation: bowlShake 0.08s infinite;
-}
-@keyframes bowlShake {
-    0% { transform: translate(2px, 2px); }
-    50% { transform: translate(-2px, -1px); }
-    100% { transform: translate(1px, 2px); }
-}
-
-/* Xúc xắc */
+/* Xúc xắc bên trong (tam giác) */
 .dices {
     display: flex;
-    justify-content: center;
-    gap: 12px;
-    z-index: 2;
-}
-.dice {
-    width: 58px;
-    height: 58px;
-    background: #fff;
-    border-radius: 14px;
-    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    font-size: 36px;
-    color: #000;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: opacity 0.25s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    gap: 4px;
+    z-index: 5;
+    padding: 20px;
 }
-.dice.reveal {
-    opacity: 1;
-    transform: scale(1);
+.dice-row {
+    display: flex;
+    gap: 10px;
 }
 
-/* Kết quả neon trong bát */
-.result-notice {
-    position: absolute;
-    bottom: 15%;
-    left: 50%;
-    transform: translateX(-50%);
+/* Hàng thông tin (Tổng & Lời/Lỗ) ngang hàng */
+.info-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.info-box {
+    background: rgba(15, 23, 42, 0.8);
+    border: 2px solid rgba(56, 189, 248, 0.2);
+    border-radius: 16px;
+    padding: 10px 18px;
+    min-width: 80px;
+    text-align: center;
     font-family: 'Orbitron', sans-serif;
     font-weight: 900;
     font-size: 18px;
-    z-index: 20;
-    padding: 8px 20px;
-    border-radius: 12px;
-    border: 2px solid;
-    display: none;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(6px);
-    white-space: nowrap;
-    pointer-events: none;
-    animation: noticePop 0.35s ease-out;
-}
-@keyframes noticePop {
-    from { bottom: 5%; opacity: 0; }
-    to   { bottom: 15%; opacity: 1; }
-}
-/* Thắng (Lời) – giống result-win của Xì Dách */
-.notice-profit {
-    background: rgba(34, 197, 94, 0.92);
-    color: #fff;
-    border: none;
-    box-shadow: 0 0 20px #22c55e;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    color: #facc15;
+    text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
 }
 
-/* Thua (Lỗ) – giống result-lose của Xì Dách */
-.notice-lost {
-    background: rgba(239, 68, 68, 0.92);
-    color: #fff;
-    border: none;
-    box-shadow: 0 0 20px #ef4444;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+/* Trạng thái chờ (Đang lắc...) */
+#result-notice.waiting {
+    color: #94a3b8;
+    text-shadow: none;
+    font-size: 14px;
+    padding: 8px 14px;
+    min-width: 70px;
+    background: rgba(15, 23, 42, 0.8);
+    border-color: rgba(56, 189, 248, 0.2);
+    box-shadow: none;
 }
+
+/* Kết quả thắng */
+#result-notice.win {
+    background: rgba(34, 197, 94, 0.9);
+    border-color: #22c55e;
+    color: #fff;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    box-shadow: 0 0 20px #22c55e;
+}
+
+/* Kết quả thua */
+#result-notice.lose {
+    background: rgba(239, 68, 68, 0.9);
+    border-color: #ef4444;
+    color: #fff;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    box-shadow: 0 0 20px #ef4444;
+}
+
+/* Nút lắc */
+.main-btn {
+    width: 100%;
+    margin: 15px 0;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(14,165,233,0.3);
+    transition: 0.2s;
+}
+.main-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+.main-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
 
 /* Tổng cược */
 .total-bet-display {
-    margin-top: 12px;
     font-family: 'Orbitron';
     font-size: 14px;
     color: #94a3b8;
+    margin-bottom: 15px;
 }
 #total-bet-val { color: #facc15; font-weight: 700; }
 
 /* Bàn cược */
 .bet-board {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
     margin-bottom: 15px;
 }
-
 .bet-card {
     background: rgba(15,23,42,0.6);
     border: 2px solid rgba(56,189,248,0.1);
-    border-radius: 16px;
-    padding: 12px 5px;
+    border-radius: 20px;
+    padding: 18px 10px;
     cursor: pointer;
     transition: all 0.25s;
     text-align: center;
-    font-family: 'Nunito', sans-serif;
     font-weight: 700;
-}
-.bet-card:hover {
-    background: rgba(14,165,233,0.08);
-    border-color: #0ea5e9;
 }
 .bet-card.has-bet {
     border-color: #0ea5e9;
@@ -245,18 +248,19 @@ body {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(14,165,233,0.2);
 }
-.emoji { font-size: 30px; display: block; margin-bottom: 4px; }
-.name  { font-size: 13px; color: #e2e8f0; }
-
+.emoji { font-size: 36px; display: block; margin-bottom: 6px; }
+.name { font-size: 18px; color: #e2e8f0; }
+.bet-info { font-size: 12px; color: #94a3b8; }
 .my-bet {
-    margin-top: 6px;
+    margin-top: 8px;
     background: #1e293b;
     color: #38bdf8;
-    padding: 3px 8px;
+    padding: 3px 10px;
     border-radius: 10px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 800;
     font-family: 'Orbitron', sans-serif;
+    display: inline-block;
 }
 
 /* Chip selector */
@@ -265,9 +269,8 @@ body {
     justify-content: center;
     gap: 8px;
     flex-wrap: wrap;
-    margin-top: 10px;
+    width: 100%;
 }
-
 .chip {
     padding: 10px 14px;
     border-radius: 10px;
@@ -285,7 +288,6 @@ body {
     box-shadow: 0 0 12px #0ea5e9;
     color: white;
 }
-
 .chip-clear {
     padding: 10px 18px;
     border-radius: 10px;
@@ -299,35 +301,15 @@ body {
 }
 .chip-clear:hover { background: #dc2626; }
 
-/* Nút chính */
-.main-btn {
-    width: 100%;
-    margin-top: 12px;
-    padding: 14px;
-    border-radius: 12px;
-    border: none;
-    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
-    color: #fff;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(14,165,233,0.3);
-    transition: 0.2s;
-}
-.main-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-.main-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    filter: brightness(1.1);
-}
-
 /* Responsive */
-@media (max-width: 480px) {
-    .game-container { padding: 12px; }
-    .bowl { width: 180px; height: 180px; }
-    .dice { width: 48px; height: 48px; font-size: 28px; }
+@media (max-width: 500px) {
+    .bowl-wrapper {
+        width: 180px;
+        height: 180px;
+    }
+    .info-box {
+        min-width: 70px;
+        font-size: 16px;
+        padding: 8px 12px;
+    }
 }

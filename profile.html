@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="profile.css"/>
   <link rel="stylesheet" href="pet.css"/>
   <link rel="stylesheet" href="shop-bag.css"/>
+  <link rel="stylesheet" href="character.css"/>
 </head>
 <body>
   <canvas id="bg-canvas"></canvas>
@@ -27,17 +28,23 @@
 
   <div class="pro-wrap">
 
-    <!-- BANNER + AVATAR -->
+    <!-- BANNER -->
     <div class="pro-banner">
       <div class="pro-banner-bg"></div>
-      <div class="pro-avatar-ring">
-  <div class="pro-avatar" id="pro-avatar">?</div>
-  <!-- Thêm: nút upload, chỉ hiện nếu là profile của mình -->
-  <label class="pro-avatar-upload" id="pro-avatar-upload-btn" title="Đổi ảnh">
-    📷
-    <input type="file" id="pro-avatar-input" accept="image/*" style="display:none"/>
-  </label>
-</div>
+    </div>
+
+    <!-- AVATAR (ngoài banner, không bị overflow che) -->
+    <div style="display:flex;justify-content:center;margin-top:-46px;margin-bottom:12px;position:relative;z-index:10">
+      <div style="position:relative;width:92px;height:92px;">
+        <div class="pro-avatar-ring">
+          <div class="pro-avatar" id="pro-avatar">?</div>
+        </div>
+        <label class="pro-avatar-upload" id="pro-avatar-upload-btn" title="Đổi ảnh">
+          📷
+          <input type="file" id="pro-avatar-input" accept="image/*" style="display:none"/>
+        </label>
+      </div>
+    </div>
 
     <!-- TÊN + ĐIỂM -->
     <div class="pro-identity">
@@ -53,19 +60,10 @@
     <div class="pro-grid">
 
       <!-- Ô NHÂN VẬT -->
-      <div class="pro-card pro-card-character">
-        <div class="pro-card-label">⚔️ Nhân vật</div>
-        <div class="pro-character-frame" id="pro-character-frame">
-          <div class="pro-character-placeholder">
-            <div class="pro-char-body">
-              <div class="pro-char-head"></div>
-              <div class="pro-char-torso"></div>
-              <div class="pro-char-legs"></div>
-            </div>
-            <span class="pro-coming-soon">Sắp có</span>
-          </div>
-        </div>
-        <div class="pro-card-sub" id="pro-char-name">Chưa có nhân vật</div>
+      <div class="pro-card pro-card-character" onclick="openWardrobeModal()" style="cursor:pointer">
+        <div class="pro-card-label">⚔️ Nhân vật <span style="font-size:9px;color:#38bdf8;margin-left:4px">✏️ Thay đồ</span></div>
+        <div class="pro-character-frame" id="pro-character-frame"></div>
+        <div class="pro-card-sub" id="pro-char-name">Chưa chọn nhân vật</div>
       </div>
 
       <!-- Ô THÚ CƯNG -->
@@ -108,6 +106,13 @@
 
   </div>
 
+  <script type="module" src="character.js"></script>
+  <script>
+    // fallback: tránh lỗi "not defined" nếu module chưa load kịp khi click
+    window.openWardrobeModal = window.openWardrobeModal || function() {
+      document.addEventListener('character-ready', () => window.openWardrobeModal());
+    };
+  </script>
   <script type="module" src="profile.js"></script>
 <script type="module">
   // bag.js mới không có modal — chuyển thẳng sang trang bag.html

@@ -4,63 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VTWorld — Bầu Cua</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="baucua.css">
-  <link rel="stylesheet" href="quests.css"/>
-  <script type="module" src="quests.js"></script>
+    <link rel="stylesheet" href="quests.css">
+    <script type="module" src="quests.js"></script>
 </head>
 <body>
     <nav class="casino-nav">
-        <div class="logo" onclick="location.href='games.html'">
-            <span class="vt">VT</span><span class="world">World</span>
+        <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
+            <span style="color:#0ea5e9">VT</span><span>World</span>
         </div>
         <div class="nav-center">
-            <div id="nav-pts">
-                <span class="star">⭐</span>
-                <span id="pts-value">0</span>
-            </div>
+            <div id="nav-pts">⭐ 0</div>
         </div>
         <div class="nav-right">
-            <button onclick="location.href='games.html'" class="btn-games-pill">
-                <span class="arrow">←</span> Games
-            </button>
+            <button class="nav-btn exit-btn" onclick="location.href='games.html'">SẢNH</button>
         </div>
     </nav>
 
     <div class="game-container">
+        <!-- Bát & xúc xắc -->
         <div class="bowl-container">
             <div id="bowl" class="bowl">
                 <div id="bowl-lid" class="bowl-lid"></div>
-                
                 <div id="dice-container" class="dices">
                     <div class="dice" id="dice-0">?</div>
                     <div class="dice" id="dice-1">?</div>
                     <div class="dice" id="dice-2">?</div>
                 </div>
+                <!-- Thông báo kết quả nằm trong bát -->
+                <div id="result-notice" class="result-notice" style="display:none"></div>
             </div>
-            
-            <button id="btn-roll" class="main-btn">LẮC BẦU CUA</button>
-            
+
+            <button id="btn-roll" class="main-btn">🎲 LẮC BẦU CUA</button>
+
             <div class="total-bet-display">
                 TỔNG CƯỢC: <span id="total-bet-val">0</span>
             </div>
         </div>
 
+        <!-- Bàn đặt cược 6 ô -->
         <div class="bet-board">
-            <div class="bet-card" data-id="bau"><span class="emoji">🎃</span><span class="name">Bầu</span><div class="my-bet" id="bet-bau">0</div></div>
-            <div class="bet-card" data-id="cua"><span class="emoji">🦀</span><span class="name">Cua</span><div class="my-bet" id="bet-cua">0</div></div>
-            <div class="bet-card" data-id="tom"><span class="emoji">🦞</span><span class="name">Tôm</span><div class="my-bet" id="bet-tom">0</div></div>
-            <div class="bet-card" data-id="ca"><span class="emoji">🐟</span><span class="name">Cá</span><div class="my-bet" id="bet-ca">0</div></div>
-            <div class="bet-card" data-id="ga"><span class="emoji">🐔</span><span class="name">Gà</span><div class="my-bet" id="bet-ga">0</div></div>
-            <div class="bet-card" data-id="nai"><span class="emoji">🦌</span><span class="name">Nai</span><div class="my-bet" id="bet-nai">0</div></div>
+            <div class="bet-card" data-id="bau">
+                <span class="emoji">🎃</span><span class="name">Bầu</span>
+                <div class="my-bet" id="bet-bau">0</div>
+            </div>
+            <div class="bet-card" data-id="cua">
+                <span class="emoji">🦀</span><span class="name">Cua</span>
+                <div class="my-bet" id="bet-cua">0</div>
+            </div>
+            <div class="bet-card" data-id="tom">
+                <span class="emoji">🦞</span><span class="name">Tôm</span>
+                <div class="my-bet" id="bet-tom">0</div>
+            </div>
+            <div class="bet-card" data-id="ca">
+                <span class="emoji">🐟</span><span class="name">Cá</span>
+                <div class="my-bet" id="bet-ca">0</div>
+            </div>
+            <div class="bet-card" data-id="ga">
+                <span class="emoji">🐔</span><span class="name">Gà</span>
+                <div class="my-bet" id="bet-ga">0</div>
+            </div>
+            <div class="bet-card" data-id="nai">
+                <span class="emoji">🦌</span><span class="name">Nai</span>
+                <div class="my-bet" id="bet-nai">0</div>
+            </div>
         </div>
 
+        <!-- Chọn chip + xoá cược -->
         <div class="chip-selector">
             <button class="chip" data-amt="100">100</button>
             <button class="chip" data-amt="500">500</button>
             <button class="chip active" data-amt="1000">1k</button>
             <button class="chip" data-amt="5000">5k</button>
-            <button id="btn-clear" class="chip-clear">Xoá Cược</button>
+            <button id="btn-clear" class="chip-clear">🗑️ Xoá cược</button>
         </div>
     </div>
 

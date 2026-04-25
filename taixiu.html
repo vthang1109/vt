@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VTWorld — Tài Xỉu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="taixiu.css">
+    <link rel="stylesheet" href="xucxac.css">
+    <link rel="stylesheet" href="quests.css">
+    <script src="xucxac.js"></script>
+    <script type="module" src="quests.js"></script>
+</head>
+<body>
+    <nav class="casino-nav">
+        <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
+            <span style="color:#0ea5e9">VT</span><span>World</span>
+        </div>
+        <div class="nav-center">
+            <div id="nav-pts">⭐ 0</div>
+        </div>
+        <div class="nav-right">
+            <button class="nav-btn exit-btn" onclick="location.href='games.html'">SẢNH</button>
+        </div>
+    </nav>
+
+    <div class="game-container">
+        <!-- Bát ở trên -->
+        <div class="bowl-wrapper">
+            <div id="bowl" class="bowl">
+                <div id="bowl-lid" class="bowl-lid"></div>
+                <div id="dice-container" class="dices">
+                    <xuc-xac id="dice-0" value="1"></xuc-xac>
+                    <div class="dice-row">
+                        <xuc-xac id="dice-1" value="1"></xuc-xac>
+                        <xuc-xac id="dice-2" value="1"></xuc-xac>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hàng ngang: Tổng điểm và Lời/Lỗ -->
+        <div class="info-row">
+            <div id="total-score" class="info-box">Tổng:<br>--</div>
+            <div id="result-notice" class="info-box" style="display:none">--</div>
+        </div>
+
+        <!-- Nút lắc -->
+        <button id="btn-roll" class="main-btn">🎲 LẮC TÀI XỈU</button>
+
+        <!-- Tổng cược -->
+        <div class="total-bet-display">
+            TỔNG CƯỢC: <span id="total-bet-val">0</span>
+        </div>
+
+        <!-- Bàn cược -->
+        <div class="bet-board">
+            <div class="bet-card tai" data-id="tai">
+                <span class="emoji">🔴</span>
+                <span class="name">TÀI</span>
+                <div class="bet-info">11-17</div>
+                <div class="my-bet" id="bet-tai">0</div>
+            </div>
+            <div class="bet-card xiu" data-id="xiu">
+                <span class="emoji">🔵</span>
+                <span class="name">XỈU</span>
+                <div class="bet-info">4-10</div>
+                <div class="my-bet" id="bet-xiu">0</div>
+            </div>
+        </div>
+
+        <!-- Chip -->
+        <div class="chip-selector">
+            <button class="chip" data-amt="100">100</button>
+            <button class="chip" data-amt="500">500</button>
+            <button class="chip active" data-amt="1000">1k</button>
+            <button class="chip" data-amt="5000">5k</button>
+            <button id="btn-clear" class="chip-clear">🗑️ Xoá cược</button>
+        </div>
+    </div>
+
+    <script type="module" src="taixiu.js"></script>
+</body>
+</html>

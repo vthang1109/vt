@@ -538,9 +538,12 @@ function renderViewProfileActions(uid, data) {
   }
   getFriendStatus(_currentUser.uid, uid, (status) => {
     if (status === 'friends') {
-      area.innerHTML = `<div style="display:flex;gap:8px">
-        <button onclick="openConvoWithUid('${uid}','${escHtml(data.nickname)}')" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#34d399,#059669);border:none;color:#fff;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">💬 Nhắn tin</button>
-        <button onclick="unfriend('${uid}')" style="flex:1;padding:10px;border-radius:10px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#f87171;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">Hủy kết bạn</button>
+      area.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:8px">
+          <button onclick="openConvoWithUid('${uid}','${escHtml(data.nickname)}')" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#34d399,#059669);border:none;color:#fff;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">💬 Nhắn tin</button>
+          <button onclick="unfriend('${uid}')" style="flex:1;padding:10px;border-radius:10px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#f87171;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">Hủy kết bạn</button>
+        </div>
+        <button onclick="window.openSendPointsModal('${uid}','${escHtml(data.nickname)}')" style="width:100%;padding:10px;border-radius:10px;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">💸 Gửi điểm</button>
       </div>`;
     } else if (status === 'pending_sent') {
       area.innerHTML = `<div style="text-align:center;padding:10px;border-radius:10px;background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);color:#7dd3fc;font-weight:700;font-size:13px">⏳ Đã gửi lời mời kết bạn</div>`;

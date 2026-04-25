@@ -1,0 +1,112 @@
+/* ===== XÚC XẮC CUSTOM COMPONENT ===== */
+.xuc-xac {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  padding: 8px;
+  box-sizing: border-box;
+  transition: transform 0.3s ease;
+}
+
+.xuc-xac.rolling {
+  animation: shake 0.1s infinite;
+}
+
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Mặt bên trong chứa các chấm */
+.face {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+}
+
+.pip {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #000;
+}
+
+/* Chấm đỏ cho mặt 1 (sẽ được gán bằng class riêng nếu cần) */
+.pip.red {
+  background: #e53e3e;
+}
+
+/* Các layout mặt xúc xắc */
+.face-1 {
+  grid-template-areas:
+    ". . ."
+    ". a ."
+    ". . .";
+}
+.face-1 .pip { grid-area: a; }
+
+.face-2 {
+  grid-template-areas:
+    ". . b"
+    ". . ."
+    "a . .";
+}
+.face-2 .pip:nth-child(1) { grid-area: a; }
+.face-2 .pip:nth-child(2) { grid-area: b; }
+
+.face-3 {
+  grid-template-areas:
+    ". . c"
+    ". b ."
+    "a . .";
+}
+.face-3 .pip:nth-child(1) { grid-area: a; }
+.face-3 .pip:nth-child(2) { grid-area: b; }
+.face-3 .pip:nth-child(3) { grid-area: c; }
+
+.face-4 {
+  grid-template-areas:
+    "a . c"
+    ". . ."
+    "b . d";
+}
+.face-4 .pip:nth-child(1) { grid-area: a; }
+.face-4 .pip:nth-child(2) { grid-area: b; }
+.face-4 .pip:nth-child(3) { grid-area: c; }
+.face-4 .pip:nth-child(4) { grid-area: d; }
+
+.face-5 {
+  grid-template-areas:
+    "a . c"
+    ". e ."
+    "b . d";
+}
+.face-5 .pip:nth-child(1) { grid-area: a; }
+.face-5 .pip:nth-child(2) { grid-area: b; }
+.face-5 .pip:nth-child(3) { grid-area: c; }
+.face-5 .pip:nth-child(4) { grid-area: d; }
+.face-5 .pip:nth-child(5) { grid-area: e; }
+
+.face-6 {
+  grid-template-areas:
+    "a . c"
+    "d . f"
+    "b . e";
+}
+.face-6 .pip:nth-child(1) { grid-area: a; }
+.face-6 .pip:nth-child(2) { grid-area: b; }
+.face-6 .pip:nth-child(3) { grid-area: c; }
+.face-6 .pip:nth-child(4) { grid-area: d; }
+.face-6 .pip:nth-child(5) { grid-area: e; }
+.face-6 .pip:nth-child(6) { grid-area: f; }

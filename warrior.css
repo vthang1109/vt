@@ -1,0 +1,53 @@
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#030812; font-family:'Nunito',sans-serif; color:#fff; overflow:hidden; height:100vh; width:100vw; display:flex; align-items:center; justify-content:center; }
+#game-wrapper { position:relative; width:100vw; height:100vh; display:flex; flex-direction:column; background:#030812; }
+
+/* Top bar */
+#top-bar { display:flex; justify-content:space-between; align-items:center; padding:4px 12px; background:rgba(0,0,0,0.85); border-bottom:1px solid rgba(14,165,233,0.3); z-index:10; }
+.logo { font-family:'Orbitron',sans-serif; font-weight:900; font-size:0.95rem; color:#fff; cursor:pointer; }
+.logo span { color:#0ea5e9; }
+#nav-pts { font-family:'Orbitron'; color:#38bdf8; font-weight:700; font-size:13px; }
+.bar-right { display:flex; gap:6px; }
+.nav-btn { padding:4px 8px; border-radius:6px; font-family:'Orbitron'; font-size:10px; cursor:pointer; border:1px solid rgba(239,68,68,0.5); background:rgba(239,68,68,0.15); color:#ef4444; font-weight:700; }
+.fullscreen-btn { background:rgba(14,165,233,0.15); border-color:rgba(14,165,233,0.5); color:#0ea5e9; font-size:16px; padding:2px 7px; }
+
+/* Canvas */
+canvas { display:block; margin:0 auto; border:2px solid rgba(56,189,248,0.25); border-radius:2px; image-rendering:pixelated; image-rendering:crisp-edges; max-width:100vw; max-height:calc(100vh - 120px); }
+
+/* HUD */
+#hud { display:flex; align-items:center; justify-content:center; gap:16px; padding:4px 10px; font-family:'Press Start 2P',monospace; font-size:9px; flex-wrap:wrap; }
+.hud-bar { display:flex; align-items:center; gap:4px; }
+.hud-label { color:#94a3b8; font-size:8px; }
+.hud-bg { width:80px; height:8px; background:#1e293b; border:1px solid #475569; border-radius:2px; overflow:hidden; }
+.hud-fill { height:100%; transition:width 0.2s; }
+.hud-fill.hp { background:linear-gradient(180deg,#ef4444,#991b1b); }
+.hud-fill.mp { background:linear-gradient(180deg,#3b82f6,#1e40af); }
+.hud-gold { color:#facc15; font-size:10px; }
+
+/* Touch */
+#touchControls { display:flex; justify-content:space-between; padding:4px 10px; }
+.touch-group { display:flex; gap:6px; }
+.t-btn { width:42px; height:42px; border-radius:10px; border:2px solid rgba(56,189,248,0.3); background:rgba(15,23,42,0.9); color:#e2e8f0; font-size:17px; font-weight:900; cursor:pointer; user-select:none; -webkit-user-select:none; touch-action:manipulation; }
+.t-btn:active { background:rgba(14,165,233,0.3); border-color:#0ea5e9; }
+.jump-btn { border-color:#3b82f6; }
+.atk-btn { border-color:#ef4444; color:#f87171; }
+.magic-btn { border-color:#a78bfa; color:#c4b5fd; }
+
+/* Modal */
+.modal-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.9); z-index:50; display:none; align-items:center; justify-content:center; }
+.modal-box { background:#0a1a35; border:2px solid #38bdf8; border-radius:14px; padding:18px 22px; text-align:center; min-width:260px; max-width:380px; }
+.modal-box h2 { color:#facc15; font-family:'Press Start 2P',monospace; font-size:12px; margin-bottom:8px; }
+.modal-box p { font-size:13px; color:#e2e8f0; margin:6px 0; }
+.modal-btn { padding:10px 24px; border-radius:10px; border:none; background:#22c55e; color:#fff; font-weight:900; font-size:13px; cursor:pointer; margin-top:6px; }
+.modal-btn:active { background:#16a34a; }
+.start-box h1 { font-family:'Press Start 2P',monospace; font-size:14px; color:#facc15; text-shadow:0 0 16px #facc15; margin-bottom:10px; }
+.start-box p { font-size:12px; color:#94a3b8; }
+.start-btn { margin-top:14px; font-size:15px; padding:12px 30px; }
+.ctrl-hint { margin-top:10px; font-size:9px; color:#64748b; }
+
+#shopItems { display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+.shop-item { display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-radius:8px; border:1px solid rgba(56,189,248,0.2); background:rgba(255,255,255,0.03); }
+.shop-item button { padding:5px 10px; border-radius:6px; border:none; background:#0ea5e9; color:#fff; font-weight:700; font-size:11px; cursor:pointer; }
+.shop-item button:disabled { opacity:0.35; cursor:not-allowed; }
+
+@media (max-width:500px) { .t-btn { width:36px; height:36px; font-size:15px; } #hud { gap:8px; } }

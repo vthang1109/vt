@@ -137,7 +137,9 @@
           const medal = rank===1?'👑':(rank===2?'🥈':'🥉');
           div.innerHTML = `
             <div class="rank">${medal} #${rank}</div>
-            <div class="ava">${esc(nm[0].toUpperCase())}</div>
+            ${u.avatarUrl
+  ? `<div class="ava" style="background:url(${u.avatarUrl}) center/cover"></div>`
+  : `<div class="ava">${esc(nm[0].toUpperCase())}</div>`}
             <div class="nm">${esc(nm)}</div>
             <div class="pts">${(u.points||0).toLocaleString()} đ</div>`;
         }
@@ -158,7 +160,9 @@
         div.className = 'lb-row' + (isMe ? ' me' : '');
         div.innerHTML = `
           <div class="lb-rank">#${rank}</div>
-          <div class="lb-ava">${esc(nm[0].toUpperCase())}</div>
+          ${u.avatarUrl
+  ? `<div class="lb-ava" style="background:url(${u.avatarUrl}) center/cover"></div>`
+  : `<div class="lb-ava">${esc(nm[0].toUpperCase())}</div>`}
           <div class="lb-name">${esc(nm)}${isMe ? ' <span style="color:#34d399;font-size:11px">(Bạn)</span>' : ''}</div>
           <div class="lb-pts">${(u.points||0).toLocaleString()} đ</div>`;
         el.appendChild(div);

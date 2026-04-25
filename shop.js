@@ -2,6 +2,7 @@
 import { getFirestore, doc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doGacha } from './pet.js';
+import { OUTFIT_GACHA_POOL, grantOutfitItem } from './character.js';
 
 const db = getFirestore();
 const auth = getAuth();
@@ -34,6 +35,15 @@ export async function buyTickets(count = 1, type = 'normal', pricePerTicket = 10
 // quay gacha wrapper: gọi doGacha và trả về kết quả
 export async function rollGacha(rolls = 1, type = 'normal') {
   const results = await doGacha(rolls, type);
+
+  // 15% chance rơi 1 trang phục mỗi lần roll
+  const pool = OUTFIT_GACHA_POOL[type] || OUTFIT_GACHA_POOL.normal;
+  if (pool.length && Math.random() < 0.15) {
+    const itemId = pool[Math.floor(Math.random() * pool.length)];
+    await grantOutfitItem(itemId);
+    results.push({ _type: 'outfit', id: itemId });
+  }
+
   return results;
 }
 

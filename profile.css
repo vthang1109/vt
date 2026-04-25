@@ -10,8 +10,8 @@
 /* ===== BANNER ===== */
 .pro-banner {
   position: relative;
-  height: 130px;
-  margin-bottom: 52px;
+  height: 90px;
+  margin-bottom: 0;
   overflow: visible;
 }
 
@@ -44,23 +44,19 @@
     rgba(56,189,248,0.04) 41px
   );
 }
-
+/* MỚI */
 .pro-avatar-ring {
-  position: absolute;
-  bottom: -44px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 92px;
-  height: 92px;
+  width: 86px;
+  height: 86px;
   border-radius: 50%;
-  padding: 3px;
+  padding: 2px;
   background: linear-gradient(135deg, #38bdf8, #a78bfa, #34d399);
   animation: rotateRing 4s linear infinite;
-}
-
-@keyframes rotateRing {
-  0%   { background: linear-gradient(0deg,   #38bdf8, #a78bfa, #34d399); }
-  100% { background: linear-gradient(360deg, #38bdf8, #a78bfa, #34d399); }
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .pro-avatar {
@@ -68,14 +64,8 @@
   height: 100%;
   border-radius: 50%;
   background: linear-gradient(135deg, #1e293b, #0f172a);
-  border: 3px solid #0f172a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Orbitron', monospace;
-  font-size: 32px;
-  font-weight: 900;
-  color: #e0f2fe;
+  border: none;            /* ← xóa border thừa */
+  ...
 }
 
 /* ===== IDENTITY ===== */
@@ -438,4 +428,3 @@
   border: 2px solid #0f172a;
   z-index: 10;
 }
-.pro-avatar-ring { position: relative; }
