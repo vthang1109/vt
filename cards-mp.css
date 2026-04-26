@@ -1,7 +1,5 @@
 /* cards-mp.css */
 :root {
-  --card-width: 37px;
-  --card-height: 56px;
   --card-bg: #ffffff;
   --card-red: #e11d48;
   --card-black: #1e293b;
@@ -9,47 +7,47 @@
 }
 
 .card {
-  width: var(--card-width);
-  height: var(--card-height);
+  width: 40px !important;
+  height: 58px !important;
   background: var(--card-bg);
-  border-radius: 5px;
+  border-radius: 5px !important;
   position: relative;
-  margin-left: -23px;
+  margin-left: -23px !important;
   box-shadow: 2px 5px 15px rgba(0,0,0,0.3);
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
   justify-content: space-between;
-  padding: 3px;
+  padding: 3px !important;
   transition: transform 0.2s ease, margin 0.2s ease;
   border: 1px solid #ddd;
   user-select: none;
   flex-shrink: 0;
 }
 
-.card:first-child { margin-left: 0; }
+.card:first-child { margin-left: 0 !important; }
 
 .card.red { color: var(--card-red); }
 .card.black { color: var(--card-black); }
 
-.card-top { font-size: 7px; font-weight: 900; line-height: 1.1; }
-.card-top span { display: block; font-size: 6px; }
+.card-top { font-size: 7px !important; font-weight: 900; line-height: 1.1; }
+.card-top span { display: block; font-size: 6px !important; }
 
 .card-center {
-  font-size: 18px;
+  font-size: 18px !important;
   align-self: center;
   filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
 }
 
 .card-bottom {
-  font-size: 7px;
+  font-size: 7px !important;
   font-weight: 900;
   transform: rotate(180deg);
   line-height: 1.1;
 }
 
 .card.hidden {
-  background: linear-gradient(135deg, var(--vt-blue), #1e40af);
-  border: 3px solid #fff;
+  background: linear-gradient(135deg, var(--vt-blue), #1e40af) !important;
+  border: 2px solid #fff !important;
 }
 
 .card.hidden .card-back-pattern {
@@ -68,11 +66,11 @@
 }
 
 .xd-cards {
-  display: flex;
-  flex-wrap: nowrap;
+  display: flex !important;
+  flex-wrap: nowrap !important;
   align-items: flex-start;
-  height: auto;
-  min-height: unset;
+  height: auto !important;
+  min-height: unset !important;
   overflow: visible;
   padding: 2px 0;
 }
