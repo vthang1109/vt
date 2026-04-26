@@ -25,7 +25,6 @@ onAuthStateChanged(auth, async (u) => {
   if (ROOM_ID) start();
 });
 
-// Hàm tính điểm dựa trên mảng card object (từ cards.js)
 function cardValue(card) {
   const v = card.v;
   if (v === 'A') return 1;
@@ -40,10 +39,7 @@ function bestScore(cards) {
     total += val;
     if (c.v === 'A') aces++;
   }
-  while (aces > 0 && total + 10 <= 21) {
-    total += 10;
-    aces--;
-  }
+  while (aces > 0 && total + 10 <= 21) { total += 10; aces--; }
   return total;
 }
 
@@ -87,21 +83,20 @@ function render(r) {
   }
   else if (gs.phase === 'dealer') phEl.textContent = '🃏 Nhà cái mở bài...';
   else if (gs.phase === 'result') phEl.textContent = `📢 Vòng ${gs.round} — Kết quả`;
-  else if (gs.phase === 'early_reveal') phEl.textContent = '⚡ Nhà cái mạnh — đang khui bài!';
 
-  // Bet row (người chơi, không phải nhà cái)
+  // Bet row — chỉ hiện cho người chơi chưa đặt
   const myBet = gs.bets?.[_user.uid] || 0;
   if (gs.phase === 'betting' && !isHost) {
     betRow.style.display = myBet > 0 ? 'none' : 'flex';
   } else betRow.style.display = 'none';
 
-  // Sắp xếp ghế: nhà cái trên cùng, bản thân dưới cùng
-  // FIX: Loại trừ nhà cái khỏi otherPlayers, tránh hiển thị 2 lần
+  // Thứ tự ghế:
+  // HOST thấy: người chơi khác trên, nhà cái (mình) DƯỚI CÙNG
+  // Người chơi thấy: nhà cái trên, người khác, mình dưới cùng
   const otherPlayers = (r.members || []).filter(uid => uid !== dealerUid && uid !== _user.uid);
-  // Nếu user là nhà cái thì seatsOrder = [dealer] + others, không có _user.uid thêm lần nữa
   let seatsOrder;
   if (isHost) {
-    seatsOrder = [dealerUid, ...otherPlayers];
+    seatsOrder = [...otherPlayers, dealerUid]; // nhà cái xuống dưới cùng
   } else {
     seatsOrder = [dealerUid, ...otherPlayers, _user.uid];
   }
@@ -109,13 +104,17 @@ function render(r) {
   const tEl = document.getElementById('xd-table');
   tEl.innerHTML = '';
 
-  // Kiểm tra nhà cái có đủ điểm để khui sớm không
+  // Thông tin nhà cái
   const dealerHand = gs.hands?.[dealerUid] || [];
   const dealerStat = dealerHand.length ? status(dealerHand) : null;
+  // Điều kiện khui sớm
   const canEarlyReveal = dealerStat && isHost && gs.phase === 'playing' && (
     (dealerHand.length === 2 && dealerStat.score >= 15) ||
-    (dealerHand.length === 3 && dealerStat.score >= 16)
+    (dealerHand.length >= 3 && dealerStat.score >= 16)
   );
+  // Nhà cái xì dách / xì bàn
+  const dealerIsSpecial = dealerStat && (dealerStat.tag === 'blackjack' || dealerStat.score === 21);
+  const dealerRevealedAll = !!(gs.dealerRevealedAll);
 
   for (const uid of seatsOrder) {
     const isDealer = (uid === dealerUid);
@@ -125,161 +124,134 @@ function render(r) {
     const myBetAmt = gs.bets?.[uid] || 0;
     const stat = hand.length ? status(hand) : null;
     const isTurn = gs.phase === 'playing' && gs.turnOrder?.[gs.turnIdx] === uid;
-
-    // Kiểm tra bài có bị khui sớm không
     const isEarlyRevealed = !!(gs.earlyRevealed?.[uid]);
+    const isSelfRevealed = !!(gs.revealed?.[uid]);
 
-    // Xác định bài hiển thị (che bài người khác)
-    let visibleCards = [];
+    // Số lá được nhìn thấy
+    let visibleCount = 0;
     if (isMe) {
-      // Người chơi luôn thấy bài của mình
-      visibleCards = hand;
+      visibleCount = hand.length;
     } else if (isDealer) {
-      // FIX: Nhà cái úp hết khi phase=playing, chỉ mở khi dealer/result/early_reveal
-      if (gs.phase === 'playing' || gs.phase === 'betting') {
-        visibleCards = []; // úp hết
-      } else {
-        visibleCards = hand; // mở hết
-      }
+      // Nhà cái úp hết khi playing/betting; mở hết khi dealer/result
+      visibleCount = (gs.phase === 'playing' || gs.phase === 'betting') ? 0 : hand.length;
     } else {
-      // Người chơi khác
-      if (gs.phase === 'result' || gs.phase === 'dealer' || gs.phase === 'early_reveal' || isEarlyRevealed) {
-        visibleCards = hand;
-      } else if (isMe) {
-        visibleCards = hand;
-      } else {
-        visibleCards = []; // úp hết
-      }
+      // Người chơi khác: mở khi result/dealer, hoặc bị khui, hoặc tự mở, hoặc nhà cái mở tất
+      visibleCount = (gs.phase === 'result' || gs.phase === 'dealer' || isEarlyRevealed || isSelfRevealed || dealerRevealedAll)
+        ? hand.length : 0;
     }
 
-    // Tạo HTML bài
+    // Render bài
     let cardsHtml = '';
     if (!hand.length) {
       cardsHtml = '<div style="color:#64748b;font-size:12px;padding:8px 0">Chưa có bài</div>';
     } else {
-      // FIX: Sửa lại logic render bài - không bị lỗi biến backHtml
       for (let i = 0; i < hand.length; i++) {
-        if (i < visibleCards.length) {
-          cardsHtml += renderCardUI(hand[i], false); // mặt ngửa
-        } else {
-          cardsHtml += renderCardUI(null, true); // mặt úp
-        }
+        cardsHtml += renderCardUI(i < visibleCount ? hand[i] : null, i >= visibleCount);
       }
     }
 
-    // Class và tag
+    // CSS class
     let cls = 'xd-seat';
     if (isTurn) cls += ' turn';
-    if ((gs.phase === 'result' || gs.phase === 'early_reveal') && gs.results?.[uid]) {
+    if (gs.phase === 'result' && gs.results?.[uid]) {
       const res = gs.results[uid];
       if (res.outcome === 'win') cls += ' win';
       else if (res.outcome === 'lose') cls += ' lose';
     }
-    if (isMe) cls += ' me';
+    // Ghế "me" cho chính mình — kể cả khi là host/dealer
+    if (isMe || (isHost && isDealer)) cls += ' me';
     if (isDealer) cls += ' dealer';
 
-    // Tag hiển thị trạng thái
+    // Tags
     let tagHtml = '';
-    // FIX: Bài quắc vẫn úp, chỉ hiện tag cho chính mình
-    const showStat = isMe || gs.phase === 'result' || gs.phase === 'dealer' || gs.phase === 'early_reveal' || isEarlyRevealed || isDealer;
+    const showStat = isMe || gs.phase === 'result' || gs.phase === 'dealer' || isEarlyRevealed || isSelfRevealed || dealerRevealedAll || isDealer && gs.phase !== 'playing';
     if (stat && showStat) {
-      if (stat.tag === 'bust') {
-        // FIX: Người chơi quắc vẫn úp bài, nhưng hiện tag Quắc cho chính mình
-        if (isMe) tagHtml += '<span class="xd-seat-tag xd-tag-bust">Quắc</span>';
-        else if (gs.phase === 'result' || gs.phase === 'early_reveal' || isEarlyRevealed) tagHtml += '<span class="xd-seat-tag xd-tag-bust">Quắc</span>';
-      } else if (stat.tag === 'blackjack') {
-        tagHtml += '<span class="xd-seat-tag xd-tag-blackjack">Xì dách</span>';
-      } else if (standed && !isDealer && (isMe || gs.phase !== 'playing')) {
-        tagHtml += '<span class="xd-seat-tag xd-tag-stand">✋ Dằn</span>';
-      }
+      if (stat.tag === 'bust') tagHtml += '<span class="xd-seat-tag xd-tag-bust">Quắc</span>';
+      else if (stat.tag === 'blackjack') tagHtml += '<span class="xd-seat-tag xd-tag-blackjack">Xì dách ♠️</span>';
+      else if (stat.score === 21) tagHtml += '<span class="xd-seat-tag xd-tag-blackjack">Xì bàn 21</span>';
+      else if (standed && !isDealer) tagHtml += '<span class="xd-seat-tag xd-tag-stand">✋ Dằn</span>';
     }
-
-    // Tag kết quả thắng/thua (chỉ hiển thị cho người có liên quan hoặc ở result)
-    const showResult = gs.phase === 'result' || (gs.phase === 'early_reveal' && isEarlyRevealed);
-    if (showResult && gs.results?.[uid] && !isDealer) {
+    if (gs.phase === 'result' && gs.results?.[uid] && !isDealer) {
       const res = gs.results[uid];
       if (res.outcome === 'win') tagHtml += `<span class="xd-seat-tag" style="background:rgba(52,211,153,.2);color:#34d399">+${res.delta}đ</span>`;
       else if (res.outcome === 'lose') tagHtml += `<span class="xd-seat-tag xd-tag-bust">${res.delta}đ</span>`;
       else tagHtml += `<span class="xd-seat-tag xd-tag-stand">Hoà</span>`;
     }
 
-    // Tên hiển thị
-    let nameHtml = '';
-    if (isDealer) {
-      nameHtml = `<span class="xd-seat-name">👑 Nhà Cái</span>`;
-    } else {
-      nameHtml = `<span class="xd-seat-name">${esc(r.memberInfo?.[uid]?.name || '?')}${isMe ? ' <span style="color:#fbbf24">(bạn)</span>' : ''}</span>`;
-    }
+    // Tên
+    let nameHtml = isDealer
+      ? `<span class="xd-seat-name">👑 Nhà Cái${isHost ? ' <span style="color:#fbbf24;font-size:12px">(bạn)</span>' : ''}</span>`
+      : `<span class="xd-seat-name">${esc(r.memberInfo?.[uid]?.name || '?')}${isMe ? ' <span style="color:#fbbf24">(bạn)</span>' : ''}</span>`;
 
-    // Điểm số - chỉ hiện cho mình hoặc khi mở bài
+    // Điểm
     let scoreText = '';
     if (isDealer) {
       if (gs.phase !== 'playing' && gs.phase !== 'betting' && stat) scoreText = stat.score;
       else if (gs.phase === 'playing') scoreText = '?';
     } else {
-      if (stat && (isMe || showResult || isEarlyRevealed)) scoreText = stat.score;
+      if (stat && (isMe || gs.phase === 'result' || gs.phase === 'dealer' || isEarlyRevealed || isSelfRevealed || dealerRevealedAll)) scoreText = stat.score;
     }
 
-    // Nút Mở bài khi người chơi xì dách / xì bàn (score 21)
+    // Nút mở bài cho người chơi (xì dách/xì bàn)
     let openBtnHtml = '';
-    if (isMe && stat && (stat.tag === 'blackjack' || stat.score === 21) && gs.phase === 'playing') {
-      openBtnHtml = `<button onclick="revealMyHand()" style="margin-top:6px;padding:6px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:800;font-family:'Nunito',sans-serif;font-size:12px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1f1f1f">🎉 Mở bài</button>`;
+    if (!isDealer && isMe && stat && (stat.tag === 'blackjack' || stat.score === 21) && gs.phase === 'playing' && !isSelfRevealed) {
+      openBtnHtml = `<button onclick="revealMyHand()" class="xd-open-btn">🎉 Mở bài</button>`;
     }
 
-    // Nút khui sớm cho nhà cái (chỉ host thấy)
+    // Nút mở tất cả bài (nhà cái xì dách/xì bàn)
+    let dealerOpenAllBtn = '';
+    if (isDealer && isHost && dealerIsSpecial && gs.phase === 'playing' && !dealerRevealedAll) {
+      dealerOpenAllBtn = `<button onclick="dealerRevealAll()" class="xd-open-btn xd-open-all-btn">🃏 Mở tất cả bài</button>`;
+    }
+
+    // Nút khui sớm (host, từng người)
     let earlyRevealBtn = '';
-    if (isHost && canEarlyReveal && gs.phase === 'playing' && !isDealer) {
-      // Chỉ show nút cho từng người chơi chưa bị khui
-      if (!isEarlyRevealed) {
-        earlyRevealBtn = `<button onclick="earlyRevealPlayer('${uid}')" style="margin-top:4px;padding:5px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:800;font-family:'Nunito',sans-serif;font-size:11px;background:linear-gradient(135deg,#f87171,#dc2626);color:#fff">⚡ Khui bài</button>`;
-      }
+    if (isHost && canEarlyReveal && !isDealer && !isEarlyRevealed) {
+      earlyRevealBtn = `<button onclick="earlyRevealPlayer('${uid}')" class="xd-early-btn">⚡ Khui bài</button>`;
     }
 
     tEl.innerHTML += `
       <div class="${cls}">
         <div class="xd-seat-head">
           ${nameHtml}
-          <div>${tagHtml}</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${tagHtml}</div>
         </div>
-        <div class="xd-cards">
-          ${cardsHtml}
-        </div>
+        <div class="xd-cards">${cardsHtml}</div>
         <div class="xd-seat-meta">
           <span class="xd-score">${scoreText}</span>
           ${myBetAmt > 0 ? `<span class="xd-bet">Cược: ${myBetAmt.toLocaleString('vi-VN')}đ</span>` : (isDealer ? '' : '<span class="xd-bet" style="color:#64748b">chưa đặt</span>')}
         </div>
-        ${openBtnHtml}
-        ${earlyRevealBtn}
+        ${openBtnHtml}${dealerOpenAllBtn}${earlyRevealBtn}
       </div>
     `;
   }
 
-  // Nút điều khiển
-  // FIX: Nhà cái không có lượt chơi trong turnOrder nên không hiện nút Rút/Dằn cho host
+  // Nút điều khiển người chơi
   const myTurn = !isHost && gs.phase === 'playing' && gs.turnOrder?.[gs.turnIdx] === _user.uid;
   btnHit.style.display = myTurn ? 'inline-block' : 'none';
   btnStand.style.display = myTurn ? 'inline-block' : 'none';
 
+  // FIX nút Chia bài: hiện khi phase=betting và có ít nhất 1 người đặt cược
   const allBetIn = (r.members || []).filter(u => u !== r.hostUid).every(u => (gs.bets?.[u] || 0) > 0);
   const anyBet = Object.values(gs.bets || {}).some(v => v > 0);
   btnDeal.style.display = (isHost && gs.phase === 'betting' && anyBet) ? 'inline-block' : 'none';
   btnDeal.disabled = !allBetIn;
   btnDeal.textContent = allBetIn ? '🃏 Chia bài' : '⏳ Chờ tất cả đặt cược';
+
+  // Nút vòng mới
   btnNext.style.display = (isHost && gs.phase === 'result') ? 'inline-block' : 'none';
 
-  // Nút bốc bài cho nhà cái (khi phase=dealer)
+  // Nút bốc bài nhà cái (dynamic)
   let dealerDrawBtn = document.getElementById('btn-dealer-draw');
   if (!dealerDrawBtn) {
     dealerDrawBtn = document.createElement('button');
     dealerDrawBtn.id = 'btn-dealer-draw';
     dealerDrawBtn.className = 'btn-deal';
-    dealerDrawBtn.style.background = 'linear-gradient(135deg,#fbbf24,#f59e0b)';
-    dealerDrawBtn.style.color = '#1f1f1f';
+    dealerDrawBtn.style.cssText = 'background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1f1f1f;';
     dealerDrawBtn.onclick = hostDealerDraw;
     document.querySelector('.xd-actions').insertBefore(dealerDrawBtn, document.querySelector('.btn-leave-xd'));
   }
   dealerDrawBtn.style.display = (isHost && gs.phase === 'dealer') ? 'inline-block' : 'none';
-  // Cập nhật text nút dựa trên điểm nhà cái
   if (isHost && gs.phase === 'dealer') {
     const dScore = dealerStat ? dealerStat.score : 0;
     dealerDrawBtn.textContent = dScore < 17 ? `🃏 Bốc bài (${dScore} điểm)` : `✅ Kết thúc (${dScore} điểm)`;
@@ -306,7 +278,6 @@ window.placeBet = async function() {
 };
 
 // Chia bài (host)
-// FIX: Nhà cái chia bài, tất cả úp (dealer cũng úp), phase -> playing
 window.hostDeal = async function() {
   const snap = await getDoc(doc(db,'rooms',ROOM_ID));
   if (!snap.exists()) return;
@@ -315,13 +286,10 @@ window.hostDeal = async function() {
   const gs = r.gameState || {};
   const players = (r.members || []).filter(u => u !== r.hostUid && (gs.bets?.[u] || 0) > 0);
   if (players.length === 0) { showToast('Chưa ai cược','warn'); return; }
-  
-  const deck = createDeck(); // tạo bộ bài 52 lá trộn
+  const deck = createDeck();
   const hands = {};
-  // FIX: Chia bài - nhà cái 2 lá úp hết, người chơi 2 lá
-  hands[r.hostUid] = [deck.pop(), deck.pop()];
+  hands[r.hostUid] = [deck.pop(), deck.pop()]; // nhà cái 2 lá, úp hết
   players.forEach(uid => { hands[uid] = [deck.pop(), deck.pop()]; });
-  
   await updateDoc(doc(db,'rooms',ROOM_ID), {
     'gameState.phase': 'playing',
     'gameState.deck': deck,
@@ -330,11 +298,14 @@ window.hostDeal = async function() {
     'gameState.turnOrder': players,
     'gameState.turnIdx': 0,
     'gameState.results': {},
-    'gameState.earlyRevealed': {}
+    'gameState.earlyRevealed': {},
+    'gameState.earlyResults': {},
+    'gameState.revealed': {},
+    'gameState.dealerRevealedAll': false
   });
 };
 
-// Rút bài (người chơi)
+// Rút bài
 window.hit = async function() {
   const snap = await getDoc(doc(db,'rooms',ROOM_ID));
   if (!snap.exists()) return;
@@ -345,12 +316,8 @@ window.hit = async function() {
   if (deck.length === 0) { showToast('Hết bài!','warn'); return; }
   hand.push(deck.pop());
   const stat = status(hand);
-  const updates = {
-    'gameState.deck': deck,
-    [`gameState.hands.${_user.uid}`]: hand
-  };
+  const updates = { 'gameState.deck': deck, [`gameState.hands.${_user.uid}`]: hand };
   let advance = false;
-  // FIX: Quắc vẫn advance nhưng bài vẫn úp (không tự khui)
   if (stat.tag === 'bust' || hand.length >= 5 || stat.score === 21) {
     updates[`gameState.stand.${_user.uid}`] = true;
     advance = true;
@@ -369,53 +336,39 @@ window.stand = async function() {
   await advanceTurnIfNeeded();
 };
 
-// Chuyển lượt hoặc kết thúc vòng chơi
+// Chuyển lượt
 async function advanceTurnIfNeeded() {
   const snap = await getDoc(doc(db,'rooms',ROOM_ID));
   if (!snap.exists()) return;
   const r = snap.data(); const gs = r.gameState;
   if (gs.phase !== 'playing') return;
   let idx = gs.turnIdx;
-  // Tìm người tiếp theo chưa stand
   while (idx < gs.turnOrder.length && gs.stand?.[gs.turnOrder[idx]]) idx++;
   if (idx >= gs.turnOrder.length) {
-    // Tất cả đã dằn -> chuyển sang dealer
-    // FIX: Chuyển sang phase dealer, host tự bốc bài thủ công
     await updateDoc(doc(db,'rooms',ROOM_ID), { 'gameState.turnIdx': idx, 'gameState.phase': 'dealer' });
   } else {
     await updateDoc(doc(db,'rooms',ROOM_ID), { 'gameState.turnIdx': idx });
   }
 }
 
-// FIX: Nhà cái bốc bài thủ công (nút bấm)
+// Nhà cái bốc bài thủ công
 async function hostDealerDraw() {
   const snap = await getDoc(doc(db,'rooms',ROOM_ID));
   if (!snap.exists()) return;
   const r = snap.data(); const gs = r.gameState;
-  if (r.hostUid !== _user.uid) return;
-  if (gs.phase !== 'dealer') return;
-
+  if (r.hostUid !== _user.uid || gs.phase !== 'dealer') return;
   let deck = [...(gs.deck || [])];
   let hand = [...(gs.hands?.[r.hostUid] || [])];
   const score = bestScore(hand);
-
   if (score >= 17 || hand.length >= 5) {
-    // Đủ điểm hoặc đủ bài -> kết thúc
     await finishDealerAndSettle(r, hand, deck);
   } else {
-    // Bốc thêm 1 lá
     if (deck.length === 0) { showToast('Hết bài!','warn'); return; }
     hand.push(deck.pop());
-    const newScore = bestScore(hand);
-    await updateDoc(doc(db,'rooms',ROOM_ID), {
-      'gameState.deck': deck,
-      [`gameState.hands.${r.hostUid}`]: hand
-    });
-    if (newScore >= 17 || hand.length >= 5 || newScore > 21) {
-      // Tự kết thúc nếu đủ điều kiện
-      const updatedSnap = await getDoc(doc(db,'rooms',ROOM_ID));
-      const updatedR = updatedSnap.data();
-      await finishDealerAndSettle(updatedR, hand, deck);
+    await updateDoc(doc(db,'rooms',ROOM_ID), { 'gameState.deck': deck, [`gameState.hands.${r.hostUid}`]: hand });
+    if (bestScore(hand) >= 17 || hand.length >= 5 || bestScore(hand) > 21) {
+      const upd = await getDoc(doc(db,'rooms',ROOM_ID));
+      await finishDealerAndSettle(upd.data(), hand, deck);
     }
   }
 }
@@ -430,19 +383,12 @@ async function finishDealerAndSettle(r, dealerHand, deck) {
     if (bet === 0) return;
     const playerHand = r.gameState.hands?.[uid] || [];
     const playerStat = status(playerHand);
-    let outcome = 'lose';
-    let delta = -bet;
-    if (playerStat.tag === 'bust') {
-      outcome = 'lose'; delta = -bet;
-    } else if (dealerStat.tag === 'bust') {
-      outcome = 'win'; delta = bet;
-    } else if (playerStat.tag === 'blackjack' && dealerStat.tag !== 'blackjack') {
-      outcome = 'win'; delta = Math.floor(bet * 1.5);
-    } else if (playerStat.score > dealerStat.score) {
-      outcome = 'win'; delta = bet;
-    } else if (playerStat.score === dealerStat.score) {
-      outcome = 'draw'; delta = 0;
-    }
+    let outcome = 'lose', delta = -bet;
+    if (playerStat.tag === 'bust') { outcome = 'lose'; delta = -bet; }
+    else if (dealerStat.tag === 'bust') { outcome = 'win'; delta = bet; }
+    else if (playerStat.tag === 'blackjack' && dealerStat.tag !== 'blackjack') { outcome = 'win'; delta = Math.floor(bet * 1.5); }
+    else if (playerStat.score > dealerStat.score) { outcome = 'win'; delta = bet; }
+    else if (playerStat.score === dealerStat.score) { outcome = 'draw'; delta = 0; }
     results[uid] = { outcome, delta };
   });
   await updateDoc(doc(db,'rooms',ROOM_ID), {
@@ -453,44 +399,34 @@ async function finishDealerAndSettle(r, dealerHand, deck) {
   });
 }
 
-// ===== TÍNH NĂNG MỚI: Khui sớm bài người chơi =====
-// Nhà cái đủ điểm (2 lá >= 15 hoặc 3 lá >= 16) có thể khui bài từng người
+// Khui sớm từng người (nhà cái mạnh)
 window.earlyRevealPlayer = async function(targetUid) {
   const snap = await getDoc(doc(db,'rooms',ROOM_ID));
   if (!snap.exists()) return;
   const r = snap.data(); const gs = r.gameState;
-  if (r.hostUid !== _user.uid) return;
-  if (gs.phase !== 'playing') return;
-
-  // Kiểm tra lại điều kiện nhà cái
+  if (r.hostUid !== _user.uid || gs.phase !== 'playing') return;
   const dealerHand = gs.hands?.[r.hostUid] || [];
   const dealerScore = bestScore(dealerHand);
-  const canReveal = (dealerHand.length === 2 && dealerScore >= 15) || (dealerHand.length === 3 && dealerScore >= 16);
+  const canReveal = (dealerHand.length === 2 && dealerScore >= 15) || (dealerHand.length >= 3 && dealerScore >= 16);
   if (!canReveal) { showToast('Chưa đủ điểm để khui','warn'); return; }
-
-  // Tính kết quả riêng cho người bị khui
   const targetHand = gs.hands?.[targetUid] || [];
   const targetStat = status(targetHand);
   const dealerStat = status(dealerHand);
   const bet = gs.bets?.[targetUid] || 0;
-
-  let outcome = 'lose'; let delta = -bet;
+  let outcome = 'lose', delta = -bet;
   if (targetStat.tag === 'bust') { outcome = 'lose'; delta = -bet; }
   else if (dealerStat.tag === 'bust') { outcome = 'win'; delta = bet; }
   else if (targetStat.tag === 'blackjack' && dealerStat.tag !== 'blackjack') { outcome = 'win'; delta = Math.floor(bet * 1.5); }
   else if (targetStat.score > dealerScore) { outcome = 'win'; delta = bet; }
   else if (targetStat.score === dealerScore) { outcome = 'draw'; delta = 0; }
-
-  // Lưu kết quả riêng vào earlyResults, đánh dấu đã khui
   await updateDoc(doc(db,'rooms',ROOM_ID), {
     [`gameState.earlyRevealed.${targetUid}`]: true,
     [`gameState.earlyResults.${targetUid}`]: { outcome, delta }
   });
-
   showToast(`⚡ Đã khui bài ${esc(r.memberInfo?.[targetUid]?.name || '?')}`, 'info');
 };
 
-// ===== TÍNH NĂNG MỚI: Mở bài khi Xì dách / Xì bàn =====
+// Người chơi tự mở bài (xì dách/xì bàn)
 window.revealMyHand = async function() {
   const snap = await getDoc(doc(db,'rooms',ROOM_ID));
   if (!snap.exists()) return;
@@ -499,18 +435,26 @@ window.revealMyHand = async function() {
   const hand = gs.hands?.[_user.uid] || [];
   const stat = status(hand);
   if (stat.tag !== 'blackjack' && stat.score !== 21) return;
-
-  // Đánh dấu người này tự mở bài
-  await updateDoc(doc(db,'rooms',ROOM_ID), {
-    [`gameState.revealed.${_user.uid}`]: true
-  });
+  await updateDoc(doc(db,'rooms',ROOM_ID), { [`gameState.revealed.${_user.uid}`]: true });
   showToast('🎉 Đã mở bài cho mọi người xem!', 'success');
 };
 
-// Xử lý kết quả cho người chơi (cộng trừ điểm)
+// Nhà cái xì dách/xì bàn → mở tất cả bài
+window.dealerRevealAll = async function() {
+  const snap = await getDoc(doc(db,'rooms',ROOM_ID));
+  if (!snap.exists()) return;
+  const r = snap.data(); const gs = r.gameState;
+  if (r.hostUid !== _user.uid || gs.phase !== 'playing') return;
+  const dealerHand = gs.hands?.[r.hostUid] || [];
+  const dStat = status(dealerHand);
+  if (dStat.tag !== 'blackjack' && dStat.score !== 21) return;
+  await updateDoc(doc(db,'rooms',ROOM_ID), { 'gameState.dealerRevealedAll': true });
+  showToast('🃏 Nhà cái mở tất cả bài!', 'success');
+};
+
+// Settle kết quả
 async function settleMyResult(r, gs) {
   if (r.hostUid === _user.uid) {
-    // Nhà cái: tổng lỗ/lãi
     let dealerDelta = 0;
     Object.values(gs.results || {}).forEach(res => { dealerDelta -= res.delta; });
     if (dealerDelta !== 0) {
@@ -524,7 +468,6 @@ async function settleMyResult(r, gs) {
     }
     return;
   }
-  // Người chơi
   const bet = gs.bets?.[_user.uid] || 0;
   const res = gs.results?.[_user.uid];
   if (!res) return;
@@ -546,7 +489,7 @@ async function settleMyResult(r, gs) {
   }
 }
 
-// Vòng mới
+// Vòng mới — reset toàn bộ để nút Chia bài xuất hiện lại
 window.hostNextRound = async function() {
   const snap = await getDoc(doc(db,'rooms',ROOM_ID));
   if (!snap.exists()) return;
@@ -564,6 +507,7 @@ window.hostNextRound = async function() {
     'gameState.earlyRevealed': {},
     'gameState.earlyResults': {},
     'gameState.revealed': {},
+    'gameState.dealerRevealedAll': false,
     'gameState.round': (r.gameState.round || 1) + 1
   });
 };
