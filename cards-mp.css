@@ -1,0 +1,31 @@
+/* cards-mp.css — lá bài thu nhỏ cho multiplayer */
+:root {
+  --card-width: 46px;
+  --card-height: 64px;
+}
+
+.card-top { font-size: 10px !important; }
+.card-top span { font-size: 9px !important; }
+.card-center { font-size: 22px !important; }
+.card-bottom { font-size: 10px !important; }
+.card { margin-left: -18px !important; }
+.card:first-child { margin-left: 0 !important; }
+
+/* Nhà cái */
+.xd-seat.dealer:not(.me) .card {
+  --card-width: 52px;
+  --card-height: 72px;
+}
+
+/* Bản thân */
+.xd-seat.me .card {
+  --card-width: 68px;
+  --card-height: 95px;
+}
+.xd-seat.me .card-top { font-size: 13px !important; }
+.xd-seat.me .card-center { font-size: 32px !important; }
+
+.xd-cards {
+  min-height: 70px;
+  overflow: visible;
+}
