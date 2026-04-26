@@ -138,6 +138,23 @@
       font-weight:800; font-family:'Nunito',sans-serif; font-size:12px;
       background:linear-gradient(135deg,#fbbf24,#f59e0b); color:#1f1f1f;
     }
+    /* xidach-mp.html — thêm vào sau phần CSS bài hiện tại */
+
+/* Ẩn center + bottom khi bài nhỏ (người khác + nhà cái) */
+.xd-seat:not(.me) .xd-cards .card-center,
+.xd-seat:not(.me) .xd-cards .card-bottom { display: none !important; }
+
+.xd-seat:not(.me) .xd-cards .card {
+  justify-content: flex-start !important;
+}
+
+.xd-seat:not(.me) .xd-cards .card-top {
+  font-size: 9px !important;
+  line-height: 1 !important;
+}
+.xd-seat:not(.me) .xd-cards .card-top span {
+  font-size: 9px !important;
+}
   </style>
 </head>
 <body>
