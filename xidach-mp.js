@@ -124,7 +124,8 @@ function render(r) {
 
   const dealerHand = gs.hands?.[dealerUid] || [];
   const dealerStat = dealerHand.length ? handStatus(dealerHand) : null;
-  const dealerAllOpen = gs.phase === 'result' || gs.phase === 'dealer' || !!(gs.dealerChecked && Object.keys(gs.dealerChecked).length > 0);
+  // Nhà cái chỉ lật bài khi đến lượt mình (dealer) hoặc kết thúc (result)
+  const dealerOpen = gs.phase === 'dealer' || gs.phase === 'result';
 
   for (const uid of seatsOrder) {
     const isDealer = (uid === dealerUid);
@@ -134,16 +135,17 @@ function render(r) {
     const standed = !!gs.stands?.[uid];
     const isTurn = gs.phase === 'playing' && gs.turnOrder?.[gs.turnIdx] === uid;
     const betAmt = gs.bets?.[uid] || 0;
+    const checked = !!gs.dealerChecked?.[uid];
 
     // Xác định số lá được mở
     let visibleCount = 0;
     if (isMe) {
       visibleCount = hand.length;
     } else if (isDealer) {
-      visibleCount = dealerAllOpen ? hand.length : 0;
+      visibleCount = dealerOpen ? hand.length : 0;
     } else {
-      visibleCount = (gs.phase === 'result' || gs.phase === 'dealer' || dealerAllOpen)
-        ? hand.length : 0;
+      // Người chơi khác: mở khi bị xét hoặc khi ván kết thúc
+      visibleCount = (gs.phase === 'result' || (gs.phase === 'dealer' && checked)) ? hand.length : 0;
     }
 
     let cardsHtml = hand.length === 0
@@ -152,7 +154,7 @@ function render(r) {
 
     let cls = 'xd-seat';
     if (isTurn) cls += ' turn';
-    if (gs.phase === 'result' && gs.results?.[uid]) {
+    if (gs.results?.[uid]) {
       const res = gs.results[uid];
       if (res.outcome === 'win') cls += ' win';
       else if (res.outcome === 'lose') cls += ' lose';
@@ -161,7 +163,7 @@ function render(r) {
     if (isDealer) cls += ' dealer';
 
     let tagHtml = '';
-    const showStat = isMe || gs.phase === 'result' || gs.phase === 'dealer' || dealerAllOpen;
+    const showStat = isMe || gs.phase === 'result' || (gs.phase === 'dealer' && (isDealer || checked));
     if (stat && showStat) {
       if (stat.tag === 'xi_bang') tagHtml += '<span class="xd-seat-tag xd-tag-blackjack">Xì Bàng</span>';
       else if (stat.tag === 'xi_dach') tagHtml += '<span class="xd-seat-tag xd-tag-blackjack">Xì Dách</span>';
@@ -182,16 +184,16 @@ function render(r) {
 
     let scoreText = '';
     if (isDealer) {
-      if (dealerAllOpen && stat) scoreText = stat.score;
+      if (dealerOpen && stat) scoreText = stat.score;
       else scoreText = '?';
     } else {
-      if (stat && (isMe || gs.phase === 'result' || gs.phase === 'dealer' || dealerAllOpen))
+      if (stat && (isMe || gs.phase === 'result' || (gs.phase === 'dealer' && checked)))
         scoreText = stat.score;
     }
 
     // Nút xét bài (dành cho host khi đến lượt dealer, chưa xét người này)
     let checkBtnHtml = '';
-    if (isHost && gs.phase === 'dealer' && !isDealer && !gs.dealerChecked?.[uid]) {
+    if (isHost && gs.phase === 'dealer' && !isDealer && !checked) {
       const dScore = dealerStat ? dealerStat.score : 0;
       const dLen = dealerHand.length;
       const canCheck = (dLen === 2 && dScore >= 15) || (dLen >= 3 && dScore >= 16);
@@ -316,7 +318,6 @@ window.hostDeal = async function() {
     'gameState.dealerChecked': {}
   };
 
-  // Nếu nhà cái xì bàng/xì dách -> mở hết và tính kết quả
   if (dealerStat.tag === 'xi_bang' || dealerStat.tag === 'xi_dach') {
     updates['gameState.phase'] = 'result';
     updates['gameState.dealerChecked'] = Object.fromEntries(players.map(u => [u, true]));
@@ -387,7 +388,6 @@ async function advanceTurn() {
   }
 }
 
-// Nhà cái bốc bài khi đến lượt
 window.hostDealerDraw = async function() {
   const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
   if (!snap.exists()) return;
@@ -399,14 +399,12 @@ window.hostDealerDraw = async function() {
   hand.push(deck.pop());
   await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.deck': deck, [`gameState.hands.${r.hostUid}`]: hand });
   
-  // Kiểm tra nếu nhà cái quắc -> mở hết bài, xử lý kết quả
   const newStat = handStatus(hand);
   if (newStat.tag === 'bust') {
     await finalizeBustDealer(r, hand, deck);
   }
 };
 
-// Nhà cái xét bài từng người chơi
 window.hostCheckPlayer = async function(targetUid) {
   const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
   if (!snap.exists()) return;
@@ -416,7 +414,6 @@ window.hostCheckPlayer = async function(targetUid) {
   const dealerScore = bestScore(dealerHand);
   const dLen = dealerHand.length;
   
-  // Điều kiện xét : 2 lá >=15 hoặc >=3 lá >=16
   const canCheck = (dLen === 2 && dealerScore >= 15) || (dLen >= 3 && dealerScore >= 16);
   if (!canCheck) { showToast('Chưa đủ điểm để xét bài!', 'warn'); return; }
   
@@ -424,7 +421,6 @@ window.hostCheckPlayer = async function(targetUid) {
   const bet = gs.bets?.[targetUid] || 0;
   const outcome = compareHands(targetHand, dealerHand, bet);
   
-  // Cập nhật kết quả cho người này, đánh dấu đã xét
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
     [`gameState.results.${targetUid}`]: outcome,
     [`gameState.dealerChecked.${targetUid}`]: true
@@ -433,7 +429,6 @@ window.hostCheckPlayer = async function(targetUid) {
   showToast(`✅ Đã xét bài ${esc(r.memberInfo?.[targetUid]?.name || '?')}`, 'success');
 };
 
-// Kết thúc lượt nhà cái: tự động so sánh tất cả người chơi chưa được xét
 window.hostEndDealerTurn = async function() {
   const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
   if (!snap.exists()) return;
@@ -465,7 +460,6 @@ window.hostEndDealerTurn = async function() {
   });
 };
 
-// Xử lý khi nhà cái quắc
 async function finalizeBustDealer(r, dealerHand, deck) {
   const players = (r.members || []).filter(u => u !== r.hostUid);
   const results = {};
@@ -493,7 +487,6 @@ function compareHands(playerHand, dealerHand, bet) {
   const dStat = handStatus(dealerHand);
   let outcome = 'lose', delta = -bet;
 
-  // Xử lý quắc
   if (pStat.tag === 'bust') {
     if (dStat.tag === 'bust') { outcome = 'draw'; delta = 0; }
     else { outcome = 'lose'; delta = -bet; }
@@ -501,19 +494,16 @@ function compareHands(playerHand, dealerHand, bet) {
   }
   if (dStat.tag === 'bust') { outcome = 'win'; delta = bet; return { outcome, delta }; }
 
-  // So sánh rank đặc biệt
   const pRank = getRank(pStat);
   const dRank = getRank(dStat);
   if (pRank > dRank) { outcome = 'win'; delta = bet; }
   else if (pRank < dRank) { outcome = 'lose'; delta = -bet; }
   else {
     if (pStat.tag === 'ngu_linh') {
-      // Ngũ linh: ít điểm hơn thắng
       if (pStat.score < dStat.score) { outcome = 'win'; delta = bet; }
       else if (pStat.score > dStat.score) { outcome = 'lose'; delta = -bet; }
       else { outcome = 'draw'; delta = 0; }
     } else {
-      // Điểm thường
       if (pStat.score > dStat.score) { outcome = 'win'; delta = bet; }
       else if (pStat.score < dStat.score) { outcome = 'lose'; delta = -bet; }
       else { outcome = 'draw'; delta = 0; }
@@ -529,7 +519,6 @@ function getRank(stat) {
   return 1;
 }
 
-// Settle kết quả từng người khi vào phase result
 async function settleMyResult(r, gs) {
   if (r.hostUid === _user.uid) {
     let dealerDelta = 0;
