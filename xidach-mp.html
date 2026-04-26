@@ -7,42 +7,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="quests.css"/>
+  <link rel="stylesheet" href="cards.css"/>
   <script type="module" src="quests.js"></script>
   <style>
-    /* ===================== LÁ BÀI ===================== */
-    .card {
-      width: 40px !important; height: 56px !important;
-      background: #ffffff !important;
-      border-radius: 5px !important;
-      position: relative;
-      margin-left: -22px !important;
-      box-shadow: 2px 4px 10px rgba(0,0,0,0.3);
-      display: flex !important; flex-direction: column !important;
-      justify-content: space-between;
-      padding: 3px 4px !important;
-      border: 1px solid #ddd;
-      user-select: none;
-      flex-shrink: 0;
-    }
-    .card:first-child { margin-left: 0 !important; }
-    .card.red  { color: #e11d48; }
-    .card.black { color: #1e293b; }
-    .card-top { font-size: 7px !important; font-weight: 900; line-height: 1; }
-    .card-top span { display: block; font-size: 6px !important; }
-    .card-center { font-size: 18px !important; align-self: center; }
-    .card-bottom { font-size: 7px !important; font-weight: 900; transform: rotate(180deg); line-height: 1; }
-    .card.hidden { background: linear-gradient(135deg,#0ea5e9,#1e40af) !important; border: 2px solid #fff !important; }
-    .card.hidden .card-back-pattern {
-      width: 100%; height: 100%; border-radius: 3px;
-      background-image: radial-gradient(rgba(255,255,255,0.3) 1px, transparent 1px);
-      background-size: 4px 4px; opacity: 0.8;
-    }
-    .xd-cards {
-      display: flex !important; flex-wrap: nowrap !important;
-      align-items: flex-start;
-      height: auto !important; min-height: unset !important;
-      overflow: visible; padding: 2px 0;
-    }
+    /* ===================== LAYOUT ===================== */
     .xd-wrap { min-height:100vh; padding:14px 12px 40px; max-width:900px; margin:0 auto; position:relative; z-index:1; }
     .xd-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px; }
     .xd-room { font-family:'Orbitron',monospace; color:#34d399; font-weight:900; font-size:14px; padding:6px 14px; border-radius:999px; background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.4); }
@@ -87,6 +55,54 @@
     .xd-seat-meta { display:flex; justify-content:space-between; align-items:center; margin-top:6px; gap:10px; flex-wrap:wrap; }
     .xd-score { font-family:'Orbitron',monospace; font-weight:900; color:#e0f2fe; font-size:16px; }
     .xd-bet { color:#fbbf24; font-weight:700; font-size:12px; }
+
+    /* ===================== LÁ BÀI — THU NHỎ ĐỀU 2 CẠNH ===================== */
+    /*
+      Tỉ lệ gốc thường là 63×88 (aspect ~0.716).
+      Đặt width=height sẽ làm méo. 
+      Ta dùng aspect-ratio để giữ đúng tỉ lệ.
+    */
+
+    /* Người chơi khác: nhỏ nhất */
+    .xd-cards .card {
+      width: 44px !important;
+      aspect-ratio: 63 / 88 !important;
+      height: auto !important;
+      min-height: unset !important;
+      margin-left: -16px !important;
+      border-radius: 5px !important;
+    }
+    .xd-cards .card:first-child { margin-left: 0 !important; }
+
+    /* Nhà cái: cỡ trung */
+    .xd-seat.dealer .xd-cards .card {
+      width: 52px !important;
+      margin-left: -20px !important;
+    }
+    .xd-seat.dealer .xd-cards .card:first-child { margin-left: 0 !important; }
+
+    /* Bản thân: to nhất */
+    .xd-seat.me .xd-cards .card {
+      width: 62px !important;
+      margin-left: -24px !important;
+    }
+    .xd-seat.me .xd-cards .card:first-child { margin-left: 0 !important; }
+
+    /* Nhà cái + me (host): to nhất */
+    .xd-seat.dealer.me .xd-cards .card {
+      width: 62px !important;
+      margin-left: -24px !important;
+    }
+    .xd-seat.dealer.me .xd-cards .card:first-child { margin-left: 0 !important; }
+
+    .xd-cards {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: flex-start;
+      min-height: 62px;
+      padding: 4px 0 4px 0;
+      overflow: visible;
+    }
 
     /* ===================== ĐẶT CƯỢC ===================== */
     .xd-bet-row { display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap; justify-content:center; }

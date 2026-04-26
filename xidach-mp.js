@@ -1,4 +1,4 @@
-// ===== XÌ DÁCH MULTIPLAYER (LUẬT MỚI) - PHẦN 1/2 =====
+// ===== XÌ DÁCH MULTIPLAYER (LUẬT MỚI - LƯỚI 2x2) - PHẦN 1/2 =====
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -38,17 +38,14 @@ onAuthStateChanged(auth, async (u) => {
 /* ========== UTILS ========== */
 function cardPoints(card) {
   const v = card.v;
-  if (v === 'A') return 0; // Sẽ xử lý riêng
+  if (v === 'A') return 0;
   if (['J', 'Q', 'K'].includes(v)) return 10;
   return parseInt(v);
 }
 
 function bestScore(hand) {
-  // Xì Bàng: 2 lá A -> trả về 21 (không bust)
   if (hand.length === 2 && hand.every(c => c.v === 'A')) return 21;
-
-  let total = 0;
-  let aces = 0;
+  let total = 0, aces = 0;
   for (const c of hand) {
     if (c.v === 'A') aces++;
     else total += cardPoints(c);
@@ -57,7 +54,7 @@ function bestScore(hand) {
   let aceValue;
   if (len === 2) aceValue = 11;
   else if (len === 3) aceValue = 10;
-  else aceValue = 1; // ≥4 lá
+  else aceValue = 1;
   total += aces * aceValue;
   return total;
 }
@@ -65,9 +62,7 @@ function bestScore(hand) {
 function handStatus(hand) {
   const score = bestScore(hand);
   const len = hand.length;
-  // Xì Bàng: 2 lá A
   if (len === 2 && hand[0].v === 'A' && hand[1].v === 'A') return { score, tag: 'xi_bang' };
-  // Xì Dách: 2 lá, 1 A + 1 lá 10/J/Q/K
   if (len === 2) {
     const hasA = hand.some(c => c.v === 'A');
     const hasTen = hand.some(c => ['10','J','Q','K'].includes(c.v));
@@ -122,19 +117,45 @@ function render(r) {
     betRow.style.display = 'none';
   }
 
-  const otherPlayers = (r.members || []).filter(uid => uid !== dealerUid && uid !== _user.uid);
-  let seatsOrder = isHost
-    ? [...otherPlayers, dealerUid]
-    : [dealerUid, ...otherPlayers, _user.uid];
-
+  // === LAYOUT LƯỚI 2x2 ===
   const tEl = document.getElementById('xd-table');
+  tEl.style.display = 'grid';
+  tEl.style.gridTemplateColumns = '1fr 1fr';
+  tEl.style.gridTemplateRows = 'auto auto auto';
+  tEl.style.gap = '10px';
   tEl.innerHTML = '';
+
+  const otherPlayers = (r.members || []).filter(uid => uid !== dealerUid && uid !== _user.uid);
+  const seatPositions = [
+    { row: 1, col: 1 }, // góc trên trái
+    { row: 1, col: 2 }, // góc trên phải
+    { row: 3, col: 1 }, // góc dưới trái
+    { row: 3, col: 2 }  // góc dưới phải
+  ];
+  let seatIndex = 0;
+  let seatsMap = new Map();
+
+  if (isHost) {
+    // Host: người chơi khác vào 4 góc, mình (dealer) giữa
+    for (const uid of otherPlayers) {
+      if (seatIndex < 4) seatsMap.set(uid, seatPositions[seatIndex++]);
+    }
+    seatsMap.set(dealerUid, { row: 2, col: 1, span: 2 });
+  } else {
+    // Không phải host: dealer giữa, người chơi khác + mình vào 4 góc
+    seatsMap.set(dealerUid, { row: 2, col: 1, span: 2 });
+    for (const uid of otherPlayers) {
+      if (seatIndex < 4) seatsMap.set(uid, seatPositions[seatIndex++]);
+    }
+    if (seatIndex < 4) seatsMap.set(_user.uid, seatPositions[seatIndex]);
+  }
 
   const dealerHand = gs.hands?.[dealerUid] || [];
   const dealerStat = dealerHand.length ? handStatus(dealerHand) : null;
   const dealerOpen = gs.phase === 'dealer' || gs.phase === 'result';
 
-  for (const uid of seatsOrder) {
+  // Duyệt qua tất cả uid trong seatsMap để render đúng vị trí
+  for (const [uid, pos] of seatsMap) {
     const isDealer = (uid === dealerUid);
     const isMe = (uid === _user.uid);
     const hand = gs.hands?.[uid] || [];
@@ -206,19 +227,24 @@ function render(r) {
       }
     }
 
-    tEl.innerHTML += `
-      <div class="${cls}">
-        <div class="xd-seat-head">
-          <span class="xd-seat-name">${nameHtml}</span>
-          <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${tagHtml}</div>
-        </div>
-        <div class="xd-cards">${cardsHtml}</div>
-        <div class="xd-seat-meta">
-          <span class="xd-score">${scoreText}</span>
-          ${betAmt > 0 ? `<span class="xd-bet">Cược: ${betAmt.toLocaleString('vi-VN')}đ</span>` : (isDealer ? '' : '<span class="xd-bet" style="color:#64748b">chưa đặt</span>')}
-        </div>
-        ${checkBtnHtml}
-      </div>`;
+    // Tạo div với vị trí grid
+    const div = document.createElement('div');
+    div.className = cls;
+    div.style.gridRow = pos.row;
+    div.style.gridColumn = pos.col + (pos.span ? ' / span ' + pos.span : '');
+    div.innerHTML = `
+      <div class="xd-seat-head">
+        <span class="xd-seat-name">${nameHtml}</span>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${tagHtml}</div>
+      </div>
+      <div class="xd-cards">${cardsHtml}</div>
+      <div class="xd-seat-meta">
+        <span class="xd-score">${scoreText}</span>
+        ${betAmt > 0 ? `<span class="xd-bet">Cược: ${betAmt.toLocaleString('vi-VN')}đ</span>` : (isDealer ? '' : '<span class="xd-bet" style="color:#64748b">chưa đặt</span>')}
+      </div>
+      ${checkBtnHtml}
+    `;
+    tEl.appendChild(div);
   }
 
   const myTurn = !isHost && gs.phase === 'playing' && gs.turnOrder?.[gs.turnIdx] === _user.uid;
