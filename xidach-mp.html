@@ -56,53 +56,49 @@
     .xd-score { font-family:'Orbitron',monospace; font-weight:900; color:#e0f2fe; font-size:16px; }
     .xd-bet { color:#fbbf24; font-weight:700; font-size:12px; }
 
-/* xidach-mp.html dòng 61-98 — giảm size */
+/* xidach-mp.html — thay toàn bộ phần CSS bài */
 
-/* Tất cả bài */
-.xd-cards .card {
-  width: 36px !important;
-  height: 50px !important;
-  min-height: unset !important;
-  margin-left: -14px !important;
-  border-radius: 4px !important;
-  padding: 2px 3px !important;
-  flex-direction: column !important;
-  display: flex !important;
+/* Người chơi khác: scale nhỏ lại, giữ nguyên layout gốc */
+.xd-seat:not(.me) .xd-cards .card {
+  transform: scale(0.45) !important;
+  transform-origin: top left !important;
+  margin-left: -46px !important;  /* bù lại khoảng trống sau scale */
 }
-.xd-cards .card:first-child { margin-left: 0 !important; }
-.xd-cards .card-top, .xd-cards .card-bottom { font-size: 9px !important; line-height: 1 !important; }
-.xd-cards .card-top span { font-size: 8px !important; }
-.xd-cards .card-center { font-size: 16px !important; }
-.xd-cards { min-height: 56px !important; }
+.xd-seat:not(.me) .xd-cards .card:first-child {
+  margin-left: 0 !important;
+}
 
-/* Nhà cái */
+/* Nhà cái (không phải mình): hơi to hơn */
 .xd-seat.dealer:not(.me) .xd-cards .card {
-  width: 40px !important;
-  height: 56px !important;
-  margin-left: -16px !important;
+  transform: scale(0.52) !important;
+  transform-origin: top left !important;
+  margin-left: -40px !important;
 }
-.xd-seat.dealer:not(.me) .xd-cards .card:first-child { margin-left: 0 !important; }
+.xd-seat.dealer:not(.me) .xd-cards .card:first-child {
+  margin-left: 0 !important;
+}
 
-/* Bản thân */
+/* Bản thân: scale vừa phải */
 .xd-seat.me .xd-cards .card {
-  width: 52px !important;
-  height: 72px !important;
-  margin-left: -20px !important;
-  padding: 4px 5px !important;
+  transform: scale(0.72) !important;
+  transform-origin: top left !important;
+  margin-left: -24px !important;
 }
-.xd-seat.me .xd-cards .card:first-child { margin-left: 0 !important; }
-.xd-seat.me .xd-cards .card-top,
-.xd-seat.me .xd-cards .card-bottom { font-size: 12px !important; }
-.xd-seat.me .xd-cards .card-center { font-size: 24px !important; }
+.xd-seat.me .xd-cards .card:first-child {
+  margin-left: 0 !important;
+}
 
 /* Nhà cái + bản thân */
 .xd-seat.dealer.me .xd-cards .card {
-  width: 52px !important;
-  height: 72px !important;
-  margin-left: -20px !important;
-  padding: 4px 5px !important;
+  transform: scale(0.72) !important;
+  transform-origin: top left !important;
+  margin-left: -24px !important;
 }
-.xd-seat.dealer.me .xd-cards .card:first-child { margin-left: 0 !important; }
+.xd-seat.dealer.me .xd-cards .card:first-child {
+  margin-left: 0 !important;
+}
+
+.xd-cards { min-height: 90px !important; overflow: visible !important; }
 
     /* ===================== ĐẶT CƯỢC ===================== */
     .xd-bet-row { display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap; justify-content:center; }
