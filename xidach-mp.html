@@ -56,47 +56,6 @@
     .xd-score { font-family:'Orbitron',monospace; font-weight:900; color:#e0f2fe; font-size:16px; }
     .xd-bet { color:#fbbf24; font-weight:700; font-size:12px; }
 
-    /* ===================== LÁ BÀI — SCALE ===================== */
-    .xd-cards {
-      display: flex;
-      flex-wrap: nowrap;
-      align-items: flex-start;
-      min-height: 90px;
-      padding: 4px 0;
-      overflow: visible;
-    }
-
-    /* Người chơi khác: nhỏ nhất */
-    .xd-seat:not(.me) .xd-cards .card {
-      transform: scale(0.5) !important;
-      transform-origin: top left !important;
-      margin-left: -41px !important;
-    }
-    .xd-seat:not(.me) .xd-cards .card:first-child { margin-left: 0 !important; }
-
-    /* Nhà cái (không phải mình) */
-    .xd-seat.dealer:not(.me) .xd-cards .card {
-      transform: scale(0.58) !important;
-      transform-origin: top left !important;
-      margin-left: -34px !important;
-    }
-    .xd-seat.dealer:not(.me) .xd-cards .card:first-child { margin-left: 0 !important; }
-
-    /* Bản thân */
-    .xd-seat.me .xd-cards .card {
-      transform: scale(0.78) !important;
-      transform-origin: top left !important;
-      margin-left: -18px !important;
-    }
-    .xd-seat.me .xd-cards .card:first-child { margin-left: 0 !important; }
-
-    /* Nhà cái + bản thân */
-    .xd-seat.dealer.me .xd-cards .card {
-      transform: scale(0.78) !important;
-      transform-origin: top left !important;
-      margin-left: -18px !important;
-    }
-    .xd-seat.dealer.me .xd-cards .card:first-child { margin-left: 0 !important; }
 
     /* ===================== ĐẶT CƯỢC ===================== */
     .xd-bet-row { display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap; justify-content:center; }
