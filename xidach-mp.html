@@ -58,46 +58,49 @@
 
 /* xidach-mp.html dòng 61-98 — giảm size */
 
-/* Người chơi khác */
+/* Tất cả bài */
 .xd-cards .card {
-  width: 22px !important;
-  height: 31px !important;
+  width: 36px !important;
+  height: 50px !important;
   min-height: unset !important;
-  margin-left: -8px !important;
-  border-radius: 3px !important;
-  padding: 1px 2px !important;
+  margin-left: -14px !important;
+  border-radius: 4px !important;
+  padding: 2px 3px !important;
+  flex-direction: column !important;
+  display: flex !important;
 }
 .xd-cards .card:first-child { margin-left: 0 !important; }
-.xd-cards .card-top, .xd-cards .card-bottom { font-size: 8px !important; }
-.xd-cards .card-top span { font-size: 7px !important; }
-.xd-cards .card-center { font-size: 14px !important; }
+.xd-cards .card-top, .xd-cards .card-bottom { font-size: 9px !important; line-height: 1 !important; }
+.xd-cards .card-top span { font-size: 8px !important; }
+.xd-cards .card-center { font-size: 16px !important; }
+.xd-cards { min-height: 56px !important; }
 
 /* Nhà cái */
 .xd-seat.dealer:not(.me) .xd-cards .card {
-  width: 26px !important;
-  height: 36px !important;
-  margin-left: -10px !important;
+  width: 40px !important;
+  height: 56px !important;
+  margin-left: -16px !important;
 }
 .xd-seat.dealer:not(.me) .xd-cards .card:first-child { margin-left: 0 !important; }
 
 /* Bản thân */
 .xd-seat.me .xd-cards .card {
-  width: 40px !important;
-  height: 56px !important;
-  margin-left: -16px !important;
-  padding: 3px 4px !important;
+  width: 52px !important;
+  height: 72px !important;
+  margin-left: -20px !important;
+  padding: 4px 5px !important;
 }
 .xd-seat.me .xd-cards .card:first-child { margin-left: 0 !important; }
 .xd-seat.me .xd-cards .card-top,
-.xd-seat.me .xd-cards .card-bottom { font-size: 11px !important; }
-.xd-seat.me .xd-cards .card-center { font-size: 20px !important; }
+.xd-seat.me .xd-cards .card-bottom { font-size: 12px !important; }
+.xd-seat.me .xd-cards .card-center { font-size: 24px !important; }
 
 /* Nhà cái + bản thân */
 .xd-seat.dealer.me .xd-cards .card {
-  width: 40px !important;
-  height: 56px !important;
-  margin-left: -16px !important;
-  padding: 3px 4px !important;
+  width: 52px !important;
+  height: 72px !important;
+  margin-left: -20px !important;
+  padding: 4px 5px !important;
 }
 .xd-seat.dealer.me .xd-cards .card:first-child { margin-left: 0 !important; }
 
@@ -138,23 +141,6 @@
       font-weight:800; font-family:'Nunito',sans-serif; font-size:12px;
       background:linear-gradient(135deg,#fbbf24,#f59e0b); color:#1f1f1f;
     }
-    /* xidach-mp.html — thêm vào sau phần CSS bài hiện tại */
-
-/* Ẩn center + bottom khi bài nhỏ (người khác + nhà cái) */
-.xd-seat:not(.me) .xd-cards .card-center,
-.xd-seat:not(.me) .xd-cards .card-bottom { display: none !important; }
-
-.xd-seat:not(.me) .xd-cards .card {
-  justify-content: flex-start !important;
-}
-
-.xd-seat:not(.me) .xd-cards .card-top {
-  font-size: 9px !important;
-  line-height: 1 !important;
-}
-.xd-seat:not(.me) .xd-cards .card-top span {
-  font-size: 9px !important;
-}
   </style>
 </head>
 <body>
