@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Ứng Dụng</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="games.css"/>
+  <link rel="stylesheet" href="quests.css"/>
+  <script type="module" src="quests.js"></script>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div class="games-page">
+    <nav>
+      <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer">
+        <span class="logo-vt">VT</span><span class="logo-world">World</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700">⭐ 0</span>
+        <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="window.location.href='index.html'">← Trang chủ</button>
+      </div>
+    </nav>
+
+    <div class="games-hero">
+      <h1>📱 <span>Ứng Dụng</span> & Tiện Ích</h1>
+      <p>Công cụ hữu ích · Giải trí · Tiện lợi</p>
+    </div>
+
+    <div class="nav-tabs">
+      <a class="nav-tab" href="games.html">🎮 GAMES</a>
+      <a class="nav-tab active" href="applications.html">📱 ỨNG DỤNG</a>
+    </div>
+
+    <div class="points-bar">
+      <span class="pts-icon">⭐</span>
+      <span class="pts-label">Điểm của bạn:</span>
+      <span class="pts-val" id="userPoints">0 đ</span>
+    </div>
+
+    <!-- Bảng Xếp Hạng & Online -->
+    <div class="category-section">
+      <div class="category-label"><span class="cat-icon">🏆</span><span class="cat-name">Bảng Xếp Hạng & Online</span><div class="cat-line"></div></div>
+      <div class="game-lobby-grid">
+        <!-- BXH - Vàng neon -->
+<a class="game-lobby-card card-feature-gold" href="leaderboard.html">
+    <span class="glc-badge gold">#1</span>
+    <span class="glc-emoji">🏆</span>
+    <span class="glc-name">Top giàu nhất</span>
+    <span class="glc-pts">Xem bảng xếp hạng</span>
+</a>
+
+<!-- Phòng chơi - Tím neon -->
+<a class="game-lobby-card card-feature-purple" href="rooms.html">
+    <span class="glc-badge ready">Live</span>
+    <span class="glc-emoji">👥</span>
+    <span class="glc-name">Phòng chơi</span>
+    <span class="glc-pts">Tạo phòng & mời bạn</span>
+</a>
+        <a class="game-lobby-card card-purple" href="rooms.html">
+          <span class="glc-badge ready">Online</span>
+          <span class="glc-emoji">👥</span>
+          <span class="glc-name">Phòng chơi</span>
+          <span class="glc-pts">Tạo phòng & mời bạn</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Tiệc Tùng & Giải Trí -->
+    <div class="category-section">
+      <div class="category-label"><span class="cat-icon">🎉</span><span class="cat-name">Tiệc Tùng & Giải Trí</span><div class="cat-line"></div></div>
+      <div class="game-lobby-grid">
+        <a class="game-lobby-card" href="uongdi.html">
+          <span class="glc-badge hot">Hot</span>
+          <span class="glc-emoji">🍺</span>
+          <span class="glc-name">Uống Đi!</span>
+          <span class="glc-pts">2000+ lá bài</span>
+        </a>
+        <a class="game-lobby-card" href="#">
+          <span class="glc-badge new">Mới</span>
+          <span class="glc-emoji">🎭</span>
+          <span class="glc-name">Sự Thật hay Thử Thách</span>
+          <span class="glc-pts">Sắp ra mắt</span>
+        </a>
+        <a class="game-lobby-card" href="#">
+          <span class="glc-badge new">Mới</span>
+          <span class="glc-emoji">🎤</span>
+          <span class="glc-name">Karaoke</span>
+          <span class="glc-pts">Sắp ra mắt</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Tiện Ích -->
+    <div class="category-section">
+      <div class="category-label"><span class="cat-icon">🛠️</span><span class="cat-name">Tiện Ích</span><div class="cat-line"></div></div>
+      <div class="game-lobby-grid">
+        <a class="game-lobby-card" href="#"><span class="glc-emoji">🎲</span><span class="glc-name">Xúc Xắc</span><span class="glc-pts">Sắp ra mắt</span></a>
+        <a class="game-lobby-card" href="#"><span class="glc-emoji">🪙</span><span class="glc-name">Tung Đồng Xu</span><span class="glc-pts">Sắp ra mắt</span></a>
+        <a class="game-lobby-card" href="#"><span class="glc-emoji">🎯</span><span class="glc-name">Vòng Quay</span><span class="glc-pts">Sắp ra mắt</span></a>
+        <a class="game-lobby-card" href="#"><span class="glc-emoji">🔢</span><span class="glc-name">Random Number</span><span class="glc-pts">Sắp ra mắt</span></a>
+      </div>
+    </div>
+  </div>
+
+  <button class="admin-btn-visible" onclick="window.location.href='admin.html'">QUẢN LÝ ADMIN</button>
+
+  <script type="module">
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { auth, db, claimDailyLogin } from './points.js';
+
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    for (let i = 0; i < 40; i++) { particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-.5)*.4, vy: (Math.random()-.5)*.4, r: Math.random()*1.5+.5 }); }
+    function drawParticles() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
+        if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle='rgba(56,189,248,0.5)'; ctx.fill();
+      });
+      for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
+        const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
+        if(d<100){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(56,189,248,${0.07*(1-d/100)})`; ctx.lineWidth=.5; ctx.stroke(); }
+      }
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = 'index.html'; return; }
+      onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
+        if (docSnap.exists()) {
+          const pts = docSnap.data().points || 0;
+          document.getElementById('userPoints').textContent = pts.toLocaleString() + ' đ';
+          document.getElementById('nav-pts').textContent = '⭐ ' + pts.toLocaleString();
+        }
+      });
+      try { await claimDailyLogin(); } catch(e){}
+    });
+  </script>
+</body>
+</html>

@@ -21,19 +21,18 @@
       <span class="logo-vt">VT</span><span class="logo-world">World</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
-      <button onclick="openBagModal()" style="padding:7px 14px;border-radius:50px;border:1px solid rgba(52,211,153,0.35);background:rgba(52,211,153,0.08);color:#34d399;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">🎒 Túi đồ</button>
+      <button onclick="window.openBagModal?.()" style="padding:7px 14px;border-radius:50px;border:1px solid rgba(52,211,153,0.35);background:rgba(52,211,153,0.08);color:#34d399;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">🎒 Túi đồ</button>
       <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="history.back()">← Quay lại</button>
     </div>
   </nav>
 
   <div class="pro-wrap">
-
     <!-- BANNER -->
     <div class="pro-banner">
       <div class="pro-banner-bg"></div>
     </div>
 
-    <!-- AVATAR (ngoài banner, không bị overflow che) -->
+    <!-- AVATAR -->
     <div style="display:flex;justify-content:center;margin-top:-46px;margin-bottom:12px;position:relative;z-index:10">
       <div style="position:relative;width:92px;height:92px;">
         <div class="pro-avatar-ring">
@@ -56,19 +55,16 @@
       </div>
     </div>
 
-    <!-- GRID: 3 Ô chính -->
+    <!-- GRID MỚI: Nhân vật (trái, to) | Pet (phải trên) + Danh hiệu (phải dưới) -->
     <div class="pro-grid">
-
-      <!-- Ô NHÂN VẬT -->
-      <div class="pro-card pro-card-character" onclick="openWardrobeModal()" style="cursor:pointer">
-        <div class="pro-card-label">⚔️ Nhân vật <span style="font-size:9px;color:#38bdf8;margin-left:4px">✏️ Thay đồ</span></div>
+      <!-- Ô NHÂN VẬT (to, trái) - Bấm vào chuyển sang character.html -->
+      <div class="pro-card pro-card-character" onclick="location.href='character.html'" style="cursor:pointer">
         <div class="pro-character-frame" id="pro-character-frame"></div>
-        <div class="pro-card-sub" id="pro-char-name">Chưa chọn nhân vật</div>
+        <div class="pro-card-sub" id="pro-char-name">Nhấn để tùy chỉnh →</div>
       </div>
 
-      <!-- Ô THÚ CƯNG -->
-      <div class="pro-card pro-card-pet" onclick="openPetModal()">
-        <div class="pro-card-label">🐾 Thú cưng</div>
+      <!-- Ô THÚ CƯNG (phải trên) -->
+      <div class="pro-card pro-card-pet" onclick="window.openPetModal?.()">
         <div class="pro-pet-frame" id="pro-pet-frame">
           <div class="pro-pet-placeholder">
             <span class="pro-pet-emoji">🥚</span>
@@ -78,14 +74,11 @@
         <div class="pro-card-sub" id="pro-card-pet-sub">Chưa có thú cưng</div>
       </div>
 
-      <!-- Ô DANH HIỆU -->
+      <!-- Ô DANH HIỆU (phải dưới) -->
       <div class="pro-card pro-card-title">
         <div class="pro-card-label">🏅 Danh hiệu</div>
-        <div class="pro-titles-list" id="pro-titles-list">
-          <!-- render bằng JS -->
-        </div>
+        <div class="pro-titles-list" id="pro-titles-list"></div>
       </div>
-
     </div>
 
     <!-- STATS ROW -->
@@ -103,20 +96,12 @@
         <span class="pro-stat-label">Tham gia</span>
       </div>
     </div>
-
   </div>
 
   <script type="module" src="character.js"></script>
-  <script>
-    // fallback: tránh lỗi "not defined" nếu module chưa load kịp khi click
-    window.openWardrobeModal = window.openWardrobeModal || function() {
-      document.addEventListener('character-ready', () => window.openWardrobeModal());
-    };
-  </script>
   <script type="module" src="profile.js"></script>
-<script type="module">
-  // bag.js mới không có modal — chuyển thẳng sang trang bag.html
-  window.openBagModal = function() { location.href = 'bag.html'; };
-</script>
+  <script type="module">
+    window.openBagModal = () => { location.href = 'bag.html'; };
+  </script>
 </body>
 </html>

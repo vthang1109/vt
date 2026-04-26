@@ -1,419 +1,220 @@
-// character.js — tích hợp Firestore / shop / gacha / bag
+// character.js — ID rút gọn & Tier system
 import { db, auth } from './points.js';
 import {
-  doc, updateDoc, onSnapshot, arrayUnion, runTransaction
+  doc, getDoc, updateDoc, onSnapshot, arrayUnion, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// ── CATALOG trang phục ────────────────────────────────────
-// source: 'shop' = mua điểm | 'gacha' = rơi gacha | 'free' = mặc định
+// ── TIER ──────────────────────────────────────────────────
+export const ITEM_TIERS = {
+  NUB: { id: 1, name: 'Nub', color: '#94a3b8', icon: '🔹', short: 'N' },
+  VIP: { id: 2, name: 'Vip', color: '#fbbf24', icon: '🔶', short: 'V' },
+  GOD: { id: 3, name: 'God', color: '#f43f5e', icon: '👑', short: 'G' },
+};
+
+// ── CATALOG (ID: E1_01, H2_03, S3_01...) ─────────────────
 export const OUTFIT_CATALOG = {
-  hat: [
-    { id:'hat_none',    name:'Không',          icon:'🚫', source:'free',  gender:'both',   price:0 },
-    { id:'hat_cap',     name:'Mũ lưỡi trai',   icon:'🧢', source:'shop',  gender:'both',   price:300 },
-    { id:'hat_crown',   name:'Vương miện',      icon:'👑', source:'gacha', gender:'both',   price:0, gachaType:'vip' },
-    { id:'hat_bow',     name:'Nơ hồng',         icon:'🎀', source:'shop',  gender:'female', price:250 },
-    { id:'hat_hero',    name:'Mũ hero',         icon:'🪖', source:'gacha', gender:'male',   price:0, gachaType:'normal' },
-    { id:'hat_witch',   name:'Mũ phù thủy',    icon:'🎩', source:'gacha', gender:'both',   price:0, gachaType:'vip' },
-    { id:'hat_ribbon',  name:'Băng đô',         icon:'🌸', source:'shop',  gender:'female', price:200 },
-    { id:'hat_ninja',   name:'Băng đầu ninja',  icon:'🥷', source:'gacha', gender:'both',   price:0, gachaType:'normal' },
+  eyes: [
+    { id:'E1_01', name:'Mat Ngau', tier:1, source:'free', price:0 },
+    { id:'E1_02', name:'Mắt nâu', tier:1, source:'free', price:0 },
+    { id:'E2_01', name:'Mắt xanh dương', tier:2, source:'shop', price:150 },
+    { id:'E2_02', name:'Mắt đỏ', tier:2, source:'shop', price:150 },
+    { id:'E3_01', name:'Mắt tím', tier:3, source:'gacha', price:0 },
+    { id:'E3_02', name:'Mắt sao', tier:3, source:'gacha', price:0 },
+  ],
+  head: [
+    { id:'H1_01', name:'Tóc Quy Ong', tier:1, source:'free', price:0 },
+    { id:'H1_02', name:'Tóc nâu', tier:1, source:'free', price:0 },
+    { id:'H2_01', name:'Tóc vàng', tier:2, source:'shop', price:200 },
+    { id:'H2_02', name:'Tóc đỏ', tier:2, source:'shop', price:200 },
+    { id:'H2_03', name:'Mũ lưỡi trai', tier:2, source:'shop', price:300 },
+    { id:'H3_01', name:'Vương miện', tier:3, source:'gacha', price:0 },
+    { id:'H3_02', name:'Mũ phù thủy', tier:3, source:'gacha', price:0 },
+    { id:'H3_03', name:'Nơ hồng', tier:3, source:'gacha', price:0 },
   ],
   shirt: [
-    { id:'shirt_none',   name:'Không',         icon:'🚫', source:'free',  gender:'both',   price:0 },
-    { id:'shirt_basic',  name:'Áo phông',       icon:'👕', source:'shop',  gender:'both',   price:200 },
-    { id:'shirt_vest',   name:'Vest',            icon:'🥼', source:'shop',  gender:'male',   price:500 },
-    { id:'shirt_dress',  name:'Váy hoa',         icon:'👗', source:'gacha', gender:'female', price:0, gachaType:'vip' },
-    { id:'shirt_armor',  name:'Giáp chiến',      icon:'🦺', source:'gacha', gender:'both',   price:0, gachaType:'vip' },
-    { id:'shirt_hoodie', name:'Hoodie',           icon:'🧥', source:'shop',  gender:'both',   price:350 },
-    { id:'shirt_kimono', name:'Kimono',           icon:'👘', source:'gacha', gender:'both',   price:0, gachaType:'vip' },
-    { id:'shirt_sport',  name:'Áo thể thao',    icon:'🎽', source:'shop',  gender:'both',   price:280 },
+    { id:'S1_01', name:'Vest', tier:1, source:'free', price:0 },
+    { id:'S1_02', name:'Áo thun đen', tier:1, source:'free', price:0 },
+    { id:'S2_01', name:'Áo sơ mi', tier:2, source:'shop', price:200 },
+    { id:'S2_02', name:'Hoodie xám', tier:2, source:'shop', price:350 },
+    { id:'S2_03', name:'Vest đen', tier:2, source:'shop', price:500 },
+    { id:'S3_01', name:'Áo giáp vàng', tier:3, source:'gacha', price:0 },
+    { id:'S3_02', name:'Kimono đỏ', tier:3, source:'gacha', price:0 },
   ],
   pants: [
-    { id:'pants_none',   name:'Không',          icon:'🚫', source:'free',  gender:'both',   price:0 },
-    { id:'pants_jeans',  name:'Jeans',           icon:'👖', source:'shop',  gender:'both',   price:250 },
-    { id:'pants_skirt',  name:'Váy ngắn',        icon:'🩱', source:'shop',  gender:'female', price:220 },
-    { id:'pants_shorts', name:'Quần short',      icon:'🩳', source:'shop',  gender:'both',   price:180 },
-    { id:'pants_robe',   name:'Áo choàng',       icon:'🩴', source:'gacha', gender:'both',   price:0, gachaType:'vip' },
-    { id:'pants_cargo',  name:'Quần cargo',      icon:'🪡', source:'shop',  gender:'male',   price:300 },
+    { id:'P1_01', name:'Quần Au', tier:1, source:'free', price:0 },
+    { id:'P1_02', name:'Quần đen', tier:1, source:'free', price:0 },
+    { id:'P2_01', name:'Quần short thể thao', tier:2, source:'shop', price:180 },
+    { id:'P2_02', name:'Quần cargo', tier:2, source:'shop', price:300 },
+    { id:'P2_03', name:'Váy ngắn', tier:2, source:'shop', price:220 },
+    { id:'P3_01', name:'Quần thần thoại', tier:3, source:'gacha', price:0 },
   ],
   deco: [
-    { id:'deco_none',    name:'Không',           icon:'🚫', source:'free',  gender:'both',  price:0 },
-    { id:'deco_sword',   name:'Kiếm',            icon:'⚔️', source:'gacha', gender:'both',  price:0, gachaType:'vip' },
-    { id:'deco_wand',    name:'Gậy phép',        icon:'🪄', source:'gacha', gender:'both',  price:0, gachaType:'vip' },
-    { id:'deco_pet_cat', name:'Mèo nhỏ',         icon:'🐱', source:'shop',  gender:'both',  price:400 },
-    { id:'deco_wings',   name:'Cánh bướm',       icon:'🦋', source:'gacha', gender:'both',  price:0, gachaType:'vip' },
-    { id:'deco_shield',  name:'Khiên',           icon:'🛡️', source:'shop',  gender:'male',  price:350 },
-    { id:'deco_flower',  name:'Hoa cầm tay',     icon:'💐', source:'shop',  gender:'female',price:200 },
-    { id:'deco_ball',    name:'Bóng phép',       icon:'🔮', source:'gacha', gender:'both',  price:0, gachaType:'normal' },
+    { id:'D1_01', name:'Vali Tien', tier:1, source:'free', price:0 },
+    { id:'D2_01', name:'Khiên sắt', tier:2, source:'shop', price:350 },
+    { id:'D3_01', name:'Cánh thiên thần', tier:3, source:'gacha', price:0 },
+    { id:'D3_02', name:'Gậy phép', tier:3, source:'gacha', price:0 },
+    { id:'D3_03', name:'Mèo nhỏ', tier:3, source:'gacha', price:0 },
   ],
 };
 
-// Pool id để gacha outfit (export cho pet.js dùng)
-export const OUTFIT_GACHA_POOL = {
-  normal: Object.values(OUTFIT_CATALOG).flat().filter(i => i.source==='gacha' && i.gachaType==='normal').map(i=>i.id),
-  vip:    Object.values(OUTFIT_CATALOG).flat().filter(i => i.source==='gacha').map(i=>i.id),
-};
+const GACHA_POOL = Object.values(OUTFIT_CATALOG).flat()
+  .filter(i => i.source === 'gacha');
+
+const GACHA_PRICE = { x1: 300, x5: 1300, x10: 2400 };
 
 export const SLOT_META = {
-  hat:   { label:'Mũ / Tóc', icon:'🧢' },
-  shirt: { label:'Áo',       icon:'👕' },
-  pants: { label:'Quần',     icon:'👖' },
-  deco:  { label:'Phụ kiện', icon:'✨' },
+  eyes:  { label:'Mắt',        icon:'👁️' },
+  head:  { label:'Đầu / Tóc',  icon:'💇' },
+  shirt: { label:'Áo',         icon:'👕' },
+  pants: { label:'Quần',       icon:'👖' },
+  deco:  { label:'Phụ kiện',   icon:'✨' },
 };
 
-// ── CHIBI SVG ─────────────────────────────────────────────
-const CHIBI_SVG = {
-  male: `<svg class="chibi-svg" viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg">
-    <rect x="27" y="72" width="11" height="22" rx="5" fill="#1e3a5f"/>
-    <rect x="42" y="72" width="11" height="22" rx="5" fill="#1e3a5f"/>
-    <rect x="22" y="44" width="36" height="30" rx="10" fill="#1e4a7a"/>
-    <rect x="10" y="46" width="12" height="8" rx="4" fill="#1e4a7a"/>
-    <circle cx="10" cy="50" r="5" fill="#fcd9b0"/>
-    <rect x="58" y="46" width="12" height="8" rx="4" fill="#1e4a7a"/>
-    <circle cx="70" cy="50" r="5" fill="#fcd9b0"/>
-    <rect x="35" y="37" width="10" height="9" rx="3" fill="#fcd9b0"/>
-    <ellipse cx="40" cy="26" rx="19" ry="20" fill="#fcd9b0"/>
-    <ellipse cx="21" cy="27" rx="4" ry="5" fill="#fcd9b0"/>
-    <ellipse cx="59" cy="27" rx="4" ry="5" fill="#fcd9b0"/>
-    <ellipse cx="33" cy="25" rx="4" ry="4.5" fill="#fff"/>
-    <ellipse cx="47" cy="25" rx="4" ry="4.5" fill="#fff"/>
-    <circle cx="34" cy="26" r="2.5" fill="#1a2744"/>
-    <circle cx="48" cy="26" r="2.5" fill="#1a2744"/>
-    <circle cx="34.8" cy="24.8" r=".9" fill="#fff"/>
-    <circle cx="48.8" cy="24.8" r=".9" fill="#fff"/>
-    <circle cx="40" cy="31" r="1.2" fill="#e8a87c"/>
-    <path d="M36 35 Q40 38 44 35" stroke="#c47a5a" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-    <ellipse cx="40" cy="10" rx="18" ry="10" fill="#2d1b00"/>
-    <rect x="22" y="10" width="36" height="12" rx="4" fill="#2d1b00"/>
-  </svg>`,
-  female: `<svg class="chibi-svg" viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg">
-    <rect x="27" y="72" width="11" height="22" rx="5" fill="#5a1a3a"/>
-    <rect x="42" y="72" width="11" height="22" rx="5" fill="#5a1a3a"/>
-    <ellipse cx="40" cy="68" rx="20" ry="10" fill="#c0397a"/>
-    <rect x="22" y="44" width="36" height="28" rx="10" fill="#e05090"/>
-    <rect x="10" y="46" width="12" height="8" rx="4" fill="#e05090"/>
-    <circle cx="10" cy="50" r="5" fill="#fcd9b0"/>
-    <rect x="58" y="46" width="12" height="8" rx="4" fill="#e05090"/>
-    <circle cx="70" cy="50" r="5" fill="#fcd9b0"/>
-    <rect x="35" y="37" width="10" height="9" rx="3" fill="#fcd9b0"/>
-    <ellipse cx="40" cy="26" rx="19" ry="20" fill="#fcd9b0"/>
-    <ellipse cx="21" cy="27" rx="4" ry="5" fill="#fcd9b0"/>
-    <ellipse cx="59" cy="27" rx="4" ry="5" fill="#fcd9b0"/>
-    <ellipse cx="33" cy="25" rx="4.5" ry="5.2" fill="#fff"/>
-    <ellipse cx="47" cy="25" rx="4.5" ry="5.2" fill="#fff"/>
-    <circle cx="33.5" cy="26" r="3" fill="#1a2744"/>
-    <circle cx="47.5" cy="26" r="3" fill="#1a2744"/>
-    <circle cx="34.2" cy="24.5" r="1" fill="#fff"/>
-    <circle cx="48.2" cy="24.5" r="1" fill="#fff"/>
-    <path d="M29 21 Q33 19 37 21" stroke="#1a2744" stroke-width="1.3" fill="none"/>
-    <path d="M43 21 Q47 19 51 21" stroke="#1a2744" stroke-width="1.3" fill="none"/>
-    <ellipse cx="27" cy="30" rx="4" ry="2.5" fill="#f9a8c9" opacity=".5"/>
-    <ellipse cx="53" cy="30" rx="4" ry="2.5" fill="#f9a8c9" opacity=".5"/>
-    <circle cx="40" cy="31" r="1" fill="#e8a87c"/>
-    <path d="M36.5 35 Q40 38.5 43.5 35" stroke="#c47a5a" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-    <ellipse cx="40" cy="10" rx="18" ry="10" fill="#5c1a1a"/>
-    <rect x="22" y="10" width="36" height="14" rx="4" fill="#5c1a1a"/>
-    <rect x="19" y="18" width="8" height="30" rx="4" fill="#5c1a1a"/>
-    <rect x="53" y="18" width="8" height="30" rx="4" fill="#5c1a1a"/>
-  </svg>`,
-};
+const LAYER_ORDER = ['pants','shirt','eyes','head','deco'];
 
-function getEquipOverlay(slot, item) {
-  if (!item || item.id.endsWith('_none')) return '';
-  const pos = {
-    hat:   'top:2px;left:50%;transform:translateX(-50%);font-size:22px',
-    shirt: 'top:40px;left:50%;transform:translateX(-50%);font-size:20px;opacity:.8',
-    pants: 'bottom:18px;left:50%;transform:translateX(-50%);font-size:18px;opacity:.8',
-    deco:  'bottom:8px;right:2px;font-size:20px',
-  };
-  return `<div style="position:absolute;${pos[slot]};pointer-events:none;">${item.icon}</div>`;
+// Helpers
+function allItems() { return Object.values(OUTFIT_CATALOG).flat(); }
+export function findInSlot(slot, id) { return (OUTFIT_CATALOG[slot]||[]).find(i=>i.id===id)||null; }
+export function getTierById(id) {
+  const item = allItems().find(i => i.id === id);
+  if (!item) return ITEM_TIERS.NUB;
+  return Object.values(ITEM_TIERS).find(t => t.id === item.tier) || ITEM_TIERS.NUB;
 }
 
-// ── STATE ─────────────────────────────────────────────────
-let charState = {
-  gender:   'male',
-  equipped: { hat:'hat_none', shirt:'shirt_none', pants:'pants_none', deco:'deco_none' },
-  owned:    ['hat_none','shirt_none','pants_none','deco_none','shirt_basic','pants_jeans'],
+// State
+export let state = {
+  equipped: { eyes:'E1_01', head:'H1_01', shirt:'S1_01', pants:'P1_01', deco:'D1_01' },
+  owned: ['E1_01','H1_01','S1_01','P1_01','D1_01'],
 };
-let pendingEquipped = {};
-let activeTab = 'hat';
-let unsubChar = null;
+let unsub = null;
 
-// ── FIRESTORE SYNC ────────────────────────────────────────
+function ensureFreeOwned() {
+  allItems().filter(i=>i.source==='free').forEach(i => {
+    if (!state.owned.includes(i.id)) state.owned.push(i.id);
+  });
+}
+
+// ── Callback để UI cập nhật ─────────────────────────────
+function notifyUI() {
+  if (window._charUIUpdate) window._charUIUpdate();
+}
+
 export function initCharacterSystem() {
   onAuthStateChanged(auth, user => {
     if (!user) return;
-    if (unsubChar) unsubChar();
-    unsubChar = onSnapshot(doc(db, 'users', user.uid), snap => {
+    if (unsub) unsub();
+    unsub = onSnapshot(doc(db,'users',user.uid), snap => {
       if (!snap.exists()) return;
       const d = snap.data();
-      if (d.character) {
-        charState.gender   = d.character.gender   || 'male';
-        charState.equipped = d.character.equipped || charState.equipped;
-      }
-      if (d.outfitOwned && d.outfitOwned.length) charState.owned = d.outfitOwned;
-      renderProfileChar();
+      if (d.character?.equipped) state.equipped = { ...state.equipped, ...d.character.equipped };
+      if (d.outfitOwned?.length) state.owned = d.outfitOwned;
+      else ensureFreeOwned();
+      renderProfilePreview();
+      notifyUI(); // ← Báo cho character-ui.js
     });
   });
 }
 
-async function saveToFirestore() {
-  const user = auth.currentUser;
-  if (!user) return;
-  charState.equipped = { ...pendingEquipped };
-  await updateDoc(doc(db, 'users', user.uid), {
-    'character.gender':   charState.gender,
-    'character.equipped': charState.equipped,
+export async function saveEquipped(newEquipped) {
+  const user = auth.currentUser; if (!user) throw new Error('Chưa đăng nhập');
+  state.equipped = { ...newEquipped };
+  await updateDoc(doc(db,'users',user.uid), { 'character.equipped': state.equipped });
+  renderProfilePreview();
+  notifyUI();
+}
+
+export async function buyItem(item) {
+  const user = auth.currentUser; if (!user) throw new Error('Chưa đăng nhập');
+  const ref = doc(db,'users',user.uid);
+  await runTransaction(db, async tx => {
+    const s = await tx.get(ref);
+    const pts = s.data()?.points || 0;
+    if (pts < item.price) throw new Error(`Không đủ điểm (cần ${item.price}⭐)`);
+    tx.update(ref, { points: pts - item.price, outfitOwned: arrayUnion(item.id) });
   });
 }
 
-// ── MUA TRANG PHỤC (shop) ────────────────────────────────
-export async function buyOutfitItem(itemId) {
-  const user = auth.currentUser;
-  if (!user) throw new Error('Chưa đăng nhập');
-  const item = findItemById(itemId);
-  if (!item || item.source !== 'shop') throw new Error('Item không bán');
-  if (charState.owned.includes(itemId)) throw new Error('Đã sở hữu');
-
-  const userRef = doc(db, 'users', user.uid);
-  return runTransaction(db, async tx => {
-    const snap = await tx.get(userRef);
-    if (!snap.exists()) throw new Error('User not found');
-    const pts = snap.data().points || 0;
-    if (pts < item.price) throw new Error(`Không đủ điểm (cần ${item.price} ⭐)`);
-    tx.update(userRef, {
-      points:      pts - item.price,
-      outfitOwned: arrayUnion(itemId),
-    });
-    // Cập nhật statusbar nếu đang ở trang shop
-    const spEl = document.getElementById('status-pts');
-    if (spEl) spEl.textContent = (pts - item.price).toLocaleString('vi');
-    return { newPoints: pts - item.price };
+export async function gachaRoll(rolls) {
+  const key = rolls===1?'x1':rolls===5?'x5':'x10';
+  const price = GACHA_PRICE[key];
+  const user = auth.currentUser; if (!user) throw new Error('Chưa đăng nhập');
+  const ref = doc(db,'users',user.uid);
+  await runTransaction(db, async tx => {
+    const s = await tx.get(ref);
+    const pts = s.data()?.points || 0;
+    if (pts < price) throw new Error(`Không đủ điểm! Cần ${price}⭐`);
+    tx.update(ref, { points: pts - price });
   });
+
+  const results = [];
+  const newOwned = [];
+  for (let i=0; i<rolls; i++) {
+    const item = GACHA_POOL[Math.floor(Math.random()*GACHA_POOL.length)];
+    results.push(item);
+    if (!state.owned.includes(item.id)) {
+      state.owned.push(item.id);
+      newOwned.push(item.id);
+    }
+  }
+  if (newOwned.length) {
+    await updateDoc(doc(db,'users',user.uid), { outfitOwned: arrayUnion(...newOwned) });
+  }
+  return results;
 }
 
-// ── NHẬN TRANG PHỤC TỪ GACHA ────────────────────────────
-// Gọi từ pet.js/doGacha sau khi roll có outfit
-export async function grantOutfitItem(itemId) {
-  const user = auth.currentUser;
-  if (!user) return;
-  await updateDoc(doc(db, 'users', user.uid), {
-    outfitOwned: arrayUnion(itemId),
-  });
-}
-
-// ── RENDER CHIBI (export để bag.js dùng preview) ─────────
-export function renderChibiTo(container, gender, equipped) {
+// Render chibi (dùng ảnh)
+export function renderChibiTo(container, equipped) {
+  if (!container) return;
   container.innerHTML = '';
-  const wrap = document.createElement('div');
-  wrap.className = 'chibi-wrap animate';
-  wrap.style.position = 'relative';
+  container.style.position = 'relative';
+  container.style.width = '100%';
+  container.style.height = '100%';
+  container.style.overflow = 'hidden';
 
-  const bodyLayer = document.createElement('div');
-  bodyLayer.className = 'chibi-layer chibi-layer-body';
-  bodyLayer.innerHTML = CHIBI_SVG[gender] || CHIBI_SVG.male;
-  wrap.appendChild(bodyLayer);
+  // Fallback nếu container trống sau khi render
+  setTimeout(() => {
+    if (container.children.length === 0) {
+      container.innerHTML = `
+        <div class="preview-placeholder">
+          <span>👤</span>
+          Nhấn chọn đồ bên dưới
+        </div>`;
+    }
+  }, 500);
 
-  ['pants','shirt','hat','deco'].forEach(slot => {
-    const item = findItem(slot, equipped[slot]);
-    const html = getEquipOverlay(slot, item);
-    if (html) wrap.innerHTML += html;
+  function addLayer(src, zIndex) {
+    if (!src) return;
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:${zIndex};pointer-events:none;`;
+    img.onerror = () => img.remove();
+    container.appendChild(img);
+  }
+
+  addLayer('assets/character/body/base.png', 0);
+
+  LAYER_ORDER.forEach((slot, zi) => {
+    const id = equipped[slot];
+    if (!id) return;
+    const item = findInSlot(slot, id);
+    if (item) {
+      const imgPath = `assets/character/${slot}/${id}.png`;
+      addLayer(imgPath, zi+1);
+    }
   });
-
-  container.appendChild(wrap);
+  container.classList.add('chibi-bounce');
 }
 
-function renderProfileChar() {
+function renderProfilePreview() {
   const frame = document.getElementById('pro-character-frame');
   if (!frame) return;
-  renderChibiTo(frame, charState.gender, charState.equipped);
-  const sub = document.getElementById('pro-char-name');
-  if (sub) sub.textContent = charState.gender === 'male' ? 'Nhân vật Nam' : 'Nhân vật Nữ';
+  renderChibiTo(frame, state.equipped);
 }
 
-// ── MODAL TỦ ĐỒ ──────────────────────────────────────────
-export function openWardrobeModal() {
-  pendingEquipped = { ...charState.equipped };
-  const existing = document.getElementById('wardrobe-overlay');
-  if (existing) { existing.classList.add('open'); refreshWardrobe(); return; }
-  buildWardrobeModal();
-}
-
-export function closeWardrobeModal() {
-  document.getElementById('wardrobe-overlay')?.classList.remove('open');
-}
-
-function buildWardrobeModal() {
-  const overlay = document.createElement('div');
-  overlay.id = 'wardrobe-overlay';
-  overlay.className = 'wardrobe-overlay';
-  overlay.innerHTML = `
-    <div class="wardrobe-modal">
-      <div class="wardrobe-handle"></div>
-      <div class="wardrobe-header">
-        <span class="wardrobe-title">🗄️ TỦ ĐỒ</span>
-        <button class="wardrobe-close" id="wd-close-btn">✕</button>
-      </div>
-      <div class="wardrobe-body">
-        <div class="wardrobe-preview">
-          <div class="wardrobe-char-stage" id="wd-stage"></div>
-          <div class="gender-toggle">
-            <button class="gender-btn" data-g="male">♂ Nam</button>
-            <button class="gender-btn" data-g="female">♀ Nữ</button>
-          </div>
-          <div class="wardrobe-slots" id="wd-slots"></div>
-        </div>
-        <div class="wardrobe-right">
-          <div class="wardrobe-tabs" id="wd-tabs"></div>
-          <div class="wardrobe-items" id="wd-items"></div>
-        </div>
-      </div>
-      <button class="wardrobe-save" id="wd-save-btn">💾 LƯU TRANG PHỤC</button>
-    </div>`;
-
-  overlay.addEventListener('click', e => { if(e.target===overlay) closeWardrobeModal(); });
-  overlay.querySelector('#wd-close-btn').addEventListener('click', closeWardrobeModal);
-  overlay.querySelector('#wd-save-btn').addEventListener('click', saveWardrobe);
-  overlay.querySelectorAll('.gender-btn').forEach(b =>
-    b.addEventListener('click', () => setGender(b.dataset.g))
-  );
-  document.body.appendChild(overlay);
-  setTimeout(() => { overlay.classList.add('open'); refreshWardrobe(); }, 10);
-}
-
-function refreshWardrobe() {
-  updateGenderBtns();
-  renderWardrobePreview();
-  renderWardrobeTabs();
-  renderWardrobeItems();
-  renderSlotSummary();
-}
-
-function renderWardrobePreview() {
-  const stage = document.getElementById('wd-stage');
-  if (stage) renderChibiTo(stage, charState.gender, pendingEquipped);
-}
-
-function updateGenderBtns() {
-  document.querySelectorAll('.gender-btn').forEach(b =>
-    b.classList.toggle('active', b.dataset.g === charState.gender)
-  );
-}
-
-function renderWardrobeTabs() {
-  const el = document.getElementById('wd-tabs');
-  if (!el) return;
-  el.innerHTML = Object.entries(SLOT_META).map(([k,v]) =>
-    `<button class="wardrobe-tab ${activeTab===k?'active':''}" data-tab="${k}">${v.icon} ${v.label}</button>`
-  ).join('');
-  el.querySelectorAll('.wardrobe-tab').forEach(b =>
-    b.addEventListener('click', () => setTab(b.dataset.tab))
-  );
-}
-
-function renderWardrobeItems() {
-  const el = document.getElementById('wd-items');
-  if (!el) return;
-  const items = (OUTFIT_CATALOG[activeTab] || []).filter(i =>
-    i.gender === 'both' || i.gender === charState.gender
-  );
-
-  el.innerHTML = items.map(item => {
-    const owned   = charState.owned.includes(item.id);
-    const equipped = pendingEquipped[activeTab] === item.id;
-    const locked  = !owned && item.source !== 'free';
-
-    let badge = '';
-    if (!owned && item.source === 'shop')
-      badge = `<span class="item-source shop">🛒 ${item.price}⭐</span>`;
-    else if (!owned && item.source === 'gacha')
-      badge = `<span class="item-source gacha">🎲 Gacha</span>`;
-
-    return `<div class="wardrobe-item ${equipped?'equipped':''} ${locked?'locked':''}"
-      data-id="${item.id}" data-source="${item.source}" data-price="${item.price||0}">
-      ${badge}
-      <span class="item-icon">${locked ? (item.source==='shop'?'🔒':'🎲') : item.icon}</span>
-      <span class="item-name">${item.name}</span>
-      ${equipped ? '<span class="item-equipped-check">✓</span>' : ''}
-    </div>`;
-  }).join('');
-
-  el.querySelectorAll('.wardrobe-item').forEach(card => {
-    card.addEventListener('click', async () => {
-      const id     = card.dataset.id;
-      const owned  = charState.owned.includes(id);
-      const source = card.dataset.source;
-      const price  = parseInt(card.dataset.price) || 0;
-
-      if (owned) { equipItem(activeTab, id); return; }
-
-      if (source === 'shop') {
-        if (!confirm(`Mua "${findItemById(id)?.name}" với giá ${price} ⭐?`)) return;
-        try {
-          await buyOutfitItem(id);
-          showToast(`✅ Mua thành công! -${price} ⭐`);
-          charState.owned.push(id);
-          equipItem(activeTab, id);
-        } catch(e) { showToast('❌ ' + e.message); }
-      } else {
-        showToast('🎲 Item này chỉ có từ Gacha!');
-      }
-    });
-  });
-}
-
-function renderSlotSummary() {
-  const el = document.getElementById('wd-slots');
-  if (!el) return;
-  el.innerHTML = Object.entries(SLOT_META).map(([k,v]) => {
-    const item = findItem(k, pendingEquipped[k]);
-    const val  = item && !item.id.endsWith('_none') ? item.icon+' '+item.name : '—';
-    return `<div class="slot-row">
-      <span class="slot-icon">${v.icon}</span>
-      <span class="slot-name">${v.label}</span>
-      <span class="slot-val">${val}</span>
-    </div>`;
-  }).join('');
-}
-
-function setGender(g) { charState.gender = g; refreshWardrobe(); }
-function setTab(tab)   { activeTab = tab; renderWardrobeTabs(); renderWardrobeItems(); }
-
-function equipItem(slot, id) {
-  pendingEquipped[slot] = id;
-  renderWardrobePreview();
-  renderWardrobeItems();
-  renderSlotSummary();
-}
-
-async function saveWardrobe() {
-  try {
-    await saveToFirestore();
-    renderProfileChar();
-    closeWardrobeModal();
-    showToast('✅ Đã lưu trang phục!');
-  } catch(e) { showToast('❌ ' + e.message); }
-}
-
-// ── UTILS ─────────────────────────────────────────────────
-function findItem(slot, id)  { return (OUTFIT_CATALOG[slot]||[]).find(i=>i.id===id); }
-function findItemById(id)    { return Object.values(OUTFIT_CATALOG).flat().find(i=>i.id===id); }
-
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.textContent = msg;
-  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0d1829;border:1px solid #38bdf8;color:#38bdf8;padding:10px 22px;border-radius:99px;font-size:13px;font-weight:800;z-index:9999;font-family:Nunito,sans-serif;pointer-events:none;';
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 2400);
-}
-
-// ── GLOBAL ────────────────────────────────────────────────
-window.openWardrobeModal  = openWardrobeModal;
-window.closeWardrobeModal = closeWardrobeModal;
-
-// ── AUTO INIT ─────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+// Auto init
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => initCharacterSystem());
+} else {
   initCharacterSystem();
-  document.getElementById('pro-character-frame')
-    ?.addEventListener('click', openWardrobeModal);
-});
+}

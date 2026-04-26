@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VTWorld — Thay Đồ Nhân Vật</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="character.css">
+    <style>
+        body { background: #0a0f1a; }
+        .char-page { max-width: 480px; margin: 0 auto; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="char-page">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h2 style="font-family:'Orbitron'; color:#e0f2fe;">🗄️ TỦ ĐỒ</h2>
+            <button onclick="history.back()" style="background:rgba(239,68,68,0.2); border:1px solid #ef4444; color:#ef4444; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer;">← Quay lại</button>
+        </div>
+        <div id="wardrobeContainer"></div>
+    </div>
+
+    <script type="module">
+        import { initWardrobeUI } from './character-ui.js';
+        window.addEventListener('load', () => {
+            initWardrobeUI(document.getElementById('wardrobeContainer'));
+        });
+    </script>
+</body>
+</html>

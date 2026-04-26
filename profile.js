@@ -4,6 +4,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 import { getFirestore, doc, onSnapshot, updateDoc, getDocs, collection, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { renderAvatar } from './avatar.js';
 import { renderProfilePet, mountPetModal } from './pet-ui.js';
+import './character.js';  // Khởi tạo initCharacterSystem và render preview
 
 const firebaseConfig = {
   apiKey:"AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -42,7 +43,7 @@ onAuthStateChanged(auth, user => {
       reader.readAsDataURL(file);
     } catch(err) { alert('Lỗi: ' + err.message); }
   });
-}); // Sửa: đóng onAuthStateChanged
+});
 
 async function calcRank(uid) {
   try {
@@ -74,32 +75,27 @@ function listenProfile(uid) {
       ? new Date(d.createdAt.seconds * 1000).toLocaleDateString('vi-VN')
       : 'Mới tham gia';
 
-renderAvatar(document.getElementById('pro-avatar'), d, '80px');
+    renderAvatar(document.getElementById('pro-avatar'), d, '80px');
     const nm = document.getElementById('pro-name');
     if(nm) nm.textContent = d.nickname || 'Người dùng VT';
 
-    // điểm
     const pe = document.getElementById('pro-points');
     if(pe) pe.textContent = points.toLocaleString('vi-VN');
 
-    // stats
     const fr = document.getElementById('pro-stat-friends');
     if(fr) fr.textContent = friends.length;
     const jo = document.getElementById('pro-stat-joined');
     if(jo) jo.textContent = joined;
 
-    // xếp hạng
     const rk = document.getElementById('pro-stat-rank');
     if(rk) { rk.textContent = '...'; calcRank(uid).then(v => rk.textContent = v); }
 
-    // danh hiệu
     const titles = calcTitles(points, friends);
     const tEl = document.getElementById('pro-titles-list');
     if(tEl) tEl.innerHTML = titles.length
       ? titles.map(t => `<span class="pro-title-badge ${t.cls}">${t.label}</span>`).join('')
       : '<span class="pro-title-empty">Chưa có danh hiệu</span>';
 
-    // pet — truyền thêm petCollection để render tier
     renderProfilePet(uid, d.petCollection || {}, d.activePet || null);
   }, err => console.error('onSnapshot:', err));
 }

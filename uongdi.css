@@ -1,0 +1,489 @@
+/* ===== UỐNG ĐI! — CASINO NEON UI (XANH CHỦ ĐẠO) ===== */
+body {
+    background: radial-gradient(circle at center, #0f2847, #061220);
+    min-height: 100vh;
+    margin: 0;
+    overflow-y: auto;
+    font-family: 'Nunito', sans-serif;
+    color: white;
+}
+
+/* Navbar */
+.casino-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: rgba(0,30,60,0.7);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(56,189,248,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.logo {
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: white;
+}
+.logo span:first-child { color: #38bdf8; }
+.nav-center { flex: 1; display: flex; justify-content: center; }
+.nav-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 16px;
+    color: #facc15;
+    text-shadow: 0 0 20px rgba(250,204,21,0.6);
+    letter-spacing: 2px;
+}
+.nav-right { display: flex; gap: 10px; }
+.nav-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-family: 'Orbitron';
+    font-size: 11px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: 0.3s;
+    font-weight: 700;
+}
+.exit-btn {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    color: #ef4444;
+}
+.exit-btn:hover { background: rgba(239, 68, 68, 0.4); }
+
+/* Game container */
+.game-container {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Lá bài */
+.card-area {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.card-display {
+    width: 100%;
+    max-width: 420px;
+    min-height: 240px;
+    border-radius: 24px;
+    padding: 32px 24px;
+    text-align: center;
+    transition: all 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg, #0a2a4a, #061a30);
+    border: 3px solid rgba(56,189,248,0.4);
+    box-shadow: 0 0 40px rgba(56,189,248,0.25), 0 0 80px rgba(56,189,248,0.1), inset 0 0 40px rgba(56,189,248,0.06);
+}
+
+/* Neon theo nhóm */
+.card-display.drink {
+    border-color: #ef4444;
+    box-shadow: 0 0 40px rgba(239,68,68,0.5), 0 0 90px rgba(239,68,68,0.2), inset 0 0 40px rgba(239,68,68,0.08);
+    background: linear-gradient(160deg, #2a1015, #1a0a0f);
+}
+.card-display.choose {
+    border-color: #fbbf24;
+    box-shadow: 0 0 40px rgba(251,191,36,0.5), 0 0 90px rgba(251,191,36,0.2), inset 0 0 40px rgba(251,191,36,0.08);
+    background: linear-gradient(160deg, #2a2010, #1a150a);
+}
+.card-display.all {
+    border-color: #3b82f6;
+    box-shadow: 0 0 40px rgba(59,130,246,0.5), 0 0 90px rgba(59,130,246,0.2), inset 0 0 40px rgba(59,130,246,0.08);
+    background: linear-gradient(160deg, #101a2a, #0a101a);
+}
+.card-display.truth_or_drink {
+    border-color: #a855f7;
+    box-shadow: 0 0 40px rgba(168,85,247,0.5), 0 0 90px rgba(168,85,247,0.2), inset 0 0 40px rgba(168,85,247,0.08);
+    background: linear-gradient(160deg, #1a102a, #100a1a);
+}
+.card-display.dare_or_drink {
+    border-color: #ec4899;
+    box-shadow: 0 0 40px rgba(236,72,153,0.5), 0 0 90px rgba(236,72,153,0.2), inset 0 0 40px rgba(236,72,153,0.08);
+    background: linear-gradient(160deg, #2a1020, #1a0a14);
+}
+.card-display.save_card {
+    border-color: #22c55e;
+    box-shadow: 0 0 40px rgba(34,197,94,0.5), 0 0 90px rgba(34,197,94,0.2), inset 0 0 40px rgba(34,197,94,0.08);
+    background: linear-gradient(160deg, #102a18, #0a1a10);
+}
+.card-display.swap_card {
+    border-color: #38bdf8;
+    box-shadow: 0 0 40px rgba(56,189,248,0.5), 0 0 90px rgba(56,189,248,0.2), inset 0 0 40px rgba(56,189,248,0.08);
+    background: linear-gradient(160deg, #0a1a2a, #06101a);
+}
+.card-display.double_next {
+    border-color: #f97316;
+    box-shadow: 0 0 40px rgba(249,115,22,0.5), 0 0 90px rgba(249,115,22,0.2), inset 0 0 40px rgba(249,115,22,0.08);
+    background: linear-gradient(160deg, #2a1810, #1a0e0a);
+}
+.card-display.reverse {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 40px rgba(139,92,246,0.5), 0 0 90px rgba(139,92,246,0.2), inset 0 0 40px rgba(139,92,246,0.08);
+    background: linear-gradient(160deg, #18102a, #0e0a1a);
+}
+.card-display.free_pass {
+    border-color: #10b981;
+    box-shadow: 0 0 40px rgba(16,185,129,0.5), 0 0 90px rgba(16,185,129,0.2), inset 0 0 40px rgba(16,185,129,0.08);
+    background: linear-gradient(160deg, #0a1a14, #06100e);
+}
+.card-display.choose_two {
+    border-color: #f59e0b;
+    box-shadow: 0 0 40px rgba(245,158,11,0.5), 0 0 90px rgba(245,158,11,0.2), inset 0 0 40px rgba(245,158,11,0.08);
+    background: linear-gradient(160deg, #2a1c10, #1a120a);
+}
+.card-display.rock_paper {
+    border-color: #6366f1;
+    box-shadow: 0 0 40px rgba(99,102,241,0.5), 0 0 90px rgba(99,102,241,0.2), inset 0 0 40px rgba(99,102,241,0.08);
+    background: linear-gradient(160deg, #14102a, #0c0a1a);
+}
+.card-display.guess_number {
+    border-color: #14b8a6;
+    box-shadow: 0 0 40px rgba(20,184,166,0.5), 0 0 90px rgba(20,184,166,0.2), inset 0 0 40px rgba(20,184,166,0.08);
+    background: linear-gradient(160deg, #0a1a16, #06100e);
+}
+.card-display.hold_breath {
+    border-color: #38bdf8;
+    box-shadow: 0 0 40px rgba(56,189,248,0.5), 0 0 90px rgba(56,189,248,0.2), inset 0 0 40px rgba(56,189,248,0.08);
+    background: linear-gradient(160deg, #0a1a2a, #06101a);
+}
+.card-display.staring {
+    border-color: #f472b6;
+    box-shadow: 0 0 40px rgba(244,114,182,0.5), 0 0 90px rgba(244,114,182,0.2), inset 0 0 40px rgba(244,114,182,0.08);
+    background: linear-gradient(160deg, #2a1420, #1a0c14);
+}
+.card-display.fun {
+    border-color: #eab308;
+    box-shadow: 0 0 40px rgba(234,179,8,0.5), 0 0 90px rgba(234,179,8,0.2), inset 0 0 40px rgba(234,179,8,0.08);
+    background: linear-gradient(160deg, #2a2410, #1a180a);
+}
+.card-display.rule {
+    border-color: #f87171;
+    box-shadow: 0 0 40px rgba(248,113,113,0.5), 0 0 90px rgba(248,113,113,0.2), inset 0 0 40px rgba(248,113,113,0.08);
+    background: linear-gradient(160deg, #2a1414, #1a0c0c);
+}
+.card-display.penalty {
+    border-color: #d4a017;
+    box-shadow: 0 0 40px rgba(212,160,23,0.5), 0 0 90px rgba(212,160,23,0.2), inset 0 0 40px rgba(212,160,23,0.08);
+    background: linear-gradient(160deg, #2a2010, #1a140a);
+}
+
+.card-inner { position: relative; z-index: 1; width: 100%; }
+
+.card-type-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    background: rgba(14,165,233,0.2);
+    color: #7dd3fc;
+    border: 1px solid rgba(56,189,248,0.3);
+    text-shadow: 0 0 12px rgba(56,189,248,0.4);
+    box-shadow: 0 0 20px rgba(56,189,248,0.15);
+}
+
+.card-text {
+    font-size: 24px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 0 0 20px rgba(255,255,255,0.4);
+}
+
+.card-icon {
+    font-size: 56px;
+    animation: float 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.4));
+}
+
+@keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Stats */
+.stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.stat-box {
+    background: rgba(10,40,70,0.7);
+    border: 2px solid rgba(56,189,248,0.3);
+    border-radius: 16px;
+    padding: 12px 24px;
+    text-align: center;
+    min-width: 100px;
+    box-shadow: 0 0 25px rgba(56,189,248,0.15);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #7dd3fc;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+}
+
+.stat-value {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    color: #facc15;
+    text-shadow: 0 0 15px rgba(250,204,21,0.5);
+}
+
+/* Buttons */
+.btn-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.game-btn {
+    padding: 16px 32px;
+    border-radius: 14px;
+    border: 2px solid;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.25s;
+    font-size: 15px;
+    letter-spacing: 1px;
+    min-width: 160px;
+}
+
+/* Nút Rút lá - xanh dương */
+.game-btn.primary {
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+    border-color: #38bdf8;
+    box-shadow: 0 6px 30px rgba(14,165,233,0.5), 0 0 50px rgba(56,189,248,0.2);
+}
+
+/* Nút Làm mới - vàng (đồng bộ style) */
+.reset-btn {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24) !important;
+    border-color: #fbbf24 !important;
+    color: #1a1a2e !important;
+    box-shadow: 0 6px 30px rgba(251,191,36,0.5), 0 0 50px rgba(251,191,36,0.2) !important;
+    padding: 16px 32px !important;
+    border-radius: 14px !important;
+    min-width: 160px !important;
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 900 !important;
+    font-size: 15px !important;
+    letter-spacing: 1px !important;
+}
+
+.game-btn:hover { 
+    transform: translateY(-3px); 
+    filter: brightness(1.2); 
+}
+.game-btn:active { 
+    transform: scale(0.97); 
+}
+
+.reset-btn:hover {
+    box-shadow: 0 8px 40px rgba(251,191,36,0.7), 0 0 70px rgba(251,191,36,0.3) !important;
+    filter: brightness(1.1);
+}
+
+/* History */
+.history-section {
+    margin-top: 24px;
+    background: rgba(10,30,60,0.6);
+    border: 2px solid rgba(56,189,248,0.2);
+    border-radius: 20px;
+    padding: 18px;
+    max-height: 220px;
+    overflow-y: auto;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 0 20px rgba(56,189,248,0.1);
+}
+
+.section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+    color: #7dd3fc;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+}
+
+.history-list { display: flex; flex-direction: column; gap: 8px; }
+
+.history-item {
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(10,40,70,0.5);
+    border-left: 4px solid;
+    color: #e2e8f0;
+}
+
+.history-item.empty {
+    color: #5c7b9c;
+    border-left-color: #3b5a7a;
+    font-style: italic;
+    font-weight: 600;
+}
+
+.history-item.drink { border-left-color: #ef4444; }
+.history-item.choose { border-left-color: #fbbf24; }
+.history-item.all { border-left-color: #3b82f6; }
+.history-item.truth_or_drink { border-left-color: #a855f7; }
+.history-item.dare_or_drink { border-left-color: #ec4899; }
+.history-item.save_card { border-left-color: #22c55e; }
+.history-item.swap_card { border-left-color: #0ea5e9; }
+.history-item.double_next { border-left-color: #f97316; }
+.history-item.reverse { border-left-color: #8b5cf6; }
+.history-item.free_pass { border-left-color: #10b981; }
+.history-item.choose_two { border-left-color: #f59e0b; }
+.history-item.rock_paper { border-left-color: #6366f1; }
+.history-item.guess_number { border-left-color: #14b8a6; }
+.history-item.hold_breath { border-left-color: #38bdf8; }
+.history-item.staring { border-left-color: #f472b6; }
+.history-item.fun { border-left-color: #eab308; }
+.history-item.rule { border-left-color: #f87171; }
+.history-item.penalty { border-left-color: #d4a017; }
+
+/* ===== Modal xác nhận ===== */
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+.confirm-overlay.active {
+    display: flex;
+}
+
+.confirm-box {
+    background: linear-gradient(160deg, #0a2a4a, #061a30);
+    border: 2px solid #fbbf24;
+    border-radius: 20px;
+    padding: 30px 28px;
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 0 50px rgba(251,191,36,0.3), 0 0 100px rgba(251,191,36,0.1);
+    animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.confirm-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.confirm-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 16px;
+    color: #fbbf24;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.confirm-text {
+    font-size: 14px;
+    color: #e2e8f0;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+.confirm-text small {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.confirm-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.confirm-btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: 2px solid;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+}
+
+.cancel-btn {
+    background: rgba(15,23,42,0.9);
+    border-color: #64748b;
+    color: #94a3b8;
+}
+.cancel-btn:hover {
+    background: rgba(30,40,60,0.9);
+    border-color: #94a3b8;
+}
+
+.ok-btn {
+    background: #fbbf24;
+    border-color: #fbbf24;
+    color: #1a1a2e;
+    box-shadow: 0 0 20px rgba(251,191,36,0.4);
+}
+.ok-btn:hover {
+    background: #f59e0b;
+    box-shadow: 0 0 30px rgba(251,191,36,0.6);
+    transform: translateY(-2px);
+}
+.ok-btn:active {
+    transform: scale(0.95);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .game-container { padding: 12px; }
+    .card-display { min-height: 200px; padding: 24px 16px; }
+    .card-text { font-size: 20px; }
+    .card-icon { font-size: 44px; }
+    .game-btn { padding: 14px 20px; font-size: 13px; min-width: 130px; }
+    .reset-btn { padding: 14px 20px !important; font-size: 13px !important; min-width: 130px !important; }
+    .stat-box { min-width: 80px; padding: 10px 16px; }
+    .stat-value { font-size: 24px; }
+}

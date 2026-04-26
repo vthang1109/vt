@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VTWorld — Uống Đi!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="uongdi.css">
+</head>
+<body>
+    <nav class="casino-nav">
+        <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
+            <span style="color:#0ea5e9">VT</span><span>World</span>
+        </div>
+        <div class="nav-center">
+            <div class="nav-title">🍺 UỐNG ĐI! 🍺</div>
+        </div>
+        <div class="nav-right">
+            <button class="nav-btn exit-btn" onclick="location.href='games.html'">SẢNH</button>
+        </div>
+    </nav>
+
+    <div class="game-container">
+        <!-- Lá bài -->
+        <div class="card-area">
+            <div class="card-display" id="cardDisplay">
+                <div class="card-inner">
+                    <div class="card-type-badge" id="cardBadge">🃏 SẴN SÀNG</div>
+                    <div class="card-text" id="cardText">Nhấn nút bên dưới<br>để rút lá đầu tiên!</div>
+                    <div class="card-icon" id="cardIcon">🃏</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bộ đếm -->
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-label">📤 ĐÃ RÚT</div>
+                <div class="stat-value" id="drawnCount">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">📦 CÒN LẠI</div>
+                <div class="stat-value" id="remainCount">2050</div>
+            </div>
+        </div>
+
+        <!-- Nút (chỉ còn 2 nút) -->
+        <div class="btn-row">
+            <button class="game-btn primary" id="btnDraw">🃏 RÚT LÁ</button>
+            <button class="game-btn reset-btn" id="btnReset">🔄 LÀM MỚI</button>
+        </div>
+
+        <!-- Lịch sử -->
+        <div class="history-section">
+            <div class="section-title">📋 LỊCH SỬ</div>
+            <div class="history-list" id="historyList">
+                <div class="history-item empty">Chưa có lá nào được rút</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="uongdi.js"></script>
+</body>
+</html>

@@ -1,267 +1,52 @@
 /* ===== CHARACTER SYSTEM ===== */
 
-/* --- Khung nhân vật trên profile --- */
+/* Khung nhân vật trên profile */
 .pro-character-frame {
-  width: 90px;
-  height: 110px;
-  border-radius: 12px;
-  background: rgba(56,189,248,0.05);
-  border: 1px dashed rgba(56,189,248,0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.pro-character-frame:hover {
-  border-color: rgba(56,189,248,0.45);
-  box-shadow: 0 0 14px rgba(56,189,248,0.15);
+  /* Kế thừa từ profile.css */
 }
 
-/* --- Chibi canvas wrapper --- */
-.chibi-wrap {
-  position: relative;
-  width: 80px;
-  height: 100px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-/* Layer hệ thống — thứ tự z-index */
-.chibi-layer {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 100px;
-  pointer-events: none;
-}
-.chibi-layer-body   { z-index: 1; }
-.chibi-layer-pants  { z-index: 2; }
-.chibi-layer-shirt  { z-index: 3; }
-.chibi-layer-hat    { z-index: 4; }
-.chibi-layer-deco   { z-index: 5; }
-
-/* --- Chibi SVG base body --- */
-.chibi-svg { width: 80px; height: 100px; }
-
-/* idle bounce animation */
+/* Bounce idle */
 @keyframes chibiIdle {
-  0%,100% { transform: translateX(-50%) translateY(0); }
-  50%      { transform: translateX(-50%) translateY(-3px); }
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
 }
-.chibi-wrap.animate .chibi-layer {
+.chibi-bounce img {
   animation: chibiIdle 2.4s ease-in-out infinite;
 }
 
-/* ===== WARDROBE MODAL ===== */
-.wardrobe-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(5,10,24,0.82);
-  backdrop-filter: blur(6px);
-  z-index: 9000;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s;
-}
-.wardrobe-overlay.open {
-  opacity: 1;
-  pointer-events: all;
-}
-
-.wardrobe-modal {
-  width: 100%;
-  max-width: 480px;
-  background: linear-gradient(180deg, #0d1829 0%, #080f1e 100%);
-  border: 1px solid rgba(56,189,248,0.18);
-  border-radius: 24px 24px 0 0;
-  padding: 0 0 32px;
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
-  max-height: 88vh;
-  display: flex;
-  flex-direction: column;
-}
-.wardrobe-overlay.open .wardrobe-modal {
-  transform: translateY(0);
-}
-
-/* Handle kéo */
-.wardrobe-handle {
-  width: 40px; height: 4px;
-  background: rgba(56,189,248,0.25);
-  border-radius: 99px;
-  margin: 12px auto 0;
-  flex-shrink: 0;
-}
-
-/* Header */
-.wardrobe-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px 10px;
-  flex-shrink: 0;
-}
-.wardrobe-title {
-  font-family: 'Orbitron', monospace;
-  font-size: 15px;
-  font-weight: 900;
-  color: #e0f2fe;
-  letter-spacing: .5px;
-}
-.wardrobe-close {
-  width: 30px; height: 30px;
-  background: rgba(56,189,248,0.08);
-  border: 1px solid rgba(56,189,248,0.2);
-  border-radius: 50%;
-  color: #38bdf8;
-  font-size: 15px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.2s;
-}
-.wardrobe-close:hover { background: rgba(56,189,248,0.18); }
-
-/* Body layout */
-.wardrobe-body {
-  display: flex;
-  gap: 0;
-  flex: 1;
-  overflow: hidden;
-  padding: 0 16px 8px;
-}
-
-/* Preview nhân vật bên trái */
-.wardrobe-preview {
-  width: 130px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding-top: 8px;
-}
-
-.wardrobe-char-stage {
-  width: 100px;
-  height: 126px;
-  background: rgba(56,189,248,0.04);
-  border: 1px solid rgba(56,189,248,0.12);
-  border-radius: 16px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 8px;
-  position: relative;
-  overflow: hidden;
-}
-.wardrobe-char-stage::before {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 30px;
-  background: radial-gradient(ellipse at center bottom, rgba(56,189,248,0.12) 0%, transparent 70%);
-}
-
-/* Toggle giới tính */
-.gender-toggle {
-  display: flex;
-  background: rgba(15,23,42,0.6);
-  border: 1px solid rgba(56,189,248,0.15);
-  border-radius: 99px;
-  padding: 2px;
-  gap: 2px;
-  width: 100%;
-}
-.gender-btn {
-  flex: 1;
-  padding: 5px 0;
-  border-radius: 99px;
-  border: none;
-  background: transparent;
-  color: #4a7a9b;
-  font-size: 11px;
-  font-weight: 800;
-  font-family: 'Nunito', sans-serif;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-.gender-btn.active {
-  background: rgba(56,189,248,0.15);
-  color: #38bdf8;
-}
-
-/* Tabs danh mục */
-.wardrobe-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding-top: 8px;
-}
-
+/* ===== WARDROBE (TỦ ĐỒ) ===== */
 .wardrobe-tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
+  display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap;
 }
 .wardrobe-tab {
-  padding: 5px 10px;
-  border-radius: 99px;
+  padding: 6px 12px; border-radius: 99px;
   border: 1px solid rgba(56,189,248,0.15);
-  background: transparent;
-  color: #4a7a9b;
-  font-size: 10px;
-  font-weight: 800;
+  background: transparent; color: #4a7a9b;
+  font-size: 11px; font-weight: 800;
   font-family: 'Nunito', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
 }
 .wardrobe-tab.active {
   background: rgba(56,189,248,0.15);
-  border-color: rgba(56,189,248,0.4);
-  color: #38bdf8;
+  border-color: rgba(56,189,248,0.4); color: #38bdf8;
 }
 
-/* Grid items */
 .wardrobe-items {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
-  overflow-y: auto;
-  flex: 1;
-  padding-right: 2px;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 8px; margin-bottom: 12px;
 }
-.wardrobe-items::-webkit-scrollbar { width: 3px; }
-.wardrobe-items::-webkit-scrollbar-track { background: transparent; }
-.wardrobe-items::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.2); border-radius: 99px; }
 
 .wardrobe-item {
   aspect-ratio: 1;
   background: rgba(15,23,42,0.7);
   border: 1px solid rgba(56,189,248,0.1);
   border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  cursor: pointer;
-  transition: all 0.18s;
-  position: relative;
-  padding: 6px 4px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4px; cursor: pointer;
+  transition: all 0.18s; position: relative; padding: 8px 4px;
 }
-.wardrobe-item:hover {
+.wardrobe-item:hover:not(.locked) {
   border-color: rgba(56,189,248,0.35);
   background: rgba(56,189,248,0.06);
   transform: translateY(-1px);
@@ -271,96 +56,47 @@
   background: rgba(56,189,248,0.12);
   box-shadow: 0 0 10px rgba(56,189,248,0.2);
 }
-.wardrobe-item.locked {
-  opacity: 0.45;
-  cursor: default;
-}
+.wardrobe-item.locked { opacity: 0.45; cursor: default; }
 
-/* Badge source */
 .item-source {
-  position: absolute;
-  top: 4px; right: 4px;
-  font-size: 8px;
-  padding: 1px 5px;
-  border-radius: 99px;
-  font-weight: 800;
-  letter-spacing: .3px;
+  position: absolute; top: 3px; right: 3px;
+  font-size: 8px; padding: 1px 4px; border-radius: 99px; font-weight: 800;
 }
-.item-source.shop {
-  background: rgba(251,191,36,0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(251,191,36,0.3);
-}
-.item-source.gacha {
-  background: rgba(167,139,250,0.15);
-  color: #a78bfa;
-  border: 1px solid rgba(167,139,250,0.3);
-}
+.item-source.shop  { background: rgba(251,191,36,.15);  color: #fbbf24; border: 1px solid rgba(251,191,36,.3); }
+.item-source.gacha { background: rgba(167,139,250,.15); color: #a78bfa; border: 1px solid rgba(167,139,250,.3); }
 
 .item-icon { font-size: 22px; line-height: 1; }
-.item-name {
-  font-size: 9px;
-  color: #7ca8c2;
-  font-weight: 700;
-  text-align: center;
-  line-height: 1.2;
-}
-.item-equipped-check {
-  position: absolute;
-  bottom: 3px; right: 3px;
-  font-size: 9px;
-  color: #38bdf8;
-}
+.item-name { font-size: 10px; color: #7ca8c2; font-weight: 700; text-align: center; line-height: 1.2; }
+.item-equipped-check { position: absolute; bottom: 3px; right: 3px; font-size: 9px; color: #38bdf8; }
 
-/* Equipped indicator trên layer slots */
-.wardrobe-slots {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  width: 100%;
-}
-.slot-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(15,23,42,0.5);
-  border: 1px solid rgba(56,189,248,0.08);
-  border-radius: 8px;
-  padding: 4px 8px;
-}
-.slot-icon { font-size: 12px; }
-.slot-name {
-  font-size: 9px;
-  color: #4a7a9b;
-  font-weight: 700;
-  flex: 1;
-}
-.slot-val {
-  font-size: 9px;
-  color: #38bdf8;
-  font-weight: 800;
-  max-width: 60px;
+/* ===== PREVIEW NHÂN VẬT ===== */
+.wardrobe-preview {
+  background: rgba(56,189,248,0.05);
+  border: 2px solid rgba(56,189,248,0.25);
+  border-radius: 16px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-height: 250px;
+  position: relative;
+}
+.wardrobe-preview .preview-placeholder {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #4a7a9b;
+  font-size: 14px;
+  font-weight: 700;
+}
+.wardrobe-preview .preview-placeholder span {
+  display: block;
+  font-size: 40px;
+  margin-bottom: 8px;
 }
 
-/* Nút lưu */
+/* Save button */
 .wardrobe-save {
-  margin: 10px 16px 0;
-  width: calc(100% - 32px);
-  padding: 12px;
-  background: linear-gradient(90deg, #38bdf8, #a78bfa);
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  font-family: 'Orbitron', monospace;
-  font-size: 13px;
-  font-weight: 900;
-  cursor: pointer;
-  letter-spacing: .5px;
-  transition: opacity 0.2s, transform 0.2s;
-  flex-shrink: 0;
+  margin-top: 12px; width: 100%; padding: 12px;
+  background: #22c55e; border: none; color: #fff;
+  font-weight: 900; border-radius: 10px;
+  font-family: 'Orbitron'; cursor: pointer;
 }
-.wardrobe-save:hover { opacity: 0.88; transform: translateY(-1px); }
-.wardrobe-save:active { transform: translateY(0); }

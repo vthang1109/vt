@@ -44,28 +44,37 @@
     rgba(56,189,248,0.04) 41px
   );
 }
-/* MỚI */
+
 .pro-avatar-ring {
-  width: 86px;
-  height: 86px;
+  width: 86px; height: 86px;
   border-radius: 50%;
   padding: 2px;
   background: linear-gradient(135deg, #38bdf8, #a78bfa, #34d399);
   animation: rotateRing 4s linear infinite;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   box-sizing: border-box;
 }
 
 .pro-avatar {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   border-radius: 50%;
   background: linear-gradient(135deg, #1e293b, #0f172a);
-  border: none;            /* ← xóa border thừa */
-  ...
+  border: none;
+  font-size: 32px;
+  display: flex; align-items: center; justify-content: center;
+  color: #e0f2fe; font-weight: 900;
+  font-family: 'Nunito', sans-serif;
+}
+
+.pro-avatar-upload {
+  position: absolute; bottom: 0; right: 0;
+  width: 28px; height: 28px;
+  background: #6366f1;
+  border-radius: 50%; display: none;
+  align-items: center; justify-content: center;
+  cursor: pointer; font-size: 14px;
+  border: 2px solid #0f172a; z-index: 10;
 }
 
 /* ===== IDENTITY ===== */
@@ -76,37 +85,21 @@
 
 .pro-name {
   font-family: 'Orbitron', monospace;
-  font-size: 22px;
-  font-weight: 900;
-  color: #e0f2fe;
-  margin-bottom: 8px;
-  letter-spacing: 0.5px;
+  font-size: 22px; font-weight: 900;
+  color: #e0f2fe; margin-bottom: 8px; letter-spacing: 0.5px;
 }
 
 .pro-points-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(251,191,36,0.1);
-  border: 1px solid rgba(251,191,36,0.25);
-  border-radius: 999px;
-  padding: 6px 16px;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25);
+  border-radius: 999px; padding: 6px 16px;
 }
 
 .pro-points-icon { font-size: 16px; }
-.pro-points-val  {
-  font-family: 'Orbitron', monospace;
-  font-size: 16px;
-  font-weight: 900;
-  color: #fbbf24;
-}
-.pro-points-label {
-  font-size: 12px;
-  color: #92400e;
-  font-weight: 700;
-}
+.pro-points-val  { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 900; color: #fbbf24; }
+.pro-points-label { font-size: 12px; color: #92400e; font-weight: 700; }
 
-/* ===== GRID 3 Ô ===== */
+/* ===== GRID MỚI ===== */
 .pro-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -119,111 +112,90 @@
   background: rgba(15,23,42,0.7);
   border: 1px solid rgba(56,189,248,0.12);
   border-radius: 18px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  padding: 6px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
   backdrop-filter: blur(8px);
   transition: border-color 0.2s, transform 0.2s;
 }
-
 .pro-card:hover {
   border-color: rgba(56,189,248,0.3);
   transform: translateY(-2px);
 }
 
-/* Danh hiệu chiếm full width */
-.pro-card-title {
-  grid-column: 1 / -1;
-}
-
-.pro-card-label {
-  font-size: 11px;
-  font-weight: 800;
-  color: #4a7a9b;
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  align-self: flex-start;
-}
-
-.pro-card-sub {
-  font-size: 12px;
-  color: #4a7a9b;
-  font-weight: 600;
-  text-align: center;
-}
-
-/* --- Ô NHÂN VẬT --- */
+/* Nhân vật: chiếm trọn 2 hàng bên trái */
 .pro-card-character {
-  border-color: rgba(56,189,248,0.2);
+  grid-row: 1 / 3;
+  border-color: rgba(56,189,248,0.25);
+  cursor: pointer;
+  padding: 6px;
+  justify-content: stretch;
+  align-items: stretch;
+  min-height: 280px;
 }
 
+/* Container cho nhân vật */
 .pro-character-frame {
-  width: 80px;
-  height: 100px;
-  border-radius: 12px;
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  border-radius: 16px;
   background: rgba(56,189,248,0.05);
-  border: 1px dashed rgba(56,189,248,0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 2px solid rgba(56,189,248,0.25);
+  position: relative;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden;
 }
 
-.pro-character-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+@keyframes chibiIdle {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+.pro-character-frame.chibi-bounce img {
+  animation: chibiIdle 2.4s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
-/* Hình nhân vật đơn giản bằng CSS */
-.pro-char-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  opacity: 0.3;
-}
-.pro-char-head {
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  background: #38bdf8;
-}
-.pro-char-torso {
-  width: 22px; height: 24px;
-  border-radius: 4px;
-  background: #38bdf8;
-}
-.pro-char-legs {
-  width: 22px; height: 14px;
-  background: linear-gradient(to right, #38bdf8 48%, transparent 48%, transparent 52%, #38bdf8 52%);
-  border-radius: 0 0 4px 4px;
-}
-
-/* --- Ô THÚ CƯNG --- */
+/* Thú cưng & Danh hiệu nằm bên phải */
 .pro-card-pet {
   border-color: rgba(52,211,153,0.2);
-  transition: border-color 0.4s, box-shadow 0.4s;
+  cursor: pointer;
   position: relative;
   overflow: visible;
+  transition: border-color 0.4s, box-shadow 0.4s;
 }
 
-/* Nhãn tier — góc trên phải, chéo */
+/* Khung pet bo tròn (50%) */
+.pro-pet-frame {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(52,211,153,0.05);
+  border: 2px solid rgba(52,211,153,0.25);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.4s, box-shadow 0.4s;
+  margin: 4px auto 0;
+}
+
+.pro-pet-placeholder {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.pro-pet-emoji { font-size: 28px; opacity: 0.4; }
+.pro-coming-soon {
+  font-size: 8px; color: #4a7a9b; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+
+/* Nhãn tier pet */
 .pro-card-pet .pet-tier-badge {
-  position: absolute;
-  top: 10px; right: -4px;
-  font-size: 9px; font-weight: 900;
-  padding: 3px 10px;
-  border-radius: 4px 0 0 4px;
-  letter-spacing: .6px;
-  text-transform: uppercase;
-  border: 1px solid;
-  white-space: nowrap;
-  z-index: 2;
-  /* hiệu ứng chéo */
-  transform: rotate(0deg);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  position: absolute; top: 8px; right: -2px;
+  font-size: 8px; font-weight: 900;
+  padding: 2px 8px; border-radius: 3px 0 0 3px;
+  letter-spacing: .5px; text-transform: uppercase;
+  border: 1px solid; white-space: nowrap; z-index: 2;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
 /* Màu neon theo tier */
@@ -231,200 +203,97 @@
   border-color: #94a3b8;
   box-shadow: 0 0 12px #94a3b8aa, 0 0 28px #94a3b855;
 }
-.pro-card-pet.pet-tier-1 .pet-tier-badge {
-  color: #cbd5e1; background: rgba(148,163,184,0.18); border-color: #94a3b8;
-  text-shadow: 0 0 8px #94a3b8;
-}
+.pro-card-pet.pet-tier-1 .pro-pet-frame { border-color: #94a3b8; box-shadow: inset 0 0 14px #94a3b855; }
+.pro-card-pet.pet-tier-1 .pet-tier-badge { color: #cbd5e1; background: rgba(148,163,184,0.18); border-color: #94a3b8; text-shadow: 0 0 8px #94a3b8; }
 
 .pro-card-pet.pet-tier-2 {
   border-color: #34d399;
   box-shadow: 0 0 14px #34d399cc, 0 0 32px #34d39966;
 }
-.pro-card-pet.pet-tier-2 .pet-tier-badge {
-  color: #6ee7b7; background: rgba(52,211,153,0.15); border-color: #34d399;
-  text-shadow: 0 0 8px #34d399;
-}
+.pro-card-pet.pet-tier-2 .pro-pet-frame { border-color: #34d399; box-shadow: inset 0 0 14px #34d39955; }
+.pro-card-pet.pet-tier-2 .pet-tier-badge { color: #6ee7b7; background: rgba(52,211,153,0.15); border-color: #34d399; text-shadow: 0 0 8px #34d399; }
 
 .pro-card-pet.pet-tier-3 {
   border-color: #38bdf8;
   box-shadow: 0 0 14px #38bdf8cc, 0 0 32px #38bdf866;
 }
-.pro-card-pet.pet-tier-3 .pet-tier-badge {
-  color: #7dd3fc; background: rgba(56,189,248,0.15); border-color: #38bdf8;
-  text-shadow: 0 0 8px #38bdf8;
-}
+.pro-card-pet.pet-tier-3 .pro-pet-frame { border-color: #38bdf8; box-shadow: inset 0 0 14px #38bdf855; }
+.pro-card-pet.pet-tier-3 .pet-tier-badge { color: #7dd3fc; background: rgba(56,189,248,0.15); border-color: #38bdf8; text-shadow: 0 0 8px #38bdf8; }
 
 .pro-card-pet.pet-tier-4 {
   border-color: #f43f5e;
   box-shadow: 0 0 14px #f43f5ecc, 0 0 32px #f43f5e66;
 }
-.pro-card-pet.pet-tier-4 .pet-tier-badge {
-  color: #fda4af; background: rgba(244,63,94,0.15); border-color: #f43f5e;
-  text-shadow: 0 0 8px #f43f5e;
-}
+.pro-card-pet.pet-tier-4 .pro-pet-frame { border-color: #f43f5e; box-shadow: inset 0 0 14px #f43f5e55; }
+.pro-card-pet.pet-tier-4 .pet-tier-badge { color: #fda4af; background: rgba(244,63,94,0.15); border-color: #f43f5e; text-shadow: 0 0 8px #f43f5e; }
 
 .pro-card-pet.pet-tier-5 {
   border-color: #fbbf24;
   box-shadow: 0 0 18px #fbbf24cc, 0 0 40px #fbbf2466;
   animation: petGoldPulse 2s ease-in-out infinite;
 }
-.pro-card-pet.pet-tier-5 .pet-tier-badge {
-  color: #fde68a; background: rgba(251,191,36,0.15); border-color: #fbbf24;
-  text-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24;
-}
+.pro-card-pet.pet-tier-5 .pro-pet-frame { border-color: #fbbf24; box-shadow: inset 0 0 20px #fbbf2466; }
+.pro-card-pet.pet-tier-5 .pet-tier-badge { color: #fde68a; background: rgba(251,191,36,0.15); border-color: #fbbf24; text-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24; }
 
 @keyframes petGoldPulse {
   0%,100% { box-shadow: 0 0 18px #fbbf24cc, 0 0 40px #fbbf2444; }
   50%     { box-shadow: 0 0 28px #fbbf24ff, 0 0 60px #fbbf2477; }
 }
 
-.pro-pet-frame {
-  width: 80px; height: 80px; border-radius: 50%;
-  background: rgba(52,211,153,0.05);
-  border: 2px solid rgba(52,211,153,0.25);
-  display: flex; align-items: center; justify-content: center;
-  transition: border-color 0.4s, box-shadow 0.4s;
-}
-.pet-tier-1 .pro-pet-frame { border-color: #94a3b8; box-shadow: inset 0 0 14px #94a3b855; }
-.pet-tier-2 .pro-pet-frame { border-color: #34d399; box-shadow: inset 0 0 14px #34d39955; }
-.pet-tier-3 .pro-pet-frame { border-color: #38bdf8; box-shadow: inset 0 0 14px #38bdf855; }
-.pet-tier-4 .pro-pet-frame { border-color: #f43f5e; box-shadow: inset 0 0 14px #f43f5e55; }
-.pet-tier-5 .pro-pet-frame { border-color: #fbbf24; box-shadow: inset 0 0 20px #fbbf2466; }
-
-.pro-pet-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.pro-pet-emoji {
-  font-size: 28px;
-  opacity: 0.4;
-  animation: petFloat 2.5s ease-in-out infinite;
-}
-
-@keyframes petFloat {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-4px); }
-}
-
-.pro-coming-soon {
-  font-size: 9px;
-  color: #4a7a9b;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-}
-
-/* --- Ô DANH HIỆU --- */
+/* Danh hiệu */
 .pro-card-title {
   border-color: rgba(251,191,36,0.15);
 }
 
+.pro-card-label {
+  font-size: 11px; font-weight: 800; color: #4a7a9b;
+  text-transform: uppercase; letter-spacing: .8px; align-self: flex-start;
+}
+
 .pro-titles-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  width: 100%;
-  min-height: 40px;
-  align-items: center;
+  display: flex; flex-wrap: wrap; gap: 6px;
+  justify-content: center; width: 100%;
+  min-height: 36px; align-items: center;
 }
 
 .pro-title-badge {
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-  border: 1px solid;
+  padding: 4px 10px; border-radius: 999px;
+  font-size: 11px; font-weight: 800; border: 1px solid;
 }
+.pro-title-badge.gold   { background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.35); color: #fbbf24; }
+.pro-title-badge.blue   { background: rgba(56,189,248,0.1);  border-color: rgba(56,189,248,0.3);  color: #38bdf8; }
+.pro-title-badge.green  { background: rgba(52,211,153,0.1);  border-color: rgba(52,211,153,0.3);  color: #34d399; }
+.pro-title-badge.purple { background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.3); color: #a78bfa; }
 
-.pro-title-badge.gold {
-  background: rgba(251,191,36,0.12);
-  border-color: rgba(251,191,36,0.35);
-  color: #fbbf24;
-}
+.pro-title-empty { font-size: 12px; color: #4a7a9b; font-weight: 600; }
 
-.pro-title-badge.blue {
-  background: rgba(56,189,248,0.1);
-  border-color: rgba(56,189,248,0.3);
-  color: #38bdf8;
-}
-
-.pro-title-badge.green {
-  background: rgba(52,211,153,0.1);
-  border-color: rgba(52,211,153,0.3);
-  color: #34d399;
-}
-
-.pro-title-badge.purple {
-  background: rgba(167,139,250,0.1);
-  border-color: rgba(167,139,250,0.3);
-  color: #a78bfa;
-}
-
-.pro-title-empty {
+.pro-card-sub {
+  margin-top: 8px;
   font-size: 12px;
   color: #4a7a9b;
   font-weight: 600;
+  text-align: center;
+  line-height: 1.4;
 }
 
 /* ===== STATS ROW ===== */
 .pro-stats-row {
-  display: flex;
-  justify-content: center;
-  gap: 0;
-  margin: 0 16px;
-  background: rgba(15,23,42,0.6);
-  border: 1px solid rgba(56,189,248,0.1);
-  border-radius: 16px;
-  overflow: hidden;
+  display: flex; justify-content: center; gap: 0;
+  margin: 0 16px; background: rgba(15,23,42,0.6);
+  border: 1px solid rgba(56,189,248,0.1); border-radius: 16px; overflow: hidden;
 }
-
 .pro-stat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 14px 8px;
-  gap: 4px;
-  border-right: 1px solid rgba(56,189,248,0.08);
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  padding: 14px 8px; gap: 4px; border-right: 1px solid rgba(56,189,248,0.08);
 }
-
 .pro-stat:last-child { border-right: none; }
-
-.pro-stat-val {
-  font-family: 'Orbitron', monospace;
-  font-size: 18px;
-  font-weight: 900;
-  color: #38bdf8;
-}
-
-.pro-stat-label {
-  font-size: 11px;
-  color: #4a7a9b;
-  font-weight: 700;
-}
+.pro-stat-val   { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 900; color: #38bdf8; }
+.pro-stat-label { font-size: 11px; color: #4a7a9b; font-weight: 700; }
 
 /* ===== MOBILE ===== */
 @media (max-width: 400px) {
   .pro-name { font-size: 18px; }
-  .pro-grid { grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 12px 10px; }
-}
-
-/* Avatar upload button */
-.pro-avatar-upload {
-  position: absolute;
-  bottom: 0; right: 0;
-  width: 28px; height: 28px;
-  background: #6366f1;
-  border-radius: 50%;
-  display: none; /* JS bật nếu là owner */
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 14px;
-  border: 2px solid #0f172a;
-  z-index: 10;
+  .pro-grid { gap: 8px; padding: 0 12px 10px; }
+  .pro-character-frame { min-height: 220px; }
+  .pro-pet-frame { width: 70px; height: 70px; }
 }
