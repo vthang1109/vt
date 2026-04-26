@@ -1,0 +1,89 @@
+/* ===== GAMES & APPLICATIONS — DÙNG CHUNG ===== */
+.games-page { min-height: 100vh; position: relative; z-index: 1; }
+.games-hero { text-align: center; padding: 48px 20px 32px; animation: fadeUp 0.7s both; }
+.games-hero h1 { font-family: 'Orbitron', monospace; font-size: clamp(28px, 7vw, 52px); font-weight: 900; color: #e0f2fe; margin-bottom: 8px; }
+.games-hero h1 span { color: #38bdf8; text-shadow: 0 0 30px rgba(56,189,248,0.7); }
+.games-hero p { color: #7dd3fc; font-size: 14px; font-weight: 600; }
+.points-bar { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 auto 40px; padding: 10px 24px; border-radius: 50px; background: rgba(56,189,248,0.07); border: 1px solid rgba(56,189,248,0.2); width: fit-content; animation: fadeUp 0.7s 0.1s both; }
+.points-bar .pts-val { color: #38bdf8; font-size: 16px; font-weight: 900; font-family: 'Orbitron', monospace; }
+.category-section { max-width: 800px; margin: 0 auto 48px; padding: 0 16px; animation: fadeUp 0.7s 0.15s both; }
+.category-label { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.category-label .cat-icon { font-size: 18px; }
+.category-label .cat-name { font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700; color: #7dd3fc; letter-spacing: 2px; text-transform: uppercase; }
+.category-label .cat-line { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(56,189,248,0.3), transparent); }
+.game-lobby-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.game-lobby-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px 12px 18px; border-radius: 20px; cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid rgba(56,189,248,0.12); transition: all 0.3s; overflow: hidden; text-decoration: none; }
+.game-lobby-card:hover { transform: translateY(-6px); border-color: rgba(56,189,248,0.4); box-shadow: 0 16px 40px rgba(56,189,248,0.15); }
+.glc-emoji { font-size: 40px; line-height: 1; }
+.glc-name { font-weight: 800; font-size: 14px; color: #e0f2fe; text-align: center; }
+.glc-pts { font-size: 11px; font-weight: 700; color: #38bdf8; opacity: 0.8; }
+.glc-badge { position: absolute; top: 10px; right: 10px; padding: 3px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
+.glc-badge.ready { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
+.glc-badge.gold  { background: rgba(251,191,36,0.18); color: #fbbf24; border: 1px solid rgba(251,191,36,0.4); }
+.glc-badge.new  { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+.glc-badge.hot  { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
+
+/* ===== FEATURE CARD - VÀNG TƯƠI (BXH) ===== */
+.game-lobby-card.card-feature-gold {
+    background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06));
+    border: 3px solid rgba(251,191,36,0.35);
+    box-shadow: 0 10px 40px rgba(251,191,36,0.10);
+    padding: 28px 14px 22px;
+}
+.game-lobby-card.card-feature-gold:hover {
+    border-color: rgba(251,191,36,0.6);
+    box-shadow: 0 14px 50px rgba(251,191,36,0.22);
+}
+.game-lobby-card.card-feature-gold .glc-emoji { font-size: 48px; }
+.game-lobby-card.card-feature-gold .glc-name { font-size: 18px; color: #fbbf24; font-family: 'Orbitron', monospace; font-weight: 900; }
+.game-lobby-card.card-feature-gold .glc-pts { font-size: 13px; color: #fcd34d; font-weight: 600; }
+
+/* ===== FEATURE CARD - TÍM TƯƠI (PHÒNG CHƠI) ===== */
+.game-lobby-card.card-feature-purple {
+    background: linear-gradient(135deg, rgba(167,139,250,0.14), rgba(124,58,237,0.06));
+    border: 3px solid rgba(167,139,250,0.35);
+    box-shadow: 0 10px 40px rgba(167,139,250,0.10);
+    padding: 28px 14px 22px;
+}
+.game-lobby-card.card-feature-purple:hover {
+    border-color: rgba(167,139,250,0.6);
+    box-shadow: 0 14px 50px rgba(167,139,250,0.22);
+}
+.game-lobby-card.card-feature-purple .glc-emoji { font-size: 48px; }
+.game-lobby-card.card-feature-purple .glc-name { font-size: 18px; color: #a78bfa; font-family: 'Orbitron', monospace; font-weight: 900; }
+.game-lobby-card.card-feature-purple .glc-pts { font-size: 13px; color: #c4b5fd; font-weight: 600; }
+
+/* Admin button */
+.admin-btn-visible { position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: rgba(15, 23, 42, 0.9); border: 2px solid #0ea5e9; color: #0ea5e9; padding: 10px 20px; border-radius: 12px; font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(14, 165, 233, 0.3); transition: all 0.3s; text-transform: uppercase; }
+.admin-btn-visible:hover { background: rgba(14,165,233,0.15); }
+
+/* Nav tab */
+.nav-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 30px;
+    animation: fadeUp 0.7s 0.05s both;
+}
+.nav-tab {
+    padding: 10px 24px;
+    border-radius: 12px;
+    border: 2px solid rgba(56,189,248,0.25);
+    background: rgba(15,23,42,0.8);
+    color: #94a3b8;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+    letter-spacing: 1px;
+}
+.nav-tab:hover { border-color: #38bdf8; color: #e2e8f0; }
+.nav-tab.active { background: rgba(14,165,233,0.2); border-color: #38bdf8; color: #38bdf8; box-shadow: 0 0 20px rgba(56,189,248,0.2); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Responsive */
+@media (max-width: 600px) {
+    .nav-tab { padding: 8px 16px; font-size: 11px; }
+}

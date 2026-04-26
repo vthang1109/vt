@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VTWorld — Bóng Đá</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="football.css">
+    <link rel="stylesheet" href="quests.css">
+    <script type="module" src="quests.js"></script>
+</head>
+<body>
+    <nav class="casino-nav">
+        <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
+            <span style="color:#0ea5e9">VT</span><span>World</span>
+        </div>
+        <div class="nav-center">
+            <div id="nav-pts">⭐ 0</div>
+        </div>
+        <div class="nav-right">
+            <button class="nav-btn exit-btn" onclick="location.href='games.html'">SẢNH</button>
+        </div>
+    </nav>
+
+    <div class="game-wrapper">
+        <!-- Bảng tỉ số -->
+        <div class="scoreboard">
+            <div class="team you">
+                <span class="team-name">YOU</span>
+                <span class="team-score" id="youScore">0</span>
+            </div>
+            <div class="vs">VS</div>
+            <div class="team bot">
+                <span class="team-score" id="botScore">0</span>
+                <span class="team-name">BOT</span>
+            </div>
+            <div class="timer" id="timer">60s</div>
+        </div>
+
+        <!-- Sân -->
+        <canvas id="pitch" width="800" height="400"></canvas>
+
+        <!-- Điều khiển mobile -->
+        <div class="touch-controls">
+            <div class="dpad">
+                <button class="d-btn" id="btnUp">▲</button>
+                <div class="dpad-row">
+                    <button class="d-btn" id="btnLeft">◀</button>
+                    <button class="d-btn" id="btnDown">▼</button>
+                    <button class="d-btn" id="btnRight">▶</button>
+                </div>
+            </div>
+            <button class="shoot-btn" id="btnShoot">⚽ SÚT</button>
+        </div>
+
+        <!-- Độ khó -->
+        <div class="difficulty" id="difficulty">ĐỘ KHÓ: TRUNG BÌNH</div>
+
+        <!-- Kết quả -->
+        <div class="modal-overlay" id="resultModal">
+            <div class="modal-box">
+                <h2 id="resultTitle"></h2>
+                <p id="resultText"></p>
+                <button class="game-btn primary" onclick="location.reload()">CHƠI LẠI</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="football.js"></script>
+</body>
+</html>

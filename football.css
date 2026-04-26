@@ -1,0 +1,81 @@
+/* ===== BÓNG ĐÁ — CASINO UI ===== */
+body {
+    background: radial-gradient(circle at center, #1e293b, #070b14);
+    min-height: 100vh;
+    margin: 0;
+    overflow-y: auto;
+    font-family: 'Nunito', sans-serif;
+    color: white;
+}
+
+.casino-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 20px; background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px); border-bottom: 1px solid rgba(14,165,233,0.2);
+    position: sticky; top: 0; z-index: 100;
+}
+.logo { cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1.4rem; color: white; }
+.logo span:first-child { color: #0ea5e9; }
+.nav-center { flex: 1; display: flex; justify-content: center; }
+#nav-pts { font-family: 'Orbitron'; color: #38bdf8; font-weight: 700; font-size: 18px; }
+.nav-right { display: flex; gap: 10px; }
+.nav-btn { padding: 6px 12px; border-radius: 8px; font-family: 'Orbitron'; font-size: 11px; cursor: pointer; border: 1px solid transparent; transition: 0.3s; font-weight: 700; }
+.exit-btn { background: rgba(239,68,68,0.2); border-color: #ef4444; color: #ef4444; }
+
+.game-wrapper { max-width: 800px; margin: 0 auto; padding: 10px; box-sizing: border-box; }
+
+/* Bảng điểm */
+.scoreboard {
+    display: flex; justify-content: center; align-items: center;
+    gap: 20px; padding: 12px; background: rgba(15,23,42,0.9);
+    border: 1px solid rgba(56,189,248,0.2); border-radius: 16px;
+    margin-bottom: 10px;
+}
+.team { display: flex; align-items: center; gap: 10px; }
+.team-name { font-family: 'Orbitron'; font-weight: 900; font-size: 14px; color: #e2e8f0; }
+.team-score { font-family: 'Orbitron'; font-weight: 900; font-size: 28px; color: #facc15; }
+.vs { font-family: 'Orbitron'; font-weight: 900; font-size: 14px; color: #ef4444; }
+.timer { font-family: 'Orbitron'; font-weight: 900; font-size: 14px; color: #7dd3fc; margin-left: 10px; }
+
+/* Sân */
+canvas {
+    display: block; width: 100%; height: auto;
+    border: 3px solid rgba(56,189,248,0.3); border-radius: 8px;
+    background: #0d5e0d;
+}
+
+/* Touch */
+.touch-controls {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; gap: 10px;
+}
+.dpad { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.dpad-row { display: flex; gap: 4px; }
+.d-btn {
+    width: 40px; height: 40px; border-radius: 8px;
+    border: 2px solid rgba(56,189,248,0.3); background: rgba(15,23,42,0.9);
+    color: #e2e8f0; font-size: 16px; font-weight: 900; cursor: pointer;
+    touch-action: manipulation;
+}
+.d-btn:active { background: rgba(14,165,233,0.3); }
+.shoot-btn {
+    padding: 14px 24px; border-radius: 14px; border: 2px solid #ef4444;
+    background: rgba(239,68,68,0.2); color: #fca5a5;
+    font-family: 'Orbitron'; font-weight: 900; font-size: 16px; cursor: pointer;
+    touch-action: manipulation;
+}
+.shoot-btn:active { background: rgba(239,68,68,0.4); }
+
+.difficulty {
+    text-align: center; padding: 8px; font-family: 'Orbitron';
+    font-weight: 700; font-size: 11px; color: #f59e0b; cursor: pointer;
+}
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 200; display: none; align-items: center; justify-content: center; }
+.modal-overlay.active { display: flex; }
+.modal-box { background: #0a1a35; border: 2px solid #38bdf8; border-radius: 20px; padding: 30px; text-align: center; min-width: 280px; }
+.modal-box h2 { color: #facc15; font-family: 'Orbitron'; margin-bottom: 10px; }
+.modal-box p { color: #e2e8f0; margin-bottom: 15px; }
+.game-btn { padding: 12px 28px; border-radius: 12px; border: none; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; color: #fff; background: #334155; transition: 0.2s; font-size: 14px; }
+.game-btn.primary { background: linear-gradient(135deg, #0ea5e9, #38bdf8); }

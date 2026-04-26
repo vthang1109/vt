@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VTWorld — Ô Ăn Quan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="oanquan.css">
+    <link rel="stylesheet" href="quests.css">
+    <script type="module" src="quests.js"></script>
+</head>
+<body>
+    <nav class="casino-nav">
+        <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
+            <span style="color:#0ea5e9">VT</span><span>World</span>
+        </div>
+        <div class="nav-center">
+            <div id="nav-pts">⭐ 0</div>
+        </div>
+        <div class="nav-right">
+            <button class="nav-btn exit-btn" onclick="location.href='games.html'">SẢNH</button>
+        </div>
+    </nav>
+
+    <div class="game-container">
+        <!-- Điểm AI -->
+        <div class="score-area ai">
+            <div class="score-label">🤖 AI</div>
+            <div class="score-value" id="aiScore">0</div>
+        </div>
+
+        <!-- Bàn chơi -->
+        <div class="board" id="board">
+            <!-- Hàng trên (ô của AI: 0-4) -->
+            <div class="row top-row" id="topRow"></div>
+
+            <!-- Ô quan + Ô quan -->
+            <div class="middle-row">
+                <div class="quan-cell ai-quan" id="aiQuan">
+                    <span class="quan-icon">🏺</span>
+                    <span class="quan-count" id="aiQuanCount">1</span>
+                </div>
+                <div class="board-center">
+                    <div class="turn-indicator" id="turnIndicator">👆 LƯỢT BẠN</div>
+                </div>
+                <div class="quan-cell player-quan" id="playerQuan">
+                    <span class="quan-icon">🏺</span>
+                    <span class="quan-count" id="playerQuanCount">1</span>
+                </div>
+            </div>
+
+            <!-- Hàng dưới (ô của người chơi: 5-9) -->
+            <div class="row bottom-row" id="bottomRow"></div>
+        </div>
+
+        <!-- Điểm người chơi -->
+        <div class="score-area player">
+            <div class="score-label">😎 BẠN</div>
+            <div class="score-value" id="playerScore">0</div>
+        </div>
+
+        <!-- Nút -->
+        <div class="controls">
+            <button class="game-btn primary" id="btnNew">🔄 VÁN MỚI</button>
+        </div>
+
+        <!-- Kết quả -->
+        <div class="modal-overlay" id="resultModal">
+            <div class="modal-box">
+                <h2 id="resultTitle"></h2>
+                <p id="resultText"></p>
+                <button class="game-btn primary" onclick="location.reload()">CHƠI LẠI</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="oanquan.js"></script>
+</body>
+</html>
