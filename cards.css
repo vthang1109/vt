@@ -1,7 +1,7 @@
 /* cards.css */
 :root {
-    --card-width: 80px;
-    --card-height: 115px;
+    --card-width: 60px;
+    --card-height: 86px;
     --card-bg: #ffffff;
     --card-red: #e11d48;
     --card-black: #1e293b;
