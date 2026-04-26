@@ -1,7 +1,7 @@
-/* cards-mp.css — sửa lại */
+/* cards-mp.css */
 :root {
-  --card-width: 46px;
-  --card-height: 64px;
+  --card-width: 37px;
+  --card-height: 56px;
   --card-bg: #ffffff;
   --card-red: #e11d48;
   --card-black: #1e293b;
@@ -10,48 +10,67 @@
 
 .card {
   width: var(--card-width);
-  height: var(--card-height);  /* Sửa: set cứng height */
-  min-height: unset;
+  height: var(--card-height);
   background: var(--card-bg);
-  border-radius: 8px;
+  border-radius: 5px;
   position: relative;
-  margin-left: -20px;
-  box-shadow: 2px 4px 10px rgba(0,0,0,0.3);
+  margin-left: -23px;
+  box-shadow: 2px 5px 15px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 4px 5px;
+  padding: 3px;
+  transition: transform 0.2s ease, margin 0.2s ease;
   border: 1px solid #ddd;
   user-select: none;
-  flex-shrink: 0;  /* Sửa: không cho bài bị ép nhỏ */
+  flex-shrink: 0;
 }
 
 .card:first-child { margin-left: 0; }
+
 .card.red { color: var(--card-red); }
 .card.black { color: var(--card-black); }
 
-.card-top { font-size: 10px; font-weight: 900; line-height: 1.1; }
-.card-top span { display: block; font-size: 9px; }
-.card-center { font-size: 22px; align-self: center; }
-.card-bottom { font-size: 10px; font-weight: 900; transform: rotate(180deg); line-height: 1.1; }
+.card-top { font-size: 7px; font-weight: 900; line-height: 1.1; }
+.card-top span { display: block; font-size: 6px; }
+
+.card-center {
+  font-size: 18px;
+  align-self: center;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+}
+
+.card-bottom {
+  font-size: 7px;
+  font-weight: 900;
+  transform: rotate(180deg);
+  line-height: 1.1;
+}
 
 .card.hidden {
   background: linear-gradient(135deg, var(--vt-blue), #1e40af);
-  border: 2px solid #fff;
+  border: 3px solid #fff;
 }
+
 .card.hidden .card-back-pattern {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   border-radius: 4px;
   background-image: radial-gradient(rgba(255,255,255,0.3) 1px, transparent 1px);
-  background-size: 6px 6px;
+  background-size: 4px 4px;
   opacity: 0.8;
+}
+
+.hand.active .card:hover {
+  transform: translateY(-8px) rotate(2deg);
+  z-index: 100;
+  cursor: pointer;
 }
 
 .xd-cards {
   display: flex;
   flex-wrap: nowrap;
   align-items: flex-start;
-  width: auto;
   height: auto;
   min-height: unset;
   overflow: visible;
