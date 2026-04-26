@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="quests.css"/>
   <script type="module" src="quests.js"></script>
   <style>
-    .xd-wrap { min-height:100vh; padding:14px 12px 40px; max-width:760px; margin:0 auto; position:relative; z-index:1; }
+    .xd-wrap { min-height:100vh; padding:14px 12px 40px; max-width:800px; margin:0 auto; position:relative; z-index:1; }
     .xd-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px; }
     .xd-room { font-family:'Orbitron',monospace; color:#34d399; font-weight:900; font-size:14px; padding:6px 14px; border-radius:999px; background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.4); }
     .xd-back { background:none; border:none; color:#34d399; font-weight:800; font-size:13px; cursor:pointer; font-family:'Nunito',sans-serif; }
@@ -20,41 +20,84 @@
 
     .xd-phase { text-align:center; padding:12px; border-radius:14px; margin-bottom:14px; font-weight:800; font-size:14px; background:rgba(56,189,248,.08); color:#7dd3fc; border:1px solid rgba(56,189,248,.25); }
 
-    .xd-table { display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
-    .xd-seat { padding:12px 14px; border-radius:16px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); transition:all .25s; }
-    .xd-seat.dealer { background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(124,58,237,.04)); border-color:rgba(167,139,250,.4); }
-    .xd-seat.turn { background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(251,146,60,.06)); border-color:rgba(251,191,36,.55); box-shadow: 0 0 20px rgba(251,191,36,.2); }
-    .xd-seat.win { background:linear-gradient(135deg,rgba(52,211,153,.18),rgba(5,150,105,.05)); border-color:rgba(52,211,153,.5); }
-    .xd-seat.lose { background:rgba(248,113,113,.07); border-color:rgba(248,113,113,.35); opacity:.85; }
-    .xd-seat-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-    .xd-seat-name { font-weight:800; color:#e0f2fe; font-size:14px; }
-    .xd-seat-tag { font-size:11px; padding:3px 10px; border-radius:999px; font-weight:800; }
-    .xd-tag-dealer { background:rgba(167,139,250,.2); color:#c4b5fd; }
-    .xd-tag-stand { background:rgba(56,189,248,.18); color:#7dd3fc; }
-    .xd-tag-bust { background:rgba(248,113,113,.2); color:#f87171; }
-    .xd-tag-blackjack { background:linear-gradient(135deg,#fbbf24,#f59e0b); color:#1f1f1f; }
-    .xd-cards { display:flex; gap:6px; flex-wrap:wrap; min-height:62px; }
-    .xd-card { width:42px; height:60px; border-radius:7px; background:#fff; border:1px solid #94a3b8; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:900; font-family:'Nunito',sans-serif; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,.4); }
-    .xd-card.red { color:#dc2626; }
-    .xd-card.black { color:#1f1f1f; }
-    .xd-card.back { background:linear-gradient(135deg,#1e3a8a,#1e40af); color:#fbbf24; font-size:22px; }
-    .xd-card-suit { font-size:13px; }
-    .xd-seat-meta { display:flex; justify-content:space-between; align-items:center; margin-top:8px; gap:10px; flex-wrap:wrap; }
-    .xd-score { font-family:'Orbitron',monospace; font-weight:900; color:#e0f2fe; font-size:16px; }
-    .xd-bet { color:#fbbf24; font-weight:700; font-size:12.5px; }
+    .xd-table { display:flex; flex-direction:column; gap:12px; margin-bottom:14px; }
+    
+    /* Ghế nhà cái nổi bật */
+    .xd-seat.dealer {
+      background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(124,58,237,0.1));
+      border: 2px solid #fbbf24;
+      box-shadow: 0 0 18px rgba(251,191,36,0.4);
+      margin-bottom: 8px;
+    }
+    .xd-seat.dealer .xd-seat-name {
+      font-size: 22px;
+      font-weight: 900;
+      color: #fbbf24;
+      text-shadow: 0 0 6px rgba(251,191,36,0.8);
+      letter-spacing: 1px;
+    }
+    .dealer-badge {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #1f1f1f;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 900;
+      margin-left: 12px;
+      display: inline-block;
+      vertical-align: middle;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
 
-    .xd-bet-row { display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap; justify-content:center; }
-    .xd-bet-row label { color:#cbd5e1; font-weight:700; font-size:13px; }
-    .xd-bet-row input { width:120px; padding:8px 12px; border-radius:10px; border:1px solid rgba(56,189,248,.3); background:rgba(0,0,0,.3); color:#e0f2fe; font-family:'Orbitron',monospace; font-weight:800; text-align:center; }
-    .xd-bet-row button { padding:8px 16px; border-radius:10px; border:none; cursor:pointer; font-weight:800; font-family:'Nunito',sans-serif; font-size:13px; background:linear-gradient(135deg,#34d399,#059669); color:#fff; }
+    /* Ghế của bạn to hơn, dưới cùng */
+    .xd-seat.me {
+      background: linear-gradient(135deg, rgba(251,191,36,.12), rgba(245,158,11,.06));
+      border: 1px solid rgba(251,191,36,.4);
+      box-shadow: 0 4px 20px rgba(0,0,0,.3);
+      margin-top: 8px;
+    }
+    .xd-seat.me .xd-card {
+      width: 58px;
+      height: 80px;
+      font-size: 18px;
+    }
+    .xd-seat.me .xd-card-suit {
+      font-size: 16px;
+    }
 
-    .xd-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-    .xd-actions button { padding:11px 20px; border-radius:12px; border:none; cursor:pointer; font-weight:800; font-family:'Nunito',sans-serif; font-size:13px; }
-    .btn-hit { background:linear-gradient(135deg,#38bdf8,#0ea5e9); color:#fff; }
-    .btn-stand { background:linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; }
-    .btn-deal { background:linear-gradient(135deg,#34d399,#059669); color:#fff; }
-    .btn-leave-xd { background:rgba(248,113,113,.12); color:#f87171; border:1px solid rgba(248,113,113,.3); }
-    .xd-actions button:disabled { opacity:.5; cursor:not-allowed; }
+    .xd-seat { padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); transition: all .25s; }
+    .xd-seat.turn { background: linear-gradient(135deg,rgba(251,191,36,.15),rgba(251,146,60,.06)); border-color:rgba(251,191,36,.55); box-shadow: 0 0 20px rgba(251,191,36,.2); }
+    .xd-seat.win { background: linear-gradient(135deg,rgba(52,211,153,.18),rgba(5,150,105,.05)); border-color:rgba(52,211,153,.5); }
+    .xd-seat.lose { background: rgba(248,113,113,.07); border-color:rgba(248,113,113,.35); opacity:.85; }
+    .xd-seat-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+    .xd-seat-name { font-weight: 800; color: #e0f2fe; font-size: 14px; }
+    .xd-seat-tag { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 800; }
+    .xd-tag-dealer { background: rgba(167,139,250,.2); color: #c4b5fd; }
+    .xd-tag-stand { background: rgba(56,189,248,.18); color: #7dd3fc; }
+    .xd-tag-bust { background: rgba(248,113,113,.2); color: #f87171; }
+    .xd-tag-blackjack { background: linear-gradient(135deg,#fbbf24,#f59e0b); color: #1f1f1f; }
+    .xd-cards { display: flex; gap: 6px; flex-wrap: wrap; min-height: 62px; align-items: center; }
+    .xd-card { width: 42px; height: 60px; border-radius: 7px; background: #fff; border: 1px solid #94a3b8; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-family: 'Nunito', sans-serif; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,.4); }
+    .xd-card.red { color: #dc2626; }
+    .xd-card.black { color: #1f1f1f; }
+    .xd-card.back { background: linear-gradient(135deg,#1e3a8a,#1e40af); color: #fbbf24; font-size: 22px; }
+    .xd-card-suit { font-size: 13px; }
+    .xd-seat-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 10px; flex-wrap: wrap; }
+    .xd-score { font-family: 'Orbitron', monospace; font-weight: 900; color: #e0f2fe; font-size: 16px; }
+    .xd-bet { color: #fbbf24; font-weight: 700; font-size: 12.5px; }
+
+    .xd-bet-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; justify-content: center; }
+    .xd-bet-row label { color: #cbd5e1; font-weight: 700; font-size: 13px; }
+    .xd-bet-row input { width: 120px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(56,189,248,.3); background: rgba(0,0,0,.3); color: #e0f2fe; font-family: 'Orbitron', monospace; font-weight: 800; text-align: center; }
+    .xd-bet-row button { padding: 8px 16px; border-radius: 10px; border: none; cursor: pointer; font-weight: 800; font-family: 'Nunito', sans-serif; font-size: 13px; background: linear-gradient(135deg,#34d399,#059669); color: #fff; }
+
+    .xd-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .xd-actions button { padding: 11px 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: 800; font-family: 'Nunito', sans-serif; font-size: 13px; }
+    .btn-hit { background: linear-gradient(135deg,#38bdf8,#0ea5e9); color: #fff; }
+    .btn-stand { background: linear-gradient(135deg,#a78bfa,#7c3aed); color: #fff; }
+    .btn-deal { background: linear-gradient(135deg,#34d399,#059669); color: #fff; }
+    .btn-leave-xd { background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.3); }
+    .xd-actions button:disabled { opacity: .5; cursor: not-allowed; }
   </style>
 </head>
 <body>

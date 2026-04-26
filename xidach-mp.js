@@ -35,13 +35,12 @@ function freshDeck(){
 
 function cardValue(c){
   const r = c.length === 3 ? '10' : c[0];
-  if (r === 'A') return 1; // Xì = 1 hoặc 11; tính tốt nhất khi tổng
+  if (r === 'A') return 1;
   if (['J','Q','K'].includes(r)) return 10;
   return parseInt(r);
 }
 
 function bestScore(cards){
-  // Trả tổng tốt nhất ≤ 21, tính 1 hoặc 11 cho A
   let total = 0; let aces = 0;
   for (const c of cards){ const v = cardValue(c); total += v; if (c[0]==='A') aces++; }
   while (aces > 0 && total + 10 <= 21){ total += 10; aces--; }
@@ -69,7 +68,7 @@ function start(){
 
 function render(r){
   const gs = r.gameState;
-  const isHost = r.hostUid === _user.uid; // host = nhà cái
+  const isHost = r.hostUid === _user.uid;
   const phEl = document.getElementById('xd-phase');
   const betRow = document.getElementById('xd-bet-row');
   const btnHit = document.getElementById('btn-hit');
@@ -88,88 +87,130 @@ function render(r){
   else if (gs.phase === 'dealer') phEl.textContent = '🃏 Nhà cái mở bài...';
   else if (gs.phase === 'result') phEl.textContent = `📢 Vòng ${gs.round} — Kết quả`;
 
-  // Bet row chỉ hiện khi betting và mình KHÔNG phải nhà cái và chưa cược
+  // Bet row
   const myBet = gs.bets?.[_user.uid] || 0;
   if (gs.phase === 'betting' && !isHost){
     betRow.style.display = myBet > 0 ? 'none' : 'flex';
   } else betRow.style.display = 'none';
 
-  // Render bàn
+  // Sắp xếp thứ tự ghế: Dealer -> người chơi khác -> bạn
+  const dealerUid = r.hostUid;
+  const otherPlayers = (r.members || []).filter(uid => uid !== dealerUid && uid !== _user.uid);
+  const seatsOrder = [dealerUid, ...otherPlayers, _user.uid];
+
   const tEl = document.getElementById('xd-table');
   tEl.innerHTML = '';
 
-  // Nhà cái trên cùng
-  const dealerHand = gs.hands?.[r.hostUid] || [];
-  const showDealerFull = gs.phase === 'dealer' || gs.phase === 'result';
-  const dealerVisible = (gs.phase === 'playing') ? (dealerHand.length > 0 ? [dealerHand[0]] : []) : dealerHand;
-  const dealerStatus = showDealerFull && dealerHand.length ? status(dealerHand) : null;
-  let dealerCls = 'xd-seat dealer';
-  let dealerTag = '<span class="xd-seat-tag xd-tag-dealer">👑 Nhà cái</span>';
-  if (dealerStatus){
-    if (dealerStatus.tag === 'bust') dealerTag += ' <span class="xd-seat-tag xd-tag-bust">Quắc</span>';
-    else if (dealerStatus.tag === 'blackjack') dealerTag += ' <span class="xd-seat-tag xd-tag-blackjack">Xì dách</span>';
-  }
-  const dHidden = gs.phase === 'playing' && dealerHand.length > 1;
-  tEl.innerHTML += `
-    <div class="${dealerCls}">
-      <div class="xd-seat-head"><span class="xd-seat-name">${esc(r.memberInfo?.[r.hostUid]?.name||'Nhà cái')} ${r.hostUid===_user.uid?'<span style="color:#fbbf24">(bạn)</span>':''}</span><div>${dealerTag}</div></div>
-      <div class="xd-cards">
-        ${dealerVisible.map(renderCard).join('')}
-        ${dHidden ? `<div class="xd-card back">?</div>`.repeat(dealerHand.length-1) : ''}
-      </div>
-      <div class="xd-seat-meta">
-        <span class="xd-score">${showDealerFull && dealerStatus ? dealerStatus.score : (dealerVisible.length?'?':'')}</span>
-      </div>
-    </div>
-  `;
-
-  // Người chơi (không phải nhà cái)
-  (r.members||[]).forEach(uid => {
-    if (uid === r.hostUid) return;
+  for (const uid of seatsOrder) {
+    const isDealer = (uid === dealerUid);
+    const isMe = (uid === _user.uid);
     const hand = gs.hands?.[uid] || [];
     const standed = !!gs.stand?.[uid];
     const myBetAmt = gs.bets?.[uid] || 0;
     const stat = hand.length ? status(hand) : null;
     const isTurn = gs.phase === 'playing' && gs.turnOrder?.[gs.turnIdx] === uid;
+
+    // Xác định bài được hiển thị (chỉ mình thấy bài mình, dealer 1 lá khi playing, người khác ẩn)
+    let visibleCards = [];
+    if (isMe) {
+      visibleCards = hand;
+    } else if (isDealer) {
+      if (gs.phase === 'playing') {
+        visibleCards = hand.length ? [hand[0]] : [];
+      } else {
+        visibleCards = hand;
+      }
+    } else {
+      if (gs.phase === 'result' || gs.phase === 'dealer') {
+        visibleCards = hand;
+      } else {
+        visibleCards = [];
+      }
+    }
+
+    // Xây dựng HTML cho các lá bài
+    let cardsHtml = '';
+    if (!hand.length) {
+      cardsHtml = '<div style="color:#64748b;font-size:12px;padding:18px 0">Chưa có bài</div>';
+    } else if (visibleCards.length === hand.length) {
+      cardsHtml = visibleCards.map(renderCard).join('');
+    } else {
+      // Hiển thị mặt sau cho số lá bị che
+      let backCards = Array(hand.length - visibleCards.length).fill(`<div class="xd-card back">?</div>`).join('');
+      let frontCards = visibleCards.map(renderCard).join('');
+      cardsHtml = frontCards + backCards;
+    }
+
+    // Class và tag
     let cls = 'xd-seat';
     if (isTurn) cls += ' turn';
+    if (gs.phase === 'result' && gs.results?.[uid]) {
+      const res = gs.results[uid];
+      if (res.outcome === 'win') cls += ' win';
+      else if (res.outcome === 'lose') cls += ' lose';
+    }
+    if (isMe) cls += ' me';
+    if (isDealer) cls += ' dealer';
+
     let tagHtml = '';
-    if (stat){
+    if (stat && (isMe || gs.phase !== 'playing')) {
       if (stat.tag === 'bust') tagHtml += '<span class="xd-seat-tag xd-tag-bust">Quắc</span>';
       else if (stat.tag === 'blackjack') tagHtml += '<span class="xd-seat-tag xd-tag-blackjack">Xì dách</span>';
-      else if (standed) tagHtml += '<span class="xd-seat-tag xd-tag-stand">✋ Dằn</span>';
+      else if (standed && !isDealer) tagHtml += '<span class="xd-seat-tag xd-tag-stand">✋ Dằn</span>';
     }
-    if (gs.phase === 'result' && gs.results?.[uid]){
+    if (gs.phase === 'result' && gs.results?.[uid] && !isDealer) {
       const res = gs.results[uid];
-      if (res.outcome === 'win') { cls += ' win'; tagHtml += `<span class="xd-seat-tag xd-tag-stand" style="background:rgba(52,211,153,.2);color:#34d399">+${res.delta}đ</span>`; }
-      else if (res.outcome === 'lose') { cls += ' lose'; tagHtml += `<span class="xd-seat-tag xd-tag-bust">${res.delta}đ</span>`; }
+      if (res.outcome === 'win') tagHtml += `<span class="xd-seat-tag" style="background:rgba(52,211,153,.2);color:#34d399">+${res.delta}đ</span>`;
+      else if (res.outcome === 'lose') tagHtml += `<span class="xd-seat-tag xd-tag-bust">${res.delta}đ</span>`;
       else tagHtml += `<span class="xd-seat-tag xd-tag-stand">Hoà</span>`;
     }
+
+    // Hiển thị tên (đặc biệt cho nhà cái)
+    let nameHtml = '';
+    if (isDealer) {
+      nameHtml = `<span class="xd-seat-name">NHÀ CÁI <span class="dealer-badge">👑 DEALER</span></span>`;
+    } else {
+      nameHtml = `<span class="xd-seat-name">${esc(r.memberInfo?.[uid]?.name || '?')} ${isMe ? '<span style="color:#fbbf24">(bạn)</span>' : ''}</span>`;
+    }
+
+    // Điểm số
+    let scoreText = '';
+    if (isDealer) {
+      if (gs.phase !== 'playing' && stat) scoreText = stat.score;
+      else if (gs.phase === 'playing' && visibleCards.length) scoreText = '?';
+    } else {
+      if (stat && (isMe || gs.phase !== 'playing')) scoreText = stat.score;
+    }
+
     tEl.innerHTML += `
       <div class="${cls}">
-        <div class="xd-seat-head"><span class="xd-seat-name">${esc(r.memberInfo?.[uid]?.name||'?')} ${uid===_user.uid?'<span style="color:#fbbf24">(bạn)</span>':''}</span><div>${tagHtml}</div></div>
-        <div class="xd-cards">${hand.length ? hand.map(renderCard).join('') : '<div style="color:#64748b;font-size:12px;padding:18px 0">Chưa có bài</div>'}</div>
+        <div class="xd-seat-head">
+          ${nameHtml}
+          <div>${tagHtml}</div>
+        </div>
+        <div class="xd-cards">
+          ${cardsHtml}
+        </div>
         <div class="xd-seat-meta">
-          <span class="xd-score">${stat ? stat.score : ''}</span>
-          ${myBetAmt > 0 ? `<span class="xd-bet">Cược: ${myBetAmt.toLocaleString('vi-VN')}đ</span>` : '<span class="xd-bet" style="color:#64748b">chưa đặt</span>'}
+          <span class="xd-score">${scoreText}</span>
+          ${myBetAmt > 0 ? `<span class="xd-bet">Cược: ${myBetAmt.toLocaleString('vi-VN')}đ</span>` : (isDealer ? '' : '<span class="xd-bet" style="color:#64748b">chưa đặt</span>')}
         </div>
       </div>
     `;
-  });
+  }
 
   // Nút điều khiển
   const myTurn = gs.phase === 'playing' && gs.turnOrder?.[gs.turnIdx] === _user.uid;
   btnHit.style.display = myTurn ? 'inline-block' : 'none';
   btnStand.style.display = myTurn ? 'inline-block' : 'none';
-  // Nhà cái có nút Chia bài khi: phase betting, ít nhất 1 người đã cược
-  const allBetIn = (r.members||[]).filter(u => u !== r.hostUid).every(u => (gs.bets?.[u]||0) > 0);
-  const anyBet = Object.values(gs.bets||{}).some(v => v > 0);
+  const allBetIn = (r.members || []).filter(u => u !== r.hostUid).every(u => (gs.bets?.[u] || 0) > 0);
+  const anyBet = Object.values(gs.bets || {}).some(v => v > 0);
   btnDeal.style.display = (isHost && gs.phase === 'betting' && anyBet) ? 'inline-block' : 'none';
   btnDeal.disabled = !allBetIn;
   btnDeal.textContent = allBetIn ? '🃏 Chia bài' : '⏳ Chờ tất cả đặt cược';
   btnNext.style.display = (isHost && gs.phase === 'result') ? 'inline-block' : 'none';
 
-  // Auto-settle khi vào result (mỗi user tự cộng tiền thắng / nhà cái tự cộng phần thu)
+  // Auto-settle
   if (gs.phase === 'result' && gs.round !== _settledRound){
     _settledRound = gs.round;
     settleMyResult(r, gs);
@@ -201,12 +242,10 @@ window.hostDeal = async function(){
   const r = snap.data();
   if (r.hostUid !== _user.uid) return;
   const gs = r.gameState;
-  // Lọc người đã đặt cược + nhà cái
   const players = (r.members||[]).filter(u => u !== r.hostUid && (gs.bets?.[u]||0) > 0);
   if (players.length === 0){ showToast('Chưa ai cược','warn'); return; }
   const deck = freshDeck();
   const hands = {};
-  // Mỗi người 2 lá, nhà cái 2 lá
   hands[r.hostUid] = [deck.pop(), deck.pop()];
   players.forEach(uid => { hands[uid] = [deck.pop(), deck.pop()]; });
   await updateDoc(doc(db,'rooms',ROOM_ID), {
@@ -234,7 +273,6 @@ window.hit = async function(){
     'gameState.deck': deck,
     [`gameState.hands.${_user.uid}`]: hand
   };
-  // Nếu quắc hoặc đủ 5 lá ≤21 hoặc 21 → tự dằn / lật lượt
   let advance = false;
   if (stat.tag === 'bust' || hand.length >= 5 || stat.score === 21){
     updates[`gameState.stand.${_user.uid}`] = true;
@@ -254,16 +292,13 @@ window.stand = async function(){
 };
 
 async function advanceTurnIfNeeded(){
-  // Mỗi user khi xong lượt mình sẽ cố nhích turnIdx; chỉ làm nếu mình là người vừa stand
   const snap = await getDoc(doc(db,'rooms',ROOM_ID));
   if (!snap.exists()) return;
   const r = snap.data(); const gs = r.gameState;
   if (gs.phase !== 'playing') return;
   let idx = gs.turnIdx;
-  // tìm người tiếp theo chưa stand (đề phòng sau hit auto-stand)
   while (idx < gs.turnOrder.length && gs.stand?.[gs.turnOrder[idx]]) idx++;
   if (idx >= gs.turnOrder.length){
-    // Hết người chơi → nhà cái mở bài + tự rút đến ≥17
     if (r.hostUid === _user.uid){ await dealerPlay(r); }
     else { await updateDoc(doc(db,'rooms',ROOM_ID), { 'gameState.turnIdx': idx, 'gameState.phase':'dealer' }); }
   } else {
@@ -277,7 +312,6 @@ async function dealerPlay(r){
   while (bestScore(hand) < 17 && hand.length < 5 && deck.length > 0){
     hand.push(deck.pop());
   }
-  // Tính kết quả cho từng người
   const dealerStat = status(hand);
   const results = {};
   (r.members||[]).forEach(uid => {
@@ -302,7 +336,6 @@ async function dealerPlay(r){
 }
 
 async function settleMyResult(r, gs){
-  // Nhà cái: cộng phần thu/lỗ (= -tổng delta của người chơi)
   if (r.hostUid === _user.uid){
     let dealerDelta = 0;
     Object.values(gs.results||{}).forEach(res => { dealerDelta -= res.delta; });
@@ -317,11 +350,10 @@ async function settleMyResult(r, gs){
     }
     return;
   }
-  // Người chơi: cộng (bet + delta) — vì tiền cược đã trừ lúc đặt
   const bet = gs.bets?.[_user.uid] || 0;
   const res = gs.results?.[_user.uid];
   if (!res) return;
-  const refund = bet + res.delta; // win: bet+bet=2x; draw: bet; lose: 0
+  const refund = bet + res.delta;
   if (refund > 0){
     try {
       const us = await getDoc(doc(db,'users',_user.uid));
@@ -362,7 +394,6 @@ window.quitGame = async function(){
     const snap = await getDoc(doc(db,'rooms',ROOM_ID));
     if (snap.exists()){
       const r = snap.data();
-      // Hoàn tiền nếu đang betting và chưa chia
       if (r.gameState?.phase === 'betting'){
         const myBet = r.gameState.bets?.[_user.uid] || 0;
         if (myBet > 0){
