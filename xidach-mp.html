@@ -21,8 +21,45 @@
 
     .xd-phase { text-align:center; padding:12px; border-radius:14px; margin-bottom:14px; font-weight:800; font-size:14px; background:rgba(56,189,248,.08); color:#7dd3fc; border:1px solid rgba(56,189,248,.25); }
 
-    .xd-table { display:flex; flex-direction:column; gap:12px; margin-bottom:14px; }
+    .xd-table { display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
     
+    /* ===== LÁ BÀI NHỎ LẠI ===== */
+    /* Override cards.css toàn cục cho game này */
+    .xd-cards .card {
+      width: 48px !important;
+      height: 68px !important;
+      font-size: 10px !important;
+      border-radius: 5px !important;
+      margin-left: -18px !important;
+    }
+    .xd-cards .card:first-child {
+      margin-left: 0 !important;
+    }
+    .xd-cards .card .card-val {
+      font-size: 11px !important;
+    }
+    .xd-cards .card .card-suit {
+      font-size: 14px !important;
+    }
+    /* Bài của bản thân (ghế me) to hơn chút */
+    .xd-seat.me .xd-cards .card {
+      width: 60px !important;
+      height: 86px !important;
+      margin-left: -24px !important;
+    }
+    .xd-seat.me .xd-cards .card:first-child {
+      margin-left: 0 !important;
+    }
+    /* Nhà cái */
+    .xd-seat.dealer .xd-cards .card {
+      width: 56px !important;
+      height: 80px !important;
+      margin-left: -22px !important;
+    }
+    .xd-seat.dealer .xd-cards .card:first-child {
+      margin-left: 0 !important;
+    }
+
     /* Nhà cái nổi bật */
     .xd-seat.dealer {
       background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(124,58,237,0.1));
@@ -31,7 +68,7 @@
       margin-bottom: 8px;
     }
     .xd-seat.dealer .xd-seat-name {
-      font-size: 22px;
+      font-size: 18px;
       font-weight: 900;
       color: #fbbf24;
       text-shadow: 0 0 6px rgba(251,191,36,0.8);
@@ -43,28 +80,22 @@
       box-shadow: 0 4px 20px rgba(0,0,0,.3);
       margin-top: 8px;
     }
-    .xd-seat.me .card {
-      width: 90px;
-      height: 130px;
-      margin-left: -50px;
-    }
-    .xd-seat.me .card:first-child { margin-left: 0; }
 
-    .xd-seat { padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); transition: all .25s; }
+    .xd-seat { padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); transition: all .25s; }
     .xd-seat.turn { background: linear-gradient(135deg,rgba(251,191,36,.15),rgba(251,146,60,.06)); border-color:rgba(251,191,36,.55); box-shadow: 0 0 20px rgba(251,191,36,.2); }
     .xd-seat.win { background: linear-gradient(135deg,rgba(52,211,153,.18),rgba(5,150,105,.05)); border-color:rgba(52,211,153,.5); }
     .xd-seat.lose { background: rgba(248,113,113,.07); border-color:rgba(248,113,113,.35); opacity:.85; }
-    .xd-seat-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
-    .xd-seat-name { font-weight: 800; color: #e0f2fe; font-size: 16px; }
+    .xd-seat-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
+    .xd-seat-name { font-weight: 800; color: #e0f2fe; font-size: 14px; }
     .xd-seat-tag { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 800; }
     .xd-tag-dealer { background: rgba(167,139,250,.2); color: #c4b5fd; }
     .xd-tag-stand { background: rgba(56,189,248,.18); color: #7dd3fc; }
     .xd-tag-bust { background: rgba(248,113,113,.2); color: #f87171; }
     .xd-tag-blackjack { background: linear-gradient(135deg,#fbbf24,#f59e0b); color: #1f1f1f; }
-    .xd-cards { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; min-height: 130px; }
-    .xd-seat-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 10px; flex-wrap: wrap; }
-    .xd-score { font-family: 'Orbitron', monospace; font-weight: 900; color: #e0f2fe; font-size: 18px; }
-    .xd-bet { color: #fbbf24; font-weight: 700; font-size: 12.5px; }
+    .xd-cards { display: flex; flex-wrap: nowrap; align-items: center; min-height: 70px; padding: 4px 0; overflow: visible; }
+    .xd-seat-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; gap: 10px; flex-wrap: wrap; }
+    .xd-score { font-family: 'Orbitron', monospace; font-weight: 900; color: #e0f2fe; font-size: 16px; }
+    .xd-bet { color: #fbbf24; font-weight: 700; font-size: 12px; }
 
     .xd-bet-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; justify-content: center; }
     .xd-bet-row label { color: #cbd5e1; font-weight: 700; font-size: 13px; }
@@ -78,6 +109,18 @@
     .btn-deal { background: linear-gradient(135deg,#34d399,#059669); color: #fff; }
     .btn-leave-xd { background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.3); }
     .xd-actions button:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* Early reveal notification */
+    .xd-early-notice {
+      background: linear-gradient(135deg, rgba(251,191,36,.15), rgba(245,158,11,.08));
+      border: 1px solid rgba(251,191,36,.5);
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fbbf24;
+    }
   </style>
 </head>
 <body>
