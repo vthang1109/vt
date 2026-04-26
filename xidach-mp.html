@@ -59,33 +59,33 @@
     /* ===================== LÁ BÀI — THU NHỎ ĐỀU 2 CẠNH ===================== */
     /* Người chơi khác: nhỏ nhất */
     .xd-cards .card {
-      width: 36px !important;
+      width: 28px !important;
       aspect-ratio: 63 / 88 !important;
       height: auto !important;
       min-height: unset !important;
-      margin-left: -12px !important;
+      margin-left: -10px !important;
       border-radius: 4px !important;
     }
     .xd-cards .card:first-child { margin-left: 0 !important; }
 
     /* Nhà cái (không phải bạn): cỡ trung bình */
     .xd-seat.dealer:not(.me) .xd-cards .card {
-      width: 44px !important;
-      margin-left: -16px !important;
+      width: 34px !important;
+      margin-left: -12px !important;
     }
     .xd-seat.dealer:not(.me) .xd-cards .card:first-child { margin-left: 0 !important; }
 
     /* Bản thân: to nhất */
     .xd-seat.me .xd-cards .card {
-      width: 62px !important;
-      margin-left: -24px !important;
+      width: 50px !important;
+      margin-left: -20px !important;
     }
     .xd-seat.me .xd-cards .card:first-child { margin-left: 0 !important; }
 
     /* Nhà cái đồng thời là bản thân: to nhất */
     .xd-seat.dealer.me .xd-cards .card {
-      width: 62px !important;
-      margin-left: -24px !important;
+      width: 50px !important;
+      margin-left: -20px !important;
     }
     .xd-seat.dealer.me .xd-cards .card:first-child { margin-left: 0 !important; }
 
@@ -93,7 +93,7 @@
       display: flex;
       flex-wrap: nowrap;
       align-items: flex-start;
-      min-height: 50px; /* giảm chiều cao khung */
+      min-height: 40px;
       padding: 2px 0 2px 0;
       overflow: visible;
     }
@@ -129,7 +129,6 @@
       font-weight:800; font-family:'Nunito',sans-serif; font-size:11px;
       background:linear-gradient(135deg,#f87171,#dc2626); color:#fff;
     }
-    /* Nút xét bài trong ghế (mới) */
     .xd-check-btn {
       display:inline-block; margin-top:6px; padding:5px 12px;
       border-radius:8px; border:none; cursor:pointer;
