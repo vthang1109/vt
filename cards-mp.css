@@ -1,4 +1,4 @@
-/* cards-mp.css */
+/* cards-mp.css — sửa lại */
 :root {
   --card-width: 46px;
   --card-height: 64px;
@@ -10,7 +10,8 @@
 
 .card {
   width: var(--card-width);
-  height: var(--card-height);
+  height: var(--card-height);  /* Sửa: set cứng height */
+  min-height: unset;
   background: var(--card-bg);
   border-radius: 8px;
   position: relative;
@@ -22,10 +23,10 @@
   padding: 4px 5px;
   border: 1px solid #ddd;
   user-select: none;
+  flex-shrink: 0;  /* Sửa: không cho bài bị ép nhỏ */
 }
 
 .card:first-child { margin-left: 0; }
-
 .card.red { color: var(--card-red); }
 .card.black { color: var(--card-black); }
 
@@ -46,7 +47,6 @@
   opacity: 0.8;
 }
 
-/* Khung chứa bài: auto, bài đè lên nhau */
 .xd-cards {
   display: flex;
   flex-wrap: nowrap;
