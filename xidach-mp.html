@@ -57,29 +57,23 @@
     .xd-bet { color:#fbbf24; font-weight:700; font-size:12px; }
 
     /* ===================== LÁ BÀI — THU NHỎ ĐỀU 2 CẠNH ===================== */
-    /*
-      Tỉ lệ gốc thường là 63×88 (aspect ~0.716).
-      Đặt width=height sẽ làm méo. 
-      Ta dùng aspect-ratio để giữ đúng tỉ lệ.
-    */
-
     /* Người chơi khác: nhỏ nhất */
     .xd-cards .card {
-      width: 44px !important;
+      width: 36px !important;
       aspect-ratio: 63 / 88 !important;
       height: auto !important;
       min-height: unset !important;
-      margin-left: -16px !important;
-      border-radius: 5px !important;
+      margin-left: -12px !important;
+      border-radius: 4px !important;
     }
     .xd-cards .card:first-child { margin-left: 0 !important; }
 
-    /* Nhà cái: cỡ trung */
-    .xd-seat.dealer .xd-cards .card {
-      width: 52px !important;
-      margin-left: -20px !important;
+    /* Nhà cái (không phải bạn): cỡ trung bình */
+    .xd-seat.dealer:not(.me) .xd-cards .card {
+      width: 44px !important;
+      margin-left: -16px !important;
     }
-    .xd-seat.dealer .xd-cards .card:first-child { margin-left: 0 !important; }
+    .xd-seat.dealer:not(.me) .xd-cards .card:first-child { margin-left: 0 !important; }
 
     /* Bản thân: to nhất */
     .xd-seat.me .xd-cards .card {
@@ -88,7 +82,7 @@
     }
     .xd-seat.me .xd-cards .card:first-child { margin-left: 0 !important; }
 
-    /* Nhà cái + me (host): to nhất */
+    /* Nhà cái đồng thời là bản thân: to nhất */
     .xd-seat.dealer.me .xd-cards .card {
       width: 62px !important;
       margin-left: -24px !important;
@@ -99,8 +93,8 @@
       display: flex;
       flex-wrap: nowrap;
       align-items: flex-start;
-      min-height: 62px;
-      padding: 4px 0 4px 0;
+      min-height: 50px; /* giảm chiều cao khung */
+      padding: 2px 0 2px 0;
       overflow: visible;
     }
 
@@ -134,6 +128,13 @@
       border-radius:8px; border:none; cursor:pointer;
       font-weight:800; font-family:'Nunito',sans-serif; font-size:11px;
       background:linear-gradient(135deg,#f87171,#dc2626); color:#fff;
+    }
+    /* Nút xét bài trong ghế (mới) */
+    .xd-check-btn {
+      display:inline-block; margin-top:6px; padding:5px 12px;
+      border-radius:8px; border:none; cursor:pointer;
+      font-weight:800; font-family:'Nunito',sans-serif; font-size:12px;
+      background:linear-gradient(135deg,#fbbf24,#f59e0b); color:#1f1f1f;
     }
   </style>
 </head>
