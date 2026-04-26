@@ -61,30 +61,45 @@
 /* Người chơi khác */
 .xd-cards .card {
   width: 22px !important;
-  aspect-ratio: 63 / 88 !important;
-  height: auto !important;
+  height: 31px !important;
   min-height: unset !important;
   margin-left: -8px !important;
-  border-radius: 4px !important;
+  border-radius: 3px !important;
+  padding: 1px 2px !important;
 }
+.xd-cards .card:first-child { margin-left: 0 !important; }
+.xd-cards .card-top, .xd-cards .card-bottom { font-size: 8px !important; }
+.xd-cards .card-top span { font-size: 7px !important; }
+.xd-cards .card-center { font-size: 14px !important; }
 
 /* Nhà cái */
 .xd-seat.dealer:not(.me) .xd-cards .card {
   width: 26px !important;
+  height: 36px !important;
   margin-left: -10px !important;
 }
+.xd-seat.dealer:not(.me) .xd-cards .card:first-child { margin-left: 0 !important; }
 
 /* Bản thân */
 .xd-seat.me .xd-cards .card {
   width: 40px !important;
+  height: 56px !important;
   margin-left: -16px !important;
+  padding: 3px 4px !important;
 }
+.xd-seat.me .xd-cards .card:first-child { margin-left: 0 !important; }
+.xd-seat.me .xd-cards .card-top,
+.xd-seat.me .xd-cards .card-bottom { font-size: 11px !important; }
+.xd-seat.me .xd-cards .card-center { font-size: 20px !important; }
 
 /* Nhà cái + bản thân */
 .xd-seat.dealer.me .xd-cards .card {
   width: 40px !important;
+  height: 56px !important;
   margin-left: -16px !important;
+  padding: 3px 4px !important;
 }
+.xd-seat.dealer.me .xd-cards .card:first-child { margin-left: 0 !important; }
 
     /* ===================== ĐẶT CƯỢC ===================== */
     .xd-bet-row { display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap; justify-content:center; }
