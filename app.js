@@ -380,6 +380,24 @@ function listenFriendRequests(uid) {
     });
   });
 }
+// app.js — thêm vào cuối file
+window.renderAvatar = function(avatarUrl, name, size = 36) {
+  if (avatarUrl) {
+    return `<div style="
+      width:${size}px; height:${size}px; border-radius:50%;
+      background-image:url(${avatarUrl});
+      background-size:cover; background-position:center;
+      flex-shrink:0;
+    "></div>`;
+  }
+  return `<div style="
+    width:${size}px; height:${size}px; border-radius:50%;
+    background:#6366f1; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:${Math.floor(size*0.4)}px;
+    flex-shrink:0;
+  ">${(name||'?')[0].toUpperCase()}</div>`;
+};
 
 // ===== GLOBAL CHAT LOGIC =====
 // sendMessage và listenChat được xử lý bởi chat.js — không định nghĩa lại ở đây

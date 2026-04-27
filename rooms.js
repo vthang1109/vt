@@ -297,23 +297,27 @@ function renderLobby(r){
   $('lobby-code').textContent = '#' + r.code;
   $('lobby-count').textContent = (r.members||[]).length + '/' + r.maxPlayers;
 
-  const list = $('lobby-members');
-  list.innerHTML = '';
-  (r.members||[]).forEach(uid => {
-    const info = (r.memberInfo||{})[uid] || { name: '?', ready: false };
-    const isHost = uid === r.hostUid;
-    const isMe = uid === _user.uid;
-    const div = document.createElement('div');
-    div.className = 'lobby-member' + (info.ready || isHost ? ' ready' : '');
+  // rooms.js dòng 300-315
+// Sửa: load avatarUrl từ Firestore khi render member
+async function renderLobby(data) {
+  // ... code cũ ...
+  for (const uid of data.members || []) {
+    const info = data.memberInfo?.[uid] || {};
+    // Thêm: lấy avatarUrl từ Firestore
+    let avatarUrl = info.avatarUrl || null;
+    if (!avatarUrl) {
+      try {
+        const us = await getDoc(doc(db, 'users', uid));
+        if (us.exists()) avatarUrl = us.data().avatarUrl || null;
+      } catch {}
+    }
     div.innerHTML = `
-      <div class="lm-avatar">${(info.name || '?')[0].toUpperCase()}</div>
-      <div class="lm-info">
-        <div class="lm-name">${escHtml(info.name)} ${isMe ? '<span class="lm-you">(bạn)</span>' : ''}</div>
-        <div class="lm-status">${isHost ? '👑 Chủ phòng' : (info.ready ? '✅ Sẵn sàng' : '⏳ Đang chờ')}</div>
-      </div>
+      ${window.renderAvatar ? window.renderAvatar(avatarUrl, info.name) : 
+        `<div class="lm-avatar">${(info.name||'?')[0].toUpperCase()}</div>`}
+      ...
     `;
-    list.appendChild(div);
-  });
+  }
+}
   for (let i = (r.members||[]).length; i < r.maxPlayers; i++){
     const div = document.createElement('div');
     div.className = 'lobby-member empty';
