@@ -1,169 +1,71 @@
-<!-- shop.html -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VTWorld — Cửa Hàng Gacha</title>
+  <title>VTWorld — Cửa Hàng</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="shop.css"/>
-  <link rel="stylesheet" href="character.css"/>
 </head>
 <body>
-
   <canvas id="bg-canvas"></canvas>
-  <div class="orb orb1"></div><div class="orb orb2"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
 
   <nav>
     <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">
       <span class="logo-vt">VT</span><span class="logo-world">World</span>
     </div>
-    <div style="display:flex;gap:10px;align-items:center">
-      <button class="btn-secondary" onclick="location.href='bag.html'" style="padding:8px 14px;font-size:13px">🎒 Túi</button>
-      <button class="btn-secondary" onclick="history.back()" style="padding:8px 14px;font-size:13px">← Quay lại</button>
+    
+    <!-- Nút 3 gạch với Bag + Quay lại -->
+    <div class="nav-right-menu">
+      <button class="nav-hamburger" onclick="toggleNavMenu()">☰</button>
+      <div class="nav-dropdown" id="navDropdown">
+        <a class="nav-dropdown-item" href="bag.html">
+          <span class="dd-icon">🎒</span> Bag
+        </a>
+        <a class="nav-dropdown-item" href="#" onclick="history.back();return false;">
+          <span class="dd-icon">←</span> Quay lại
+        </a>
+      </div>
     </div>
   </nav>
-  <div class="shop-statusbar">
-  <div class="shop-statusbar-item">⭐ Điểm: <strong id="status-pts">0</strong></div>
-  <div class="shop-statusbar-item">🎫 Vé thường: <strong id="status-tickets-normal">0</strong></div>
-  <div class="shop-statusbar-item vip">👑 Vé VIP: <strong id="status-tickets-vip">0</strong></div>
-</div>
 
   <div class="shop-wrap">
-    <h1 class="shop-title">🎰 Cửa Hàng Gacha</h1>
-
-    <!-- Gacha Thường -->
-    <div class="shop-gacha-section">
-      <h2>⭐ Gacha Thường</h2>
-      <p class="shop-desc">Triệu hồi thú cơ bản. Tỉ lệ: 60% Gà mờ, 30% Tinh anh, 10% Bá sàn</p>
-      <div class="shop-pack-grid">
-        <div class="shop-pack-card" onclick="shopBuyTickets(1, 'normal')">
-          <div class="pack-qty">1 lượt</div>
-          <div class="pack-price">100 ⭐</div>
-        </div>
-        <div class="shop-pack-card" onclick="shopBuyTickets(5, 'normal')">
-          <div class="pack-qty">5 lượt</div>
-          <div class="pack-price">450 ⭐</div>
-        </div>
-        <div class="shop-pack-card" onclick="shopBuyTickets(10, 'normal')">
-          <div class="pack-qty">10 lượt</div>
-          <div class="pack-price">850 ⭐</div>
-        </div>
-      </div>
-      <button class="shop-gacha-btn" onclick="shopRoll(1, 'normal')">×1 Triệu Hồi</button>
-      <button class="shop-gacha-btn" onclick="shopRoll(5, 'normal')">×5 Triệu Hồi</button>
-      <button class="shop-gacha-btn" onclick="shopRoll(10, 'normal')">×10 Triệu Hồi</button>
+    <div class="shop-hero">
+      <h1>🛒 <span>Cửa</span> Hàng</h1>
+      <p>Gacha · Thú Cưng · Trang Phục</p>
     </div>
 
-    <!-- Gacha VIP -->
-    <div class="shop-gacha-section vip">
-      <h2>👑 Gacha VIP</h2>
-      <p class="shop-desc">Triệu hồi cao cấp. Tỉ lệ: 30% Bá sàn, 40% Kiệt tác, 25% Huyền thoại, 5% Ẩn</p>
-      <div class="shop-pack-grid">
-        <div class="shop-pack-card" onclick="shopBuyTickets(1, 'vip')">
-          <div class="pack-qty">1 lượt</div>
-          <div class="pack-price">500 ⭐</div>
-        </div>
-        <div class="shop-pack-card" onclick="shopBuyTickets(5, 'vip')">
-          <div class="pack-qty">5 lượt</div>
-          <div class="pack-price">2200 ⭐</div>
-        </div>
-        <div class="shop-pack-card" onclick="shopBuyTickets(10, 'vip')">
-          <div class="pack-qty">10 lượt</div>
-          <div class="pack-price">4000 ⭐</div>
-        </div>
-      </div>
-      <button class="shop-gacha-btn vip-btn" onclick="shopRoll(1, 'vip')">×1 Triệu Hồi VIP</button>
-      <button class="shop-gacha-btn vip-btn" onclick="shopRoll(5, 'vip')">×5 Triệu Hồi VIP</button>
-      <button class="shop-gacha-btn vip-btn" onclick="shopRoll(10, 'vip')">×10 Triệu Hồi VIP</button>
+    <div class="shop-tabs">
+      <button class="shop-tab active" data-tab="pets">🐾 Thú Cưng</button>
+      <button class="shop-tab" data-tab="outfits">👕 Trang Phục</button>
     </div>
 
-    <!-- Trang phục -->
-    <div class="shop-gacha-section" style="border-color:rgba(56,189,248,0.2)">
-      <h2>👕 Trang Phục Nhân Vật</h2>
-      <p class="shop-desc">Mua trang phục cho nhân vật chibi. Item có 🎲 chỉ rơi từ Gacha.</p>
-      <div id="shop-outfit-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-bottom:12px"></div>
-      <button class="shop-gacha-btn" onclick="location.href='profile.html'" style="background:rgba(56,189,248,0.08)">
-        🗄️ Mở Tủ Đồ trên Hồ Sơ →
-      </button>
+    <div class="shop-grid" id="shopGrid"></div>
+  </div>
+
+  <!-- Kết quả Gacha -->
+  <div class="result-overlay" id="resultOverlay">
+    <div>
+      <div class="result-grid" id="resultGrid"></div>
+      <div style="text-align:center"><button class="result-close" onclick="document.getElementById('resultOverlay').classList.remove('active')">Đóng</button></div>
     </div>
   </div>
 
-  <div class="pet-result-overlay" id="shopResultOverlay">
-    <div class="pet-result-box" id="shopResultBox"></div>
-  </div>
-
-  <script type="module">
-    import { buyTickets, rollGacha, syncStatusBar } from './shop.js';
-    import { buyOutfitItem, OUTFIT_CATALOG, initCharacterSystem } from './character.js';
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    const auth = getAuth();
-
-    // sync ngay khi load
-    onAuthStateChanged(auth, user => {
-      if (user) { syncStatusBar(); initCharacterSystem(); renderOutfitShop(); }
-    });
-
-    const PRICES = { normal:{ 1:100, 5:450, 10:850 }, vip:{ 1:500, 5:2200, 10:4000 } };
-    const TIER_COLOR = { 1:'#94a3b8', 2:'#34d399', 3:'#fbbf24', 4:'#f43f5e', 5:'#a78bfa' };
-    const TIER_NAME  = { 1:'Gà mờ', 2:'Tinh anh', 3:'Bá sàn', 4:'Kiệt tác', 5:'Huyền thoại' };
-
-    // Render grid trang phục mua được trong shop
-    function renderOutfitShop() {
-      const grid = document.getElementById('shop-outfit-grid');
-      if (!grid) return;
-      const shopItems = Object.values(OUTFIT_CATALOG).flat().filter(i => i.source === 'shop');
-      grid.innerHTML = shopItems.map(item => `
-        <div class="shop-pack-card" onclick="shopBuyOutfit('${item.id}')" style="padding:12px 8px;text-align:center">
-          <div style="font-size:26px">${item.icon}</div>
-          <div style="color:#e0f2fe;font-size:12px;font-weight:700;margin:4px 0">${item.name}</div>
-          <div style="color:#38bdf8;font-size:12px;font-weight:800">${item.price} ⭐</div>
-        </div>`).join('');
+  <script>
+    function toggleNavMenu() {
+      document.getElementById('navDropdown').classList.toggle('open');
     }
-
-    window.shopBuyOutfit = async (itemId) => {
-      try {
-        const res = await buyOutfitItem(itemId);
-        syncStatusBar();
-        alert('✅ Mua trang phục thành công!');
-      } catch(e) { alert('❌ ' + e.message); }
-    };
-
-    window.shopBuyTickets = async (count, type) => {
-      const price = PRICES[type][count];
-      try {
-        await buyTickets(count, type, price / count);
-        syncStatusBar();
-        alert(`✅ Mua ${count} lượt ${type==='vip'?'VIP':'Thường'} thành công!`);
-      } catch(e) { alert('❌ ' + e.message); }
-    };
-
-    window.shopRoll = async (rolls, type) => {
-      try {
-        const results = await rollGacha(rolls, type);
-        syncStatusBar();
-        const box = document.getElementById('shopResultBox');
-        const overlay = document.getElementById('shopResultOverlay');
-        box.innerHTML = results.map(r => {
-          // Outfit drop
-          if (r._type === 'outfit') {
-            return `<div class="pet-result-item" style="border-color:rgba(56,189,248,0.5);background:rgba(56,189,248,0.06)">
-              <div style="font-size:36px">🎁</div>
-              <div style="color:#e0f2fe;font-size:13px;font-weight:700">Trang phục!</div>
-              <div style="color:#38bdf8;font-size:11px">✨ Đã vào tủ đồ</div>
-            </div>`;
-          }
-          return `<div class="pet-result-item rarity-t${r.tier.id}" style="border-color:${TIER_COLOR[r.tier.id]}66">
-            <div style="font-size:40px">${r.emoji||'🐾'}</div>
-            <div style="color:#e0f2fe;font-size:13px;font-weight:700">${r.name}</div>
-            <div style="color:${TIER_COLOR[r.tier.id]};font-size:11px">${TIER_NAME[r.tier.id]}</div>
-          </div>`;
-        }).join('');
-        overlay.style.display = 'flex';
-        overlay.onclick = () => overlay.style.display = 'none';
-      } catch(e) { alert('❌ ' + e.message); }
-    };
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-right-menu')) {
+        document.getElementById('navDropdown').classList.remove('open');
+      }
+    });
   </script>
+
+  <script type="module" src="points.js"></script>
+  <script type="module" src="shop.js"></script>
 </body>
 </html>

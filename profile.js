@@ -1,23 +1,11 @@
-// profile.js
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, onSnapshot, updateDoc, getDocs, collection, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+// profile.js — dùng chung db/auth từ points.js
+import { db, auth } from './points.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { doc, onSnapshot, updateDoc, getDocs, collection, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { renderAvatar } from './avatar.js';
 import { renderProfilePet, mountPetModal } from './pet-ui.js';
-import './character.js';  // Khởi tạo initCharacterSystem và render preview
+import './character.js';
 
-const firebaseConfig = {
-  apiKey:"AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
-  authDomain:"lienquan-fake.firebaseapp.com",
-  projectId:"lienquan-fake",
-  storageBucket: "lienquan-fake.firebasestorage.app",
-  messagingSenderId:"782694799992",
-  appId:"1:782694799992:web:2d8e4a28626c3bbae8ab8d"
-};
-
-const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
 let currentUser = null;
 
 onAuthStateChanged(auth, user => {

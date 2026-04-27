@@ -1,27 +1,13 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { auth, db } from './points.js';
 import {
-  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
   signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import {
-  getFirestore, doc, setDoc, getDoc, getDocs, updateDoc,
+  doc, setDoc, getDoc, getDocs, updateDoc,
   collection, query, orderBy, limit, onSnapshot,
-  addDoc, serverTimestamp, where, deleteDoc, arrayUnion, arrayRemove
+  addDoc, serverTimestamp, deleteDoc, arrayUnion, arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-// ===== FIREBASE CONFIG =====
-const firebaseConfig = {
-  apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
-  authDomain: "lienquan-fake.firebaseapp.com",
-  projectId: "lienquan-fake",
-  storageBucket: "lienquan-fake.firebasestorage.app",
-  messagingSenderId: "782694799992",
-  appId: "1:782694799992:web:2d8e4a28626c3bbae8ab8d"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
 // ===== PARTICLE CANVAS =====
 const canvas = document.getElementById('bg-canvas');
@@ -81,7 +67,6 @@ window.doRegister = async function() {
   err.textContent = '';
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    // Lưu đầy đủ dữ liệu user
     await setDoc(doc(db, 'users', cred.user.uid), {
       uid: cred.user.uid,
       email: email,
@@ -102,7 +87,6 @@ window.doRegister = async function() {
 };
 
 window.doLogout = async function() {
-  // Cập nhật status offline trước khi logout
   if (window._currentUser) {
     try {
       await updateDoc(doc(db, 'users', window._currentUser.uid), {
@@ -114,7 +98,6 @@ window.doLogout = async function() {
   await signOut(auth);
 };
 
-// Cập nhật status khi tab inactive
 window.addEventListener('blur', async () => {
   if (window._currentUser) {
     try {
@@ -126,7 +109,6 @@ window.addEventListener('blur', async () => {
   }
 });
 
-// Cập nhật status online khi tab active
 window.addEventListener('focus', async () => {
   if (window._currentUser) {
     try {
@@ -138,14 +120,13 @@ window.addEventListener('focus', async () => {
   }
 });
 
-// ===== AUTH STATE (ĐÃ SỬA ĐỂ CẬP NHẬT REALTIME) =====
+// ===== AUTH STATE (KHÔNG CẬP NHẬT ĐIỂM) =====
 onAuthStateChanged(auth, async (user) => {
   window._currentUser = user;
   const infoBar  = document.getElementById('user-info-bar');
   const authBtns = document.getElementById('auth-btn-row');
   const nameEl   = document.getElementById('user-display-name');
   const avatarEl = document.getElementById('user-avatar-char');
-  const pointsEl = document.getElementById('user-points-home');
 
   if (user) {
     localStorage.setItem('current_user', user.email);
@@ -155,7 +136,6 @@ onAuthStateChanged(auth, async (user) => {
 
     const userRef = doc(db, 'users', user.uid);
 
-    // --- TẠO ROOM SERVER MẶC ĐỊNH ---
     try {
       const serverRef = doc(db, 'chats', 'server');
       const serverSnap = await getDoc(serverRef);
@@ -168,29 +148,18 @@ onAuthStateChanged(auth, async (user) => {
       }
     } catch(e) { console.error('Lỗi tạo server room:', e); }
 
-    // --- CẬP NHẬT STATUS ONLINE ---
     try {
-      await updateDoc(userRef, {
-        status: 'online',
-        lastSeen: serverTimestamp()
-      });
+      await updateDoc(userRef, { status: 'online', lastSeen: serverTimestamp() });
     } catch(e) { console.error('Lỗi update status:', e); }
 
-    // --- LẮNG NGHE ĐIỂM SỐ REALTIME ---
     onSnapshot(userRef, (docSnap) => {
       if (docSnap.exists()) {
         const userData = docSnap.data();
-        const currentPoints = userData.points || 0;
         const nickname = userData.nickname || '';
         const displayName = nickname || user.displayName || user.email.split('@')[0];
 
-        // Cập nhật điểm lên giao diện chính ngay lập tức
-        if(pointsEl) pointsEl.textContent = currentPoints.toLocaleString();
-        
-        // Cập nhật tên và avatar
         if(nameEl) nameEl.textContent = displayName;
 
-        // Avatar index (user-info-bar)
         if(avatarEl) {
           if(userData.avatarUrl) {
             avatarEl.style.backgroundImage = `url(${userData.avatarUrl})`;
@@ -203,7 +172,6 @@ onAuthStateChanged(auth, async (user) => {
           }
         }
 
-        // Avatar + tên profile page
         const profileNick  = document.getElementById('profile-nickname-display');
         const profileBigAv = document.getElementById('profile-big-avatar');
         if(profileNick) profileNick.textContent = displayName;
@@ -219,15 +187,10 @@ onAuthStateChanged(auth, async (user) => {
           }
         }
 
-        // Đồng bộ vào localStorage để các game khác vẫn lấy được điểm mới
-        localStorage.setItem('userPoints', currentPoints);
-        
-        // Kiểm tra nếu chưa có nickname thì hiện modal
         if (!nickname && window.showNicknameModal) {
             setTimeout(() => window.showNicknameModal(), 600);
         }
       } else {
-        // Nếu chưa có doc (đăng nhập cũ), tạo mới đầy đủ
         setDoc(userRef, {
           uid: user.uid,
           email: user.email,
@@ -254,7 +217,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// ===== CÁC HÀM CÒN LẠI GIỮ NGUYÊN =====
+// ===== CÁC HÀM CÒN LẠI =====
 window._saveNickname = async function(nickname) {
   if (!window._currentUser) throw new Error('Not logged in');
   await updateDoc(doc(db, 'users', window._currentUser.uid), { nickname });
@@ -380,24 +343,3 @@ function listenFriendRequests(uid) {
     });
   });
 }
-// app.js — thêm vào cuối file
-window.renderAvatar = function(avatarUrl, name, size = 36) {
-  if (avatarUrl) {
-    return `<div style="
-      width:${size}px; height:${size}px; border-radius:50%;
-      background-image:url(${avatarUrl});
-      background-size:cover; background-position:center;
-      flex-shrink:0;
-    "></div>`;
-  }
-  return `<div style="
-    width:${size}px; height:${size}px; border-radius:50%;
-    background:#6366f1; color:#fff;
-    display:flex; align-items:center; justify-content:center;
-    font-weight:900; font-size:${Math.floor(size*0.4)}px;
-    flex-shrink:0;
-  ">${(name||'?')[0].toUpperCase()}</div>`;
-};
-
-// ===== GLOBAL CHAT LOGIC =====
-// sendMessage và listenChat được xử lý bởi chat.js — không định nghĩa lại ở đây

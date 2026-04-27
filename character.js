@@ -1,187 +1,251 @@
-// character.js — ID rút gọn & Tier system
+// character.js — Character System (Real & Fims, 3 Slots, Dùng ảnh)
 import { db, auth } from './points.js';
 import {
-  doc, getDoc, updateDoc, onSnapshot, arrayUnion, runTransaction
+  doc, updateDoc, onSnapshot, arrayUnion, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// ── TIER ──────────────────────────────────────────────────
-export const ITEM_TIERS = {
-  NUB: { id: 1, name: 'Nub', color: '#94a3b8', icon: '🔹', short: 'N' },
-  VIP: { id: 2, name: 'Vip', color: '#fbbf24', icon: '🔶', short: 'V' },
-  GOD: { id: 3, name: 'God', color: '#f43f5e', icon: '👑', short: 'G' },
-};
-
-// ── CATALOG (ID: E1_01, H2_03, S3_01...) ─────────────────
+// ── CATALOG (mỗi slot ~20 món) ───────────────────────────
 export const OUTFIT_CATALOG = {
-  eyes: [
-    { id:'E1_01', name:'Mat Ngau', tier:1, source:'free', price:0 },
-    { id:'E1_02', name:'Mắt nâu', tier:1, source:'free', price:0 },
-    { id:'E2_01', name:'Mắt xanh dương', tier:2, source:'shop', price:150 },
-    { id:'E2_02', name:'Mắt đỏ', tier:2, source:'shop', price:150 },
-    { id:'E3_01', name:'Mắt tím', tier:3, source:'gacha', price:0 },
-    { id:'E3_02', name:'Mắt sao', tier:3, source:'gacha', price:0 },
-  ],
-  head: [
-    { id:'H1_01', name:'Tóc Quy Ong', tier:1, source:'free', price:0 },
-    { id:'H1_02', name:'Tóc nâu', tier:1, source:'free', price:0 },
-    { id:'H2_01', name:'Tóc vàng', tier:2, source:'shop', price:200 },
-    { id:'H2_02', name:'Tóc đỏ', tier:2, source:'shop', price:200 },
-    { id:'H2_03', name:'Mũ lưỡi trai', tier:2, source:'shop', price:300 },
-    { id:'H3_01', name:'Vương miện', tier:3, source:'gacha', price:0 },
-    { id:'H3_02', name:'Mũ phù thủy', tier:3, source:'gacha', price:0 },
-    { id:'H3_03', name:'Nơ hồng', tier:3, source:'gacha', price:0 },
-  ],
-  shirt: [
-    { id:'S1_01', name:'Vest', tier:1, source:'free', price:0 },
-    { id:'S1_02', name:'Áo thun đen', tier:1, source:'free', price:0 },
-    { id:'S2_01', name:'Áo sơ mi', tier:2, source:'shop', price:200 },
-    { id:'S2_02', name:'Hoodie xám', tier:2, source:'shop', price:350 },
-    { id:'S2_03', name:'Vest đen', tier:2, source:'shop', price:500 },
-    { id:'S3_01', name:'Áo giáp vàng', tier:3, source:'gacha', price:0 },
-    { id:'S3_02', name:'Kimono đỏ', tier:3, source:'gacha', price:0 },
-  ],
-  pants: [
-    { id:'P1_01', name:'Quần Au', tier:1, source:'free', price:0 },
-    { id:'P1_02', name:'Quần đen', tier:1, source:'free', price:0 },
-    { id:'P2_01', name:'Quần short thể thao', tier:2, source:'shop', price:180 },
-    { id:'P2_02', name:'Quần cargo', tier:2, source:'shop', price:300 },
-    { id:'P2_03', name:'Váy ngắn', tier:2, source:'shop', price:220 },
-    { id:'P3_01', name:'Quần thần thoại', tier:3, source:'gacha', price:0 },
-  ],
-  deco: [
-    { id:'D1_01', name:'Vali Tien', tier:1, source:'free', price:0 },
-    { id:'D2_01', name:'Khiên sắt', tier:2, source:'shop', price:350 },
-    { id:'D3_01', name:'Cánh thiên thần', tier:3, source:'gacha', price:0 },
-    { id:'D3_02', name:'Gậy phép', tier:3, source:'gacha', price:0 },
-    { id:'D3_03', name:'Mèo nhỏ', tier:3, source:'gacha', price:0 },
-  ],
+  real: {
+    label: 'Real',
+    icon: '🧑',
+    slots: {
+      head: [
+        { id: 'RH_00', name: 'Mặc định' },
+        { id: 'RH_01', name: 'HTH' },
+        { id: 'RH_02', name: 'QHMTD' },
+        { id: 'RH_03', name: 'JACK' },
+        { id: 'RH_04', name: 'Tóc đỏ' },
+        { id: 'RH_05', name: 'Mũ lưỡi trai' },
+        { id: 'RH_06', name: 'Kính râm' },
+        { id: 'RH_07', name: 'Tóc tết' },
+        { id: 'RH_08', name: 'Mũ len' },
+        { id: 'RH_09', name: 'Băng đô' },
+        { id: 'RH_10', name: 'Tóc búi' },
+        { id: 'RH_11', name: 'Nón lá' },
+        { id: 'RH_12', name: 'Tai thỏ' },
+        { id: 'RH_13', name: 'Mũ cao bồi' },
+        { id: 'RH_14', name: 'Tóc giả hề' },
+        { id: 'RH_15', name: 'Vòng nguyệt quế' },
+        { id: 'RH_16', name: 'Kẹp nơ' },
+        { id: 'RH_17', name: 'Sừng quỷ' },
+        { id: 'RH_18', name: 'Mũ bảo hiểm' },
+        { id: 'RH_19', name: 'Khăn turban' },
+      ],
+      body: [
+        { id: 'RB_00', name: 'Mặc định' },
+        { id: 'RB_01', name: 'Sad' },
+        { id: 'RB_02', name: 'Color' },
+        { id: 'RB_03', name: 'Cam' },
+        { id: 'RB_04', name: 'Rig' },
+        { id: 'RB_05', name: 'KF' },
+        { id: 'RB_06', name: 'BuleBall' },
+        { id: 'RB_07', name: 'Jean' },
+        { id: 'RB_08', name: 'Thun đen' },
+        { id: 'RB_09', name: 'Hawaii' },
+        { id: 'RB_10', name: 'Sọc ngang' },
+        { id: 'RB_11', name: 'Flannel' },
+        { id: 'RB_12', name: 'Blazer' },
+        { id: 'RB_13', name: 'Áo dài' },
+        { id: 'RB_14', name: 'Gile' },
+        { id: 'RB_15', name: 'Đầm suông' },
+        { id: 'RB_16', name: 'Áo yếm' },
+        { id: 'RB_17', name: 'Giáp sắt' },
+        { id: 'RB_18', name: 'Áo khoác dù' },
+        { id: 'RB_19', name: 'Hoodie xám' },
+      ],
+      acc: [
+        { id: 'RA_00', name: 'Không' },
+        { id: 'RA_01', name: 'Đồng hồ' },
+        { id: 'RA_02', name: 'Ba lô' },
+        { id: 'RA_03', name: 'Điện thoại' },
+        { id: 'RA_04', name: 'Mèo' },
+        { id: 'RA_05', name: 'Kiếm' },
+        { id: 'RA_06', name: 'Cặp sách' },
+        { id: 'RA_07', name: 'Dù' },
+        { id: 'RA_08', name: 'Gậy tự sướng' },
+        { id: 'RA_09', name: 'Bình nước' },
+        { id: 'RA_10', name: 'Sổ tay' },
+        { id: 'RA_11', name: 'Mặt nạ' },
+        { id: 'RA_12', name: 'Cờ' },
+        { id: 'RA_13', name: 'Đàn guitar' },
+        { id: 'RA_14', name: 'Bóng đá' },
+        { id: 'RA_15', name: 'Cần câu' },
+        { id: 'RA_16', name: 'Bút chì khổng lồ' },
+        { id: 'RA_17', name: 'Máy ảnh' },
+        { id: 'RA_18', name: 'Hoa' },
+        { id: 'RA_19', name: 'Kẹo bông' },
+      ],
+    }
+  },
+  fims: {
+    label: 'Fims',
+    icon: '🎬',
+    slots: {
+      head: [
+        { id: 'FH_00', name: 'Mặc định' },
+        { id: 'FH_01', name: 'Tóc hồng' },
+        { id: 'FH_02', name: 'Tóc xanh' },
+        { id: 'FH_03', name: 'Tai mèo' },
+        { id: 'FH_04', name: 'Mũ phù thủy' },
+        { id: 'FH_05', name: 'Vương miện' },
+        { id: 'FH_06', name: 'Kẹo mút' },
+        { id: 'FH_07', name: 'Băng đô sao' },
+        { id: 'FH_08', name: 'Ruy băng' },
+        { id: 'FH_09', name: 'Tai thỏ' },
+        { id: 'FH_10', name: 'Nơ bướm' },
+        { id: 'FH_11', name: 'Mũ hề' },
+        { id: 'FH_12', name: 'Tóc cầu vồng' },
+        { id: 'FH_13', name: 'Sừng kỳ lân' },
+        { id: 'FH_14', name: 'Mạng che mặt' },
+        { id: 'FH_15', name: 'Kính 3D' },
+        { id: 'FH_16', name: 'Tai nghe' },
+        { id: 'FH_17', name: 'Mũ lông' },
+        { id: 'FH_18', name: 'Tóc công chúa' },
+        { id: 'FH_19', name: 'Halo thiên thần' },
+      ],
+      body: [
+        { id: 'FB_00', name: 'Mặc định' },
+        { id: 'FB_01', name: 'Áo hồng' },
+        { id: 'FB_02', name: 'Áo xanh dương' },
+        { id: 'FB_03', name: 'Áo cầu vồng' },
+        { id: 'FB_04', name: 'Áo choàng tím' },
+        { id: 'FB_05', name: 'Giáp bạc' },
+        { id: 'FB_06', name: 'Váy công chúa' },
+        { id: 'FB_07', name: 'Áo sọc màu' },
+        { id: 'FB_08', name: 'Váy tiên' },
+        { id: 'FB_09', name: 'Bộ sư tử' },
+        { id: 'FB_10', name: 'Áo thủy thủ' },
+        { id: 'FB_11', name: 'Choàng sao' },
+        { id: 'FB_12', name: 'Giáp rồng' },
+        { id: 'FB_13', name: 'Đầm dạ hội' },
+        { id: 'FB_14', name: 'Áo len ấm' },
+        { id: 'FB_15', name: 'Bộ phi hành gia' },
+        { id: 'FB_16', name: 'Áo bóng đá' },
+        { id: 'FB_17', name: 'Váy ballet' },
+        { id: 'FB_18', name: 'Áo choàng phù thủy' },
+        { id: 'FB_19', name: 'Bộ Ninja' },
+      ],
+      acc: [
+        { id: 'FA_00', name: 'Không' },
+        { id: 'FA_01', name: 'Cánh bướm' },
+        { id: 'FA_02', name: 'Gậy phép' },
+        { id: 'FA_03', name: 'Bóng bay' },
+        { id: 'FA_04', name: 'Thú bông' },
+        { id: 'FA_05', name: 'Khiên' },
+        { id: 'FA_06', name: 'Kiếm ánh sáng' },
+        { id: 'FA_07', name: 'Cung tên' },
+        { id: 'FA_08', name: 'Sách phép' },
+        { id: 'FA_09', name: 'Đuôi mèo' },
+        { id: 'FA_10', name: 'Cánh thiên thần' },
+        { id: 'FA_11', name: 'Cánh dơi' },
+        { id: 'FA_12', name: 'Sừng cưng' },
+        { id: 'FA_13', name: 'Lồng đèn' },
+        { id: 'FA_14', name: 'Đàn lia' },
+        { id: 'FA_15', name: 'Hộp nhạc' },
+        { id: 'FA_16', name: 'Kiếm gỗ' },
+        { id: 'FA_17', name: 'Bùa may mắn' },
+        { id: 'FA_18', name: 'Kẹo que' },
+        { id: 'FA_19', name: 'Mặt nạ lễ hội' },
+      ],
+    }
+  }
 };
-
-const GACHA_POOL = Object.values(OUTFIT_CATALOG).flat()
-  .filter(i => i.source === 'gacha');
-
-const GACHA_PRICE = { x1: 300, x5: 1300, x10: 2400 };
 
 export const SLOT_META = {
-  eyes:  { label:'Mắt',        icon:'👁️' },
-  head:  { label:'Đầu / Tóc',  icon:'💇' },
-  shirt: { label:'Áo',         icon:'👕' },
-  pants: { label:'Quần',       icon:'👖' },
-  deco:  { label:'Phụ kiện',   icon:'✨' },
+  head: { label:'Đầu', icon:'💇' },
+  body: { label:'Thân', icon:'👕' },
+  acc:  { label:'P.Kiện', icon:'✨' },
 };
 
-const LAYER_ORDER = ['pants','shirt','eyes','head','deco'];
+const LAYER_ORDER = ['body', 'head', 'acc'];
 
 // Helpers
-function allItems() { return Object.values(OUTFIT_CATALOG).flat(); }
-export function findInSlot(slot, id) { return (OUTFIT_CATALOG[slot]||[]).find(i=>i.id===id)||null; }
-export function getTierById(id) {
-  const item = allItems().find(i => i.id === id);
-  if (!item) return ITEM_TIERS.NUB;
-  return Object.values(ITEM_TIERS).find(t => t.id === item.tier) || ITEM_TIERS.NUB;
+export function findInSlot(system, slot, id) {
+  return (OUTFIT_CATALOG[system]?.slots[slot] || []).find(i => i.id === id) || null;
 }
 
 // State
 export let state = {
-  equipped: { eyes:'E1_01', head:'H1_01', shirt:'S1_01', pants:'P1_01', deco:'D1_01' },
-  owned: ['E1_01','H1_01','S1_01','P1_01','D1_01'],
+  system: 'real',
+  equipped: {
+    real:  { head:'RH_00', body:'RB_00', acc:'RA_00' },
+    fims:  { head:'FH_00', body:'FB_00', acc:'FA_00' },
+  }
 };
+
 let unsub = null;
-
-function ensureFreeOwned() {
-  allItems().filter(i=>i.source==='free').forEach(i => {
-    if (!state.owned.includes(i.id)) state.owned.push(i.id);
-  });
-}
-
-// ── Callback để UI cập nhật ─────────────────────────────
-function notifyUI() {
-  if (window._charUIUpdate) window._charUIUpdate();
-}
 
 export function initCharacterSystem() {
   onAuthStateChanged(auth, user => {
     if (!user) return;
     if (unsub) unsub();
-    unsub = onSnapshot(doc(db,'users',user.uid), snap => {
+    unsub = onSnapshot(doc(db, 'users', user.uid), snap => {
       if (!snap.exists()) return;
       const d = snap.data();
-      if (d.character?.equipped) state.equipped = { ...state.equipped, ...d.character.equipped };
-      if (d.outfitOwned?.length) state.owned = d.outfitOwned;
-      else ensureFreeOwned();
+      if (d.characterV3) {
+        if (d.characterV3.system) state.system = d.characterV3.system;
+        if (d.characterV3.equipped) {
+          state.equipped.real = { ...state.equipped.real, ...d.characterV3.equipped.real };
+          state.equipped.fims = { ...state.equipped.fims, ...d.characterV3.equipped.fims };
+        }
+      }
+      // Fallback về mặc định nếu thiếu
+      const cur = state.equipped[state.system];
+      if (!cur.head || !OUTFIT_CATALOG[state.system].slots.head.find(i=>i.id===cur.head)) cur.head = state.system==='real'?'RH_00':'FH_00';
+      if (!cur.body || !OUTFIT_CATALOG[state.system].slots.body.find(i=>i.id===cur.body)) cur.body = state.system==='real'?'RB_00':'FB_00';
+      if (!cur.acc || !OUTFIT_CATALOG[state.system].slots.acc.find(i=>i.id===cur.acc)) cur.acc = state.system==='real'?'RA_00':'FA_00';
+      
       renderProfilePreview();
-      notifyUI(); // ← Báo cho character-ui.js
+      if (window._charUIUpdate) window._charUIUpdate();
     });
   });
 }
 
-export async function saveEquipped(newEquipped) {
-  const user = auth.currentUser; if (!user) throw new Error('Chưa đăng nhập');
-  state.equipped = { ...newEquipped };
-  await updateDoc(doc(db,'users',user.uid), { 'character.equipped': state.equipped });
+export async function saveEquipped(system, slotValues) {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Chưa đăng nhập');
+  if (!slotValues.head || !slotValues.body) throw new Error('Đầu và Thân không được để trống!');
+  state.equipped[system] = { ...slotValues };
+  await updateDoc(doc(db, 'users', user.uid), {
+    'characterV3.system': system,
+    'characterV3.equipped': state.equipped,
+  });
   renderProfilePreview();
-  notifyUI();
+  if (window._charUIUpdate) window._charUIUpdate();
 }
 
-export async function buyItem(item) {
-  const user = auth.currentUser; if (!user) throw new Error('Chưa đăng nhập');
-  const ref = doc(db,'users',user.uid);
-  await runTransaction(db, async tx => {
-    const s = await tx.get(ref);
-    const pts = s.data()?.points || 0;
-    if (pts < item.price) throw new Error(`Không đủ điểm (cần ${item.price}⭐)`);
-    tx.update(ref, { points: pts - item.price, outfitOwned: arrayUnion(item.id) });
-  });
-}
+// ── GACHA POOL ────────────────────────────────────────────
+const GACHA_POOL_REAL = [
+  ...OUTFIT_CATALOG.real.slots.head.filter(i => i.id !== 'RH_00'),
+  ...OUTFIT_CATALOG.real.slots.body.filter(i => i.id !== 'RB_00'),
+  ...OUTFIT_CATALOG.real.slots.acc.filter(i => i.id !== 'RA_00'),
+];
+const GACHA_POOL_FIMS = [
+  ...OUTFIT_CATALOG.fims.slots.head.filter(i => i.id !== 'FH_00'),
+  ...OUTFIT_CATALOG.fims.slots.body.filter(i => i.id !== 'FB_00'),
+  ...OUTFIT_CATALOG.fims.slots.acc.filter(i => i.id !== 'FA_00'),
+];
 
-export async function gachaRoll(rolls) {
-  const key = rolls===1?'x1':rolls===5?'x5':'x10';
-  const price = GACHA_PRICE[key];
-  const user = auth.currentUser; if (!user) throw new Error('Chưa đăng nhập');
-  const ref = doc(db,'users',user.uid);
-  await runTransaction(db, async tx => {
-    const s = await tx.get(ref);
-    const pts = s.data()?.points || 0;
-    if (pts < price) throw new Error(`Không đủ điểm! Cần ${price}⭐`);
-    tx.update(ref, { points: pts - price });
-  });
-
+export async function gachaRoll(rolls, system = 'real') {
+  const pool = system === 'real' ? GACHA_POOL_REAL : GACHA_POOL_FIMS;
   const results = [];
-  const newOwned = [];
-  for (let i=0; i<rolls; i++) {
-    const item = GACHA_POOL[Math.floor(Math.random()*GACHA_POOL.length)];
+  for (let i = 0; i < rolls; i++) {
+    const item = pool[Math.floor(Math.random() * pool.length)];
     results.push(item);
-    if (!state.owned.includes(item.id)) {
-      state.owned.push(item.id);
-      newOwned.push(item.id);
-    }
-  }
-  if (newOwned.length) {
-    await updateDoc(doc(db,'users',user.uid), { outfitOwned: arrayUnion(...newOwned) });
   }
   return results;
 }
 
-// Render chibi (dùng ảnh)
-export function renderChibiTo(container, equipped) {
+// ── RENDER CHIBI ──────────────────────────────────────────
+export function renderChibiTo(container, system, equipped) {
   if (!container) return;
   container.innerHTML = '';
   container.style.position = 'relative';
   container.style.width = '100%';
   container.style.height = '100%';
   container.style.overflow = 'hidden';
-
-  // Fallback nếu container trống sau khi render
-  setTimeout(() => {
-    if (container.children.length === 0) {
-      container.innerHTML = `
-        <div class="preview-placeholder">
-          <span>👤</span>
-          Nhấn chọn đồ bên dưới
-        </div>`;
-    }
-  }, 500);
 
   function addLayer(src, zIndex) {
     if (!src) return;
@@ -192,24 +256,23 @@ export function renderChibiTo(container, equipped) {
     container.appendChild(img);
   }
 
-  addLayer('assets/character/body/base.png', 0);
-
   LAYER_ORDER.forEach((slot, zi) => {
     const id = equipped[slot];
     if (!id) return;
-    const item = findInSlot(slot, id);
-    if (item) {
-      const imgPath = `assets/character/${slot}/${id}.png`;
-      addLayer(imgPath, zi+1);
-    }
+    if (slot === 'acc' && (id === 'RA_00' || id === 'FA_00')) return;
+    const imgPath = `assets/character/${system}/${slot}/${id}.png`;
+    addLayer(imgPath, zi + 1);
   });
+
   container.classList.add('chibi-bounce');
 }
 
 function renderProfilePreview() {
   const frame = document.getElementById('pro-character-frame');
   if (!frame) return;
-  renderChibiTo(frame, state.equipped);
+  const curSys = state.system;
+  const curEquip = state.equipped[curSys];
+  renderChibiTo(frame, curSys, curEquip);
 }
 
 // Auto init

@@ -1,25 +1,12 @@
-// ===== VT WORLD — MULTIPLAYER ROOMS (FIX HIỂN THỊ PHÒNG) =====
-import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+// ===== VT WORLD — MULTIPLAYER ROOMS (Đồng bộ points) =====
+import { db, auth } from './points.js';
 import {
-  getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
+  collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
   query, where, onSnapshot, serverTimestamp, addDoc, arrayUnion, arrayRemove,
-  orderBy, limit, enableNetwork
+  orderBy, limit
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
-  authDomain: "lienquan-fake.firebaseapp.com",
-  projectId: "lienquan-fake",
-  storageBucket: "lienquan-fake.firebasestorage.app",
-  messagingSenderId: "782694799992",
-  appId: "1:782694799992:web:2d8e4a28626c3bbae8ab8d"
-};
-const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-// ===== GAME CATALOG =====
 const GAMES = {
   caro:      { id: 'caro',      name: 'Caro 5 hàng',     icon: '♟️', max: 2, min: 2, page: 'caro-mp.html',      ready: true },
   tictactoe: { id: 'tictactoe', name: 'Tic-Tac-Toe',     icon: '⭕', max: 2, min: 2, page: 'tictactoe-mp.html', ready: true },
@@ -35,12 +22,9 @@ let _unsubRoom = null;
 let _unsubChat = null;
 let _currentRoomId = null;
 
-// ===== UTILS =====
 function $(id){ return document.getElementById(id); }
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function genCode(){
-  return String(Math.floor(100000 + Math.random() * 900000));
-}
+function genCode(){ return String(Math.floor(100000 + Math.random() * 900000)); }
 function toast(msg, type='info'){
   if (window.showToast) return window.showToast(msg, type);
   const c = document.createElement('div');
@@ -48,7 +32,6 @@ function toast(msg, type='info'){
   c.textContent = msg; document.body.appendChild(c); setTimeout(()=>c.remove(),2800);
 }
 
-// ===== AUTH BOOT =====
 onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = 'index.html'; return; }
   _user = user;
@@ -58,39 +41,22 @@ onAuthStateChanged(auth, async (user) => {
   startListeningPublicRooms();
 });
 
-// ===== LIST PUBLIC ROOMS (ĐÃ SỬA LỖI) =====
 function startListeningPublicRooms(){
   if (_unsubRooms) _unsubRooms();
-  enableNetwork(db); // Sửa: đảm bảo online, không dùng cache
   const q = query(collection(db, 'rooms'));
-  _unsubRooms = onSnapshot(q, { includeMetadataChanges: false }, (snap) => {
+  _unsubRooms = onSnapshot(q, (snap) => {
     const list = $('rooms-list');
-    console.log('📡 Snapshot rooms count:', snap.size); // Debug
-    snap.forEach(d => console.log('📦 Room:', d.id, d.data().status, d.data().name));
-
     if (!snap.size) {
       list.innerHTML = '<div class="rm-empty">Chưa có phòng nào. Tạo phòng đầu tiên nhé! 🎮</div>';
       return;
     }
-
     list.innerHTML = '';
-
-    // Lọc thủ công các phòng có status === 'lobby'
     const rooms = [];
     snap.forEach(d => {
-      const data = d.data();
-      if (data.status === 'lobby') rooms.push({ id: d.id, ...data });
+      const r = d.data();
+      if (r.status === 'lobby') rooms.push({ id: d.id, ...r });
     });
-
-    console.log('📡 Lobby rooms:', rooms.length); // Debug
-
-    // Sắp xếp theo createdAt giảm dần
     rooms.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-
-    if (!rooms.length) {
-      list.innerHTML = '<div class="rm-empty">Chưa có phòng nào. Tạo phòng đầu tiên nhé! 🎮</div>';
-      return;
-    }
 
     rooms.forEach(r => {
       const game = GAMES[r.gameType] || { name: r.gameType, icon: '🎮' };
@@ -116,8 +82,6 @@ function startListeningPublicRooms(){
       `;
       list.appendChild(div);
     });
-
-    // Gán sự kiện sau khi render
     list.querySelectorAll('.btn-join').forEach(b => {
       b.addEventListener('click', () => {
         const id = b.getAttribute('data-id');
@@ -125,14 +89,13 @@ function startListeningPublicRooms(){
         joinRoomFlow(id, needPw);
       });
     });
-
   }, (err) => {
     console.error('rooms snapshot err', err);
     $('rooms-list').innerHTML = '<div class="rm-empty">⚠️ Không tải được danh sách. Kiểm tra quyền Firestore.</div>';
   });
 }
 
-// ===== CREATE ROOM =====
+// ── CREATE / JOIN / LOBBY ──────────────────────────────────
 window.openCreateModal = function(){
   $('createModal').classList.add('open');
   const sel = $('cr-game');
@@ -168,19 +131,17 @@ window.doCreateRoom = async function(){
       hostUid: _user.uid,
       hostName: myName,
       password: pw || '',
-      status: 'lobby',         // <-- ĐẢM BẢO CÓ STATUS
+      status: 'lobby',
       maxPlayers: Math.min(max, g.max),
       members: [_user.uid],
       memberInfo: { [_user.uid]: { name: myName, ready: false } },
       createdAt: serverTimestamp()
     });
-    console.log('✅ Phòng đã tạo:', ref.id, 'status:', 'lobby');
     closeCreateModal();
     enterLobby(ref.id);
   } catch(e){ toast('Tạo phòng thất bại', 'error'); console.error(e); }
 };
 
-// ===== JOIN BY CODE =====
 window.openJoinByCode = function(){
   $('joinModal').classList.add('open');
   $('jc-code').value='';
@@ -192,10 +153,7 @@ window.closeJoinModal = function(){ $('joinModal').classList.remove('open'); };
 window.doJoinByCode = async function(){
   const code = $('jc-code').value.trim();
   const pw = $('jc-pw').value.trim();
-  if (!code || code.length !== 6 || isNaN(code)) {
-    toast('Mã phòng phải là 6 chữ số!', 'warn');
-    return;
-  }
+  if (!code || code.length !== 6 || isNaN(code)) { toast('Mã phòng phải là 6 chữ số!', 'warn'); return; }
   try {
     const q = query(collection(db, 'rooms'), where('code','==',code));
     const snap = await getDocs(q);
@@ -231,9 +189,7 @@ async function joinRoomById(id, data){
     if (!(data.members||[]).includes(_user.uid)){
       const myName = _myProfile.nickname || _user.email.split('@')[0];
       const memberInfo = data.memberInfo || {};
-      const mySnap = await getDoc(doc(db, 'users', _user.uid));
-      const myAvatar = mySnap.exists() ? (mySnap.data().avatarUrl || null) : null;
-      memberInfo[_user.uid] = { name: myName, ready: false, avatarUrl: myAvatar };
+      memberInfo[_user.uid] = { name: myName, ready: false };
       await updateDoc(doc(db,'rooms',id), {
         members: arrayUnion(_user.uid),
         memberInfo
@@ -243,7 +199,6 @@ async function joinRoomById(id, data){
   } catch(e){ toast('Không thể vào phòng', 'error'); console.error(e); }
 }
 
-// ===== LOBBY =====
 function enterLobby(roomId){
   _currentRoomId = roomId;
   $('lobbyView').style.display = 'flex';
@@ -302,14 +257,18 @@ function renderLobby(r){
   const list = $('lobby-members');
   list.innerHTML = '';
   (r.members||[]).forEach(uid => {
-    const info = r.memberInfo?.[uid] || {};
-    const avatarUrl = info.avatarUrl || null;
+    const info = (r.memberInfo||{})[uid] || { name: '?', ready: false };
+    const isHost = uid === r.hostUid;
+    const isMe = uid === _user.uid;
     const div = document.createElement('div');
-    div.className = 'lobby-member';
-    const avHtml = avatarUrl
-      ? `<div class="lm-avatar" style="background-image:url(${avatarUrl});background-size:cover;background-position:center;color:transparent;">.</div>`
-      : `<div class="lm-avatar">${(info.name||'?')[0].toUpperCase()}</div>`;
-    div.innerHTML = `${avHtml}<div class="lm-info"><div class="lm-name">${escHtml(info.name||uid)}</div><div class="lm-status">${r.hostUid===uid?'👑 Chủ phòng':(info.ready?'✅ Sẵn sàng':'⏳ Đang chờ')}</div></div>`;
+    div.className = 'lobby-member' + (info.ready || isHost ? ' ready' : '');
+    div.innerHTML = `
+      <div class="lm-avatar">${(info.name || '?')[0].toUpperCase()}</div>
+      <div class="lm-info">
+        <div class="lm-name">${escHtml(info.name)} ${isMe ? '<span class="lm-you">(bạn)</span>' : ''}</div>
+        <div class="lm-status">${isHost ? '👑 Chủ phòng' : (info.ready ? '✅ Sẵn sàng' : '⏳ Đang chờ')}</div>
+      </div>
+    `;
     list.appendChild(div);
   });
   for (let i = (r.members||[]).length; i < r.maxPlayers; i++){
@@ -380,10 +339,7 @@ window.startGame = async function(){
 };
 
 window.leaveLobby = async function(){
-  if (!_currentRoomId) {
-    backToList();
-    return;
-  }
+  if (!_currentRoomId) { backToList(); return; }
   try {
     const snap = await getDoc(doc(db,'rooms',_currentRoomId));
     if (snap.exists()){
@@ -420,7 +376,7 @@ window.sendLobbyChat = async function(){
   await addDoc(collection(db,'rooms',_currentRoomId,'chat'), {
     text,
     senderUid: _user.uid,
-    senderName: _myProfile.nickname || _user.email.split('[@]')[0],
+    senderName: _myProfile.nickname || _user.email.split('@')[0],
     createdAt: serverTimestamp()
   });
 };

@@ -8,24 +8,191 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="character.css">
     <style>
-        body { background: #0a0f1a; }
-        .char-page { max-width: 480px; margin: 0 auto; padding: 20px; }
+        body { background: #0a0f1a; margin: 0; }
+        .char-page { max-width: 480px; margin: 0 auto; padding: 16px; }
+        .char-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 20px;
+            font-weight: 900;
+            color: #facc15;
+            text-shadow: 0 0 20px rgba(250,204,21,0.5);
+            text-align: center;
+            margin: 12px 0 16px;
+            letter-spacing: 1px;
+        }
+        .char-preview {
+            width: 100%;
+            height: 280px;
+            background: rgba(56,189,248,0.05);
+            border: 2px solid rgba(56,189,248,0.25);
+            border-radius: 16px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .wardrobe-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .wardrobe-tab {
+            flex: 1;
+            min-width: 50px;
+            padding: 8px 6px;
+            border-radius: 10px;
+            border: 1px solid rgba(56,189,248,0.15);
+            background: transparent;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-family: 'Nunito', sans-serif;
+        }
+        .wardrobe-tab.active {
+            background: rgba(56,189,248,0.15);
+            border-color: rgba(56,189,248,0.4);
+            color: #38bdf8;
+        }
+        .wardrobe-items {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        .wardrobe-item {
+            aspect-ratio: 1;
+            background: rgba(15,23,42,0.7);
+            border: 2px solid rgba(56,189,248,0.1);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            padding: 6px;
+        }
+        .wardrobe-item:hover {
+            border-color: rgba(56,189,248,0.4);
+            transform: translateY(-2px);
+        }
+        .wardrobe-item.equipped {
+            border-color: #38bdf8;
+            background: rgba(56,189,248,0.12);
+            box-shadow: 0 0 12px rgba(56,189,248,0.25);
+        }
+        .wardrobe-item .emoji {
+            font-size: 30px;
+            line-height: 1;
+        }
+        .wardrobe-item .name {
+            font-size: 10px;
+            color: #94a3b8;
+            text-align: center;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .wardrobe-item .tier-badge {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            font-size: 8px;
+            font-weight: 900;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #000;
+        }
+        .wardrobe-item .check {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            font-size: 12px;
+            color: #38bdf8;
+        }
+        .save-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 14px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(34,197,94,0.3);
+            transition: all 0.2s;
+        }
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(34,197,94,0.5);
+        }
     </style>
 </head>
 <body>
-    <div class="char-page">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-            <h2 style="font-family:'Orbitron'; color:#e0f2fe;">🗄️ TỦ ĐỒ</h2>
-            <button onclick="history.back()" style="background:rgba(239,68,68,0.2); border:1px solid #ef4444; color:#ef4444; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer;">← Quay lại</button>
+    <canvas id="bg-canvas"></canvas>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+
+    <nav>
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">
+            <span class="logo-vt">VT</span><span class="logo-world">World</span>
         </div>
-        <div id="wardrobeContainer"></div>
+        <div class="nav-right-menu">
+            <button class="nav-hamburger" onclick="toggleNavMenu()">☰</button>
+            <div class="nav-dropdown" id="navDropdown">
+                <a class="nav-dropdown-item" href="profile.html">
+                    <span class="dd-icon">👤</span> Hồ sơ
+                </a>
+                <a class="nav-dropdown-item" href="#" onclick="history.back();return false;">
+                    <span class="dd-icon">←</span> Quay lại
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="char-page">
+        <div class="char-title">✨ PHÒNG THAY ĐỒ ✨</div>
+
+        <div class="char-preview" id="charPreview"></div>
+
+        <div class="wardrobe-tabs" id="wardrobeTabs"></div>
+
+        <div class="wardrobe-items" id="wardrobeItems"></div>
+
+        <button class="save-btn" id="saveBtn">💾 LƯU & QUAY LẠI</button>
     </div>
 
-    <script type="module">
-        import { initWardrobeUI } from './character-ui.js';
-        window.addEventListener('load', () => {
-            initWardrobeUI(document.getElementById('wardrobeContainer'));
+    <script>
+        function toggleNavMenu() {
+            document.getElementById('navDropdown').classList.toggle('open');
+        }
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav-right-menu')) {
+                document.getElementById('navDropdown').classList.remove('open');
+            }
         });
+    </script>
+
+    <script type="module">
+        // Import cả character.js để khởi tạo hệ thống
+        import { initCharacterSystem } from './character.js';
+        import { initWardrobeUI } from './character-ui.js';
+        
+        initCharacterSystem();
+        
+        // Đợi một chút để Firestore sync, rồi mới khởi tạo UI
+        setTimeout(() => {
+            initWardrobeUI();
+        }, 300);
     </script>
 </body>
 </html>
