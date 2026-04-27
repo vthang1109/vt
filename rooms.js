@@ -1,8 +1,9 @@
-// ===== VT WORLD — MULTIPLAYER ROOMS =====
+// ===== VT WORLD — MULTIPLAYER ROOMS (ID PHÒNG DẠNG SỐ) =====
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
-  query, where, orderBy, onSnapshot, serverTimestamp, addDoc, limit, arrayUnion, arrayRemove
+  query, where, onSnapshot, serverTimestamp, addDoc, arrayUnion, arrayRemove,
+  orderBy, limit
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -38,10 +39,7 @@ let _currentRoomId = null;
 function $(id){ return document.getElementById(id); }
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function genCode(){
-  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-  let s = '';
-  for (let i=0;i<6;i++) s += chars[Math.floor(Math.random()*chars.length)];
-  return s;
+  return String(Math.floor(100000 + Math.random() * 900000));
 }
 function toast(msg, type='info'){
   if (window.showToast) return window.showToast(msg, type);
@@ -60,10 +58,16 @@ onAuthStateChanged(auth, async (user) => {
   startListeningPublicRooms();
 });
 
-// ===== LIST PUBLIC ROOMS =====
+// ===== LIST PUBLIC ROOMS (SỬA LỖI) =====
 function startListeningPublicRooms(){
   if (_unsubRooms) _unsubRooms();
-  const q = query(collection(db, 'rooms'), where('status','==','lobby'), orderBy('createdAt','desc'), limit(40));
+
+  // Sửa: Bỏ orderBy và limit để tránh lỗi composite index
+  const q = query(
+    collection(db, 'rooms'),
+    where('status', '==', 'lobby')
+  );
+
   _unsubRooms = onSnapshot(q, (snap) => {
     const list = $('rooms-list');
     if (!snap.size) {
@@ -71,8 +75,13 @@ function startListeningPublicRooms(){
       return;
     }
     list.innerHTML = '';
-    snap.forEach(d => {
-      const r = d.data();
+
+    // Sắp xếp thủ công theo createdAt giảm dần
+    const rooms = [];
+    snap.forEach(d => rooms.push({ id: d.id, ...d.data() }));
+    rooms.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+    rooms.forEach(r => {
       const game = GAMES[r.gameType] || { name: r.gameType, icon: '🎮' };
       const full = (r.members || []).length >= (r.maxPlayers || 2);
       const div = document.createElement('div');
@@ -94,8 +103,11 @@ function startListeningPublicRooms(){
           <button class="btn-join" ${full ? 'disabled' : ''} data-id="${d.id}" data-pw="${r.password ? '1' : ''}">${full ? 'Đầy' : 'Vào'}</button>
         </div>
       `;
+
       list.appendChild(div);
     });
+
+    // Gán sự kiện sau khi render
     list.querySelectorAll('.btn-join').forEach(b => {
       b.addEventListener('click', () => {
         const id = b.getAttribute('data-id');
@@ -103,6 +115,7 @@ function startListeningPublicRooms(){
         joinRoomFlow(id, needPw);
       });
     });
+
   }, (err) => {
     console.error('rooms snapshot err', err);
     $('rooms-list').innerHTML = '<div class="rm-empty">⚠️ Không tải được danh sách. Kiểm tra quyền Firestore.</div>';
@@ -157,15 +170,23 @@ window.doCreateRoom = async function(){
 };
 
 // ===== JOIN BY CODE =====
-window.openJoinByCode = function(){ $('joinModal').classList.add('open'); $('jc-code').value=''; $('jc-pw').value=''; };
+window.openJoinByCode = function(){
+  $('joinModal').classList.add('open');
+  $('jc-code').value='';
+  $('jc-pw').value='';
+  $('jc-code').placeholder = 'Nhập 6 số';
+};
 window.closeJoinModal = function(){ $('joinModal').classList.remove('open'); };
 
 window.doJoinByCode = async function(){
-  const code = $('jc-code').value.trim().toUpperCase();
+  const code = $('jc-code').value.trim();
   const pw = $('jc-pw').value.trim();
-  if (!code) { toast('Nhập mã phòng!', 'warn'); return; }
+  if (!code || code.length !== 6 || isNaN(code)) {
+    toast('Mã phòng phải là 6 chữ số!', 'warn');
+    return;
+  }
   try {
-    const q = query(collection(db, 'rooms'), where('code','==',code), where('status','==','lobby'), limit(1));
+    const q = query(collection(db, 'rooms'), where('code','==',code), where('status','==','lobby'));
     const snap = await getDocs(q);
     if (snap.empty) { toast('Không tìm thấy phòng', 'error'); return; }
     const docSnap = snap.docs[0];
@@ -226,12 +247,10 @@ function enterLobby(roomId){
     }
     const data = snap.data();
     renderLobby(data);
-    // Nếu chủ đã start → mở trang game
     if (data.status === 'playing'){
       const g = GAMES[data.gameType];
       if (g && g.page && g.page !== '#'){
         const url = `${g.page}?room=${roomId}`;
-        // tránh redirect lặp
         if (!window.__navigated) { window.__navigated = true; window.location.href = url; }
       }
     }
@@ -281,11 +300,9 @@ function renderLobby(r){
         <div class="lm-name">${escHtml(info.name)} ${isMe ? '<span class="lm-you">(bạn)</span>' : ''}</div>
         <div class="lm-status">${isHost ? '👑 Chủ phòng' : (info.ready ? '✅ Sẵn sàng' : '⏳ Đang chờ')}</div>
       </div>
-      ${isHost && !isMe ? '' : ''}
     `;
     list.appendChild(div);
   });
-  // Slot trống
   for (let i = (r.members||[]).length; i < r.maxPlayers; i++){
     const div = document.createElement('div');
     div.className = 'lobby-member empty';
@@ -293,7 +310,6 @@ function renderLobby(r){
     list.appendChild(div);
   }
 
-  // Nút điều khiển
   const isHost = r.hostUid === _user.uid;
   const me = (r.memberInfo||{})[_user.uid];
   const btnReady = $('btn-ready');
@@ -363,7 +379,6 @@ window.leaveLobby = async function(){
     const snap = await getDoc(doc(db,'rooms',_currentRoomId));
     if (snap.exists()){
       const data = snap.data();
-      // Nếu chủ thoát → xoá phòng (nếu lobby) hoặc giữ
       if (data.hostUid === _user.uid && data.status === 'lobby'){
         await deleteDoc(doc(db,'rooms',_currentRoomId));
       } else {
@@ -388,7 +403,6 @@ function backToList(){
   $('listView').style.display = 'block';
 }
 
-// ===== LOBBY CHAT =====
 window.sendLobbyChat = async function(){
   const input = $('lobby-chat-input');
   const text = input.value.trim();
@@ -397,7 +411,7 @@ window.sendLobbyChat = async function(){
   await addDoc(collection(db,'rooms',_currentRoomId,'chat'), {
     text,
     senderUid: _user.uid,
-    senderName: _myProfile.nickname || _user.email.split('@')[0],
+    senderName: _myProfile.nickname || _user.email.split('[@]')[0],
     createdAt: serverTimestamp()
   });
 };
