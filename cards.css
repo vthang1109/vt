@@ -1,70 +1,71 @@
-/* ===== CARDS CSS (ĐƠN GIẢN) ===== */
-.card {
-  --card-width: 60px;
-  --card-height: 86px;
-  --card-radius: 8px;
-  --card-bg: #ffffff;
-  --card-red: #e0245e;
-  --card-black: #1e293b;
-  --card-shadow: 2px 4px 12px rgba(0,0,0,0.2);
-
-  width: var(--card-width);
-  height: var(--card-height);
-  background: var(--card-bg);
-  border-radius: var(--card-radius);
-  box-shadow: var(--card-shadow);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  user-select: none;
-  transition: transform 0.15s;
-  margin-left: -32px; /* xếp chồng nhẹ */
+/* cards.css */
+:root {
+    --card-width: 60px;
+    --card-height: 86px;
+    --card-bg: #ffffff;
+    --card-red: #e11d48;
+    --card-black: #1e293b;
+    --vt-blue: #0ea5e9;
 }
+
+.card {
+    width: var(--card-width);
+    height: var(--card-height);
+    background: var(--card-bg);
+    border-radius: 10px;
+    position: relative;
+    margin-left: -45px; /* Tạo hiệu ứng bài xếp chồng */
+    box-shadow: 2px 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 6px;
+    transition: transform 0.2s ease, margin 0.2s ease;
+    border: 1px solid #ddd;
+    user-select: none;
+}
+
 .card:first-child { margin-left: 0; }
 
-/* Màu theo chất */
-.card.red  { color: var(--card-red); }
+/* Màu sắc theo chất bài */
+.card.red { color: var(--card-red); }
 .card.black { color: var(--card-black); }
 
-/* Số + chất góc trên */
-.card-corner {
-  position: absolute;
-  font-size: 14px;
-  line-height: 1;
-  text-align: center;
-}
-.card-corner.top    { top: 6px; left: 6px; }
-.card-corner.bottom { bottom: 6px; right: 6px; transform: rotate(180deg); }
+/* Bố cục số và chất */
+.card-top { font-size: 14px; font-weight: 900; line-height: 1.1; }
+.card-top span { display: block; font-size: 12px; }
 
-.card-corner .rank { display: block; font-size: 16px; font-weight: 900; }
-.card-corner .suit { display: block; font-size: 12px; }
-
-/* Chất lớn ở giữa */
-.card-center {
-  font-size: 34px;
-  opacity: 0.9;
+.card-center { 
+    font-size: 36px; 
+    align-self: center; 
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
 }
 
-/* Mặt sau (úp) */
+.card-bottom { 
+    font-size: 14px; 
+    font-weight: 900; 
+    transform: rotate(180deg); 
+    line-height: 1.1;
+}
+
+/* Mặt sau lá bài (Úp bài) */
 .card.hidden {
-  background: linear-gradient(135deg, #0ea5e9, #2563eb);
-  border: 2px solid rgba(255,255,255,0.3);
+    background: linear-gradient(135deg, var(--vt-blue), #1e40af);
+    border: 3px solid #fff;
 }
-.card.hidden .card-corner,
-.card.hidden .card-center { display: none; }
-.card.hidden::after {
-  content: '';
-  position: absolute;
-  inset: 4px;
-  border-radius: 4px;
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(255,255,255,0.15) 0px,
-    rgba(255,255,255,0.15) 2px,
-    transparent 2px,
-    transparent 8px
-  );
+
+.card.hidden .card-back-pattern {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    background-image: radial-gradient(rgba(255,255,255,0.3) 1px, transparent 1px);
+    background-size: 8px 8px;
+    opacity: 0.8;
+}
+
+/* Hiệu ứng khi tương tác */
+.hand.active .card:hover {
+    transform: translateY(-15px) rotate(2deg);
+    z-index: 100;
+    cursor: pointer;
 }
