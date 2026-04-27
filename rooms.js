@@ -231,7 +231,9 @@ async function joinRoomById(id, data){
     if (!(data.members||[]).includes(_user.uid)){
       const myName = _myProfile.nickname || _user.email.split('@')[0];
       const memberInfo = data.memberInfo || {};
-      memberInfo[_user.uid] = { name: myName, ready: false };
+      const mySnap = await getDoc(doc(db, 'users', _user.uid));
+      const myAvatar = mySnap.exists() ? (mySnap.data().avatarUrl || null) : null;
+      memberInfo[_user.uid] = { name: myName, ready: false, avatarUrl: myAvatar };
       await updateDoc(doc(db,'rooms',id), {
         members: arrayUnion(_user.uid),
         memberInfo
@@ -297,27 +299,19 @@ function renderLobby(r){
   $('lobby-code').textContent = '#' + r.code;
   $('lobby-count').textContent = (r.members||[]).length + '/' + r.maxPlayers;
 
-  // rooms.js dòng 300-315
-// Sửa: load avatarUrl từ Firestore khi render member
-async function renderLobby(data) {
-  // ... code cũ ...
-  for (const uid of data.members || []) {
-    const info = data.memberInfo?.[uid] || {};
-    // Thêm: lấy avatarUrl từ Firestore
-    let avatarUrl = info.avatarUrl || null;
-    if (!avatarUrl) {
-      try {
-        const us = await getDoc(doc(db, 'users', uid));
-        if (us.exists()) avatarUrl = us.data().avatarUrl || null;
-      } catch {}
-    }
-    div.innerHTML = `
-      ${window.renderAvatar ? window.renderAvatar(avatarUrl, info.name) : 
-        `<div class="lm-avatar">${(info.name||'?')[0].toUpperCase()}</div>`}
-      ...
-    `;
-  }
-}
+  const list = $('lobby-members');
+  list.innerHTML = '';
+  (r.members||[]).forEach(uid => {
+    const info = r.memberInfo?.[uid] || {};
+    const avatarUrl = info.avatarUrl || null;
+    const div = document.createElement('div');
+    div.className = 'lobby-member';
+    const avHtml = avatarUrl
+      ? `<div class="lm-avatar" style="background-image:url(${avatarUrl});background-size:cover;background-position:center;color:transparent;">.</div>`
+      : `<div class="lm-avatar">${(info.name||'?')[0].toUpperCase()}</div>`;
+    div.innerHTML = `${avHtml}<div class="lm-info"><div class="lm-name">${escHtml(info.name||uid)}</div><div class="lm-status">${r.hostUid===uid?'👑 Chủ phòng':(info.ready?'✅ Sẵn sàng':'⏳ Đang chờ')}</div></div>`;
+    list.appendChild(div);
+  });
   for (let i = (r.members||[]).length; i < r.maxPlayers; i++){
     const div = document.createElement('div');
     div.className = 'lobby-member empty';
