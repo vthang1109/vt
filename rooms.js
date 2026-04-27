@@ -68,6 +68,7 @@ function startListeningPublicRooms(){
   _unsubRooms = onSnapshot(q, (snap) => {
     const list = $('rooms-list');
     console.log('📡 Snapshot rooms count:', snap.size); // Debug
+    snap.forEach(d => console.log('📦 Room:', d.id, d.data().status, d.data().name));
 
     if (!snap.size) {
       list.innerHTML = '<div class="rm-empty">Chưa có phòng nào. Tạo phòng đầu tiên nhé! 🎮</div>';
