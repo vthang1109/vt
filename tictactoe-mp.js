@@ -111,8 +111,17 @@ window.quitGame = async function(){
     const snap = await getDoc(doc(db,'rooms',ROOM_ID));
     if (snap.exists()){
       const r = snap.data();
-      if (r.hostUid === _user.uid) await deleteDoc(doc(db,'rooms',ROOM_ID));
-      else { const mi = r.memberInfo||{}; delete mi[_user.uid]; await updateDoc(doc(db,'rooms',ROOM_ID), { members: arrayRemove(_user.uid), memberInfo: mi }); }
+      if (r.hostUid === _user.uid) {
+        await deleteDoc(doc(db,'rooms',ROOM_ID)); // Sửa: host rời → xóa phòng
+      } else {
+        const remaining = (r.members || []).filter(u => u !== _user.uid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db,'rooms',ROOM_ID)); // Sửa: không còn ai → xóa phòng
+        } else {
+          const mi = r.memberInfo||{}; delete mi[_user.uid];
+          await updateDoc(doc(db,'rooms',ROOM_ID), { members: arrayRemove(_user.uid), memberInfo: mi });
+        }
+      }
     }
   } catch(e){}
   location.href='rooms.html';

@@ -245,14 +245,16 @@ window.quitGame = async function(){
     if (snap.exists()){
       const r = snap.data();
       if (r.hostUid === _user.uid){
-        await deleteDoc(doc(db,'rooms',ROOM_ID));
+        await deleteDoc(doc(db,'rooms',ROOM_ID)); // Sửa: host rời → xóa phòng
       } else {
-        const memberInfo = r.memberInfo || {};
-        delete memberInfo[_user.uid];
-        await updateDoc(doc(db,'rooms',ROOM_ID), {
-          members: arrayRemove(_user.uid),
-          memberInfo
-        });
+        const remaining = (r.members || []).filter(u => u !== _user.uid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db,'rooms',ROOM_ID)); // Sửa: không còn ai → xóa phòng
+        } else {
+          const memberInfo = r.memberInfo || {};
+          delete memberInfo[_user.uid];
+          await updateDoc(doc(db,'rooms',ROOM_ID), { members: arrayRemove(_user.uid), memberInfo });
+        }
       }
     }
   } catch(e){}
