@@ -3,7 +3,7 @@ import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
   query, where, onSnapshot, serverTimestamp, addDoc, arrayUnion, arrayRemove,
-  orderBy, limit
+  orderBy, limit, enableNetwork
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -61,11 +61,9 @@ onAuthStateChanged(auth, async (user) => {
 // ===== LIST PUBLIC ROOMS (ĐÃ SỬA LỖI) =====
 function startListeningPublicRooms(){
   if (_unsubRooms) _unsubRooms();
-
-  // Lấy TẤT CẢ phòng, không lọc theo status để debug
+  enableNetwork(db); // Sửa: đảm bảo online, không dùng cache
   const q = query(collection(db, 'rooms'));
-
-  _unsubRooms = onSnapshot(q, (snap) => {
+  _unsubRooms = onSnapshot(q, { includeMetadataChanges: false }, (snap) => {
     const list = $('rooms-list');
     console.log('📡 Snapshot rooms count:', snap.size); // Debug
     snap.forEach(d => console.log('📦 Room:', d.id, d.data().status, d.data().name));
