@@ -56,14 +56,6 @@
     .xd-score { font-family:'Orbitron',monospace; font-weight:900; color:#e0f2fe; font-size:16px; }
     .xd-bet { color:#fbbf24; font-weight:700; font-size:12px; }
 
-    /* ===================== LÁ BÀI — THU NHỎ ĐỀU 2 CẠNH ===================== */
-    /*
-      Tỉ lệ gốc thường là 63×88 (aspect ~0.716).
-      Đặt width=height sẽ làm méo. 
-      Ta dùng aspect-ratio để giữ đúng tỉ lệ.
-    */
-
-    /* Người chơi khác: nhỏ nhất */
     .xd-cards .card {
       width: 44px !important;
       aspect-ratio: 63 / 88 !important;
@@ -73,36 +65,6 @@
       border-radius: 5px !important;
     }
     .xd-cards .card:first-child { margin-left: 0 !important; }
-
-    /* Nhà cái: cỡ trung */
-    .xd-seat.dealer .xd-cards .card {
-      width: 52px !important;
-      margin-left: -20px !important;
-    }
-    .xd-seat.dealer .xd-cards .card:first-child { margin-left: 0 !important; }
-
-    /* Bản thân: to nhất */
-    .xd-seat.me .xd-cards .card {
-      width: 62px !important;
-      margin-left: -24px !important;
-    }
-    .xd-seat.me .xd-cards .card:first-child { margin-left: 0 !important; }
-
-    /* Nhà cái + me (host): to nhất */
-    .xd-seat.dealer.me .xd-cards .card {
-      width: 62px !important;
-      margin-left: -24px !important;
-    }
-    .xd-seat.dealer.me .xd-cards .card:first-child { margin-left: 0 !important; }
-
-    .xd-cards {
-      display: flex;
-      flex-wrap: nowrap;
-      align-items: flex-start;
-      min-height: 62px;
-      padding: 4px 0 4px 0;
-      overflow: visible;
-    }
 
     /* ===================== ĐẶT CƯỢC ===================== */
     .xd-bet-row { display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap; justify-content:center; }
