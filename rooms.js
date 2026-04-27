@@ -1,4 +1,4 @@
-// ===== VT WORLD — MULTIPLAYER ROOMS (ID PHÒNG DẠNG SỐ) =====
+// ===== VT WORLD — MULTIPLAYER ROOMS (FIX HIỂN THỊ PHÒNG) =====
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
@@ -58,28 +58,40 @@ onAuthStateChanged(auth, async (user) => {
   startListeningPublicRooms();
 });
 
-// ===== LIST PUBLIC ROOMS (SỬA LỖI) =====
+// ===== LIST PUBLIC ROOMS (ĐÃ SỬA LỖI) =====
 function startListeningPublicRooms(){
   if (_unsubRooms) _unsubRooms();
 
-  // Sửa: Bỏ orderBy và limit để tránh lỗi composite index
-  const q = query(
-    collection(db, 'rooms'),
-    where('status', '==', 'lobby')
-  );
+  // Lấy TẤT CẢ phòng, không lọc theo status để debug
+  const q = query(collection(db, 'rooms'));
 
   _unsubRooms = onSnapshot(q, (snap) => {
     const list = $('rooms-list');
+    console.log('📡 Snapshot rooms count:', snap.size); // Debug
+
     if (!snap.size) {
       list.innerHTML = '<div class="rm-empty">Chưa có phòng nào. Tạo phòng đầu tiên nhé! 🎮</div>';
       return;
     }
+
     list.innerHTML = '';
 
-    // Sắp xếp thủ công theo createdAt giảm dần
+    // Lọc thủ công các phòng có status === 'lobby'
     const rooms = [];
-    snap.forEach(d => rooms.push({ id: d.id, ...d.data() }));
+    snap.forEach(d => {
+      const data = d.data();
+      if (data.status === 'lobby') rooms.push({ id: d.id, ...data });
+    });
+
+    console.log('📡 Lobby rooms:', rooms.length); // Debug
+
+    // Sắp xếp theo createdAt giảm dần
     rooms.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+    if (!rooms.length) {
+      list.innerHTML = '<div class="rm-empty">Chưa có phòng nào. Tạo phòng đầu tiên nhé! 🎮</div>';
+      return;
+    }
 
     rooms.forEach(r => {
       const game = GAMES[r.gameType] || { name: r.gameType, icon: '🎮' };
@@ -100,10 +112,9 @@ function startListeningPublicRooms(){
         </div>
         <div class="rm-action">
           <span class="rm-code">#${r.code}</span>
-          <button class="btn-join" ${full ? 'disabled' : ''} data-id="${d.id}" data-pw="${r.password ? '1' : ''}">${full ? 'Đầy' : 'Vào'}</button>
+          <button class="btn-join" ${full ? 'disabled' : ''} data-id="${r.id}" data-pw="${r.password ? '1' : ''}">${full ? 'Đầy' : 'Vào'}</button>
         </div>
       `;
-
       list.appendChild(div);
     });
 
@@ -158,12 +169,13 @@ window.doCreateRoom = async function(){
       hostUid: _user.uid,
       hostName: myName,
       password: pw || '',
-      status: 'lobby',
+      status: 'lobby',         // <-- ĐẢM BẢO CÓ STATUS
       maxPlayers: Math.min(max, g.max),
       members: [_user.uid],
       memberInfo: { [_user.uid]: { name: myName, ready: false } },
       createdAt: serverTimestamp()
     });
+    console.log('✅ Phòng đã tạo:', ref.id, 'status:', 'lobby');
     closeCreateModal();
     enterLobby(ref.id);
   } catch(e){ toast('Tạo phòng thất bại', 'error'); console.error(e); }
@@ -186,7 +198,7 @@ window.doJoinByCode = async function(){
     return;
   }
   try {
-    const q = query(collection(db, 'rooms'), where('code','==',code), where('status','==','lobby'));
+    const q = query(collection(db, 'rooms'), where('code','==',code));
     const snap = await getDocs(q);
     if (snap.empty) { toast('Không tìm thấy phòng', 'error'); return; }
     const docSnap = snap.docs[0];
