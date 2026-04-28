@@ -489,4 +489,131 @@ async function finalizeBustDealer(r, dealerHand, deck) {
     results[uid] = { outcome, delta };
   }
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
-    'gameSt
+    'gameSt    'gameState.phase': 'result',
+    'gameState.deck': deck,
+    [`gameState.hands.${r.hostUid}`]: dealerHand,
+    'gameState.results': results,
+    'gameState.dealerChecked': Object.fromEntries(players.map(u => [u, true]))
+  });
+}
+
+function compareHands(playerHand, dealerHand, bet) {
+  const pStat = handStatus(playerHand);
+  const dStat = handStatus(dealerHand);
+  let outcome = 'lose', delta = -bet;
+
+  if (pStat.tag === 'bust') {
+    if (dStat.tag === 'bust') { outcome = 'draw'; delta = 0; }
+    else { outcome = 'lose'; delta = -bet; }
+    return { outcome, delta };
+  }
+  if (dStat.tag === 'bust') { outcome = 'win'; delta = bet; return { outcome, delta }; }
+
+  const pRank = getRank(pStat);
+  const dRank = getRank(dStat);
+  if (pRank > dRank) { outcome = 'win'; delta = bet; }
+  else if (pRank < dRank) { outcome = 'lose'; delta = -bet; }
+  else {
+    if (pStat.tag === 'ngu_linh') {
+      if (pStat.score < dStat.score) { outcome = 'win'; delta = bet; }
+      else if (pStat.score > dStat.score) { outcome = 'lose'; delta = -bet; }
+      else { outcome = 'draw'; delta = 0; }
+    } else {
+      if (pStat.score > dStat.score) { outcome = 'win'; delta = bet; }
+      else if (pStat.score < dStat.score) { outcome = 'lose'; delta = -bet; }
+      else { outcome = 'draw'; delta = 0; }
+    }
+  }
+  return { outcome, delta };
+}
+
+function getRank(stat) {
+  if (stat.tag === 'xi_bang') return 5;
+  if (stat.tag === 'xi_dach') return 4;
+  if (stat.tag === 'ngu_linh') return 3;
+  return 1;
+}
+
+async function settleMyResult(r, gs) {
+  if (r.hostUid === _user.uid) {
+    let dealerDelta = 0;
+    for (const res of Object.values(gs.results || {})) dealerDelta -= res.delta;
+    if (dealerDelta !== 0) {
+      const us = await getDoc(doc(db, 'users', _user.uid));
+      const cur = us.exists() ? (us.data().points || 0) : 0;
+      await updateDoc(doc(db, 'users', _user.uid), { points: cur + dealerDelta });
+      showToast(dealerDelta >= 0 ? `🎉 Nhà cái thu ${dealerDelta.toLocaleString('vi-VN')}đ` : `💸 Nhà cái lỗ ${(-dealerDelta).toLocaleString('vi-VN')}đ`, dealerDelta >= 0 ? 'success' : 'warn');
+      if (window.VTQuests && dealerDelta > 0) window.VTQuests.trackEarn(dealerDelta);
+    }
+    return;
+  }
+  const res = gs.results?.[_user.uid];
+  if (!res) return;
+  const bet = gs.bets?.[_user.uid] || 0;
+  const refund = bet + res.delta;
+  if (refund > 0) {
+    const us = await getDoc(doc(db, 'users', _user.uid));
+    const cur = us.exists() ? (us.data().points || 0) : 0;
+    await updateDoc(doc(db, 'users', _user.uid), { points: cur + refund });
+  }
+  if (res.outcome === 'win') {
+    showToast(`🎉 Thắng +${res.delta.toLocaleString('vi-VN')}đ!`, 'success');
+    if (window.VTQuests) { window.VTQuests.trackEarn(res.delta); window.VTQuests.trackWinSmart(); }
+  } else if (res.outcome === 'lose') {
+    showToast(`💸 Thua ${bet.toLocaleString('vi-VN')}đ`, 'warn');
+  } else {
+    showToast(`🤝 Hoà`, 'info');
+  }
+}
+
+window.hostNextRound = async function() {
+  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
+  if (!snap.exists()) return;
+  const r = snap.data();
+  if (r.hostUid !== _user.uid) return;
+  await updateDoc(doc(db, 'rooms', ROOM_ID), {
+    'gameState.phase': 'betting',
+    'gameState.hands': {},
+    'gameState.bets': {},
+    'gameState.stands': {},
+    'gameState.turnOrder': [],
+    'gameState.turnIdx': 0,
+    'gameState.results': {},
+    'gameState.deck': [],
+    'gameState.revealed': {},
+    'gameState.dealerChecked': {},
+    'gameState.round': (r.gameState.round || 1) + 1
+  });
+};
+
+window.quitGame = async function() {
+  try {
+    const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
+    if (snap.exists()) {
+      const r = snap.data();
+      if (r.gameState?.phase === 'betting') {
+        const myBet = r.gameState.bets?.[_user.uid] || 0;
+        if (myBet > 0) {
+          const us = await getDoc(doc(db, 'users', _user.uid));
+          const cur = us.exists() ? (us.data().points || 0) : 0;
+          await updateDoc(doc(db, 'users', _user.uid), { points: cur + myBet });
+        }
+      }
+      if (r.hostUid === _user.uid) {
+        await deleteDoc(doc(db, 'rooms', ROOM_ID));
+      } else {
+        const remaining = (r.members || []).filter(u => u !== _user.uid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db, 'rooms', ROOM_ID));
+        } else {
+          const mi = r.memberInfo || {};
+          delete mi[_user.uid];
+          await updateDoc(doc(db, 'rooms', ROOM_ID), { members: arrayRemove(_user.uid), memberInfo: mi });
+        }
+      }
+    }
+  } catch (e) {}
+  location.href = 'rooms.html';
+};
+
+function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
