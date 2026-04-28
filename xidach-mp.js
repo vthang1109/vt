@@ -38,38 +38,81 @@ onAuthStateChanged(auth, async (u) => {
 /* ========== UTILS ========== */
 function cardPoints(card) {
   const v = card.v;
-  if (v === 'A') return 0;
+  if (v === 'A') return 0; // Át được xử lý riêng
   if (['J', 'Q', 'K'].includes(v)) return 10;
   return parseInt(v);
 }
 
 function bestScore(hand) {
-  if (hand.length === 2 && hand.every(c => c.v === 'A')) return 21;
-  let total = 0, aces = 0;
+  if (!hand || hand.length === 0) return 0;
+
+  // Đếm số lượng Át và tính điểm các lá còn lại
+  let totalWithoutAces = 0;
+  let aceCount = 0;
   for (const c of hand) {
-    if (c.v === 'A') aces++;
-    else total += cardPoints(c);
+    if (c.v === 'A') {
+      aceCount++;
+    } else {
+      totalWithoutAces += cardPoints(c);
+    }
   }
+
   const len = hand.length;
-  let aceValue;
-  if (len === 2) aceValue = 11;
-  else if (len === 3) aceValue = 10;
-  else aceValue = 1;
-  total += aces * aceValue;
-  return total;
+
+  // Nếu có 2 lá và cả 2 đều là Át -> Xì Bàng (21 điểm)
+  if (len === 2 && aceCount === 2) return 21;
+
+  // Xác định các giá trị có thể của Át
+  let possibleAceValues;
+  if (len <= 3) {
+    // ≤ 3 lá: Át có thể là 1, 10, 11
+    possibleAceValues = [1, 10, 11];
+  } else {
+    // > 3 lá: Át bắt buộc là 1
+    possibleAceValues = [1];
+  }
+
+  // Duyệt qua tất cả tổ hợp để tìm điểm cao nhất <= 21
+  let best = 0;
+  function tryAces(index, currentSum) {
+    if (index === aceCount) {
+      if (currentSum <= 21 && currentSum > best) {
+        best = currentSum;
+      } else if (currentSum > 21 && (best === 0 || currentSum < best)) {
+        best = currentSum;
+      }
+      return;
+    }
+    for (const val of possibleAceValues) {
+      tryAces(index + 1, currentSum + val);
+    }
+  }
+  tryAces(0, totalWithoutAces);
+
+  return best;
 }
 
 function handStatus(hand) {
   const score = bestScore(hand);
   const len = hand.length;
+
+  // Kiểm tra Xì Bàng: 2 lá Át
   if (len === 2 && hand[0].v === 'A' && hand[1].v === 'A') return { score, tag: 'xi_bang' };
+
+  // Kiểm tra Xì Dách: 1 Át + 1 lá 10/J/Q/K
   if (len === 2) {
     const hasA = hand.some(c => c.v === 'A');
-    const hasTen = hand.some(c => ['10','J','Q','K'].includes(c.v));
+    const hasTen = hand.some(c => ['10', 'J', 'Q', 'K'].includes(c.v));
     if (hasA && hasTen) return { score: 21, tag: 'xi_dach' };
   }
-  if (len >= 5 && score <= 21) return { score, tag: 'ngu_linh' };
+
+  // Ngũ Linh: đúng 5 lá và <= 21 điểm
+  if (len === 5 && score <= 21) return { score, tag: 'ngu_linh' };
+
+  // Quắc: > 21 điểm
   if (score > 21) return { score, tag: 'bust' };
+
+  // Bình thường
   return { score, tag: 'ok' };
 }
 
@@ -87,7 +130,6 @@ function start() {
     render(r);
   });
 }
-
 /* ========== RENDER ========== */
 function render(r) {
   const gs = r.gameState;
@@ -162,17 +204,7 @@ function render(r) {
     if (isMe || (isHost && isDealer)) cls += ' me';
     if (isDealer) cls += ' dealer';
 
-    let tagHtml = '';
-    const showStat = isMe || gs.phase === 'result' || (gs.phase === 'dealer' && (isDealer || checked));
-    if (stat && showStat) {
-      if (stat.tag === 'xi_bang') tagHtml += '<span class="xd-seat-tag xd-tag-blackjack">Xì Bàng</span>';
-      else if (stat.tag === 'xi_dach') tagHtml += '<span class="xd-seat-tag xd-tag-blackjack">Xì Dách</span>';
-      else if (stat.tag === 'ngu_linh') tagHtml += '<span class="xd-seat-tag" style="background:linear-gradient(45deg,#facc15,#fb923c);color:#000">Ngũ Linh</span>';
-      else if (stat.tag === 'bust') tagHtml += '<span class="xd-seat-tag xd-tag-bust">Quắc</span>';
-      else if (standed && !isDealer) tagHtml += '<span class="xd-seat-tag xd-tag-stand">✋ Dừng</span>';
-    }
-    // Kết quả thắng/thua/hoà đã hiển thị qua result overlay lớn, không cần tag nhỏ nữa
-
+    // --- Tên + Điểm (sát nhau) ---
     let nameHtml = isDealer
       ? `👑 Nhà Cái${isHost ? ' <span style="color:#fbbf24;font-size:12px">(bạn)</span>' : ''}`
       : `${esc(r.memberInfo?.[uid]?.name || '?')}${isMe ? ' <span style="color:#fbbf24">(bạn)</span>' : ''}`;
@@ -186,68 +218,79 @@ function render(r) {
         scoreText = stat.score;
     }
 
+    if (scoreText !== '') {
+      nameHtml += ` <span class="xd-score-inline">${scoreText}</span>`;
+    }
+
+    // --- Nút xét bài (góc trên phải) ---
     let checkBtnHtml = '';
     if (isHost && gs.phase === 'dealer' && !isDealer && !checked) {
       const dScore = dealerStat ? dealerStat.score : 0;
       const dLen = dealerHand.length;
       const canCheck = (dLen === 2 && dScore >= 15) || (dLen >= 3 && dScore >= 16);
       if (canCheck) {
-        checkBtnHtml = `<button onclick="hostCheckPlayer('${uid}')" class="xd-check-btn">⚡ Xét bài</button>`;
+        checkBtnHtml = `<button class="xd-check-btn-neon" onclick="hostCheckPlayer('${uid}')">XÉT BÀI</button>`;
       }
     }
 
-    // --- Bet badge (góc phải trên) ---
-    const betBadgeHtml = betAmt > 0
-      ? `<div class="xd-bet-badge">${betAmt.toLocaleString('vi-VN')}đ</div>`
-      : '';
-
-    // --- Result overlay to đẹp ---
+    // --- Result overlay ---
     let resultOverlayHtml = '';
     if (gs.results?.[uid] && !isDealer) {
       const res = gs.results[uid];
-      const pStat = stat;
       let overlayClass = '', overlayText = '';
       if (res.outcome === 'win') {
-        if (pStat?.tag === 'xi_bang')  { overlayClass = 'xd-result-special'; overlayText = '✦ XÌ BÀNG ✦'; }
-        else if (pStat?.tag === 'xi_dach') { overlayClass = 'xd-result-special'; overlayText = '★ XÌ DÁCH ★'; }
-        else if (pStat?.tag === 'ngu_linh') { overlayClass = 'xd-result-special'; overlayText = '⚡ NGŨ LINH ⚡'; }
-        else { overlayClass = 'xd-result-win'; overlayText = `THẮNG<br>+${res.delta.toLocaleString('vi-VN')}đ`; }
+        if (stat?.tag === 'xi_bang') {
+          overlayClass = 'xd-result-special'; overlayText = 'XÌ BÀN';
+        } else if (stat?.tag === 'xi_dach') {
+          overlayClass = 'xd-result-special'; overlayText = 'XÌ DÁCH';
+        } else if (stat?.tag === 'ngu_linh') {
+          overlayClass = 'xd-result-special'; overlayText = 'NGŨ LINH';
+        } else {
+          overlayClass = 'xd-result-win';
+          overlayText = `THẮNG +${res.delta.toLocaleString('vi-VN')}đ`;
+        }
       } else if (res.outcome === 'lose') {
-        if (pStat?.tag === 'bust') { overlayClass = 'xd-result-bust'; overlayText = 'QUẮC'; }
-        else { overlayClass = 'xd-result-lose'; overlayText = `THUA<br>${res.delta.toLocaleString('vi-VN')}đ`; }
+        if (stat?.tag === 'bust') {
+          overlayClass = 'xd-result-bust'; overlayText = 'QUẮC';
+        } else {
+          overlayClass = 'xd-result-lose';
+          overlayText = `THUA ${res.delta.toLocaleString('vi-VN')}đ`;
+        }
       } else {
-        overlayClass = 'xd-result-draw'; overlayText = 'HOÀ';
+        overlayClass = 'xd-result-draw';
+        overlayText = 'HÒA';
       }
       resultOverlayHtml = `<div class="xd-result-overlay ${overlayClass}">${overlayText}</div>`;
     }
 
+    // --- Badge tiền cược (góc dưới phải) ---
+    let betBadgeHtml = '';
+    if (!isDealer && betAmt > 0) {
+      betBadgeHtml = `<div class="xd-bet-badge">${betAmt.toLocaleString('vi-VN')}đ</div>`;
+    }
+
     tEl.innerHTML += `
       <div class="${cls}">
-        ${betBadgeHtml}
         ${resultOverlayHtml}
+        ${checkBtnHtml}
         <div class="xd-seat-head">
           <span class="xd-seat-name">${nameHtml}</span>
-          <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${tagHtml}</div>
         </div>
         <div class="xd-cards">${cardsHtml}</div>
-        <div class="xd-seat-meta">
-          <span class="xd-score">${scoreText}</span>
-        </div>
-        ${checkBtnHtml}
+        ${betBadgeHtml}
       </div>`;
   }
 
   const myTurn = !isHost && gs.phase === 'playing' && gs.turnOrder?.[gs.turnIdx] === _user.uid;
   const myHand = gs.hands?.[_user.uid] || [];
   const myScore = myHand.length ? bestScore(myHand) : 0;
-  const canStand = myScore >= 16 || myHand.length >= 5;
+  const canStand = myScore >= 16 || myHand.length === 5;
   btnHit.style.display = myTurn ? 'inline-block' : 'none';
   btnStand.style.display = myTurn ? 'inline-block' : 'none';
   btnStand.disabled = !canStand;
 
   const players = (r.members || []).filter(u => u !== dealerUid);
   const allBet = players.every(u => (gs.bets?.[u] || 0) > 0);
-  const anyBet = Object.values(gs.bets || {}).some(v => v > 0);
   btnDeal.style.display = (isHost && gs.phase === 'betting') ? 'inline-block' : 'none';
   btnDeal.disabled = !allBet;
   btnDeal.textContent = allBet ? '🃏 Chia bài' : '⏳ Chờ đặt cược';
@@ -291,7 +334,6 @@ function render(r) {
     settleMyResult(r, gs);
   }
 }
-// ===== XÌ DÁCH MULTIPLAYER (LUẬT MỚI) - PHẦN 2/2 =====
 
 /* ========== HÀNH ĐỘNG ========== */
 window.placeBet = async function() {
@@ -600,7 +642,7 @@ window.quitGame = async function() {
         }
       }
       if (r.hostUid === _user.uid) {
-        await deleteDoc(doc(db, 'rooms', ROOM_ID));
+      await deleteDoc(doc(db, 'rooms', ROOM_ID));
       } else {
         const remaining = (r.members || []).filter(u => u !== _user.uid);
         if (remaining.length === 0) {
