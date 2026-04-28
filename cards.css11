@@ -1,9 +1,0 @@
-/* cards.css */
-.card {
-  display: inline-block;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  vertical-align: top;
-  object-fit: contain;
-  background: none;  /* ← loại bỏ nền trắng */
-}
