@@ -1,4 +1,4 @@
-// ===== XÌ DÁCH MULTIPLAYER (LUẬT MỚI) - PHẦN 1/2 =====
+// ===== XÌ DÁCH MULTIPLAYER (LUẬT MỚI) - PHẦN 1/3 =====
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -38,15 +38,13 @@ onAuthStateChanged(auth, async (u) => {
 /* ========== UTILS ========== */
 function cardPoints(card) {
   const v = card.v;
-  if (v === 'A') return 0; // Át được xử lý riêng
+  if (v === 'A') return 0;
   if (['J', 'Q', 'K'].includes(v)) return 10;
   return parseInt(v);
 }
 
 function bestScore(hand) {
   if (!hand || hand.length === 0) return 0;
-
-  // Đếm số lượng Át và tính điểm các lá còn lại
   let totalWithoutAces = 0;
   let aceCount = 0;
   for (const c of hand) {
@@ -56,23 +54,14 @@ function bestScore(hand) {
       totalWithoutAces += cardPoints(c);
     }
   }
-
   const len = hand.length;
-
-  // Nếu có 2 lá và cả 2 đều là Át -> Xì Bàng (21 điểm)
   if (len === 2 && aceCount === 2) return 21;
-
-  // Xác định các giá trị có thể của Át
   let possibleAceValues;
   if (len <= 3) {
-    // ≤ 3 lá: Át có thể là 1, 10, 11
     possibleAceValues = [1, 10, 11];
   } else {
-    // > 3 lá: Át bắt buộc là 1
     possibleAceValues = [1];
   }
-
-  // Duyệt qua tất cả tổ hợp để tìm điểm cao nhất <= 21
   let best = 0;
   function tryAces(index, currentSum) {
     if (index === aceCount) {
@@ -88,31 +77,20 @@ function bestScore(hand) {
     }
   }
   tryAces(0, totalWithoutAces);
-
   return best;
 }
 
 function handStatus(hand) {
   const score = bestScore(hand);
   const len = hand.length;
-
-  // Kiểm tra Xì Bàng: 2 lá Át
   if (len === 2 && hand[0].v === 'A' && hand[1].v === 'A') return { score, tag: 'xi_bang' };
-
-  // Kiểm tra Xì Dách: 1 Át + 1 lá 10/J/Q/K
   if (len === 2) {
     const hasA = hand.some(c => c.v === 'A');
     const hasTen = hand.some(c => ['10', 'J', 'Q', 'K'].includes(c.v));
     if (hasA && hasTen) return { score: 21, tag: 'xi_dach' };
   }
-
-  // Ngũ Linh: đúng 5 lá và <= 21 điểm
   if (len === 5 && score <= 21) return { score, tag: 'ngu_linh' };
-
-  // Quắc: > 21 điểm
   if (score > 21) return { score, tag: 'bust' };
-
-  // Bình thường
   return { score, tag: 'ok' };
 }
 
@@ -130,7 +108,7 @@ function start() {
     render(r);
   });
 }
-/* ========== RENDER ========== */
+// ===== XÌ DÁCH MULTIPLAYER - PHẦN 2/3 (RENDER) =====
 function render(r) {
   const gs = r.gameState;
   const isHost = r.hostUid === _user.uid;
@@ -204,7 +182,7 @@ function render(r) {
     if (isMe || (isHost && isDealer)) cls += ' me';
     if (isDealer) cls += ' dealer';
 
-    // --- Tên + Điểm (sát nhau) ---
+    // Tên + Điểm
     let nameHtml = isDealer
       ? `👑 Nhà Cái${isHost ? ' <span style="color:#fbbf24;font-size:12px">(bạn)</span>' : ''}`
       : `${esc(r.memberInfo?.[uid]?.name || '?')}${isMe ? ' <span style="color:#fbbf24">(bạn)</span>' : ''}`;
@@ -217,12 +195,11 @@ function render(r) {
       if (stat && (isMe || gs.phase === 'result' || (gs.phase === 'dealer' && checked)))
         scoreText = stat.score;
     }
-
     if (scoreText !== '') {
       nameHtml += ` <span class="xd-score-inline">${scoreText}</span>`;
     }
 
-    // --- Nút xét bài (góc trên phải) ---
+    // Nút xét bài
     let checkBtnHtml = '';
     if (isHost && gs.phase === 'dealer' && !isDealer && !checked) {
       const dScore = dealerStat ? dealerStat.score : 0;
@@ -233,37 +210,59 @@ function render(r) {
       }
     }
 
-    // --- Result overlay ---
+    // Result overlay
     let resultOverlayHtml = '';
-    if (gs.results?.[uid] && !isDealer) {
-      const res = gs.results[uid];
-      let overlayClass = '', overlayText = '';
-      if (res.outcome === 'win') {
+    if (gs.phase === 'result') {
+      if (isDealer) {
+        // Nhà cái
+        if (dealerStat) {
+          if (dealerStat.tag === 'xi_bang') {
+            resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ BÀN</div>';
+          } else if (dealerStat.tag === 'xi_dach') {
+            resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ DÁCH</div>';
+          } else if (dealerStat.tag === 'ngu_linh') {
+            resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">NGŨ LINH</div>';
+          } else if (dealerStat.tag === 'bust') {
+            resultOverlayHtml = '<div class="xd-result-overlay xd-result-bust">QUẮC</div>';
+          }
+        }
+        if (!resultOverlayHtml) {
+          const delta = gs.dealerDelta || 0;
+          if (delta > 0) {
+            resultOverlayHtml = `<div class="xd-result-overlay xd-result-win">+${delta.toLocaleString('vi-VN')}đ</div>`;
+          } else if (delta < 0) {
+            resultOverlayHtml = `<div class="xd-result-overlay xd-result-lose">${delta.toLocaleString('vi-VN')}đ</div>`;
+          } else {
+            resultOverlayHtml = '<div class="xd-result-overlay xd-result-draw">HÒA</div>';
+          }
+        }
+      } else if (gs.results?.[uid]) {
+        // Nhà con
+        const res = gs.results[uid];
+        let overlayClass = '', overlayText = '';
         if (stat?.tag === 'xi_bang') {
           overlayClass = 'xd-result-special'; overlayText = 'XÌ BÀN';
         } else if (stat?.tag === 'xi_dach') {
           overlayClass = 'xd-result-special'; overlayText = 'XÌ DÁCH';
         } else if (stat?.tag === 'ngu_linh') {
           overlayClass = 'xd-result-special'; overlayText = 'NGŨ LINH';
-        } else {
-          overlayClass = 'xd-result-win';
-          overlayText = `THẮNG +${res.delta.toLocaleString('vi-VN')}đ`;
-        }
-      } else if (res.outcome === 'lose') {
-        if (stat?.tag === 'bust') {
+        } else if (stat?.tag === 'bust') {
           overlayClass = 'xd-result-bust'; overlayText = 'QUẮC';
-        } else {
+        } else if (res.outcome === 'win') {
+          overlayClass = 'xd-result-win';
+          overlayText = `+${res.delta.toLocaleString('vi-VN')}đ`;
+        } else if (res.outcome === 'lose') {
           overlayClass = 'xd-result-lose';
-          overlayText = `THUA ${res.delta.toLocaleString('vi-VN')}đ`;
+          overlayText = `${res.delta.toLocaleString('vi-VN')}đ`; // delta đã âm
+        } else {
+          overlayClass = 'xd-result-draw';
+          overlayText = 'HÒA';
         }
-      } else {
-        overlayClass = 'xd-result-draw';
-        overlayText = 'HÒA';
+        resultOverlayHtml = `<div class="xd-result-overlay ${overlayClass}">${overlayText}</div>`;
       }
-      resultOverlayHtml = `<div class="xd-result-overlay ${overlayClass}">${overlayText}</div>`;
     }
 
-    // --- Badge tiền cược (góc dưới phải) ---
+    // Badge tiền cược
     let betBadgeHtml = '';
     if (!isDealer && betAmt > 0) {
       betBadgeHtml = `<div class="xd-bet-badge">${betAmt.toLocaleString('vi-VN')}đ</div>`;
@@ -334,8 +333,7 @@ function render(r) {
     settleMyResult(r, gs);
   }
 }
-
-/* ========== HÀNH ĐỘNG ========== */
+// ===== XÌ DÁCH MULTIPLAYER - PHẦN 3/3 (HÀNH ĐỘNG) =====
 window.placeBet = async function() {
   const amt = parseInt(document.getElementById('xd-bet-input').value);
   if (!amt || amt < 50) { showToast('Cược tối thiểu 50', 'warn'); return; }
@@ -375,6 +373,9 @@ window.hostDeal = async function() {
     'gameState.dealerChecked': {}
   };
 
+  let dealerDelta = 0;
+
+  // Nếu nhà cái có Xì Bàng / Xì Dách => kết thúc luôn
   if (dealerStat.tag === 'xi_bang' || dealerStat.tag === 'xi_dach') {
     updates['gameState.phase'] = 'result';
     updates['gameState.dealerChecked'] = Object.fromEntries(players.map(u => [u, true]));
@@ -394,6 +395,41 @@ window.hostDeal = async function() {
       results[uid] = { outcome, delta };
     });
     updates['gameState.results'] = results;
+    for (const res of Object.values(results)) dealerDelta -= res.delta;
+    updates['gameState.dealerDelta'] = dealerDelta;
+  } else {
+    // Nhà cái không có Xì Bàng/Xì Dách, kiểm tra từng nhà con
+    const results = {};
+    const checked = {};
+    const newTurnOrder = [];
+    for (const uid of players) {
+      const playerHand = hands[uid];
+      const playerStat = handStatus(playerHand);
+      if (playerStat.tag === 'xi_bang' || playerStat.tag === 'xi_dach') {
+        // Người chơi có Xì Bàng / Xì Dách -> thắng ngay, mở bài
+        const bet = gs.bets?.[uid] || 0;
+        results[uid] = { outcome: 'win', delta: bet };
+        checked[uid] = true; // Đã xét, không cần vào lượt
+        // Không thêm vào turnOrder
+      } else {
+        newTurnOrder.push(uid);
+      }
+    }
+    if (Object.keys(results).length > 0) {
+      updates['gameState.results'] = results;
+      updates['gameState.dealerChecked'] = checked;
+      for (const res of Object.values(results)) dealerDelta -= res.delta;
+      updates['gameState.dealerDelta'] = dealerDelta;
+    }
+    // Cập nhật turnOrder mới (chỉ những người chưa có kết quả)
+    updates['gameState.turnOrder'] = newTurnOrder;
+    updates['gameState.turnIdx'] = 0;
+    // Nếu không còn ai trong turnOrder, chuyển sang phase dealer (hoặc result nếu cần)
+    if (newTurnOrder.length === 0) {
+      updates['gameState.phase'] = 'dealer';
+      // Nhưng vẫn cần dealer đánh tiếp? Nếu dealer chưa đủ điểm thì tự động bốc? 
+      // Tạm thời chuyển sang dealer để host có thể bốc hoặc kết thúc.
+    }
   }
 
   await updateDoc(doc(db, 'rooms', ROOM_ID), updates);
@@ -510,10 +546,14 @@ window.hostEndDealerTurn = async function() {
     }
   }
 
+  let dealerDelta = 0;
+  for (const res of Object.values(results)) dealerDelta -= res.delta;
+
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
     'gameState.phase': 'result',
     'gameState.results': results,
-    'gameState.dealerChecked': Object.fromEntries(players.map(u => [u, true]))
+    'gameState.dealerChecked': Object.fromEntries(players.map(u => [u, true])),
+    'gameState.dealerDelta': dealerDelta
   });
 };
 
@@ -530,43 +570,66 @@ async function finalizeBustDealer(r, dealerHand, deck) {
     else { outcome = 'win'; delta = bet; }
     results[uid] = { outcome, delta };
   }
+
+  let dealerDelta = 0;
+  for (const res of Object.values(results)) dealerDelta -= res.delta;
+
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
     'gameState.phase': 'result',
     'gameState.deck': deck,
     [`gameState.hands.${r.hostUid}`]: dealerHand,
     'gameState.results': results,
-    'gameState.dealerChecked': Object.fromEntries(players.map(u => [u, true]))
+    'gameState.dealerChecked': Object.fromEntries(players.map(u => [u, true])),
+    'gameState.dealerDelta': dealerDelta
   });
 }
 
 function compareHands(playerHand, dealerHand, bet) {
   const pStat = handStatus(playerHand);
   const dStat = handStatus(dealerHand);
-  let outcome = 'lose', delta = -bet;
 
+  if (pStat.tag === 'bust' && dStat.tag === 'bust') {
+    return { outcome: 'draw', delta: 0 };
+  }
   if (pStat.tag === 'bust') {
-    if (dStat.tag === 'bust') { outcome = 'draw'; delta = 0; }
-    else { outcome = 'lose'; delta = -bet; }
-    return { outcome, delta };
+    return { outcome: 'lose', delta: -bet };
   }
-  if (dStat.tag === 'bust') { outcome = 'win'; delta = bet; return { outcome, delta }; }
+  if (dStat.tag === 'bust') {
+    return { outcome: 'win', delta: bet };
+  }
 
-  const pRank = getRank(pStat);
-  const dRank = getRank(dStat);
-  if (pRank > dRank) { outcome = 'win'; delta = bet; }
-  else if (pRank < dRank) { outcome = 'lose'; delta = -bet; }
-  else {
-    if (pStat.tag === 'ngu_linh') {
-      if (pStat.score < dStat.score) { outcome = 'win'; delta = bet; }
-      else if (pStat.score > dStat.score) { outcome = 'lose'; delta = -bet; }
-      else { outcome = 'draw'; delta = 0; }
-    } else {
-      if (pStat.score > dStat.score) { outcome = 'win'; delta = bet; }
-      else if (pStat.score < dStat.score) { outcome = 'lose'; delta = -bet; }
-      else { outcome = 'draw'; delta = 0; }
-    }
+  const pSpecial = (pStat.tag === 'xi_bang' || pStat.tag === 'xi_dach');
+  const dSpecial = (dStat.tag === 'xi_bang' || dStat.tag === 'xi_dach');
+
+  if (pSpecial && !dSpecial) {
+    return { outcome: 'win', delta: bet };
   }
-  return { outcome, delta };
+  if (dSpecial && !pSpecial) {
+    return { outcome: 'lose', delta: -bet };
+  }
+  if (pSpecial && dSpecial) {
+    return { outcome: 'draw', delta: 0 };
+  }
+
+  if (pStat.tag === 'ngu_linh' && dStat.tag === 'ngu_linh') {
+    if (pStat.score < dStat.score) return { outcome: 'win', delta: bet };
+    if (pStat.score > dStat.score) return { outcome: 'lose', delta: -bet };
+    return { outcome: 'draw', delta: 0 };
+  }
+  if (pStat.tag === 'ngu_linh') {
+    return { outcome: 'win', delta: bet };
+  }
+  if (dStat.tag === 'ngu_linh') {
+    return { outcome: 'lose', delta: -bet };
+  }
+
+  if (pStat.score > dStat.score) {
+    return { outcome: 'win', delta: bet };
+  }
+  if (pStat.score < dStat.score) {
+    return { outcome: 'lose', delta: -bet };
+  }
+  return { outcome: 'draw', delta: 0 };
 }
 
 function getRank(stat) {
@@ -578,8 +641,7 @@ function getRank(stat) {
 
 async function settleMyResult(r, gs) {
   if (r.hostUid === _user.uid) {
-    let dealerDelta = 0;
-    for (const res of Object.values(gs.results || {})) dealerDelta -= res.delta;
+    const dealerDelta = gs.dealerDelta || 0;
     if (dealerDelta !== 0) {
       const us = await getDoc(doc(db, 'users', _user.uid));
       const cur = us.exists() ? (us.data().points || 0) : 0;
@@ -642,7 +704,7 @@ window.quitGame = async function() {
         }
       }
       if (r.hostUid === _user.uid) {
-      await deleteDoc(doc(db, 'rooms', ROOM_ID));
+        await deleteDoc(doc(db, 'rooms', ROOM_ID));
       } else {
         const remaining = (r.members || []).filter(u => u !== _user.uid);
         if (remaining.length === 0) {
@@ -659,3 +721,4 @@ window.quitGame = async function() {
 };
 
 function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
