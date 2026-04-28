@@ -329,7 +329,7 @@ window.startGame = async function(){
   } else if (data.gameType === 'baucua'){
     gameState = { phase: 'betting', round: 1, dice: [null,null,null], bets: {} };
   } else if (data.gameType === 'xidach'){
-    gameState = { phase: 'betting', round: 1, hands: {}, bets: {}, stand: {}, turnOrder: [], turnIdx: 0, results: {}, deck: [] };
+    gameState = { phase: 'betting', round: 1, hands: {}, bets: {}, stands: {}, turnOrder: [], turnIdx: 0, results: {}, deck: [], revealed: {}, dealerChecked: {} };
   }
   await updateDoc(doc(db,'rooms',_currentRoomId), {
     status: 'playing',
