@@ -251,18 +251,6 @@
     (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(52,211,153,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
     window.showToast=function(msg,type='info'){const c={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};const t=document.createElement('div');t.style.cssText=`pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;t.innerHTML=msg;toastContainer.appendChild(t);setTimeout(()=>t.remove(),3500)};
   </script>
-  <script>
-    window.addEventListener('error', function(e) {
-      document.getElementById('xd-phase').textContent = '❌ LỖI JS: ' + e.message + ' (' + (e.filename||'').split('/').pop() + ':' + e.lineno + ')';
-      document.getElementById('xd-phase').style.background = 'rgba(239,68,68,0.2)';
-      document.getElementById('xd-phase').style.color = '#f87171';
-    });
-    window.addEventListener('unhandledrejection', function(e) {
-      document.getElementById('xd-phase').textContent = '❌ LỖI PROMISE: ' + (e.reason?.message || e.reason);
-      document.getElementById('xd-phase').style.background = 'rgba(239,68,68,0.2)';
-      document.getElementById('xd-phase').style.color = '#f87171';
-    });
-  </script>
   <script type="module" src="xidach-mp.js"></script>
 </body>
 </html>
