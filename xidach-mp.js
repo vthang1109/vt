@@ -489,7 +489,7 @@ async function finalizeBustDealer(r, dealerHand, deck) {
     results[uid] = { outcome, delta };
   }
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
-    'gameSt    'gameState.phase': 'result',
+    'gameState.phase': 'result',
     'gameState.deck': deck,
     [`gameState.hands.${r.hostUid}`]: dealerHand,
     'gameState.results': results,
