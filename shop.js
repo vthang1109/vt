@@ -1,8 +1,9 @@
 // shop.js — Cửa hàng (Gacha Thú Cưng & Trang Phục bằng điểm)
 import { db, auth } from './points.js';
-import { doc, runTransaction, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, runTransaction, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doGacha } from './pet.js';
-import { gachaRoll } from './character.js';
+import { gachaMultiple } from './character.js';
 
 const TIER_COLOR = { 1:'#94a3b8', 2:'#34d399', 3:'#fbbf24', 4:'#f43f5e', 5:'#a78bfa' };
 const TIER_NAME  = { 1:'Gà mờ', 2:'Tinh anh', 3:'Bá sàn', 4:'Kiệt tác', 5:'Huyền thoại' };
@@ -18,9 +19,12 @@ const petGacha = [
 ];
 
 const outfitGacha = [
-  { id:'og_x1', name:'Gacha Trang Phục x1', icon:'👕', qty:1, price:300 },
-  { id:'og_x5', name:'Gacha Trang Phục x5', icon:'👕', qty:5, price:1300 },
-  { id:'og_x10', name:'Gacha Trang Phục x10', icon:'👕', qty:10, price:2400 },
+  { id:'og_x1', name:'Gacha Real x1', icon:'🧑', system:'real', qty:1, price:300 },
+  { id:'og_x5', name:'Gacha Real x5', icon:'🧑', system:'real', qty:5, price:1300 },
+  { id:'og_x10', name:'Gacha Real x10', icon:'🧑', system:'real', qty:10, price:2400 },
+  { id:'og_fims_x1', name:'Gacha Fims x1', icon:'🎬', system:'fims', qty:1, price:300 },
+  { id:'og_fims_x5', name:'Gacha Fims x5', icon:'🎬', system:'fims', qty:5, price:1300 },
+  { id:'og_fims_x10', name:'Gacha Fims x10', icon:'🎬', system:'fims', qty:10, price:2400 },
 ];
 
 // ── ROLL PET GACHA TRỰC TIẾP (dùng điểm) ──────────────────
@@ -44,39 +48,23 @@ async function rollPetGachaDirect(qty, price, type = 'normal') {
   return results;
 }
 
-// ── ROLL OUTFIT GACHA (dùng điểm) ─────────────────────────
-async function rollOutfitGacha(qty, price, system = 'real') {
-  const user = auth.currentUser;
-  if (!user) throw new Error('Chưa đăng nhập');
-  const userRef = doc(db, 'users', user.uid);
-
-  // Trừ điểm
-  await runTransaction(db, async tx => {
-    const snap = await tx.get(userRef);
-    if (!snap.exists()) throw new Error('Không tìm thấy tài khoản');
-    const data = snap.data();
-    const pts = data.points || 0;
-    if (pts < price) throw new Error(`Không đủ điểm! Cần ${price}⭐`);
-    tx.update(userRef, { points: pts - price });
-  });
-
-  // Gacha
-  const results = await gachaRoll(qty, system);
+// ── ROLL OUTFIT GACHA (dùng gachaMultiple) ─────────────────
+async function rollOutfitGacha(system, qty, price) {
+  const results = await gachaMultiple(system, qty, price);
   return results;
 }
 
-// ── SHOW RESULT ───────────────────────────────────────────
+// ── HIỂN THỊ KẾT QUẢ ──────────────────────────────────────
 function showResult(results, type = 'pet') {
   const grid = document.getElementById('resultGrid');
   if (!grid) return;
   grid.innerHTML = results.map(r => {
     if (type === 'outfit') {
-      const color = '#38bdf8';
       return `
-        <div class="result-card" style="border-color:${color}">
+        <div class="result-card" style="border-color:#38bdf8">
           <div class="emoji">👕</div>
           <div class="name">${r.name}</div>
-          <div class="tier" style="color:${color}">Trang phục</div>
+          <div class="tier" style="color:#38bdf8">Trang phục</div>
         </div>`;
     } else {
       const tier = r.tier || { id: 1 };
@@ -109,7 +97,7 @@ function render() {
       </div>`).join('');
   } else if (activeTab === 'outfits') {
     grid.innerHTML = outfitGacha.map(o => `
-      <div class="shop-card" data-action="rollOutfitGacha" data-qty="${o.qty}" data-price="${o.price}">
+      <div class="shop-card" data-action="rollOutfitGacha" data-system="${o.system}" data-qty="${o.qty}" data-price="${o.price}">
         <span class="shop-card-emoji">${o.icon}</span>
         <span class="shop-card-name">${o.name}</span>
         <span class="shop-card-price">${o.price} ⭐</span>
@@ -131,12 +119,15 @@ function bindCardEvents() {
           const results = await rollPetGachaDirect(qty, price, type);
           showResult(results, 'pet');
         } else if (action === 'rollOutfitGacha') {
+          const system = card.dataset.system || 'real';
           const qty = parseInt(card.dataset.qty);
           const price = parseInt(card.dataset.price);
-          const results = await rollOutfitGacha(qty, price, 'real'); // Hoặc 'fims' nếu cần
+          const results = await rollOutfitGacha(system, qty, price);
           showResult(results, 'outfit');
         }
-      } catch(e) { alert('❌ ' + e.message); }
+      } catch(e) {
+        alert('❌ ' + e.message);
+      }
     });
   });
 }
@@ -150,6 +141,18 @@ document.addEventListener('DOMContentLoaded', () => {
       tab.classList.add('active');
       activeTab = tab.dataset.tab;
       render();
+    });
+  });
+
+  // Cập nhật điểm trên nav
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.href = 'index.html'; return; }
+    onSnapshot(doc(db, 'users', user.uid), snap => {
+      if (snap.exists()) {
+        const pts = snap.data().points || 0;
+        const el = document.getElementById('nav-shop-points');
+        if (el) el.textContent = pts.toLocaleString('vi-VN');
+      }
     });
   });
 });

@@ -22,7 +22,15 @@
       </div>
       <div style="display:flex;align-items:center;gap:12px">
         <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700">⭐ 0</span>
-        <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="window.location.href='index.html'">← Trang chủ</button>
+        <div class="nav-right-menu">
+          <button class="nav-hamburger" onclick="toggleNavMenu()">☰</button>
+          <div class="nav-dropdown" id="navDropdown">
+            <a class="nav-dropdown-item" href="shop.html"><span class="dd-icon">🛒</span> Shop</a>
+            <a class="nav-dropdown-item" href="bag.html"><span class="dd-icon">🎒</span> Bag</a>
+            <a class="nav-dropdown-item" href="profile.html"><span class="dd-icon">👤</span> Profile</a>
+            <a class="nav-dropdown-item" href="#" onclick="history.back(); return false;"><span class="dd-icon">←</span> Quay lại</a>
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -96,36 +104,50 @@
     </div>
   </div>
 
-  <button class="admin-btn-visible" onclick="window.location.href='admin.html'">QUẢN LÝ ADMIN</button>
+  <!-- ĐÃ XÓA NÚT QUẢN LÝ ADMIN Ở ĐÂY -->
+
+  <script>
+    function toggleNavMenu() {
+      document.getElementById('navDropdown').classList.toggle('open');
+    }
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-right-menu')) {
+        document.getElementById('navDropdown')?.classList.remove('open');
+      }
+    });
+  </script>
 
   <script type="module">
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { auth, db, claimDailyLogin } from './points.js';
 
+    // Vẽ background particles
     const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    for (let i = 0; i < 40; i++) { particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-.5)*.4, vy: (Math.random()-.5)*.4, r: Math.random()*1.5+.5 }); }
-    function drawParticles() {
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      particles.forEach(p => {
-        p.x += p.vx; p.y += p.vy;
-        if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
-        if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0;
-        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        ctx.fillStyle='rgba(56,189,248,0.5)'; ctx.fill();
-      });
-      for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
-        const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
-        if(d<100){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(56,189,248,${0.07*(1-d/100)})`; ctx.lineWidth=.5; ctx.stroke(); }
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      for (let i = 0; i < 40; i++) { particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-.5)*.4, vy: (Math.random()-.5)*.4, r: Math.random()*1.5+.5 }); }
+      function drawParticles() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach(p => {
+          p.x += p.vx; p.y += p.vy;
+          if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
+          if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0;
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          ctx.fillStyle='rgba(56,189,248,0.5)'; ctx.fill();
+        });
+        for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
+          const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
+          if(d<100){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(56,189,248,${0.07*(1-d/100)})`; ctx.lineWidth=.5; ctx.stroke(); }
+        }
+        requestAnimationFrame(drawParticles);
       }
-      requestAnimationFrame(drawParticles);
+      drawParticles();
     }
-    drawParticles();
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) { window.location.href = 'index.html'; return; }

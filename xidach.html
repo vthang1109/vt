@@ -30,11 +30,11 @@
             <button class="mode-btn" onclick="game.setMode('solo')">CHƠI ĐƠN (OFFLINE)</button>
             <hr style="opacity: 0.1; margin: 20px 0; border: none; border-top: 1px solid #fff;">
             <h3 style="font-size: 14px; color: #64748b; margin-bottom: 15px; font-family:'Orbitron'">CHẾ ĐỘ ONLINE</h3>
-            <button class="mode-btn" style="background: #059669; border-color: #10b981;" onclick="game.createOnlineRoom()">TẠO PHÒNG (NHÀ CÁI)</button>
+            <button class="mode-btn" style="background: #059669; border-color: #10b981;" disabled>TẠO PHÒNG (NHÀ CÁI)</button>
             <div style="display: flex; gap: 8px; margin-top: 12px;">
                 <input type="number" id="room-id-input" placeholder="Nhập ID phòng..." 
-                       style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; font-family:'Orbitron'">
-                <button class="game-btn primary" style="padding: 0 20px;" onclick="game.joinOnlineRoom(document.getElementById('room-id-input').value)">VÀO</button>
+                       style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; font-family:'Orbitron'" disabled>
+                <button class="game-btn primary" style="padding: 0 20px;" disabled>VÀO</button>
             </div>
         </div>
     </div>

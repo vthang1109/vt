@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="profile.css"/>
   <link rel="stylesheet" href="pet.css"/>
-  <link rel="stylesheet" href="shop-bag.css"/>
   <link rel="stylesheet" href="character.css"/>
 </head>
 <body>
@@ -21,7 +20,6 @@
       <span class="logo-vt">VT</span><span class="logo-world">World</span>
     </div>
 
-    <!-- Nút 3 gạch với Bag + Quay lại -->
     <div class="nav-right-menu">
       <button class="nav-hamburger" onclick="toggleNavMenu()">☰</button>
       <div class="nav-dropdown" id="navDropdown">
@@ -54,9 +52,9 @@
       </div>
     </div>
 
-    <!-- TÊN + ĐIỂM -->
+    <!-- TÊN + ĐIỂM (NHẤN VÀO TÊN ĐỂ ĐỔI) -->
     <div class="pro-identity">
-      <h1 class="pro-name" id="pro-name">Đang tải...</h1>
+      <h1 class="pro-name" id="pro-name" style="cursor:default">Đang tải...</h1>
       <div class="pro-points-row">
         <span class="pro-points-icon">⭐</span>
         <span class="pro-points-val" id="pro-points">0</span>
@@ -64,15 +62,13 @@
       </div>
     </div>
 
-    <!-- GRID: Nhân vật (trái, to) | Pet (phải trên) | Xe (phải giữa) | Danh hiệu (phải dưới) -->
+    <!-- GRID -->
     <div class="pro-grid">
-      <!-- Ô NHÂN VẬT (bấm vào mở popup thay đồ) -->
       <div class="pro-card pro-card-character" id="btnOpenOutfit" style="cursor:pointer">
         <div class="pro-character-frame" id="pro-character-frame"></div>
         <div class="pro-card-sub" id="pro-char-name">Nhấn để thay đồ →</div>
       </div>
 
-      <!-- Ô THÚ CƯNG (hàng 1, cột 2) -->
       <div class="pro-card pro-card-pet" onclick="window.openPetModal?.()">
         <div class="pro-pet-frame" id="pro-pet-frame">
           <div class="pro-pet-placeholder">
@@ -83,20 +79,17 @@
         <div class="pro-card-sub" id="pro-card-pet-sub">Chưa có thú cưng</div>
       </div>
 
-      <!-- Ô XE (hàng 2, cột 2) -->
       <div class="pro-card pro-card-vehicle">
         <div class="pro-card-label">🚗 Xe</div>
         <div class="pro-card-sub" id="pro-card-vehicle-sub">Chưa có xe</div>
       </div>
 
-      <!-- Ô DANH HIỆU (hàng 3, cột 2) -->
       <div class="pro-card pro-card-title">
         <div class="pro-card-label">🏅 Danh hiệu</div>
         <div class="pro-titles-list" id="pro-titles-list"></div>
       </div>
     </div>
 
-    <!-- STATS ROW -->
     <div class="pro-stats-row">
       <div class="pro-stat">
         <span class="pro-stat-val" id="pro-stat-friends">—</span>
@@ -113,7 +106,7 @@
     </div>
   </div>
 
-  <!-- ===== POPUP THAY ĐỒ NHÂN VẬT ===== -->
+  <!-- POPUP THAY ĐỒ -->
   <div class="pet-modal-overlay" id="outfitModalOverlay" onclick="if(event.target===this)document.getElementById('outfitModalOverlay').classList.remove('open')">
     <div class="pet-modal">
       <div class="pet-modal-header">
@@ -121,15 +114,10 @@
         <button class="pet-modal-close" onclick="document.getElementById('outfitModalOverlay').classList.remove('open')">✕</button>
       </div>
       <div class="pet-tab-content active" style="padding:16px;overflow-y:auto;max-height:70vh;">
-        <!-- Chọn hệ (Real / Fims) -->
         <div id="modalSystemSwitch" style="display:flex;gap:8px;margin-bottom:12px;"></div>
-        <!-- Preview nhân vật -->
         <div id="modalCharPreview" style="width:100%;height:200px;background:rgba(56,189,248,0.05);border:2px solid rgba(56,189,248,0.25);border-radius:16px;margin-bottom:12px;position:relative;overflow:hidden;"></div>
-        <!-- Tab chọn slot (Đầu, Áo, P.Kiện) -->
         <div id="modalWardrobeTabs" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"></div>
-        <!-- Grid item -->
         <div id="modalWardrobeItems" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:300px;overflow-y:auto;"></div>
-        <!-- Nút Lưu -->
         <button id="modalSaveBtn" style="width:100%;padding:12px;border-radius:12px;border:none;background:#22c55e;color:#fff;font-family:'Orbitron';font-weight:900;font-size:14px;cursor:pointer;">💾 LƯU</button>
       </div>
     </div>
@@ -150,7 +138,6 @@
   <script type="module" src="profile.js"></script>
   <script type="module">
     import { openOutfitModal } from './character-ui.js';
-    // Gán sự kiện click cho ô nhân vật
     const btn = document.getElementById('btnOpenOutfit');
     if (btn) {
       btn.addEventListener('click', openOutfitModal);

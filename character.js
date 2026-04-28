@@ -1,7 +1,7 @@
 // character.js — Character System (Real & Fims, 3 Slots, Dùng ảnh)
 import { db, auth } from './points.js';
 import {
-  doc, updateDoc, onSnapshot, arrayUnion, runTransaction
+  doc, updateDoc, onSnapshot, runTransaction, getDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -160,6 +160,8 @@ export const SLOT_META = {
 };
 
 const LAYER_ORDER = ['body', 'head', 'acc'];
+const GACHA_COST = 100; // điểm cho mỗi lần quay đơn
+const SHARD_COST_PER_ITEM = 5; // mảnh nhân vật để đổi 1 item
 
 // Helpers
 export function findInSlot(system, slot, id) {
@@ -172,18 +174,37 @@ export let state = {
   equipped: {
     real:  { head:'RH_00', body:'RB_00', acc:'RA_00' },
     fims:  { head:'FH_00', body:'FB_00', acc:'FA_00' },
-  }
+  },
+  ownedItems: {
+    real:  { head: ['RH_00'], body: ['RB_00'], acc: ['RA_00'] },
+    fims:  { head: ['FH_00'], body: ['FB_00'], acc: ['FA_00'] },
+  },
+  characterShards: 0
 };
 
 let unsub = null;
 
 export function initCharacterSystem() {
-  onAuthStateChanged(auth, user => {
+  onAuthStateChanged(auth, async user => {
     if (!user) return;
     if (unsub) unsub();
-    unsub = onSnapshot(doc(db, 'users', user.uid), snap => {
-      if (!snap.exists()) return;
+
+    const userRef = doc(db, 'users', user.uid);
+    const snap = await getDoc(userRef);
+
+    if (!snap.exists()) {
+      await updateDoc(userRef, {
+        ownedItems: state.ownedItems,
+        characterShards: 0,
+        characterV3: { system: state.system, equipped: state.equipped }
+      });
+    } else {
       const d = snap.data();
+      if (d.ownedItems) {
+        state.ownedItems.real = { ...state.ownedItems.real, ...d.ownedItems.real };
+        state.ownedItems.fims = { ...state.ownedItems.fims, ...d.ownedItems.fims };
+      }
+      state.characterShards = d.characterShards || 0;
       if (d.characterV3) {
         if (d.characterV3.system) state.system = d.characterV3.system;
         if (d.characterV3.equipped) {
@@ -191,12 +212,32 @@ export function initCharacterSystem() {
           state.equipped.fims = { ...state.equipped.fims, ...d.characterV3.equipped.fims };
         }
       }
-      // Fallback về mặc định nếu thiếu
+    }
+
+    unsub = onSnapshot(userRef, snap => {
+      if (!snap.exists()) return;
+      const d = snap.data();
+      if (d.ownedItems) {
+        state.ownedItems.real = { ...state.ownedItems.real, ...d.ownedItems.real };
+        state.ownedItems.fims = { ...state.ownedItems.fims, ...d.ownedItems.fims };
+      }
+      state.characterShards = d.characterShards || 0;
+      if (d.characterV3) {
+        if (d.characterV3.system) state.system = d.characterV3.system;
+        if (d.characterV3.equipped) {
+          state.equipped.real = { ...state.equipped.real, ...d.characterV3.equipped.real };
+          state.equipped.fims = { ...state.equipped.fims, ...d.characterV3.equipped.fims };
+        }
+      }
+      // Fallback an toàn
       const cur = state.equipped[state.system];
-      if (!cur.head || !OUTFIT_CATALOG[state.system].slots.head.find(i=>i.id===cur.head)) cur.head = state.system==='real'?'RH_00':'FH_00';
-      if (!cur.body || !OUTFIT_CATALOG[state.system].slots.body.find(i=>i.id===cur.body)) cur.body = state.system==='real'?'RB_00':'FB_00';
-      if (!cur.acc || !OUTFIT_CATALOG[state.system].slots.acc.find(i=>i.id===cur.acc)) cur.acc = state.system==='real'?'RA_00':'FA_00';
-      
+      if (!cur.head || !OUTFIT_CATALOG[state.system].slots.head.find(i=>i.id===cur.head))
+        cur.head = state.system === 'real' ? 'RH_00' : 'FH_00';
+      if (!cur.body || !OUTFIT_CATALOG[state.system].slots.body.find(i=>i.id===cur.body))
+        cur.body = state.system === 'real' ? 'RB_00' : 'FB_00';
+      if (!cur.acc || !OUTFIT_CATALOG[state.system].slots.acc.find(i=>i.id===cur.acc))
+        cur.acc = state.system === 'real' ? 'RA_00' : 'FA_00';
+
       renderProfilePreview();
       if (window._charUIUpdate) window._charUIUpdate();
     });
@@ -209,33 +250,144 @@ export async function saveEquipped(system, slotValues) {
   if (!slotValues.head || !slotValues.body) throw new Error('Đầu và Thân không được để trống!');
   state.equipped[system] = { ...slotValues };
   await updateDoc(doc(db, 'users', user.uid), {
-    'characterV3.system': system,
+    'characterV3.system': state.system,
     'characterV3.equipped': state.equipped,
   });
   renderProfilePreview();
   if (window._charUIUpdate) window._charUIUpdate();
 }
 
-// ── GACHA POOL ────────────────────────────────────────────
-const GACHA_POOL_REAL = [
-  ...OUTFIT_CATALOG.real.slots.head.filter(i => i.id !== 'RH_00'),
-  ...OUTFIT_CATALOG.real.slots.body.filter(i => i.id !== 'RB_00'),
-  ...OUTFIT_CATALOG.real.slots.acc.filter(i => i.id !== 'RA_00'),
-];
-const GACHA_POOL_FIMS = [
-  ...OUTFIT_CATALOG.fims.slots.head.filter(i => i.id !== 'FH_00'),
-  ...OUTFIT_CATALOG.fims.slots.body.filter(i => i.id !== 'FB_00'),
-  ...OUTFIT_CATALOG.fims.slots.acc.filter(i => i.id !== 'FA_00'),
-];
+// ── GACHA ĐƠN (có thưởng mảnh nếu trùng) ─────────────────
+export async function gachaItem(system) {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Chưa đăng nhập');
 
-export async function gachaRoll(rolls, system = 'real') {
-  const pool = system === 'real' ? GACHA_POOL_REAL : GACHA_POOL_FIMS;
-  const results = [];
-  for (let i = 0; i < rolls; i++) {
+  const pool = [];
+  ['head', 'body', 'acc'].forEach(slot => {
+    const items = OUTFIT_CATALOG[system].slots[slot].filter(i => i.id.endsWith('_00') === false);
+    items.forEach(i => pool.push({ ...i, slot }));
+  });
+
+  const userRef = doc(db, 'users', user.uid);
+
+  return runTransaction(db, async tx => {
+    const snap = await tx.get(userRef);
+    if (!snap.exists()) throw new Error('User not found');
+    const data = snap.data();
+    const points = data.points || 0;
+    if (points < GACHA_COST) throw new Error(`Cần ${GACHA_COST} điểm để quay!`);
+
     const item = pool[Math.floor(Math.random() * pool.length)];
-    results.push(item);
-  }
-  return results;
+    const owned = data.ownedItems || {};
+    if (!owned[system]) owned[system] = { head: [], body: [], acc: [] };
+    if (!owned[system][item.slot]) owned[system][item.slot] = [];
+
+    let shardsGain = 0;
+    if (owned[system][item.slot].includes(item.id)) {
+      // Trùng → thưởng 1 mảnh nhân vật
+      shardsGain = 1;
+    } else {
+      owned[system][item.slot].push(item.id);
+    }
+
+    const newShards = (data.characterShards || 0) + shardsGain;
+
+    tx.update(userRef, {
+      points: points - GACHA_COST,
+      ownedItems: owned,
+      characterShards: newShards
+    });
+
+    return { ...item, isDuplicate: shardsGain > 0, shardsGain };
+  });
+}
+
+// ── GACHA NHIỀU LẦN (DÙNG CHO SHOP) ────────────────────
+export async function gachaMultiple(system, qty, price) {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Chưa đăng nhập');
+
+  const pool = [];
+  ['head', 'body', 'acc'].forEach(slot => {
+    const items = OUTFIT_CATALOG[system].slots[slot].filter(i => i.id.endsWith('_00') === false);
+    items.forEach(i => pool.push({ ...i, slot }));
+  });
+
+  const userRef = doc(db, 'users', user.uid);
+
+  return runTransaction(db, async tx => {
+    const snap = await tx.get(userRef);
+    if (!snap.exists()) throw new Error('User not found');
+    const data = snap.data();
+    const points = data.points || 0;
+    if (points < price) throw new Error(`Không đủ điểm! Cần ${price}⭐`);
+
+    const results = [];
+    let totalShardsGain = 0;
+    const owned = data.ownedItems || {};
+    if (!owned[system]) owned[system] = { head: [], body: [], acc: [] };
+    for (const slot of ['head', 'body', 'acc']) {
+      if (!owned[system][slot]) owned[system][slot] = [];
+    }
+
+    for (let i = 0; i < qty; i++) {
+      const item = pool[Math.floor(Math.random() * pool.length)];
+      const isDuplicate = owned[system][item.slot].includes(item.id);
+      if (!isDuplicate) {
+        owned[system][item.slot].push(item.id);
+      } else {
+        totalShardsGain += 1; // mỗi trùng +1 mảnh
+      }
+      results.push({ ...item, isDuplicate, shardsGain: isDuplicate ? 1 : 0 });
+    }
+
+    const newShards = (data.characterShards || 0) + totalShardsGain;
+
+    tx.update(userRef, {
+      points: points - price,
+      ownedItems: owned,
+      characterShards: newShards
+    });
+
+    return results;
+  });
+}
+
+// ── ĐỔI MẢNH LẤY ITEM OUTFIT ─────────────────────────────
+export async function redeemOutfitShard(system, slot, itemId) {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Chưa đăng nhập');
+
+  const item = findInSlot(system, slot, itemId);
+  if (!item) throw new Error('Vật phẩm không tồn tại');
+
+  const userRef = doc(db, 'users', user.uid);
+
+  return runTransaction(db, async tx => {
+    const snap = await tx.get(userRef);
+    if (!snap.exists()) throw new Error('User not found');
+    const data = snap.data();
+
+    const shards = data.characterShards || 0;
+    if (shards < SHARD_COST_PER_ITEM) throw new Error(`Cần ${SHARD_COST_PER_ITEM} mảnh nhân vật để đổi!`);
+
+    const owned = data.ownedItems || {};
+    if (!owned[system]) owned[system] = { head: [], body: [], acc: [] };
+    if (!owned[system][slot]) owned[system][slot] = [];
+
+    if (owned[system][slot].includes(itemId)) {
+      throw new Error('Bạn đã sở hữu vật phẩm này rồi!');
+    }
+
+    owned[system][slot].push(itemId);
+
+    tx.update(userRef, {
+      characterShards: shards - SHARD_COST_PER_ITEM,
+      ownedItems: owned
+    });
+
+    return { success: true };
+  });
 }
 
 // ── RENDER CHIBI ──────────────────────────────────────────
@@ -270,14 +422,12 @@ export function renderChibiTo(container, system, equipped) {
 function renderProfilePreview() {
   const frame = document.getElementById('pro-character-frame');
   if (!frame) return;
-  const curSys = state.system;
-  const curEquip = state.equipped[curSys];
-  renderChibiTo(frame, curSys, curEquip);
+  renderChibiTo(frame, state.system, state.equipped[state.system]);
 }
 
 // Auto init
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => initCharacterSystem());
+  document.addEventListener('DOMContentLoaded', initCharacterSystem);
 } else {
   initCharacterSystem();
 }

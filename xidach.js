@@ -1,19 +1,15 @@
-import { createRoom, joinRoom, listenRoom, updateRoomState } from './room.js';
+// xidach.js — Xì Dách Offline (Chơi đơn vs Nhà Cái)
 import { createDeck, renderCardUI } from './cards.js';
 import { addPoints, getPoints } from './points.js';
 
 class XiDach {
     constructor() {
         this.deck = [];
-        this.mode = 'solo'; 
-        this.role = 'host'; 
-        this.roomId = null;
         this.dealer = { hand: [] };
         this.players = [{ hand: [], status: 'playing', result: '' }];
         this.balance = 0;
         this.currentBet = 0;
         this.dealerDone = false;
-        this.unsubscribe = null;
         this.isBusy = false;
         this.isPlayerFlipped = false;
 
@@ -34,7 +30,7 @@ class XiDach {
 
         await this.refreshPts();
         this.bindEvents();
-        window.game = this; 
+        window.game = this;
     }
 
     bindEvents() {
@@ -71,9 +67,10 @@ class XiDach {
     }
 
     setMode(m) {
-        this.mode = m;
-        document.getElementById('mode-selector').classList.remove('active');
-        this.showBetting();
+        if (m === 'solo') {
+            document.getElementById('mode-selector').classList.remove('active');
+            this.showBetting();
+        }
     }
 
     async showBetting() {
@@ -96,66 +93,11 @@ class XiDach {
         this.startDeal();
     }
 
-    async createOnlineRoom() {
-        const state = { dealerHand: [], playerHand: [], deck: [], isDealerDone: false, gameStarted: false, result: '', bet: 0 };
-        const res = await createRoom("xidach", state);
-        if (res.error) return alert(res.error);
-        this.roomId = res.roomId;
-        this.role = 'host';
-        this.mode = 'online';
-        this.startListening();
-        alert("Mã phòng của bạn: " + res.roomId);
-    }
-
-    async joinOnlineRoom(id) {
-        if (!id) return alert("Vui lòng nhập ID phòng!");
-        const res = await joinRoom(id);
-        if (res.error) return alert(res.error);
-        this.roomId = res.roomId;
-        this.role = 'guest';
-        this.mode = 'online';
-        this.startListening();
-    }
-
-    startListening() {
-        if (this.unsubscribe) this.unsubscribe();
-        this.unsubscribe = listenRoom(this.roomId, (data) => this.syncGame(data));
-        document.getElementById('mode-selector').classList.remove('active');
-    }
-
-    async syncGame(roomData) {
-        if (!roomData) return;
-        const state = roomData.state;
-        this.dealer.hand = state.dealerHand || [];
-        this.players[0].hand = state.playerHand || [];
-        this.deck = state.deck || [];
-        this.dealerDone = state.isDealerDone;
-        this.players[0].result = state.result || '';
-        this.currentBet = state.bet || 0;
-
-        if (state.gameStarted) this.isPlayerFlipped = true;
-
-        this.render(this.dealerDone);
-
-        const isMyTurn = (this.role === roomData.turn);
-        const gameStarted = state.gameStarted;
-        const msg = document.getElementById('status-msg');
-
-        if (gameStarted) {
-            msg.textContent = isMyTurn ? "LƯỢT CỦA BẠN" : "ĐỐI THỦ ĐANG ĐI...";
-        }
-
-        this.updateButtons(isMyTurn && gameStarted && !this.dealerDone);
-
-        if (this.dealerDone && state.result && !gameStarted) {
-            await this.refreshPts();
-        }
-    }
-
     async startDeal() {
         if (this.isBusy) return;
 
-        if (this.mode === 'solo' && this.players[0].result !== '') {
+        // Nếu đây là ván mới và đã có kết quả trước đó, trừ tiền cược
+        if (this.players[0].result !== '') {
             await this.refreshPts();
             if (this.balance < this.currentBet) {
                 return alert("Bạn không đủ tiền để tiếp tục mức cược này!");
@@ -169,38 +111,24 @@ class XiDach {
         this.isBusy = true;
         this.dealerDone = false;
         this.isPlayerFlipped = false;
+        this.players[0].result = '';
 
         const deck = createDeck();
-        const dH = [deck.pop(), deck.pop()];
-        const pH = [deck.pop(), deck.pop()];
+        this.deck = deck;
+        this.dealer.hand = [deck.pop(), deck.pop()];
+        this.players[0].hand = [deck.pop(), deck.pop()];
 
-        if (this.mode === 'online') {
-            await updateRoomState(this.roomId, { 
-                dealerHand: dH, 
-                playerHand: pH, 
-                deck: deck, 
-                isDealerDone: false, 
-                gameStarted: true, 
-                result: '',
-                bet: this.currentBet 
-            }, "guest"); 
-            this.isBusy = false;
+        // Kiểm tra đặc biệt ngay sau khi chia bài
+        if (this.checkSpecials(this.dealer.hand) || this.checkSpecials(this.players[0].hand)) {
+            this.dealerDone = true;
+            this.isPlayerFlipped = true;
+            this.endGame();
         } else {
-            this.deck = deck;
-            this.dealer.hand = dH;
-            this.players[0].hand = pH;
-            this.players[0].result = '';
-            this.isBusy = false;
-
-            if (this.checkSpecials(dH) || this.checkSpecials(pH)) {
-                this.dealerDone = true;
-                this.isPlayerFlipped = true;
-                this.endGame();
-            } else {
-                this.render(false);
-                this.updateButtons(true);
-            }
+            this.render(false);
+            this.updateButtons(true); // Cho phép nhấn nút MỞ BÀI
         }
+
+        this.isBusy = false;
     }
 
     getScore(hand) {
@@ -224,6 +152,7 @@ class XiDach {
     }
 
     async hit() {
+        // Nếu chưa lật bài, lần nhấn đầu tiên là lật bài
         if (!this.isPlayerFlipped) {
             this.isPlayerFlipped = true;
             this.render(false);
@@ -231,49 +160,40 @@ class XiDach {
             return;
         }
 
-        const hand = (this.mode === 'online' && this.role === 'host') ? this.dealer.hand : this.players[0].hand;
+        const hand = this.players[0].hand;
         if (hand.length >= 5) return;
         
         const newCard = this.deck.pop();
-        newCard.isNew = true; 
+        newCard.isNew = true;
         hand.push(newCard);
         
         const sc = this.getScore(hand);
 
-        if (this.mode === 'online') {
-            const update = (this.role === 'guest') ? { playerHand: hand, deck: this.deck } : { dealerHand: hand, deck: this.deck };
-            await updateRoomState(this.roomId, update, this.role);
-            if (sc >= 21 || hand.length >= 5) this.stand();
+        this.render(false);
+        if (sc >= 21 || hand.length >= 5) {
+            this.stand();
         } else {
-            this.render(false);
-            if (sc >= 21 || hand.length >= 5) this.stand(); else this.updateButtons(true);
+            this.updateButtons(true);
         }
     }
 
     async stand() {
-        if (this.mode === 'online') {
-            if (this.role === 'guest') {
-                await updateRoomState(this.roomId, { playerHand: this.players[0].hand }, "host");
-            } else {
-                this.dealerDone = true;
-                this.endGame();
-            }
-        } else {
-            this.dealerTurnSolo();
-        }
+        await this.dealerTurnSolo();
     }
 
     async dealerTurnSolo() {
         this.isBusy = true;
         this.isPlayerFlipped = true;
         this.render(true);
+
         while (this.getScore(this.dealer.hand) < 15 && this.dealer.hand.length < 5) {
             await new Promise(r => setTimeout(r, 800));
             const newCard = this.deck.pop();
-            newCard.isNew = true; 
+            newCard.isNew = true;
             this.dealer.hand.push(newCard);
             this.render(true);
         }
+
         this.dealerDone = true;
         this.endGame();
     }
@@ -314,18 +234,9 @@ class XiDach {
         if (['THẮNG', 'NGŨ LINH', 'XD', 'AA'].includes(res)) winMult = 2;
         else if (res === 'HÒA') winMult = 1;
 
-        if (winMult > 0 && this.mode === 'solo') {
+        if (winMult > 0) {
             await addPoints('Casino', 'Kết quả Xì Dách', this.currentBet * winMult);
             await this.refreshPts();
-        }
-
-        if (this.mode === 'online' && this.role === 'host') {
-            await updateRoomState(this.roomId, { 
-                result: res, 
-                gameStarted: false, 
-                isDealerDone: true,
-                dealerHand: this.dealer.hand 
-            }, "host", "finished");
         }
         
         this.render(true);
@@ -340,12 +251,34 @@ class XiDach {
         const isGameOver = this.players[0].result !== '';
 
         const hitBtn = document.getElementById('btn-hit');
-        hitBtn.disabled = !canPlay || (this.isPlayerFlipped && (pS >= 21 || pL >= 5));
-        hitBtn.textContent = this.isPlayerFlipped ? "RÚT BÀI" : "MỞ BÀI";
+        const standBtn = document.getElementById('btn-stand');
+        const dealBtn = document.getElementById('btn-deal');
 
+        // Nút HIT (Mở bài / Rút bài)
+        // Luôn bật nếu đến lượt và game chưa kết thúc
+        hitBtn.disabled = !canPlay || isGameOver;
+        
+        if (!this.isPlayerFlipped) {
+            // Chưa lật bài: nút hiển thị "MỞ BÀI", luôn bật (khi canPlay)
+            hitBtn.textContent = "MỞ BÀI";
+        } else {
+            // Đã lật bài: nút hiển thị "RÚT BÀI", chỉ tắt nếu quá điểm hoặc quá lá
+            if (pS >= 21 || pL >= 5) {
+                hitBtn.disabled = true;
+            }
+            hitBtn.textContent = "RÚT BÀI";
+        }
+
+        // Nút DẰN chỉ bật khi đã lật bài và đủ 16 điểm hoặc 5 lá
         const hasEnough = (pS >= 16 || pL === 5);
-        document.getElementById('btn-stand').disabled = !canPlay || !hasEnough || !this.isPlayerFlipped;
-        document.getElementById('btn-deal').disabled = (this.mode === 'online' && this.role === 'guest') || !isGameOver;
+        standBtn.disabled = !canPlay || !hasEnough || !this.isPlayerFlipped || isGameOver;
+
+        // Nút VÁN MỚI chỉ bật khi game kết thúc
+        dealBtn.disabled = !isGameOver;
+
+        if (isGameOver) {
+            document.getElementById('status-msg').textContent = "VÁN ĐẤU KẾT THÚC";
+        }
     }
 
     render(showDealer = false) {

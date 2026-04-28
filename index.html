@@ -35,8 +35,8 @@
           <a class="nav-dropdown-item" href="shop.html">
             <span class="dd-icon">🛒</span> Shop
           </a>
-          <a class="nav-dropdown-item" href="#">
-            <span class="dd-icon">💰</span> Bag
+          <a class="nav-dropdown-item" href="bag.html">
+            <span class="dd-icon">🎒</span> Bag
           </a>
         </div>
       </div>
@@ -104,6 +104,9 @@
       </div>
     </div>
   </div>
+
+  <!-- ===== NÚT ADMIN (chỉ hiển thị với tài khoản admin) ===== -->
+  <button id="admin-btn" style="display:none; position:fixed; bottom:20px; right:20px; z-index:1000; background:rgba(15,23,42,0.9); border:2px solid #0ea5e9; color:#0ea5e9; padding:10px 20px; border-radius:12px; font-family:'Orbitron',sans-serif; font-size:12px; font-weight:900; cursor:pointer; box-shadow:0 0 15px rgba(14,165,233,0.3); transition:all 0.3s; text-transform:uppercase;" onclick="location.href='admin.html'">QUẢN LÝ ADMIN</button>
 
   <!-- ===== GAME MODAL ===== -->
   <div id="gameModal" class="modal-overlay" onclick="closeGameModal(event)">
@@ -281,6 +284,23 @@
       }
     });
     // ... (phần script còn lại giữ nguyên)
+  </script>
+
+  <!-- Script kiểm tra admin -->
+  <script type="module">
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    const ADMIN_EMAIL = 'thang@game.com'; // ← thay bằng email admin thật của bạn
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      const btn = document.getElementById('admin-btn');
+      if (btn) {
+        if (user && user.email === ADMIN_EMAIL) {
+          btn.style.display = 'block';
+        } else {
+          btn.style.display = 'none';
+        }
+      }
+    });
   </script>
 </body>
 </html>

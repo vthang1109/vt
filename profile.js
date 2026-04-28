@@ -1,7 +1,10 @@
 // profile.js — dùng chung db/auth từ points.js
 import { db, auth } from './points.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, onSnapshot, updateDoc, getDocs, collection, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import {
+  doc, onSnapshot, updateDoc, getDocs, collection,
+  orderBy, query, limit, runTransaction
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { renderAvatar } from './avatar.js';
 import { renderProfilePet, mountPetModal } from './pet-ui.js';
 import './character.js';
@@ -13,11 +16,29 @@ onAuthStateChanged(auth, user => {
   currentUser = user;
   mountPetModal();
   const viewUid = new URLSearchParams(window.location.search).get('uid') || user.uid;
-  listenProfile(viewUid);
   const isOwner = viewUid === user.uid;
+  
+  listenProfile(viewUid);
+  
+  // Hiển thị nút đổi avatar nếu là chủ
   const uploadBtn = document.getElementById('pro-avatar-upload-btn');
   if (uploadBtn) uploadBtn.style.display = isOwner ? 'flex' : 'none';
 
+  // Nếu là chủ, cho phép nhấn vào tên để đổi
+  const nameEl = document.getElementById('pro-name');
+  if (nameEl) {
+    if (isOwner) {
+      nameEl.style.cursor = 'pointer';
+      nameEl.title = 'Nhấn để đổi tên (1000⭐)';
+      nameEl.onclick = () => showChangeNicknameModal(user.uid);
+    } else {
+      nameEl.style.cursor = 'default';
+      nameEl.onclick = null;
+      nameEl.title = '';
+    }
+  }
+
+  // Upload avatar
   document.getElementById('pro-avatar-input')?.addEventListener('change', async e => {
     const file = e.target.files[0];
     if (!file) return;
@@ -33,6 +54,45 @@ onAuthStateChanged(auth, user => {
   });
 });
 
+// ── ĐỔI TÊN ──────────────────────────────────────────────
+async function showChangeNicknameModal(uid) {
+  const currentName = document.getElementById('pro-name')?.textContent || '';
+  const newName = prompt('Nhập tên mới (2–20 ký tự, phí 1000⭐):', currentName);
+  if (!newName || newName.trim().length < 2 || newName.trim().length > 20) {
+    alert('Tên phải từ 2 đến 20 ký tự!');
+    return;
+  }
+  if (newName.trim() === currentName) {
+    alert('Tên mới giống tên cũ!');
+    return;
+  }
+  if (!confirm(`Đổi tên thành "${newName.trim()}" sẽ tốn 1000 điểm. Tiếp tục?`)) return;
+
+  try {
+    await changeNickname(uid, newName.trim());
+    alert('✅ Đổi tên thành công!');
+    // onSnapshot sẽ tự cập nhật giao diện
+  } catch (e) {
+    alert('❌ ' + e.message);
+  }
+}
+
+async function changeNickname(uid, newNickname) {
+  const userRef = doc(db, 'users', uid);
+  return runTransaction(db, async (tx) => {
+    const snap = await tx.get(userRef);
+    if (!snap.exists()) throw new Error('Tài khoản không tồn tại');
+    const data = snap.data();
+    const points = data.points || 0;
+    if (points < 1000) throw new Error('Bạn không đủ 1000 điểm để đổi tên!');
+    tx.update(userRef, {
+      nickname: newNickname,
+      points: points - 1000
+    });
+  });
+}
+
+// ── RANK & TITLES ────────────────────────────────────────
 async function calcRank(uid) {
   try {
     const q = query(collection(db,'users'), orderBy('points','desc'), limit(100));

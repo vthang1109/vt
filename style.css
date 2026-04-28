@@ -165,6 +165,7 @@
   .chat-win-back { display: block; }
   .chat-page-wrap { position: relative; }
 }
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -458,22 +459,17 @@ nav {
   display: flex; gap: 14px; margin-bottom: 48px; flex-wrap: wrap;
   justify-content: center; animation: fadeUp 0.8s 0.7s both;
 }
-
-/* CARDS */
-.cards {
-  display: flex; gap: 12px; flex-wrap: wrap;
-  justify-content: center; animation: fadeUp 0.8s 0.85s both;
-}
-.card {
+/* ===== FEATURE CARDS (trang dashboard) ===== */
+.feature-card {  /* ← đã đổi tên từ .card */
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 18px 20px; border-radius: 16px; min-width: 120px;
   background: rgba(255,255,255,0.03); border: 1px solid rgba(56,189,248,0.15);
   backdrop-filter: blur(8px); transition: all 0.3s; cursor: default;
   font-size: 28px;
 }
-.card span { font-weight: 700; font-size: 14px; color: #e0f2fe; }
-.card small { font-size: 12px; color: #7dd3fc; opacity: 0.8; }
-.card:hover { transform: translateY(-6px); border-color: rgba(56,189,248,0.5); background: rgba(56,189,248,0.08); }
+.feature-card span { font-weight: 700; font-size: 14px; color: #e0f2fe; }
+.feature-card small { font-size: 12px; color: #7dd3fc; opacity: 0.8; }
+.feature-card:hover { transform: translateY(-6px); border-color: rgba(56,189,248,0.5); background: rgba(56,189,248,0.08); }
 
 /* AUTH */
 .auth-center {
@@ -537,6 +533,7 @@ nav {
   .quick-btns { gap: 8px; }
   .qbtn { padding: 9px 16px; font-size: 13px; }
 }
+
 /* ===== NAV 3 GẠCH ===== */
 .nav-right-menu {
     position: relative;

@@ -1,13 +1,13 @@
-<!-- bag.html -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VTWorld — Túi Thú Cưng</title>
+  <title>VTWorld — Túi Đồ</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="shop-bag.css"/>
+  <link rel="stylesheet" href="bag.css"/>
+  <link rel="stylesheet" href="character.css"/>
 </head>
 <body>
   <canvas id="bg-canvas"></canvas>
@@ -17,36 +17,86 @@
     <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">
       <span class="logo-vt">VT</span><span class="logo-world">World</span>
     </div>
-    <div style="display:flex;gap:10px;align-items:center">
-      <span style="font-weight:700;color:#fbbf24">🎫 <span id="nav-tickets">0</span></span>
-      <button class="btn-secondary" onclick="location.href='shop.html'" style="padding:8px 14px;font-size:13px">🛍️ Cửa hàng</button>
-      <button class="btn-secondary" onclick="history.back()" style="padding:8px 14px;font-size:13px">← Quay lại</button>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <span id="nav-points-display" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700">⭐ 0</span>
+      <div class="nav-right-menu">
+        <button class="nav-hamburger" onclick="toggleNavMenu()">☰</button>
+        <div class="nav-dropdown" id="navDropdown">
+          <a class="nav-dropdown-item" href="shop.html"><span class="dd-icon">🛒</span> Shop</a>
+          <a class="nav-dropdown-item" href="#" onclick="history.back(); return false;"><span class="dd-icon">←</span> Quay lại</a>
+          <a class="nav-dropdown-item" href="index.html"><span class="dd-icon">🏠</span> Trang chủ</a>
+        </div>
+      </div>
     </div>
   </nav>
 
   <div class="bag-wrap">
-    <h1 class="bag-title">🎒 Túi Thú Cưng</h1>
-    
-    <div class="bag-filters">
-      <button class="filter-btn active" data-rarity="all">Tất cả</button>
-      <button class="filter-btn" data-rarity="common">🐔 Gà mờ</button>
-      <button class="filter-btn" data-rarity="rare">🦜 Tinh anh</button>
-      <button class="filter-btn" data-rarity="epic">🐻 Bá sàn</button>
-      <button class="filter-btn" data-rarity="legendary">🐉 Kiệt tác</button>
-      <button class="filter-btn" data-rarity="mythic">✨ Huyền thoại</button>
+    <h1 class="bag-title">🎒 Túi Đồ</h1>
+
+    <div class="bag-tabs">
+      <div class="bag-tab active" data-tab="pet">🐾 Thú cưng</div>
+      <div class="bag-tab" data-tab="character">👘 Outfit</div>
+      <div class="bag-tab" data-tab="item">📦 Vật phẩm</div>
     </div>
 
-    <div class="bag-stats">
-      <span>Tổng: <strong id="bag-total">0</strong></span>
-      <span>Gà mờ: <strong id="bag-common">0</strong></span>
-      <span>Tinh anh: <strong id="bag-rare">0</strong></span>
-      <span>Bá sàn: <strong id="bag-epic">0</strong></span>
-      <span>Kiệt tác: <strong id="bag-legendary">0</strong></span>
-      <span>Huyền thoại: <strong id="bag-mythic">0</strong></span>
+    <!-- PANEL PET -->
+    <div id="pet-panel" class="bag-panel active-panel">
+      <div id="bag-shard-bar"></div>
+      <div class="bag-grid" id="bag-grid"></div>
     </div>
 
-    <div class="bag-grid" id="bag-grid"></div>
+    <!-- PANEL OUTFIT -->
+    <div id="character-panel" class="bag-panel">
+      <div id="wardrobePreview" class="wardrobe-preview"></div>
+      <div id="wardrobeTabs" class="wardrobe-tabs"></div>
+      <div id="wardrobeItems" class="wardrobe-items"></div>
+      <button id="saveOutfitBtn" class="save-outfit-btn">💾 Lưu trang phục</button>
+    </div>
+
+    <!-- PANEL VẬT PHẨM -->
+    <div id="item-panel" class="bag-panel">
+      <div id="outfit-shard-bar"></div>
+      <div class="bag-stats" id="item-stats"></div>
+      <div class="bag-grid" id="item-grid"></div>
+    </div>
   </div>
+
+  <!-- POPUP ĐỔI PET -->
+  <div id="petRedeemModal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>🧩 Đổi mảnh lấy pet</span>
+        <button class="modal-close" onclick="document.getElementById('petRedeemModal').classList.remove('open')">✕</button>
+      </div>
+      <div id="petRedeemList" class="bag-grid" style="max-height:300px;overflow-y:auto;"></div>
+      <button class="bag-btn" style="width:100%;margin-top:12px;background:rgba(56,189,248,0.15);padding:10px;font-size:13px;" onclick="document.getElementById('petRedeemModal').classList.remove('open')">Đóng</button>
+    </div>
+  </div>
+
+  <!-- POPUP ĐỔI OUTFIT -->
+  <div id="outfitRedeemModal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>🧩 Đổi mảnh nhân vật lấy trang bị</span>
+        <button class="modal-close" onclick="document.getElementById('outfitRedeemModal').classList.remove('open')">✕</button>
+      </div>
+      <div id="outfitRedeemSystemSwitch" style="display:flex;gap:8px;margin-bottom:12px;"></div>
+      <div id="outfitRedeemSlotTabs" class="wardrobe-tabs"></div>
+      <div id="outfitRedeemItems" class="bag-grid" style="max-height:240px;overflow-y:auto;"></div>
+      <button class="bag-btn" style="width:100%;margin-top:12px;background:rgba(56,189,248,0.15);padding:10px;font-size:13px;" onclick="document.getElementById('outfitRedeemModal').classList.remove('open')">Đóng</button>
+    </div>
+  </div>
+
+  <script>
+    function toggleNavMenu() {
+      document.getElementById('navDropdown').classList.toggle('open');
+    }
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-right-menu')) {
+        document.getElementById('navDropdown')?.classList.remove('open');
+      }
+    });
+  </script>
 
   <script type="module" src="bag.js"></script>
 </body>

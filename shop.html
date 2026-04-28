@@ -18,16 +18,18 @@
       <span class="logo-vt">VT</span><span class="logo-world">World</span>
     </div>
     
-    <!-- Nút 3 gạch với Bag + Quay lại -->
-    <div class="nav-right-menu">
-      <button class="nav-hamburger" onclick="toggleNavMenu()">☰</button>
-      <div class="nav-dropdown" id="navDropdown">
-        <a class="nav-dropdown-item" href="bag.html">
-          <span class="dd-icon">🎒</span> Bag
-        </a>
-        <a class="nav-dropdown-item" href="#" onclick="history.back();return false;">
-          <span class="dd-icon">←</span> Quay lại
-        </a>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700">⭐ <span id="nav-shop-points">0</span></span>
+      <div class="nav-right-menu">
+        <button class="nav-hamburger" onclick="toggleNavMenu()">☰</button>
+        <div class="nav-dropdown" id="navDropdown">
+          <a class="nav-dropdown-item" href="bag.html">
+            <span class="dd-icon">🎒</span> Bag
+          </a>
+          <a class="nav-dropdown-item" href="#" onclick="history.back();return false;">
+            <span class="dd-icon">←</span> Quay lại
+          </a>
+        </div>
       </div>
     </div>
   </nav>

@@ -108,7 +108,7 @@ export async function getPetData() {
     activePet:       d?.activePet     || null,
     tickets_normal:  d?.tickets_normal|| 0,
     tickets_vip:     d?.tickets_vip   || 0,
-    shards: d?.shards || 0,  // 1 số duy nhất
+    shards: d?.shards || 0,
     points:          d?.points        || 0,
   };
 }
@@ -121,7 +121,6 @@ export async function disassemblePet(petId, qty = 1) {
   const pet = getPetById(petId);
   if (!pet) throw new Error('Không tìm thấy pet');
   const shardGain = SHARD_DROP[pet.tier] * qty; // mảnh nhận được
-  const tierKey   = String(pet.tier);
   const userRef   = doc(db, 'users', user.uid);
   return runTransaction(db, async tx => {
     const snap = await tx.get(userRef);
@@ -130,12 +129,12 @@ export async function disassemblePet(petId, qty = 1) {
     if ((col[petId] || 0) < qty + 1) throw new Error('Cần giữ lại ít nhất 1 con!');
     col[petId] -= qty;
     const shards = (data.shards || 0) + shardGain;
-tx.update(userRef, { petCollection: col, shards });
-return { shardGain, shards };
+    tx.update(userRef, { petCollection: col, shards });
+    return { shardGain, shards };
   });
 }
 
-// Đổi mảnh tier → pet (dùng mảnh chung theo tier)
+// Đổi mảnh lấy pet (dùng mảnh chung theo tier)
 // Tier cao → tốn nhiều mảnh hơn (SHARD_COST)
 export async function redeemShard(petId) {
   const user = auth.currentUser;
@@ -143,7 +142,6 @@ export async function redeemShard(petId) {
   const pet  = getPetById(petId);
   if (!pet) throw new Error('Không tìm thấy pet');
   const cost    = SHARD_COST[pet.tier];
-  const tierKey = String(pet.tier);
   const userRef = doc(db, 'users', user.uid);
   return runTransaction(db, async tx => {
     const snap   = await tx.get(userRef);
@@ -157,13 +155,12 @@ export async function redeemShard(petId) {
   });
 }
 
-// ===== GACHA (transaction-safe) =====
+// ===== GACHA (transaction-safe) – Tự động trả mảnh nếu trùng =====
 export async function doGacha(rolls = 1, type = 'normal') {
   const user = auth.currentUser;
   if (!user) throw new Error('Chưa đăng nhập');
 
   const userRef = doc(db, 'users', user.uid);
-  const ticketKey = type === 'vip' ? 'tickets_vip' : 'tickets_normal';
 
   // generate results locally first
   const results = [];
@@ -184,30 +181,32 @@ export async function doGacha(rolls = 1, type = 'normal') {
     results.push({ ...pet, tier: selectedTier });
   }
 
-  // transaction: check tickets and update petCollection atomically
+  // transaction: update petCollection and shards based on duplicates
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(userRef);
     if (!snap.exists()) throw new Error('User not found');
     const data = snap.data();
-    const tix = data[ticketKey] || 0;
-    if (tix < rolls) throw new Error('Không đủ lượt');
-
-    // update tickets
-    tx.update(userRef, { [ticketKey]: tix - rolls });
-
-    // update petCollection
     const newCollection = { ...(data.petCollection || {}) };
+    let shards = data.shards || 0;
+
     results.forEach(r => {
-      newCollection[r.id] = (newCollection[r.id] || 0) + 1;
+      if (newCollection[r.id] && newCollection[r.id] > 0) {
+        // Đã sở hữu → cộng mảnh theo tier
+        shards += SHARD_DROP[r.tier.id] || 1;
+      } else {
+        // Chưa có → thêm 1 con
+        newCollection[r.id] = 1;
+      }
     });
-    tx.update(userRef, { petCollection: newCollection });
+
+    tx.update(userRef, { petCollection: newCollection, shards });
   });
 
-  // log count vào user doc (tránh cần subcollection permission)
+  // log total gacha rolls (non-critical)
   try {
-    await updateDoc(doc(db, 'users', user.uid), {
-      totalGachaRolls: (await getDoc(doc(db, 'users', user.uid))).data()?.totalGachaRolls + rolls || rolls
-    });
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    const current = snap.data()?.totalGachaRolls || 0;
+    await updateDoc(doc(db, 'users', user.uid), { totalGachaRolls: current + rolls });
   } catch { /* non-critical */ }
 
   return results;

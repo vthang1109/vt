@@ -1,11 +1,15 @@
-// bag.js – viết lại sạch toàn bộ
+// bag.js – Túi đồ: Pet, Vật phẩm, Outfit (gọn gàng, không rối, đã sửa lỗi hiển thị item)
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import {
-  getPetById, getTierById, disassemblePet, redeemShard,
-  SHARD_COST, SHARD_DROP, PET_POOL
+  getPetById, disassemblePet, redeemShard,
+  SHARD_DROP, PET_POOL, SHARD_COST
 } from './pet.js';
+import {
+  initCharacterSystem, state, OUTFIT_CATALOG, SLOT_META,
+  renderChibiTo, saveEquipped, redeemOutfitShard
+} from './character.js';
 
 const firebaseConfig = {
   apiKey:"AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -15,245 +19,353 @@ const firebaseConfig = {
   messagingSenderId:"782694799992",
   appId:"1:782694799992:web:2d8e4a28626c3bbae8ab8d"
 };
-
-const app  = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
 let currentUser = null;
-let allPets     = [];   // pet đang sở hữu
-let filteredPets= [];
-let shardsTotal = 0;    // tổng mảnh (1 con số)
+let allPets = [], filteredPets = [];
+let shardsTotal = 0;
+let characterShards = 0;
 
-const RARITY_KEY   = { 1:'Gà mờ', 2:'Tinh anh', 3:'Bá sàn', 4:'Kiệt tác', 5:'Huyền thoại' };
-const RARITY_CSS   = { 1:'common', 2:'rare', 3:'epic', 4:'legendary', 5:'mythic' };
-const RARITY_COLOR = { 1:'#94a3b8', 2:'#34d399', 3:'#fbbf24', 4:'#f43f5e', 5:'#a78bfa' };
+const ITEMS_DB = {
+  'mystery_box': { name: 'Hộp bí ẩn', emoji: '📦', desc: 'Mở ngẫu nhiên', convertShard: 2 },
+  'charm_buff':  { name: 'Bùa may mắn', emoji: '🍀', desc: 'Tăng tỷ lệ hiếm', convertShard: 1 }
+};
 
-// ── AUTH + REALTIME SYNC ──────────────────────────────────
+const RARITY_COLOR = {1:'#94a3b8',2:'#34d399',3:'#fbbf24',4:'#f43f5e',5:'#a78bfa'};
+const RARITY_KEY = { 1:'Gà mờ',2:'Tinh anh',3:'Bá sàn',4:'Kiệt tác',5:'Huyền thoại'};
+
+let allItems = [], filteredItems = [];
+
+// ── AUTH + SYNC ──────────────────────────────────────────
 onAuthStateChanged(auth, user => {
   if (!user) { location.href = 'index.html'; return; }
   currentUser = user;
-
+  initCharacterSystem();
   onSnapshot(doc(db, 'users', user.uid), snap => {
     if (!snap.exists()) return;
     const d = snap.data();
 
-    // nav ticket count
-    const navT = document.getElementById('nav-tickets');
-    if (navT) navT.textContent = (d.tickets_normal||0) + (d.tickets_vip||0);
+    // Hiển thị điểm
+    const ptsDisplay = document.getElementById('nav-points-display');
+    if (ptsDisplay) ptsDisplay.innerText = '⭐ ' + (d.points || 0).toLocaleString('vi-VN');
 
     shardsTotal = d.shards || 0;
+    characterShards = d.characterShards || 0;
 
-    // render ô mảnh — click mở sheet
-    let shardBar = document.getElementById('bag-shard-bar');
-    if (!shardBar) {
-      shardBar = document.createElement('div');
-      shardBar.id = 'bag-shard-bar';
-      shardBar.style.cssText = 'padding:12px 16px;margin-bottom:16px';
-      document.querySelector('.bag-wrap')?.insertBefore(shardBar, document.querySelector('.bag-filters'));
-    }
-    shardBar.innerHTML = `
-      <div onclick="window.openShardSheet()"
-           style="cursor:pointer;text-align:center;padding:12px 20px;border-radius:12px;
-                  background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25);
-                  transition:background .2s"
-           onmouseover="this.style.background='rgba(167,139,250,0.18)'"
-           onmouseout="this.style.background='rgba(167,139,250,0.08)'">
-        <div style="color:#a78bfa;font-size:12px;font-weight:700;margin-bottom:4px">🧩 Mảnh Pet</div>
-        <div style="color:#e0f2fe;font-size:26px;font-weight:900;font-family:'Orbitron',monospace">${shardsTotal}</div>
-        <div style="color:#a78bfa;font-size:11px;margin-top:4px">Nhấn để đổi mảnh lấy pet ✨</div>
-      </div>`;
+    renderShardBar();
+    renderOutfitShardBar();
 
-    // build owned list
+    // Pet collection
     const col = d.petCollection || {};
     allPets = Object.entries(col).map(([id, qty]) => {
       const pet = getPetById(id);
-      if (!pet) return null;
+      if (!pet || qty <= 0) return null;
       return {
-        id, qty,
-        name: pet.name, emoji: pet.emoji || '🐾',
-        tier: pet.tier,
-        rarity:    RARITY_KEY[pet.tier],
-        rarityCss: RARITY_CSS[pet.tier],
-        color:     RARITY_COLOR[pet.tier],
+        id, qty, name: pet.name, emoji: pet.emoji || '🐾',
+        tier: pet.tier, color: RARITY_COLOR[pet.tier]
       };
     }).filter(Boolean);
-
-    filteredPets = allPets;
+    filteredPets = [...allPets];
     renderBag();
-    updateStats();
+
+    // Item collection
+    const itemCol = d.itemCollection || {};
+    allItems = Object.entries(itemCol).map(([id, qty]) => {
+      const info = ITEMS_DB[id];
+      if (!info || qty <= 0) return null;
+      return { id, qty, ...info };
+    }).filter(Boolean);
+    filteredItems = [...allItems];
+    renderItems();
+    updateItemStats();
+
+    if (document.getElementById('character-panel').classList.contains('active-panel')) {
+      renderWardrobeUI();
+    }
   });
 });
 
-// ── RENDER BAG (chỉ pet đang sở hữu, không có nút đổi) ───
+// ── PET ──────────────────────────────────────────────────
+function renderShardBar() {
+  const bar = document.getElementById('bag-shard-bar');
+  if (!bar) return;
+  bar.innerHTML = `
+    <div onclick="window.openShardSheet()" style="cursor:pointer;text-align:center;padding:12px 20px;border-radius:12px; background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25); margin-bottom:12px;">
+      <div style="color:#a78bfa;font-size:12px;font-weight:700;">🧩 Mảnh Pet</div>
+      <div style="color:#e0f2fe;font-size:26px;font-weight:900;">${shardsTotal}</div>
+      <div style="color:#a78bfa;font-size:11px;">Nhấn để đổi pet ✨</div>
+    </div>`;
+}
+
 function renderBag() {
   const grid = document.getElementById('bag-grid');
   if (!grid) return;
   if (!filteredPets.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;color:#4a7a9b;text-align:center;padding:40px">Túi trống. Hãy gacha! 🎰</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;color:#4a7a9b;text-align:center;padding:40px">Túi trống. Hãy gacha!</div>';
     return;
   }
   grid.innerHTML = filteredPets.map(p => `
-    <div class="bag-pet-card rarity-${p.rarityCss}" style="border-color:${p.color}55">
+    <div class="bag-pet-card" style="border-color:${p.color}55">
       <div class="pet-emoji">${p.emoji}</div>
       <div class="pet-name">${p.name}</div>
-      <div class="pet-rarity" style="color:${p.color}">${p.rarity}</div>
       <div class="pet-qty">x${p.qty}</div>
       <div class="bag-actions">
-        ${p.qty > 1
-          ? `<button class="bag-btn disassemble" onclick="window.doDisassemble('${p.id}')">Phân rã</button>`
-          : ''}
+        ${p.qty > 1 ? `<button class="bag-btn disassemble" onclick="window.doDisassemble('${p.id}')">Phân rã</button>` : ''}
       </div>
     </div>`).join('');
 }
 
-function updateStats() {
-  const stats = { all:0, common:0, rare:0, epic:0, legendary:0, mythic:0 };
-  allPets.forEach(p => {
-    stats.all += p.qty;
-    if (stats[p.rarityCss] !== undefined) stats[p.rarityCss] += p.qty;
-  });
-  ['bag-total','bag-common','bag-rare','bag-epic','bag-legendary','bag-mythic']
-    .forEach((id,i) => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = stats[['all','common','rare','epic','legendary','mythic'][i]];
-    });
+window.doDisassemble = async (petId) => {
+  const qty = parseInt(prompt('Nhập số lượng muốn phân rã:', '1'));
+  if (isNaN(qty) || qty < 1) return;
+  try {
+    const result = await disassemblePet(petId, qty);
+    alert(`✅ Nhận ${result.shardGain} mảnh pet!`);
+  } catch(e) { alert('❌ ' + e.message); }
+};
+
+// ── ĐỔI PET ──────────────────────────────────────────────
+window.openShardSheet = () => {
+  const modal = document.getElementById('petRedeemModal');
+  if (!modal) return;
+  modal.classList.add('open');
+  renderPetRedeemList();
+};
+
+function renderPetRedeemList() {
+  const list = document.getElementById('petRedeemList');
+  if (!list) return;
+  const owned = allPets.reduce((acc, p) => { acc[p.id] = p.qty; return acc; }, {});
+  list.innerHTML = PET_POOL.map(pet => {
+    const cost = SHARD_COST[pet.tier] || 1;
+    const has = owned[pet.id] || 0;
+    return `
+      <div class="bag-pet-card" style="border-color:${RARITY_COLOR[pet.tier]}55">
+        <div class="pet-emoji">${pet.emoji || '🐾'}</div>
+        <div class="pet-name">${pet.name}</div>
+        <div style="color:#fbbf24;font-weight:700;">🧩 ${cost}</div>
+        <button class="bag-btn" style="background:#a78bfa; margin-top:4px;" ${has ? 'disabled' : ''} onclick="window.doRedeemPet('${pet.id}')">${has ? 'Đã có' : 'Đổi'}</button>
+      </div>`;
+  }).join('');
 }
 
-// ── PHÂN RÃ ──────────────────────────────────────────────
-window.doDisassemble = async petId => {
-  const pet = allPets.find(p => p.id === petId);
-  if (!pet || pet.qty < 2) return alert('Cần ít nhất 2 con để phân rã!');
-  const qty = parseInt(prompt(`Phân rã bao nhiêu con ${pet.name}? (có ${pet.qty}, giữ ít nhất 1)`));
-  if (!qty || qty < 1) return;
-  if (qty >= pet.qty) return alert('Phải giữ lại ít nhất 1 con!');
+window.doRedeemPet = async (petId) => {
   try {
-    await disassemblePet(petId, qty);
-    alert(`✅ +${SHARD_DROP[pet.tier] * qty} mảnh 🧩`);
+    await redeemShard(petId);
+    alert('✅ Đổi pet thành công!');
+    document.getElementById('petRedeemModal').classList.remove('open');
   } catch(e) { alert('❌ ' + e.message); }
 };
 
-// ── SHARD SHEET ───────────────────────────────────────────
-window.openShardSheet = function() {
-  let overlay = document.getElementById('shardSheetOverlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'shardSheetOverlay';
-    overlay.style.cssText = `position:fixed;inset:0;z-index:2000;
-      background:rgba(2,8,20,0.88);backdrop-filter:blur(8px);
-      display:flex;align-items:flex-end;justify-content:center;
-      opacity:0;pointer-events:none;transition:opacity .25s`;
-    overlay.onclick = e => { if (e.target === overlay) window.closeShardSheet(); };
-    document.body.appendChild(overlay);
-  }
-
-  const ownedIds = new Set(allPets.map(p => p.id));
-
-  // Nhóm pet theo tier, tier thấp trước
-  const rows = PET_POOL.map(pet => {
-    const cost      = SHARD_COST[pet.tier];
-    const canRedeem = shardsTotal >= cost;
-    const owned     = ownedIds.has(pet.id);
-    const color     = RARITY_COLOR[pet.tier];
-    const tierName  = RARITY_KEY[pet.tier];
-    const qty       = allPets.find(p => p.id === pet.id)?.qty || 0;
-
-    return `
-    <div style="display:flex;align-items:center;gap:12px;padding:11px 0;
-                border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-size:28px;width:40px;text-align:center;
-                   ${!owned ? 'filter:grayscale(1);opacity:.35' : ''}">${pet.emoji}</span>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:800;color:${owned ? '#e0f2fe' : '#64748b'}">
-          ${pet.name}
-          ${owned ? `<span style="font-size:9px;color:#34d399;background:rgba(52,211,153,0.12);
-                       padding:1px 6px;border-radius:999px;margin-left:4px">x${qty}</span>` : ''}
-        </div>
-        <div style="font-size:11px;font-weight:700;color:${color};margin-top:1px">${tierName}</div>
-      </div>
-      <div style="text-align:right;flex-shrink:0;min-width:80px">
-        <div style="font-size:11px;font-weight:700;color:${canRedeem ? '#34d399' : '#4a7a9b'}">
-          🧩 ${shardsTotal}/${cost}
-        </div>
-        ${canRedeem
-          ? `<button onclick="window.doRedeem('${pet.id}')"
-               style="margin-top:5px;padding:5px 12px;border-radius:8px;
-                      background:linear-gradient(135deg,#a78bfa,#7c3aed);
-                      border:none;color:#fff;font-size:11px;font-weight:800;
-                      cursor:pointer;font-family:'Nunito',sans-serif">
-               ${owned ? 'Đổi thêm' : 'Đổi ✨'}
-             </button>`
-          : `<span style="font-size:10px;color:#4a7a9b;display:block;margin-top:5px">
-               Thiếu ${cost - shardsTotal} 🧩
-             </span>`}
-      </div>
+// ── OUTFIT SHARD BAR ─────────────────────────────────────
+function renderOutfitShardBar() {
+  const bar = document.getElementById('outfit-shard-bar');
+  if (!bar) return;
+  bar.innerHTML = `
+    <div onclick="window.openOutfitShardSheet()" style="cursor:pointer;text-align:center;padding:12px 20px;border-radius:12px; background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25); margin-bottom:12px;">
+      <div style="color:#fbbf24;font-size:12px;font-weight:700;">🧩 Mảnh Nhân Vật</div>
+      <div style="color:#e0f2fe;font-size:26px;font-weight:900;">${characterShards}</div>
+      <div style="color:#fbbf24;font-size:11px;">Nhấn để đổi trang bị ✨</div>
     </div>`;
-  }).join('');
+}
 
-  overlay.innerHTML = `
-  <div id="shardSheetInner"
-       style="width:100%;max-width:480px;max-height:88dvh;
-              background:rgba(8,18,36,0.98);
-              border:1px solid rgba(167,139,250,0.2);
-              border-radius:24px 24px 0 0;
-              display:flex;flex-direction:column;overflow:hidden;
-              transform:translateY(100%);
-              transition:transform .3s cubic-bezier(.32,1.2,.48,1)">
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;
-                padding:16px 18px 12px;border-bottom:1px solid rgba(167,139,250,0.12);
-                flex-shrink:0">
-      <div>
-        <span style="font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:#a78bfa">
-          🧩 Đổi Mảnh Lấy Pet
-        </span>
-        <span style="margin-left:10px;font-size:12px;color:#fbbf24;font-weight:700">
-          Có: ${shardsTotal} mảnh
-        </span>
-      </div>
-      <button onclick="window.closeShardSheet()"
-              style="background:none;border:none;color:#4a7a9b;font-size:20px;cursor:pointer;padding:0">✕</button>
-    </div>
-    <!-- List -->
-    <div style="overflow-y:auto;padding:0 16px 28px;flex:1">${rows}</div>
-  </div>`;
+// ── ĐỔI OUTFIT ──────────────────────────────────────────
+window.openOutfitShardSheet = () => {
+  const modal = document.getElementById('outfitRedeemModal');
+  if (!modal) return;
+  modal.classList.add('open');
+  renderOutfitRedeemUI();
+};
 
-  overlay.style.opacity = '1';
-  overlay.style.pointerEvents = 'all';
-  requestAnimationFrame(() => {
-    document.getElementById('shardSheetInner').style.transform = 'translateY(0)';
+let redeemSystem = 'real';
+let redeemSlot = 'head';
+
+function renderOutfitRedeemUI() {
+  const sysDiv = document.getElementById('outfitRedeemSystemSwitch');
+  sysDiv.innerHTML = Object.entries(OUTFIT_CATALOG).map(([key, sys]) =>
+    `<button class="bag-tab ${key===redeemSystem?'active':''}" data-system="${key}">${sys.icon} ${sys.label}</button>`
+  ).join('');
+  sysDiv.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      redeemSystem = b.dataset.system;
+      redeemSlot = 'head';
+      renderOutfitRedeemUI();
+    });
   });
-};
 
-window.closeShardSheet = function() {
-  const overlay = document.getElementById('shardSheetOverlay');
-  if (!overlay) return;
-  const inner = document.getElementById('shardSheetInner');
-  if (inner) inner.style.transform = 'translateY(100%)';
-  overlay.style.opacity = '0';
-  overlay.style.pointerEvents = 'none';
-};
+  const slotDiv = document.getElementById('outfitRedeemSlotTabs');
+  slotDiv.innerHTML = Object.entries(SLOT_META).map(([slot, meta]) =>
+    `<button class="wardrobe-tab ${slot===redeemSlot?'active':''}" data-slot="${slot}">${meta.icon} ${meta.label}</button>`
+  ).join('');
+  slotDiv.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      redeemSlot = b.dataset.slot;
+      renderOutfitRedeemUI();
+    });
+  });
 
-window.doRedeem = async petId => {
-  const pet  = getPetById(petId);
-  if (!pet) return;
-  const cost = SHARD_COST[pet.tier];
-  if (shardsTotal < cost) return alert(`Cần ${cost} mảnh, hiện có ${shardsTotal}`);
-  if (!confirm(`Dùng ${cost} 🧩 mảnh đổi lấy ${pet.emoji} ${pet.name}?`)) return;
+  const itemsDiv = document.getElementById('outfitRedeemItems');
+  const allSlotItems = OUTFIT_CATALOG[redeemSystem]?.slots[redeemSlot] || [];
+  const owned = state.ownedItems[redeemSystem]?.[redeemSlot] || [];
+  const unowned = allSlotItems.filter(item => !owned.includes(item.id));
+  itemsDiv.innerHTML = unowned.length
+    ? unowned.map(item => `
+      <div class="bag-item-card" style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div class="item-icon">${item.emoji || '👕'}</div>
+        <div class="item-name">${item.name}</div>
+        <div style="color:#fbbf24;font-weight:700;">🧩 5</div>
+        <button class="bag-btn" style="background:#fbbf24; color:#000;" onclick="window.doRedeemOutfit('${item.id}')">Đổi</button>
+      </div>`).join('')
+    : '<div style="grid-column:1/-1;text-align:center;color:#4a7a9b;">🎉 Bạn đã sưu tập đủ!</div>';
+}
+
+window.doRedeemOutfit = async (itemId) => {
   try {
-    const res = await redeemShard(petId);
-    window.closeShardSheet();
-    alert(`✅ Đã nhận ${pet.emoji} ${pet.name}! Còn ${res.shardsLeft} mảnh 🧩`);
+    await redeemOutfitShard(redeemSystem, redeemSlot, itemId);
+    alert('✅ Đổi thành công!');
+    document.getElementById('outfitRedeemModal').classList.remove('open');
   } catch(e) { alert('❌ ' + e.message); }
 };
 
-// ── FILTER ────────────────────────────────────────────────
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', e => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    e.target.classList.add('active');
-    const rarity = e.target.dataset.rarity;
-    filteredPets = rarity === 'all' ? allPets : allPets.filter(p => p.rarityCss === rarity);
-    renderBag();
+// ── ITEM (vật phẩm) ──────────────────────────────────────
+function renderItems() {
+  const grid = document.getElementById('item-grid');
+  if (!grid) return;
+  if (!filteredItems.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;">📭 Chưa có vật phẩm</div>';
+    return;
+  }
+  grid.innerHTML = filteredItems.map(item => `
+    <div class="bag-item-card">
+      <div class="item-icon">${item.emoji}</div>
+      <div class="item-name">${item.name}</div>
+      <div class="item-qty">x${item.qty}</div>
+      <div class="item-desc">${item.desc}</div>
+      <div class="bag-actions" style="margin-top:8px; display:flex; gap:6px;">
+        ${item.convertShard ? `<button class="bag-btn" onclick="window.convertToCharShard('${item.id}')" style="background:#a78bfa">🔄 Đổi ${item.convertShard} mảnh NV</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function updateItemStats() {
+  const total = allItems.reduce((s,i)=>s+i.qty,0);
+  const container = document.getElementById('item-stats');
+  if(container) container.innerHTML = `<span>📦 Tổng: ${total}</span>`;
+}
+
+window.convertToCharShard = async (itemId) => {
+  const item = allItems.find(i=>i.id===itemId);
+  if(!item || item.qty<1) return alert('Không có vật phẩm!');
+  const qty = parseInt(prompt(`Nhập số lượng ${item.name} muốn đổi (mỗi cái +${item.convertShard} mảnh NV):`, '1'));
+  if(isNaN(qty)||qty<1||qty>item.qty) return;
+  const gain = qty * item.convertShard;
+  if(!confirm(`Đổi ${qty} ${item.name} lấy ${gain} 🧩 mảnh nhân vật?`)) return;
+  const userRef = doc(db,'users',currentUser.uid);
+  const newQty = item.qty - qty;
+  await updateDoc(userRef,{
+    [`itemCollection.${itemId}`]: newQty>0?newQty:0,
+    characterShards: (characterShards + gain)
+  });
+  alert(`✅ Nhận ${gain} mảnh nhân vật!`);
+};
+
+// ── WARDROBE UI ──────────────────────────────────────────
+let currentWardrobeSlot = 'head';
+let pendingOutfit = { head: null, body: null, acc: null };
+
+function renderWardrobeUI() {
+  if (!state || !state.ownedItems) return;
+  pendingOutfit = { ...state.equipped[state.system] };
+  renderPreview();
+  renderWardrobeTabs();
+  renderWardrobeItems();
+}
+
+function renderPreview() {
+  const container = document.getElementById('wardrobePreview');
+  if (!container) return;
+  container.innerHTML = '';
+  renderChibiTo(container, state.system, pendingOutfit);
+}
+
+function renderWardrobeTabs() {
+  const tabsDiv = document.getElementById('wardrobeTabs');
+  if (!tabsDiv) return;
+  tabsDiv.innerHTML = Object.entries(SLOT_META).map(([slot, meta]) => `
+    <button class="wardrobe-tab ${currentWardrobeSlot === slot ? 'active' : ''}" data-slot="${slot}">
+      ${meta.icon} ${meta.label}
+    </button>
+  `).join('');
+  tabsDiv.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentWardrobeSlot = btn.dataset.slot;
+      renderWardrobeTabs();
+      renderWardrobeItems();
+    });
+  });
+}
+
+function renderWardrobeItems() {
+  const itemsDiv = document.getElementById('wardrobeItems');
+  if (!itemsDiv) return;
+  const owned = state.ownedItems[state.system]?.[currentWardrobeSlot] || [];
+  const allItemsSlot = OUTFIT_CATALOG[state.system]?.slots[currentWardrobeSlot] || [];
+  const available = allItemsSlot.filter(item => owned.includes(item.id));
+  if (!available.length) {
+    itemsDiv.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#4a7a9b;padding:20px;">Chưa sở hữu item nào</div>';
+    return;
+  }
+  itemsDiv.innerHTML = available.map(item => {
+    const isEquipped = pendingOutfit[currentWardrobeSlot] === item.id;
+    return `
+      <div class="wardrobe-item ${isEquipped ? 'equipped' : ''}" data-id="${item.id}">
+        <div class="emoji">👕</div>
+        <div class="name">${item.name}</div>
+        ${isEquipped ? '<div class="check">✓</div>' : ''}
+      </div>
+    `;
+  }).join('');
+  itemsDiv.querySelectorAll('.wardrobe-item').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.id;
+      pendingOutfit[currentWardrobeSlot] = id;
+      renderPreview();
+      renderWardrobeItems();
+    });
+  });
+}
+
+async function saveOutfit() {
+  if (!currentUser) return;
+  try {
+    await saveEquipped(state.system, pendingOutfit);
+    alert('✅ Đã lưu trang phục!');
+  } catch(e) {
+    alert('Lỗi: ' + e.message);
+  }
+}
+
+// ── TAB SWITCH ───────────────────────────────────────────
+document.querySelectorAll('.bag-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const target = tab.dataset.tab;
+    document.querySelectorAll('.bag-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.bag-panel').forEach(p => p.classList.remove('active-panel'));
+    if (target === 'pet') {
+      document.getElementById('pet-panel').classList.add('active-panel');
+      renderBag();
+    } else if (target === 'item') {
+      document.getElementById('item-panel').classList.add('active-panel');
+      renderItems();
+      updateItemStats();
+    } else if (target === 'character') {
+      document.getElementById('character-panel').classList.add('active-panel');
+      renderWardrobeUI();
+    }
   });
 });
+
+document.getElementById('saveOutfitBtn')?.addEventListener('click', saveOutfit);
