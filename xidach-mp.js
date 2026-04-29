@@ -3,6 +3,7 @@ import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.
 import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { createDeck, renderCardUI } from './cards.js';
+import { getActiveBuff, getPetById, getTierById } from './pet.js';
 
 const fbConfig = {
   apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -709,18 +710,51 @@ async function settleMyResult(r, gs) {
   const res = gs.results?.[_user.uid];
   if (!res) return;
   const bet = gs.bets?.[_user.uid] || 0;
-  const refund = bet + res.delta;
-  if (refund > 0) {
+
+  if (res.outcome === 'win') {
+    // Áp dụng pet buff: chỉ bonus trên phần THẮNG (delta), không tính tiền hoàn cược
+    let winAmount = res.delta; // tiền thắng gốc
+    let buffBonus = 0;
+    let buffPct = 0;
+    try {
+      buffPct = await getActiveBuff(); // % buff từ pet đang trang bị
+      if (buffPct > 0) {
+        buffBonus = Math.round(winAmount * buffPct / 100);
+      }
+    } catch {}
+    const totalRefund = bet + winAmount + buffBonus; // hoàn cược + thắng + bonus pet
     const us = await getDoc(doc(db, 'users', _user.uid));
     const cur = us.exists() ? (us.data().points || 0) : 0;
-    await updateDoc(doc(db, 'users', _user.uid), { points: cur + refund });
-  }
-  if (res.outcome === 'win') {
-    showToast(`🎉 Thắng +${res.delta.toLocaleString('vi-VN')}đ!`, 'success');
-    if (window.VTQuests) { window.VTQuests.trackEarn(res.delta); window.VTQuests.trackWinSmart(); }
+    await updateDoc(doc(db, 'users', _user.uid), { points: cur + totalRefund });
+
+    if (buffBonus > 0) {
+      // Lấy tên pet để hiển thị
+      const petData = await (async () => {
+        try {
+          const ud = await getDoc(doc(db, 'users', _user.uid));
+          const activePetId = ud.data()?.activePet;
+          if (!activePetId) return null;
+          const pet = getPetById(activePetId);
+          const tier = pet ? getTierById(pet.tier) : null;
+          return pet ? { emoji: pet.emoji, name: pet.name, tierName: tier?.name } : null;
+        } catch { return null; }
+      })();
+      const petLabel = petData ? `${petData.emoji} ${petData.name}` : '🐾 Pet';
+      showToast(`🎉 Thắng +${winAmount.toLocaleString('vi-VN')}đ  ${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
+    } else {
+      showToast(`🎉 Thắng +${winAmount.toLocaleString('vi-VN')}đ!`, 'success');
+    }
+    if (window.VTQuests) { window.VTQuests.trackEarn(winAmount + buffBonus); window.VTQuests.trackWinSmart(); }
+
   } else if (res.outcome === 'lose') {
+    // Thua: không hoàn tiền, không buff
     showToast(`💸 Thua ${bet.toLocaleString('vi-VN')}đ`, 'warn');
+
   } else {
+    // Hoà: hoàn lại tiền cược
+    const us = await getDoc(doc(db, 'users', _user.uid));
+    const cur = us.exists() ? (us.data().points || 0) : 0;
+    await updateDoc(doc(db, 'users', _user.uid), { points: cur + bet });
     showToast(`🤝 Hoà`, 'info');
   }
 }
