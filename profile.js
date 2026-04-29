@@ -11,7 +11,9 @@ import './character.js';
 
 let currentUser = null;
 
+let authResolved = false;
 onAuthStateChanged(auth, async user => {
+  authResolved = true;
   if (!user) { location.href = 'index.html'; return; }
   currentUser = user;
   mountPetModal();
@@ -20,12 +22,10 @@ onAuthStateChanged(auth, async user => {
 
   listenProfile(viewUid);
 
-  // Sửa: load char của người được xem
-  if (!isOwner) {
-    const { renderChibiForUid } = await import('./character.js');
-    const frame = document.getElementById('pro-character-frame');
-    if (frame) renderChibiForUid(frame, viewUid);
-  }
+  // Luôn render nhân vật theo đúng viewUid (tránh hiện nhân vật của người đang login)
+  const { renderChibiForUid } = await import('./character.js');
+  const frame = document.getElementById('pro-character-frame');
+  if (frame) renderChibiForUid(frame, viewUid);
   
   // Hiển thị nút đổi avatar nếu là chủ
   const uploadBtn = document.getElementById('pro-avatar-upload-btn');

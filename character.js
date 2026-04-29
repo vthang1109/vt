@@ -431,21 +431,12 @@ export async function renderChibiForUid(container, uid) {
     renderChibiTo(container, system, equipped);
   } catch(e) { console.error(e); }
 }
-// dòng 421 — thêm hàm load char theo uid
-export async function renderChibiForUid(container, uid) {
-  if (!container) return;
-  try {
-    const snap = await getDoc(doc(db, 'users', uid));
-    if (!snap.exists()) return;
-    const d = snap.data();
-    const system   = d.characterV3?.system   || 'real';
-    const equipped = d.characterV3?.equipped?.[system] || {};
-    renderChibiTo(container, system, equipped);
-  } catch(e) { console.error(e); }
-}
 function renderProfilePreview() {
   const frame = document.getElementById('pro-character-frame');
   if (!frame) return;
+  // Chỉ render khi đang xem profile của chính mình, tránh ghi đè nhân vật người khác
+  const viewUid = new URLSearchParams(window.location.search).get('uid');
+  if (viewUid && viewUid !== auth.currentUser?.uid) return;
   renderChibiTo(frame, state.system, state.equipped[state.system]);
 }
 

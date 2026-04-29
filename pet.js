@@ -10,7 +10,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
   authDomain: "lienquan-fake.firebaseapp.com",
   projectId: "lienquan-fake",
-  storageBucket: "lienquan-fake.appspot.com",
+storageBucket: "lienquan-fake.firebasestorage.app",
   messagingSenderId: "782694799992",
   appId: "1:782694799992:web:2d8e4a28626c3bbae8ab8d"
 };
