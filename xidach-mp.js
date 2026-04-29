@@ -165,7 +165,8 @@ function render(r) {
     } else if (isDealer) {
       visibleCount = dealerOpen ? hand.length : 0;
     } else {
-      visibleCount = (gs.phase === 'result' || (gs.phase === 'dealer' && checked)) ? hand.length : 0;
+      // Lật bài ngay khi có kết quả (dù chưa đến phase result)
+visibleCount = (gs.phase === 'result' || (gs.phase === 'dealer' && checked) || gs.results?.[uid]) ? hand.length : 0;
     }
 
     let cardsHtml = hand.length === 0
@@ -210,57 +211,111 @@ function render(r) {
       }
     }
 
-    // Result overlay
-    let resultOverlayHtml = '';
+    // // Result overlay
+    // let resultOverlayHtml = '';
+    // if (gs.phase === 'result') {
+    //   if (isDealer) {
+    //     // Nhà cái
+    //     if (dealerStat) {
+    //       if (dealerStat.tag === 'xi_bang') {
+    //         resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ BÀN</div>';
+    //       } else if (dealerStat.tag === 'xi_dach') {
+    //         resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ DÁCH</div>';
+    //       } else if (dealerStat.tag === 'ngu_linh') {
+    //         resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">NGŨ LINH</div>';
+    //       } else if (dealerStat.tag === 'bust') {
+    //         resultOverlayHtml = '<div class="xd-result-overlay xd-result-bust">QUẮC</div>';
+    //       }
+    //     }
+    //     if (!resultOverlayHtml) {
+    //       const delta = gs.dealerDelta || 0;
+    //       if (delta > 0) {
+    //         resultOverlayHtml = `<div class="xd-result-overlay xd-result-win">+${delta.toLocaleString('vi-VN')}đ</div>`;
+    //       } else if (delta < 0) {
+    //         resultOverlayHtml = `<div class="xd-result-overlay xd-result-lose">${delta.toLocaleString('vi-VN')}đ</div>`;
+    //       } else {
+    //         resultOverlayHtml = '<div class="xd-result-overlay xd-result-draw">HÒA</div>';
+    //       }
+    //     }
+    //   } else if (gs.results?.[uid]) {
+    //     // Nhà con
+    //     const res = gs.results[uid];
+    //     let overlayClass = '', overlayText = '';
+    //     if (stat?.tag === 'xi_bang') {
+    //       overlayClass = 'xd-result-special'; overlayText = 'XÌ BÀN';
+    //     } else if (stat?.tag === 'xi_dach') {
+    //       overlayClass = 'xd-result-special'; overlayText = 'XÌ DÁCH';
+    //     } else if (stat?.tag === 'ngu_linh') {
+    //       overlayClass = 'xd-result-special'; overlayText = 'NGŨ LINH';
+    //     } else if (stat?.tag === 'bust') {
+    //       overlayClass = 'xd-result-bust'; overlayText = 'QUẮC';
+    //     } else if (res.outcome === 'win') {
+    //       overlayClass = 'xd-result-win';
+    //       overlayText = `+${res.delta.toLocaleString('vi-VN')}đ`;
+    //     } else if (res.outcome === 'lose') {
+    //       overlayClass = 'xd-result-lose';
+    //       overlayText = `${res.delta.toLocaleString('vi-VN')}đ`; // delta đã âm
+    //     } else {
+    //       overlayClass = 'xd-result-draw';
+    //       overlayText = 'HÒA';
+    //     }
+    //     resultOverlayHtml = `<div class="xd-result-overlay ${overlayClass}">${overlayText}</div>`;
+    //   }
+    // }
+    
+    // Result overlay (hiển thị ngay khi có kết quả, không cần chờ phase result)
+let resultOverlayHtml = '';
+if (gs.phase === 'result' || gs.results?.[uid]) { // ← THÊM || gs.results?.[uid]
+  if (isDealer) {
+    // Giữ nguyên phần code cho nhà cái (chỉ hiện ở phase result)
     if (gs.phase === 'result') {
-      if (isDealer) {
-        // Nhà cái
-        if (dealerStat) {
-          if (dealerStat.tag === 'xi_bang') {
-            resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ BÀN</div>';
-          } else if (dealerStat.tag === 'xi_dach') {
-            resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ DÁCH</div>';
-          } else if (dealerStat.tag === 'ngu_linh') {
-            resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">NGŨ LINH</div>';
-          } else if (dealerStat.tag === 'bust') {
-            resultOverlayHtml = '<div class="xd-result-overlay xd-result-bust">QUẮC</div>';
-          }
+      if (dealerStat) {
+        if (dealerStat.tag === 'xi_bang') {
+          resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ BÀN</div>';
+        } else if (dealerStat.tag === 'xi_dach') {
+          resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ DÁCH</div>';
+        } else if (dealerStat.tag === 'ngu_linh') {
+          resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">NGŨ LINH</div>';
+        } else if (dealerStat.tag === 'bust') {
+          resultOverlayHtml = '<div class="xd-result-overlay xd-result-bust">QUẮC</div>';
         }
-        if (!resultOverlayHtml) {
-          const delta = gs.dealerDelta || 0;
-          if (delta > 0) {
-            resultOverlayHtml = `<div class="xd-result-overlay xd-result-win">+${delta.toLocaleString('vi-VN')}đ</div>`;
-          } else if (delta < 0) {
-            resultOverlayHtml = `<div class="xd-result-overlay xd-result-lose">${delta.toLocaleString('vi-VN')}đ</div>`;
-          } else {
-            resultOverlayHtml = '<div class="xd-result-overlay xd-result-draw">HÒA</div>';
-          }
-        }
-      } else if (gs.results?.[uid]) {
-        // Nhà con
-        const res = gs.results[uid];
-        let overlayClass = '', overlayText = '';
-        if (stat?.tag === 'xi_bang') {
-          overlayClass = 'xd-result-special'; overlayText = 'XÌ BÀN';
-        } else if (stat?.tag === 'xi_dach') {
-          overlayClass = 'xd-result-special'; overlayText = 'XÌ DÁCH';
-        } else if (stat?.tag === 'ngu_linh') {
-          overlayClass = 'xd-result-special'; overlayText = 'NGŨ LINH';
-        } else if (stat?.tag === 'bust') {
-          overlayClass = 'xd-result-bust'; overlayText = 'QUẮC';
-        } else if (res.outcome === 'win') {
-          overlayClass = 'xd-result-win';
-          overlayText = `+${res.delta.toLocaleString('vi-VN')}đ`;
-        } else if (res.outcome === 'lose') {
-          overlayClass = 'xd-result-lose';
-          overlayText = `${res.delta.toLocaleString('vi-VN')}đ`; // delta đã âm
+      }
+      if (!resultOverlayHtml) {
+        const delta = gs.dealerDelta || 0;
+        if (delta > 0) {
+          resultOverlayHtml = `<div class="xd-result-overlay xd-result-win">+${delta.toLocaleString('vi-VN')}đ</div>`;
+        } else if (delta < 0) {
+          resultOverlayHtml = `<div class="xd-result-overlay xd-result-lose">${delta.toLocaleString('vi-VN')}đ</div>`;
         } else {
-          overlayClass = 'xd-result-draw';
-          overlayText = 'HÒA';
+          resultOverlayHtml = '<div class="xd-result-overlay xd-result-draw">HÒA</div>';
         }
-        resultOverlayHtml = `<div class="xd-result-overlay ${overlayClass}">${overlayText}</div>`;
       }
     }
+  } else if (gs.results?.[uid]) {
+    // Nhà con – hiện ngay khi có kết quả (kể cả khi phase chưa phải result)
+    const res = gs.results[uid];
+    let overlayClass = '', overlayText = '';
+    if (stat?.tag === 'xi_bang') {
+      overlayClass = 'xd-result-special'; overlayText = 'XÌ BÀN';
+    } else if (stat?.tag === 'xi_dach') {
+      overlayClass = 'xd-result-special'; overlayText = 'XÌ DÁCH';
+    } else if (stat?.tag === 'ngu_linh') {
+      overlayClass = 'xd-result-special'; overlayText = 'NGŨ LINH';
+    } else if (stat?.tag === 'bust') {
+      overlayClass = 'xd-result-bust'; overlayText = 'QUẮC';
+    } else if (res.outcome === 'win') {
+      overlayClass = 'xd-result-win';
+      overlayText = `+${res.delta.toLocaleString('vi-VN')}đ`;
+    } else if (res.outcome === 'lose') {
+      overlayClass = 'xd-result-lose';
+      overlayText = `${res.delta.toLocaleString('vi-VN')}đ`; // delta đã âm
+    } else {
+      overlayClass = 'xd-result-draw';
+      overlayText = 'HÒA';
+    }
+    resultOverlayHtml = `<div class="xd-result-overlay ${overlayClass}">${overlayText}</div>`;
+  }
+}
 
     // Badge tiền cược
     let betBadgeHtml = '';

@@ -8,11 +8,10 @@ import {
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const GAMES = {
-  caro:      { id: 'caro',      name: 'Caro 5 hàng',     icon: '♟️', max: 2, min: 2, page: 'caro-mp.html',      ready: true },
+  xidach:    { id: 'xidach',    name: 'Xì dách',     icon: '♣️', max: 5, min: 2, page: 'xidach-mp.html',    ready: true },
+  baucua:    { id: 'baucua',    name: 'Bầu Cua',     icon: '🎲', max: 8, min: 2, page: 'baucua-mp.html',    ready: true },
+  caro:      { id: 'caro',      name: 'Caro',     icon: '♟️', max: 2, min: 2, page: 'caro-mp.html',      ready: true },
   tictactoe: { id: 'tictactoe', name: 'Tic-Tac-Toe',     icon: '⭕', max: 2, min: 2, page: 'tictactoe-mp.html', ready: true },
-  baucua:    { id: 'baucua',    name: 'Bầu Cua bàn',     icon: '🎲', max: 8, min: 2, page: 'baucua-mp.html',    ready: true },
-  xidach:    { id: 'xidach',    name: 'Xì dách bàn',     icon: '🀄', max: 5, min: 2, page: 'xidach-mp.html',    ready: true },
-  quiz:      { id: 'quiz',      name: 'Quiz đối kháng',  icon: '❓', max: 6, min: 2, page: '#',                 ready: false }
 };
 
 let _user = null;

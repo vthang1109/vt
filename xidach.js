@@ -1,22 +1,35 @@
-// xidach.js — Xì Dách Offline (Chơi đơn vs Nhà Cái)
+// xidach.js — Xì Dách Offline (Máy cầm cái, luật mới)
 import { createDeck, renderCardUI } from './cards.js';
+import { auth, db } from './points.js';
+import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { addPoints, getPoints } from './points.js';
 
 class XiDach {
     constructor() {
         this.deck = [];
         this.dealer = { hand: [] };
-        this.players = [{ hand: [], status: 'playing', result: '' }];
+        this.players = [{ hand: [], result: '' }];
         this.balance = 0;
         this.currentBet = 0;
         this.dealerDone = false;
         this.isBusy = false;
         this.isPlayerFlipped = false;
-
-        this.init();
+        this.phase = 'betting';
+        this.dealerResult = '';
+        this.unsubBalance = null;
+        this.initAfterAuth();
     }
 
-    async init() {
+    async initAfterAuth() {
+        await new Promise((resolve) => {
+            const unsub = onAuthStateChanged(auth, (user) => {
+                unsub();
+                if (user) resolve();
+                else location.href = 'index.html';
+            });
+        });
+
         const style = document.createElement('style');
         style.textContent = `
             .card-new { animation: cardAppear 0.4s ease-out forwards; }
@@ -24,320 +37,384 @@ class XiDach {
                 0% { transform: translateY(-50px) rotate(-10deg); opacity: 0; }
                 100% { transform: translateY(0) rotate(0); opacity: 1; }
             }
-            .hand { display: flex; gap: 5px; justify-content: center; min-height: 120px; align-items: center; }
         `;
         document.head.appendChild(style);
 
-        await this.refreshPts();
-        this.bindEvents();
+        this.listenBalance();
         window.game = this;
+
+        document.getElementById('xd-bet-row').style.display = 'flex';
+        document.getElementById('xd-phase').textContent = 'Đặt cược để bắt đầu';
     }
 
-    bindEvents() {
-        document.querySelectorAll('.bet-opt').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const amt = btn.getAttribute('data-amount');
-                this.placeBet(amt === 'all' ? 'all' : parseInt(amt));
-            });
+    listenBalance() {
+        if (this.unsubBalance) this.unsubBalance();
+        this.unsubBalance = onSnapshot(doc(db, 'users', auth.currentUser.uid), (snap) => {
+            if (snap.exists()) {
+                this.balance = snap.data().points || 0;
+                const el = document.getElementById('xd-balance-detail');
+                if (el) el.textContent = this.balance.toLocaleString('vi-VN') + ' đ';
+            }
         });
+    }
 
-        // Đóng overlay khi click ra ngoài
-        const betOverlay = document.getElementById('bet-selector');
-        if (betOverlay) {
-            betOverlay.addEventListener('click', (e) => {
-                if (e.target === betOverlay) betOverlay.classList.remove('active');
-            });
+    async placeBet() {
+        if (this.isBusy) {
+            window.showToast('⏳ Đang xử lý ván trước...', 'warn');
+            return;
         }
-        const modeOverlay = document.getElementById('mode-selector');
-        if (modeOverlay) {
-            modeOverlay.addEventListener('click', (e) => {
-                if (e.target === modeOverlay) modeOverlay.classList.remove('active');
-            });
+        if (this.phase !== 'betting' && this.phase !== 'result') {
+            window.showToast('⏳ Không thể đặt cược lúc này', 'warn');
+            return;
         }
-    }
 
-    async refreshPts() {
-        this.balance = await getPoints();
-        const el = document.getElementById('nav-pts');
-        if (el) el.textContent = '⭐ ' + this.balance.toLocaleString();
-    }
-
-    showModes() {
-        document.getElementById('mode-selector').classList.add('active');
-    }
-
-    setMode(m) {
-        if (m === 'solo') {
-            document.getElementById('mode-selector').classList.remove('active');
-            this.showBetting();
+        let currentPoints;
+        try {
+            currentPoints = await getPoints();
+        } catch (e) {
+            window.showToast('Lỗi kiểm tra điểm', 'error');
+            return;
         }
-    }
+        if (currentPoints !== null) this.balance = currentPoints;
 
-    async showBetting() {
-        await this.refreshPts();
-        const balEl = document.getElementById('current-balance');
-        if (balEl) balEl.textContent = `Số dư: ⭐ ${this.balance.toLocaleString()}`;
-        document.getElementById('bet-selector').classList.add('active');
-    }
+        const amt = parseInt(document.getElementById('xd-bet-input').value);
+        if (!amt || amt < 50) { window.showToast('Cược tối thiểu 50 ⭐', 'warn'); return; }
+        if (amt > this.balance) { window.showToast('Không đủ điểm!', 'error'); return; }
 
-    async placeBet(amount) {
-        if (amount === 'all') amount = this.balance;
-        if (amount > this.balance || amount <= 0) return alert("Tiền không hợp lệ!");
-        
-        this.currentBet = amount;
-        document.getElementById('bet-selector').classList.remove('active');
-        
-        await addPoints('Casino', 'Cược Xì Dách', -this.currentBet);
-        await this.refreshPts();
-        
-        this.startDeal();
+        this.currentBet = amt;
+        try {
+            await addPoints('Casino', 'Cược Xì Dách', -this.currentBet);
+            // Bắt đầu ván mới
+            await this.startDeal();
+        } catch (e) {
+            console.error(e);
+            window.showToast('Lỗi đặt cược: ' + e.message, 'error');
+            // Khôi phục trạng thái
+            this.phase = 'betting';
+            document.getElementById('xd-bet-row').style.display = 'flex';
+        }
     }
 
     async startDeal() {
         if (this.isBusy) return;
-
-        // Nếu đây là ván mới và đã có kết quả trước đó, trừ tiền cược
-        if (this.players[0].result !== '') {
-            await this.refreshPts();
-            if (this.balance < this.currentBet) {
-                return alert("Bạn không đủ tiền để tiếp tục mức cược này!");
-            }
-            await addPoints('Casino', 'Cược Xì Dách (Ván mới)', -this.currentBet);
-            await this.refreshPts();
-        }
-
-        if (this.balance < 0) return alert("Hết tiền cược!");
+        if (this.balance < 50) { window.showToast('Không đủ điểm!', 'error'); return; }
 
         this.isBusy = true;
         this.dealerDone = false;
         this.isPlayerFlipped = false;
         this.players[0].result = '';
+        this.dealerResult = '';
+        this.phase = 'playing';
 
-        const deck = createDeck();
-        this.deck = deck;
-        this.dealer.hand = [deck.pop(), deck.pop()];
-        this.players[0].hand = [deck.pop(), deck.pop()];
+        // Ẩn ô cược
+        document.getElementById('xd-bet-row').style.display = 'none';
 
-        // Kiểm tra đặc biệt ngay sau khi chia bài
-        if (this.checkSpecials(this.dealer.hand) || this.checkSpecials(this.players[0].hand)) {
-            this.dealerDone = true;
-            this.isPlayerFlipped = true;
-            this.endGame();
-        } else {
-            this.render(false);
-            this.updateButtons(true); // Cho phép nhấn nút MỞ BÀI
+        try {
+            // Tạo bộ bài mới
+            this.deck = createDeck();
+            if (!this.deck || this.deck.length < 4) {
+                throw new Error('Bộ bài không đủ lá');
+            }
+            this.dealer.hand = [this.deck.pop(), this.deck.pop()];
+            this.players[0].hand = [this.deck.pop(), this.deck.pop()];
+
+            if (this.checkSpecials(this.dealer.hand) || this.checkSpecials(this.players[0].hand)) {
+                this.dealerDone = true;
+                this.isPlayerFlipped = true;
+                this.phase = 'result';
+                this.endGame();
+            } else {
+                this.render();
+                this.updateButtons(true);
+                document.getElementById('xd-phase').textContent = '🎯 Đến lượt BẠN';
+            }
+        } catch (e) {
+            console.error('Lỗi khi chia bài:', e);
+            window.showToast('Lỗi chia bài, thử lại', 'error');
+            // Quay về betting
+            this.phase = 'betting';
+            document.getElementById('xd-bet-row').style.display = 'flex';
+        } finally {
+            this.isBusy = false;
         }
-
-        this.isBusy = false;
     }
 
     getScore(hand) {
-        let s = 0, a = 0;
-        for (let c of hand) {
-            if (c.v === 'A') { a++; s += 11; }
-            else if (['J', 'Q', 'K'].includes(c.v)) s += 10;
-            else s += parseInt(c.v);
+        if (!hand || hand.length === 0) return 0;
+        let total = 0, aces = 0;
+        for (const c of hand) {
+            if (c.v === 'A') aces++;
+            else if (['J','Q','K'].includes(c.v)) total += 10;
+            else total += parseInt(c.v);
         }
-        while (s > 21 && a > 0) { s -= 10; a--; }
-        return s;
+        if (hand.length === 2 && aces === 2) return 21;
+        const possible = hand.length <= 3 ? [1,10,11] : [1];
+        let best = 0;
+        const tryAces = (idx, sum) => {
+            if (idx === aces) {
+                if (sum <= 21 && sum > best) best = sum;
+                else if (sum > 21 && (best === 0 || sum < best)) best = sum;
+                return;
+            }
+            for (const v of possible) tryAces(idx+1, sum+v);
+        };
+        tryAces(0, total);
+        return best;
     }
 
     checkSpecials(hand) {
         if (hand.length !== 2) return null;
         const v = [hand[0].v, hand[1].v];
-        if (v[0] === 'A' && v[1] === 'A') return 'AA';
-        const isHigh = (val) => ['10', 'J', 'Q', 'K'].includes(val);
-        if ((v[0] === 'A' && isHigh(v[1])) || (v[1] === 'A' && isHigh(v[0]))) return 'XD';
+        if (v[0] === 'A' && v[1] === 'A') return 'xi_bang';
+        const isHigh = (val) => ['10','J','Q','K'].includes(val);
+        if ((v[0] === 'A' && isHigh(v[1])) || (v[1] === 'A' && isHigh(v[0]))) return 'xi_dach';
         return null;
     }
 
+    getHandStatus(hand) {
+        const score = this.getScore(hand);
+        const len = hand.length;
+        if (len === 2 && hand[0].v === 'A' && hand[1].v === 'A') return { score, tag: 'xi_bang' };
+        if (len === 2) {
+            const hasA = hand.some(c => c.v === 'A');
+            const hasTen = hand.some(c => ['10','J','Q','K'].includes(c.v));
+            if (hasA && hasTen) return { score: 21, tag: 'xi_dach' };
+        }
+        if (len === 5 && score <= 21) return { score, tag: 'ngu_linh' };
+        if (score > 21) return { score, tag: 'bust' };
+        return { score, tag: 'ok' };
+    }
+
     async hit() {
-        // Nếu chưa lật bài, lần nhấn đầu tiên là lật bài
         if (!this.isPlayerFlipped) {
             this.isPlayerFlipped = true;
-            this.render(false);
+            this.render();
             this.updateButtons(true);
             return;
         }
-
         const hand = this.players[0].hand;
         if (hand.length >= 5) return;
-        
+        if (this.deck.length === 0) {
+            window.showToast('Bộ bài đã hết!', 'warn');
+            await this.stand();
+            return;
+        }
         const newCard = this.deck.pop();
+        if (!newCard) {
+            await this.stand();
+            return;
+        }
         newCard.isNew = true;
         hand.push(newCard);
-        
-        const sc = this.getScore(hand);
-
-        this.render(false);
-        if (sc >= 21 || hand.length >= 5) {
-            this.stand();
-        } else {
-            this.updateButtons(true);
-        }
+        this.render();
+        if (this.getScore(hand) >= 21 || hand.length >= 5) await this.stand();
+        else this.updateButtons(true);
     }
 
     async stand() {
-        await this.dealerTurnSolo();
+        this.isPlayerFlipped = true;
+        this.phase = 'dealer';
+        document.getElementById('xd-phase').textContent = '🃏 Nhà cái đang chơi...';
+        this.updateButtons(false);
+        await new Promise(r => setTimeout(r, 1000));
+        await this.dealerTurn();
     }
 
-    async dealerTurnSolo() {
+    async dealerTurn() {
         this.isBusy = true;
-        this.isPlayerFlipped = true;
         this.render(true);
 
-        while (this.getScore(this.dealer.hand) < 15 && this.dealer.hand.length < 5) {
-            await new Promise(r => setTimeout(r, 800));
-            const newCard = this.deck.pop();
-            newCard.isNew = true;
-            this.dealer.hand.push(newCard);
+        let safety = 0;
+        while (this.deck.length > 0 && this.getScore(this.dealer.hand) < 15 && this.dealer.hand.length < 5) {
+            const card = this.deck.pop();
+            if (!card) break;
+            card.isNew = true;
+            this.dealer.hand.push(card);
             this.render(true);
+            await new Promise(r => setTimeout(r, 800));
+            safety++;
+            if (safety > 20) break;
         }
 
         this.dealerDone = true;
+        this.phase = 'result';
         this.endGame();
     }
 
     async endGame() {
-        const dS = this.getScore(this.dealer.hand);
-        const dL = this.dealer.hand.length;
-        const dSpec = this.checkSpecials(this.dealer.hand);
-        
-        const p = this.players[0];
-        const pS = this.getScore(p.hand);
-        const pL = p.hand.length;
-        const pSpec = this.checkSpecials(p.hand);
+        const dStat = this.getHandStatus(this.dealer.hand);
+        const pStat = this.getHandStatus(this.players[0].hand);
 
-        let res = '';
-        if (pSpec || dSpec) {
-            if (pSpec === 'AA' && dSpec !== 'AA') res = 'AA';
-            else if (pSpec === 'XD' && !dSpec) res = 'XD';
-            else if (pSpec === dSpec && pSpec) res = 'HÒA';
-            else res = 'THUA';
-        } else if (pL === 5 && pS <= 21) {
-            res = (dL === 5 && dS <= 21) ? (pS < dS ? 'NGŨ LINH' : (pS > dS ? 'THUA' : 'HÒA')) : 'NGŨ LINH';
-        } else if (pS > 21) {
-            res = (dS > 21) ? 'HÒA' : 'THUA';
-        } else if (dL === 5 && dS <= 21) {
+        let res = '', delta = 0;
+
+        if (pStat.tag === 'bust') {
+            res = 'QUẮC';
+            delta = 0;
+            this.dealerResult = 'THẮNG';
+        }
+        else if (pStat.tag === 'xi_bang' && dStat.tag !== 'xi_bang') {
+            res = 'XÌ BÀN';
+            delta = this.currentBet * 2;
+        }
+        else if (pStat.tag === 'xi_dach' && dStat.tag !== 'xi_dach' && dStat.tag !== 'xi_bang') {
+            res = 'XÌ DÁCH';
+            delta = this.currentBet * 2;
+        }
+        else if (dStat.tag === 'xi_bang' || dStat.tag === 'xi_dach') {
             res = 'THUA';
-        } else if (dS > 21 || pS > dS) {
+            delta = 0;
+        }
+        else if (pStat.tag === 'ngu_linh' && dStat.tag !== 'ngu_linh') {
+            res = 'NGŨ LINH';
+            delta = this.currentBet * 2;
+        }
+        else if (dStat.tag === 'ngu_linh' && pStat.tag !== 'ngu_linh') {
+            res = 'THUA';
+            delta = 0;
+        }
+        else if (dStat.tag === 'bust') {
             res = 'THẮNG';
-        } else if (pS === dS) {
-            res = 'HÒA';
-        } else {
+            delta = this.currentBet * 2;
+        }
+        else if (pStat.score > dStat.score) {
+            res = 'THẮNG';
+            delta = this.currentBet * 2;
+        }
+        else if (pStat.score < dStat.score) {
             res = 'THUA';
+            delta = 0;
+        }
+        else {
+            res = 'HÒA';
+            delta = this.currentBet;
         }
 
-        p.result = res;
+        this.players[0].result = res;
 
-        let winMult = 0;
-        if (['THẮNG', 'NGŨ LINH', 'XD', 'AA'].includes(res)) winMult = 2;
-        else if (res === 'HÒA') winMult = 1;
-
-        if (winMult > 0) {
-            await addPoints('Casino', 'Kết quả Xì Dách', this.currentBet * winMult);
-            await this.refreshPts();
+        if (!this.dealerResult) {
+            if (dStat.tag === 'xi_bang') this.dealerResult = 'XÌ BÀN';
+            else if (dStat.tag === 'xi_dach') this.dealerResult = 'XÌ DÁCH';
+            else if (dStat.tag === 'ngu_linh') this.dealerResult = 'NGŨ LINH';
+            else if (dStat.tag === 'bust') this.dealerResult = 'QUẮC';
+            else {
+                if (res === 'THẮNG' || res === 'XÌ BÀN' || res === 'XÌ DÁCH' || res === 'NGŨ LINH') this.dealerResult = 'THUA';
+                else if (res === 'THUA' || res === 'QUẮC') this.dealerResult = 'THẮNG';
+                else this.dealerResult = 'HÒA';
+            }
         }
-        
+
+        if (delta > 0) {
+            try { await addPoints('Casino', 'Thắng Xì Dách', delta); } catch(e){}
+        }
+
         this.render(true);
         this.updateButtons(false);
+
+        let msg = res;
+        if (delta > 0) msg += ` - Nhận ${delta.toLocaleString('vi-VN')}đ`;
+        else if (res === 'QUẮC' || res === 'THUA') msg += ` - Mất ${this.currentBet.toLocaleString('vi-VN')}đ`;
+        document.getElementById('xd-phase').textContent = `📢 ${msg}`;
+
         this.isBusy = false;
-        document.getElementById('status-msg').textContent = "VÁN ĐẤU KẾT THÚC";
+        this.phase = 'betting';
+        document.getElementById('xd-bet-row').style.display = 'flex';
+    }
+
+    // ==================== RENDER (ĐÃ SỬA LỖI NHẢY) ====================
+    render(showDealer = false) {
+        const dScore = this.getScore(this.dealer.hand);
+        const dStat = this.getHandStatus(this.dealer.hand);
+        const p = this.players[0];
+        const pScore = this.getScore(p.hand);
+
+        let dealerResultHtml = '';
+        if (this.dealerDone || this.phase === 'result') {
+            const dRes = this.dealerResult;
+            if (dRes === 'XÌ BÀN' || dRes === 'XÌ DÁCH' || dRes === 'NGŨ LINH') {
+                dealerResultHtml = `<div class="xd-result-overlay xd-result-special">${dRes}</div>`;
+            } else if (dRes === 'QUẮC') {
+                dealerResultHtml = '<div class="xd-result-overlay xd-result-bust">QUẮC</div>';
+            } else if (dRes === 'THẮNG') {
+                dealerResultHtml = '<div class="xd-result-overlay xd-result-win">THẮNG</div>';
+            } else if (dRes === 'THUA') {
+                dealerResultHtml = '<div class="xd-result-overlay xd-result-lose">THUA</div>';
+            } else if (dRes === 'HÒA') {
+                dealerResultHtml = '<div class="xd-result-overlay xd-result-draw">HÒA</div>';
+            }
+        }
+
+        let playerResultHtml = '';
+        if (p.result) {
+            if (p.result === 'XÌ BÀN' || p.result === 'XÌ DÁCH' || p.result === 'NGŨ LINH') {
+                playerResultHtml = `<div class="xd-result-overlay xd-result-special">${p.result}</div>`;
+            } else if (p.result === 'QUẮC') {
+                playerResultHtml = '<div class="xd-result-overlay xd-result-bust">QUẮC</div>';
+            } else if (p.result === 'THẮNG') {
+                playerResultHtml = '<div class="xd-result-overlay xd-result-win">THẮNG</div>';
+            } else if (p.result === 'THUA') {
+                playerResultHtml = '<div class="xd-result-overlay xd-result-lose">THUA</div>';
+            } else if (p.result === 'HÒA') {
+                playerResultHtml = '<div class="xd-result-overlay xd-result-draw">HÒA</div>';
+            }
+        }
+
+        const tableEl = document.getElementById('xd-table');
+        tableEl.innerHTML = `
+            <div class="xd-seat dealer">
+                ${dealerResultHtml}
+                <div class="xd-seat-head">
+                    <span class="xd-seat-name">👑 Nhà Cái <span class="xd-score-inline">${showDealer || this.dealerDone ? dScore : '?'}</span></span>
+                </div>
+                <div class="xd-cards">
+                    ${this.dealer.hand.length ? this.dealer.hand.map((c, i) => {
+                        const shouldHide = !showDealer && !this.dealerDone;
+                        const html = renderCardUI(c, shouldHide);
+                        const finalHtml = c.isNew ? html.replace('class="card', 'class="card card-new') : html;
+                        delete c.isNew;
+                        return finalHtml;
+                    }).join('') : '<div style="color:#64748b;font-size:12px;padding:8px 0">Chưa có bài</div>'}
+                </div>
+            </div>
+
+            <div class="xd-seat me ${this.phase === 'playing' ? 'turn' : ''}">
+                ${playerResultHtml}
+                <div class="xd-seat-head">
+                    <span class="xd-seat-name">Bạn <span class="xd-score-inline">${this.isPlayerFlipped || this.phase === 'result' ? pScore : '?'}</span></span>
+                </div>
+                <div class="xd-cards">
+                    ${p.hand.length ? p.hand.map((c, i) => {
+                        const shouldHide = !this.isPlayerFlipped && this.phase !== 'result';
+                        const html = renderCardUI(c, shouldHide);
+                        const finalHtml = c.isNew ? html.replace('class="card', 'class="card card-new') : html;
+                        delete c.isNew;
+                        return finalHtml;
+                    }).join('') : '<div style="color:#64748b;font-size:12px;padding:8px 0">Chưa có bài</div>'}
+                </div>
+                <div class="xd-bet-badge">${this.currentBet ? this.currentBet.toLocaleString('vi-VN') + 'đ' : ''}</div>
+            </div>
+        `;
     }
 
     updateButtons(canPlay) {
-        const pS = this.getScore(this.players[0].hand);
-        const pL = this.players[0].hand.length;
-        const isGameOver = this.players[0].result !== '';
+        const isPlayingPhase = this.phase === 'playing' && !this.players[0].result;
+        document.getElementById('btn-hit').style.display = isPlayingPhase ? 'inline-block' : 'none';
+        document.getElementById('btn-stand').style.display = isPlayingPhase ? 'inline-block' : 'none';
 
-        const hitBtn = document.getElementById('btn-hit');
-        const standBtn = document.getElementById('btn-stand');
-        const dealBtn = document.getElementById('btn-deal');
-
-        // Nút HIT (Mở bài / Rút bài)
-        // Luôn bật nếu đến lượt và game chưa kết thúc
-        hitBtn.disabled = !canPlay || isGameOver;
-        
-        if (!this.isPlayerFlipped) {
-            // Chưa lật bài: nút hiển thị "MỞ BÀI", luôn bật (khi canPlay)
-            hitBtn.textContent = "MỞ BÀI";
-        } else {
-            // Đã lật bài: nút hiển thị "RÚT BÀI", chỉ tắt nếu quá điểm hoặc quá lá
-            if (pS >= 21 || pL >= 5) {
-                hitBtn.disabled = true;
-            }
-            hitBtn.textContent = "RÚT BÀI";
-        }
-
-        // Nút DẰN chỉ bật khi đã lật bài và đủ 16 điểm hoặc 5 lá
-        const hasEnough = (pS >= 16 || pL === 5);
-        standBtn.disabled = !canPlay || !hasEnough || !this.isPlayerFlipped || isGameOver;
-
-        // Nút VÁN MỚI chỉ bật khi game kết thúc
-        dealBtn.disabled = !isGameOver;
-
-        if (isGameOver) {
-            document.getElementById('status-msg').textContent = "VÁN ĐẤU KẾT THÚC";
+        if (canPlay && this.phase === 'playing') {
+            const pScore = this.getScore(this.players[0].hand);
+            const pLen = this.players[0].hand.length;
+            const hitBtn = document.getElementById('btn-hit');
+            hitBtn.disabled = (this.isPlayerFlipped && (pScore >= 21 || pLen >= 5));
+            hitBtn.textContent = this.isPlayerFlipped ? 'RÚT BÀI' : 'MỞ BÀI';
+            document.getElementById('btn-stand').disabled = !this.isPlayerFlipped || !(pScore >= 16 || pLen === 5);
         }
     }
 
-    render(showDealer = false) {
-        const dScore = this.getScore(this.dealer.hand);
-        const dSpec = this.checkSpecials(this.dealer.hand);
-        const dL = this.dealer.hand.length;
-        const p = this.players[0];
-        
-        let dTxt = '', dCls = '';
-        
-        if (this.dealerDone || p.result !== '') {
-            if (dSpec) { dTxt = dSpec === 'AA' ? 'XÌ BÀN' : 'XÌ DÁCH'; dCls = 'result-special'; }
-            else if (dL === 5 && dScore <= 21) { dTxt = 'NGŨ LINH'; dCls = 'result-special'; }
-            else if (dScore > 21) { dTxt = 'QUẮC'; dCls = 'result-lose'; }
-            else if (p.result !== '') {
-                if (['THẮNG', 'NGŨ LINH', 'XD', 'AA'].includes(p.result)) { dTxt = 'THUA'; dCls = 'result-lose'; }
-                else if (p.result === 'THUA') { dTxt = 'THẮNG'; dCls = 'result-win'; }
-                else if (p.result === 'HÒA') { dTxt = 'HÒA'; dCls = 'result-draw'; }
-            }
+    quit() {
+        if (confirm('Bạn muốn rời game?')) {
+            if (this.unsubBalance) this.unsubBalance();
+            location.href = 'games.html';
         }
-        
-        document.getElementById('dealer-container').innerHTML = `
-            <div class="player-hand active" style="border: 2px solid #ef4444; background: rgba(239, 68, 68, 0.05);">
-                ${dTxt ? `<div class="result-overlay ${dCls}">${dTxt}</div>` : ''}
-                <div class="hand">
-                    ${this.dealer.hand.map(c => {
-                        const html = renderCardUI(c, !showDealer);
-                        const finalHtml = (c.isNew) ? html.replace('class="card', 'class="card card-new') : html;
-                        delete c.isNew;
-                        return finalHtml;
-                    }).join('')}
-                </div>
-                <div class="badge">NHÀ CÁI: ${showDealer ? `<span style="color:#facc15; font-size: 1.1em; font-weight: 900;">${dScore}</span>` : '???'}</div>
-            </div>`;
-
-        const pS = this.getScore(p.hand);
-        const pSpec = this.checkSpecials(p.hand);
-        let pTxt = '', pCls = '';
-
-        if (p.result) {
-            if (pSpec) { pTxt = pSpec === 'AA' ? 'XÌ BÀN' : 'XÌ DÁCH'; pCls = 'result-special'; }
-            else if (p.result === 'NGŨ LINH') { pTxt = 'NGŨ LINH'; pCls = 'result-special'; }
-            else if (pS > 21) { pTxt = 'QUẮC'; pCls = 'result-lose'; }
-            else { pTxt = p.result; pCls = p.result === 'THẮNG' ? 'result-win' : (p.result === 'HÒA' ? 'result-draw' : 'result-lose'); }
-        }
-        
-        document.getElementById('game-table').innerHTML = `
-            <div class="player-hand active">
-                ${pTxt ? `<div class="result-overlay ${pCls}">${pTxt}</div>` : ''}
-                <div class="hand">
-                    ${p.hand.map(c => {
-                        const html = renderCardUI(c, !this.isPlayerFlipped);
-                        const finalHtml = (c.isNew) ? html.replace('class="card', 'class="card card-new') : html;
-                        delete c.isNew;
-                        return finalHtml;
-                    }).join('')}
-                </div>
-                <div class="badge">BẠN: <span style="color:#facc15; font-size: 1.1em; font-weight: 900;">${this.isPlayerFlipped ? pS : '???'}</span> - CƯỢC: <span style="color:#38bdf8;">${this.currentBet}</span></div>
-            </div>`;
     }
 }
 

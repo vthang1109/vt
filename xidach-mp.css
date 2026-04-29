@@ -1,0 +1,365 @@
+/* ===================== LAYOUT ===================== */
+.xd-wrap { min-height:100vh; padding:14px 12px 40px; max-width:900px; margin:0 auto; position:relative; z-index:1; }
+
+/* ===================== HEADER & HAMBURGER ===================== */
+.xd-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.xd-head-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.xd-head-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.xd-back {
+  background: none;
+  border: none;
+  color: #34d399;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+}
+.xd-room {
+  font-family: 'Orbitron', monospace;
+  color: #34d399;
+  font-weight: 900;
+  font-size: 14px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(52,211,153,.1);
+  border: 1px solid rgba(52,211,153,.4);
+  white-space: nowrap;
+}
+
+/* Hamburger menu */
+.nav-right-menu { position: relative; }
+.nav-hamburger {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #e2e8f0;
+  font-size: 22px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+.nav-hamburger:hover {
+  background: rgba(56,189,248,0.1);
+  border-color: rgba(56,189,248,0.3);
+}
+.nav-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: rgba(4,20,40,0.98);
+  border: 1px solid rgba(56,189,248,0.25);
+  border-radius: 16px;
+  padding: 8px;
+  min-width: 150px;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  z-index: 200;
+  backdrop-filter: blur(16px);
+}
+.nav-dropdown.open {
+  display: flex;
+  animation: slideDown 0.2s ease both;
+}
+.nav-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  font-family: 'Nunito', sans-serif;
+}
+.nav-dropdown-item:hover {
+  background: rgba(56,189,248,0.1);
+  color: #38bdf8;
+}
+.dd-icon { font-size: 18px; width: 24px; text-align: center; }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================== BANK & PHASE ===================== */
+.xd-bank {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(251,191,36,.15), rgba(245,158,11,.05));
+  border: 1px solid rgba(251,191,36,.4);
+  margin-bottom: 14px;
+}
+.xd-bank-l { color:#fef3c7; font-weight:700; font-size:13px; }
+.xd-bank-r { color:#fbbf24; font-weight:900; font-size:18px; font-family:'Orbitron',monospace; }
+
+.xd-phase {
+  text-align: center;
+  padding: 12px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  font-weight: 800;
+  font-size: 14px;
+  background: rgba(56,189,248,.08);
+  color: #7dd3fc;
+  border: 1px solid rgba(56,189,248,.25);
+}
+
+/* ===================== TABLE & SEATS ===================== */
+.xd-table { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+
+.xd-seat {
+  position: relative;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+  transition: all .25s;
+}
+.xd-seat.turn {
+  background: linear-gradient(135deg, rgba(251,191,36,.15), rgba(251,146,60,.06));
+  border-color: rgba(251,191,36,.55);
+  box-shadow: 0 0 20px rgba(251,191,36,.2);
+  animation: seatPulse 1s ease-in-out infinite alternate;
+}
+@keyframes seatPulse {
+  from { box-shadow: 0 0 15px rgba(251,191,36,0.2); }
+  to { box-shadow: 0 0 30px rgba(251,191,36,0.5); }
+}
+.xd-seat.win { background: linear-gradient(135deg, rgba(52,211,153,.18), rgba(5,150,105,.05)); border-color: rgba(52,211,153,.5); }
+.xd-seat.lose { background: rgba(248,113,113,.07); border-color: rgba(248,113,113,.35); opacity:.85; }
+
+/* Nhà cái */
+.xd-seat.dealer {
+  background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(124,58,237,0.1));
+  border: 2px solid #fbbf24;
+  box-shadow: 0 0 18px rgba(251,191,36,0.35);
+}
+.xd-seat.dealer .xd-seat-name { font-size:16px; font-weight:900; color:#fbbf24; text-shadow:0 0 6px rgba(251,191,36,0.7); }
+
+/* Ghế bản thân */
+.xd-seat.me {
+  background: linear-gradient(135deg, rgba(251,191,36,.12), rgba(245,158,11,.06));
+  border: 1px solid rgba(251,191,36,.4);
+  box-shadow: 0 4px 20px rgba(0,0,0,.3);
+}
+
+.xd-seat-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
+.xd-seat-name { font-weight: 800; color: #e0f2fe; font-size: 14px; }
+
+/* Điểm inline */
+.xd-score-inline {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 16px;
+  color: #fbbf24;
+  background: rgba(0,0,0,0.5);
+  padding: 1px 8px;
+  border-radius: 8px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.xd-seat.dealer .xd-score-inline { color: #fbbf24; background: rgba(0,0,0,0.6); }
+
+/* ===================== LÁ BÀI ===================== */
+.xd-cards {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  padding: 2px 0;
+  overflow: hidden;
+  min-height: 80px;
+}
+.xd-cards .card {
+  background: none !important;
+  background-color: transparent !important;
+  aspect-ratio: unset !important;
+  min-height: unset !important;
+  height: auto !important;
+  border-radius: 5px !important;
+}
+
+/* Người chơi khác */
+.xd-cards .card { width: 56px !important; margin-left: -16px !important; }
+.xd-cards .card:first-child { margin-left: 0 !important; }
+
+/* Nhà cái */
+.xd-seat.dealer .xd-cards .card { width: 58px !important; margin-left: -22px !important; }
+.xd-seat.dealer .xd-cards .card:first-child { margin-left: 0 !important; }
+
+/* Bản thân */
+.xd-seat.me .xd-cards .card { width: 62px !important; margin-left: -24px !important; }
+.xd-seat.me .xd-cards .card:first-child { margin-left: 0 !important; }
+
+/* Nhà cái + me */
+.xd-seat.dealer.me .xd-cards .card { width: 62px !important; margin-left: -24px !important; }
+.xd-seat.dealer.me .xd-cards .card:first-child { margin-left: 0 !important; }
+
+.xd-seat:not(.me):not(.dealer) { padding: 7px 10px; }
+
+/* ===================== TIỀN CƯỢC (GÓC DƯỚI PHẢI) ===================== */
+.xd-bet-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(251,191,36,0.5);
+  background: rgba(251,191,36,0.12);
+  color: #fbbf24;
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+/* ===================== NÚT XÉT BÀI NEON ===================== */
+.xd-check-btn-neon {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  padding: 5px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #ef4444;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 15px #ef4444, 0 0 30px rgba(239,68,68,0.6);
+  text-shadow: 0 0 5px rgba(255,255,255,0.5);
+  animation: neonPulse 0.8s infinite alternate;
+  z-index: 30;
+}
+@keyframes neonPulse {
+  from { box-shadow: 0 0 10px #ef4444, 0 0 20px rgba(239,68,68,0.4); }
+  to { box-shadow: 0 0 25px #ef4444, 0 0 50px rgba(239,68,68,0.8); }
+}
+
+/* ===================== KẾT QUẢ NEON TO GIỮA BÀI ===================== */
+.xd-result-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 20px;
+  white-space: nowrap;
+  padding: 10px 20px;
+  border-radius: 12px;
+  pointer-events: none;
+  animation: popResult .45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  line-height: 1.3;
+  text-align: center;
+}
+@keyframes popResult {
+  0%   { transform: translate(-50%,-50%) scale(0.4); opacity: 0; }
+  100% { transform: translate(-50%,-50%) scale(1);   opacity: 1; }
+}
+
+.xd-result-win {
+  background: rgba(34, 197, 94, 0.9);
+  color: #fff;
+  box-shadow: 0 0 30px #22c55e, 0 0 60px rgba(34, 197, 94, 0.5);
+  text-shadow: 0 0 10px #fff, 0 0 20px #22c55e;
+}
+.xd-result-lose {
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+  box-shadow: 0 0 30px #ef4444, 0 0 60px rgba(239, 68, 68, 0.5);
+  text-shadow: 0 0 10px #fff, 0 0 20px #ef4444;
+}
+.xd-result-draw {
+  background: rgba(148, 163, 184, 0.9);
+  color: #fff;
+  box-shadow: 0 0 30px #94a3b8, 0 0 60px rgba(148, 163, 184, 0.5);
+  text-shadow: 0 0 10px #fff, 0 0 20px #94a3b8;
+}
+.xd-result-special {
+  background: linear-gradient(45deg, #facc15, #fb923c);
+  color: #000;
+  box-shadow: 0 0 40px #facc15, 0 0 80px rgba(250, 204, 21, 0.6);
+  text-shadow: 0 0 10px #000, 0 0 20px #fbbf24;
+}
+.xd-result-bust {
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+  box-shadow: 0 0 30px #ef4444, 0 0 60px rgba(239, 68, 68, 0.5);
+  text-shadow: 0 0 10px #fff, 0 0 20px #ef4444;
+}
+
+/* Ẩn các thành phần cũ */
+.xd-seat-meta { display: none !important; }
+.xd-bet-badge-old { display: none !important; }
+.xd-turn-tag  { display: none !important; }
+
+/* ===================== ĐẶT CƯỢC & ACTIONS ===================== */
+.xd-bet-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; justify-content: center; }
+.xd-bet-row label { color: #cbd5e1; font-weight: 700; font-size: 13px; }
+.xd-bet-row input {
+  width: 120px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(56,189,248,.3);
+  background: rgba(0,0,0,.3);
+  color: #e0f2fe;
+  font-family: 'Orbitron', monospace;
+  font-weight: 800;
+  text-align: center;
+}
+.xd-bet-row button {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  background: linear-gradient(135deg,#34d399,#059669);
+  color: #fff;
+}
+
+.xd-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.xd-actions button {
+  padding: 11px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+}
+.btn-hit  { background: linear-gradient(135deg,#38bdf8,#0ea5e9); color: #fff; }
+.btn-stand{ background: linear-gradient(135deg,#a78bfa,#7c3aed); color: #fff; }
+.btn-deal { background: linear-gradient(135deg,#34d399,#059669); color: #fff; }
+.btn-leave-xd { display: none !important; } /* Ẩn nút rời phòng dưới cùng */
+.xd-actions button:disabled { opacity:.5; cursor: not-allowed; }
