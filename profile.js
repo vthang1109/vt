@@ -11,14 +11,21 @@ import './character.js';
 
 let currentUser = null;
 
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async user => {
   if (!user) { location.href = 'index.html'; return; }
   currentUser = user;
   mountPetModal();
   const viewUid = new URLSearchParams(window.location.search).get('uid') || user.uid;
   const isOwner = viewUid === user.uid;
-  
+
   listenProfile(viewUid);
+
+  // Sửa: load char của người được xem
+  if (!isOwner) {
+    const { renderChibiForUid } = await import('./character.js');
+    const frame = document.getElementById('pro-character-frame');
+    if (frame) renderChibiForUid(frame, viewUid);
+  }
   
   // Hiển thị nút đổi avatar nếu là chủ
   const uploadBtn = document.getElementById('pro-avatar-upload-btn');

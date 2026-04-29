@@ -419,6 +419,30 @@ export function renderChibiTo(container, system, equipped) {
   container.classList.add('chibi-bounce');
 }
 
+// Sửa: load và render char theo uid bất kỳ
+export async function renderChibiForUid(container, uid) {
+  if (!container) return;
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    if (!snap.exists()) return;
+    const d = snap.data();
+    const system   = d.characterV3?.system || 'real';
+    const equipped = d.characterV3?.equipped?.[system] || {};
+    renderChibiTo(container, system, equipped);
+  } catch(e) { console.error(e); }
+}
+// dòng 421 — thêm hàm load char theo uid
+export async function renderChibiForUid(container, uid) {
+  if (!container) return;
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    if (!snap.exists()) return;
+    const d = snap.data();
+    const system   = d.characterV3?.system   || 'real';
+    const equipped = d.characterV3?.equipped?.[system] || {};
+    renderChibiTo(container, system, equipped);
+  } catch(e) { console.error(e); }
+}
 function renderProfilePreview() {
   const frame = document.getElementById('pro-character-frame');
   if (!frame) return;

@@ -302,15 +302,9 @@ window.openConvo = function(uid, name, avatarChar, type) {
   const av = document.getElementById('chatWinAvatar');
   document.getElementById('chatWinName').textContent = name;
   if (avatarChar) {
-    // avatarChar có thể là URL hoặc chữ cái
-    if (avatarChar.startsWith('data:') || avatarChar.startsWith('http')) {
-      av.style.background = `url(${avatarChar}) center/cover`;
-      av.textContent = '';
-    } else {
-      av.textContent = avatarChar;
-      av.style.fontSize   = '15px';
-      av.style.background = 'linear-gradient(135deg,#a78bfa,#7c3aed)';
-    }
+    av.textContent = avatarChar;
+    av.style.fontSize   = '15px';
+    av.style.background = 'linear-gradient(135deg,#a78bfa,#7c3aed)';
   } else {
     av.textContent = '🌐';
     av.style.fontSize   = '18px';
@@ -409,17 +403,6 @@ window.switchTab = function(tab) {
 
 // ===== RENDER: FRIENDS IN SIDEBAR =====
 // FIX 2: Nhận list trực tiếp từ onSnapshot data (không dùng cache getDoc cũ)
-// Helper: render avatar cho contact
-function renderContactAvatar(el, user) {
-  if (!el) return;
-  if (user.avatarUrl) {
-    el.style.background = `url(${user.avatarUrl}) center/cover`;
-    el.textContent = '';
-  } else {
-    el.textContent = (user.nickname || '?')[0].toUpperCase();
-  }
-}
-
 function _renderFriendsInChatFromList(friends) {
   const el = document.getElementById('friendsInChat');
   if (!el) return;
@@ -434,15 +417,14 @@ function _renderFriendsInChatFromList(friends) {
     const div  = document.createElement('div');
     div.className = 'chat-contact';
     div.id        = 'contact-' + f.uid;
-    div.onclick   = () => window.openConvo(f.uid, name, f.avatarUrl || name[0].toUpperCase(), 'dm');
+    div.onclick   = () => window.openConvo(f.uid, name, name[0].toUpperCase(), 'dm');
     div.innerHTML = `
-      <div class="chat-contact-avatar">${name[0].toUpperCase()}</div>
+      <div class="chat-contact-avatar" style="background:linear-gradient(135deg,#34d399,#059669)">${name[0].toUpperCase()}</div>
       <div class="chat-contact-info">
         <span class="chat-contact-name">${escHtml(name)} <span class="chat-online-dot"></span></span>
         <span class="chat-contact-preview">Nhấn để nhắn tin</span>
       </div>`;
     el.appendChild(div);
-    renderContactAvatar(div.querySelector('.chat-contact-avatar'), f);
   });
 }
 
@@ -469,13 +451,12 @@ function renderAllUsersInChat() {
       div.className = 'chat-contact';
       div.onclick   = () => viewUserProfile(u.uid);
       div.innerHTML = `
-        <div class="chat-contact-avatar">${name[0].toUpperCase()}</div>
+        <div class="chat-contact-avatar" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)">${name[0].toUpperCase()}</div>
         <div class="chat-contact-info">
           <span class="chat-contact-name">${escHtml(name)}</span>
           <span class="chat-contact-preview" style="color:#a78bfa">Nhấn để xem profile</span>
         </div>`;
       el.appendChild(div);
-      renderContactAvatar(div.querySelector('.chat-contact-avatar'), u);
     });
   });
 }
@@ -544,16 +525,10 @@ function viewUserProfile(uid) {
     const nickname = data.nickname || data.email?.split('@')[0] || '?';
 
     // Avatar / nhân vật
+    document.getElementById('vp-avatar').textContent = nickname[0].toUpperCase();
+    // Màu avatar theo uid
     const colors = ['#a78bfa,#7c3aed','#38bdf8,#0ea5e9','#34d399,#059669','#fbbf24,#f59e0b','#f87171,#ef4444'];
     const colorIdx = uid.charCodeAt(0) % colors.length;
-    const avEl = document.getElementById('vp-avatar');
-    if (data.avatarUrl) {
-      avEl.style.background = `url(${data.avatarUrl}) center/cover`;
-      avEl.textContent = '';
-    } else {
-      avEl.style.background = `linear-gradient(135deg,${colors[colorIdx]})`;
-      avEl.textContent = nickname[0].toUpperCase();
-    }
     document.getElementById('vp-character-frame').style.background = `linear-gradient(135deg,${colors[colorIdx]})`;
 
     document.getElementById('vp-name').textContent  = nickname;
@@ -595,10 +570,7 @@ function renderViewProfileActions(uid, data) {
         <button onclick="declineFriend('${uid}')" style="flex:1;padding:10px;border-radius:10px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#f87171;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">❌ Từ chối</button>
       </div>`;
     } else {
-      area.innerHTML = `<div style="display:flex;gap:8px">
-        <button onclick="sendFriendRequest('${uid}')" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#0ea5e9,#38bdf8);border:none;color:#fff;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">➕ Kết bạn</button>
-        <button onclick="location.href='profile.html?uid=${uid}'" style="flex:1;padding:10px;border-radius:10px;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">👤 Hồ sơ</button>
-      </div>`;
+      area.innerHTML = `<button onclick="sendFriendRequest('${uid}')" style="width:100%;padding:10px;border-radius:10px;background:linear-gradient(135deg,#0ea5e9,#38bdf8);border:none;color:#fff;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">➕ Kết bạn</button>`;
     }
   });
 }

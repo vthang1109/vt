@@ -29,19 +29,32 @@ export async function getPoints() {
     } catch (e) { return 0; }
 }
 
-export async function addPoints(source, reason, amount) {
+export async function addPoints(source, reason, amount, applyBuff = true) {
     const user = auth.currentUser;
     if (!user) return;
     try {
         const userRef = doc(db, 'users', user.uid);
         const userSnap = await getDoc(userRef);
         let current = userSnap.exists() ? (userSnap.data().points || 0) : 0;
-        let newTotal = current + amount;
+
+let finalAmount = amount;
+        if (amount > 0) {
+            const rsn = String(reason || '').toLowerCase();
+            const isBet = rsn.includes('hoàn') || rsn.includes('refund') || rsn.includes('cược');
+            if (!isBet) {
+                try {
+                    const { getActiveBuff } = await import('./pet.js');
+                    const buff = await getActiveBuff();
+                    if (buff > 0) finalAmount = Math.round(amount * (1 + buff / 100));
+                } catch {}
+            }
+        }
+        let newTotal = current + finalAmount;
         if (newTotal < 0) newTotal = 0;
         await updateDoc(userRef, { points: newTotal, lastUpdate: serverTimestamp() });
 
-        if (window.VTQuests && amount > 0) {
-            window.VTQuests.trackEarn(amount);
+        if (window.VTQuests && finalAmount > 0) {
+            window.VTQuests.trackEarn(finalAmount);
             const rsn = String(reason || '').toLowerCase();
             if (rsn.includes('thắng') || rsn.includes('win')) window.VTQuests.trackWinSmart();
         }

@@ -261,13 +261,16 @@ function renderLobby(r){
     const isMe = uid === _user.uid;
     const div = document.createElement('div');
     div.className = 'lobby-member' + (info.ready || isHost ? ' ready' : '');
-    div.innerHTML = `
-      <div class="lm-avatar">${(info.name || '?')[0].toUpperCase()}</div>
-      <div class="lm-info">
-        <div class="lm-name">${escHtml(info.name)} ${isMe ? '<span class="lm-you">(bạn)</span>' : ''}</div>
-        <div class="lm-status">${isHost ? '👑 Chủ phòng' : (info.ready ? '✅ Sẵn sàng' : '⏳ Đang chờ')}</div>
-      </div>
-    `;
+   const avStyle = info.avatarUrl
+  ? `background:url(${info.avatarUrl}) center/cover;color:transparent`
+  : '';
+div.innerHTML = `
+  <div class="lm-avatar" style="${avStyle};cursor:pointer" onclick="window.showProfileCard && window.showProfileCard('${uid}')">${info.avatarUrl ? '' : (info.name||'?')[0].toUpperCase()}</div>
+  <div class="lm-info">
+    <div class="lm-name">${escHtml(info.name)} ${isMe ? '<span class="lm-you">(bạn)</span>' : ''}</div>
+    <div class="lm-status">${isHost ? '👑 Chủ phòng' : (info.ready ? '✅ Sẵn sàng' : '⏳ Đang chờ')}</div>
+  </div>
+`;
     list.appendChild(div);
   });
   for (let i = (r.members||[]).length; i < r.maxPlayers; i++){

@@ -312,3 +312,14 @@ body {
     padding-bottom: max(12px, env(safe-area-inset-bottom));
   }
 }
+.other-msg { display: flex; align-items: flex-start; gap: 8px; }
+.cwm-av {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg,#0ea5e9,#38bdf8);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 13px; color: #fff;
+  flex-shrink: 0; margin-top: 2px;
+  transition: transform 0.15s;
+}
+.cwm-av:hover { transform: scale(1.1); }
+.cwm-content { display: flex; flex-direction: column; }

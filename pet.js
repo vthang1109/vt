@@ -20,11 +20,11 @@ const db = getFirestore(app);
 
 // ===== CONFIG =====
 export const PET_TIERS = [
-  { id: 1, name: 'Gà mờ', color: '#94a3b8', buff: 2 },
-  { id: 2, name: 'Tinh anh', color: '#34d399', buff: 5 },
-  { id: 3, name: 'Bá sàn', color: '#fbbf24', buff: 10 },
-  { id: 4, name: 'Kiệt tác', color: '#f43f5e', buff: 20 },
-  { id: 5, name: 'Huyền thoại', color: '#a78bfa', buff: 30 }
+  { id: 1, name: 'Gà mờ', color: '#94a3b8', buff: 1 },
+  { id: 2, name: 'Tinh anh', color: '#34d399', buff: 2 },
+  { id: 3, name: 'Bá sàn', color: '#fbbf24', buff: 4 },
+  { id: 4, name: 'Kiệt tác', color: '#f43f5e', buff: 7 },
+  { id: 5, name: 'Huyền thoại', color: '#a78bfa', buff: 10 }
 ];
 
 // ID theo tier: t{tier}_{số thứ tự trong tier}
@@ -168,13 +168,17 @@ export async function doGacha(rolls = 1, type = 'normal') {
     const rnd = Math.random();
     let selectedTier;
     if (type === 'vip') {
-      if (rnd < 0.30) selectedTier = PET_TIERS[2];
-      else if (rnd < 0.70) selectedTier = PET_TIERS[3];
+      if (rnd < 0.01) selectedTier = PET_TIERS[0];
+      else if (rnd < 0.11) selectedTier = PET_TIERS[1];
+      else if (rnd < 0.55) selectedTier = PET_TIERS[2];
+      else if (rnd < 0.95) selectedTier = PET_TIERS[3];
       else selectedTier = PET_TIERS[4];
     } else {
-      if (rnd < 0.60) selectedTier = PET_TIERS[0];
-      else if (rnd < 0.90) selectedTier = PET_TIERS[1];
-      else selectedTier = PET_TIERS[2];
+      if (rnd < 0.50) selectedTier = PET_TIERS[0];
+      else if (rnd < 0.80) selectedTier = PET_TIERS[1];
+      else if (rnd < 0.96) selectedTier = PET_TIERS[2];
+      else if (rnd < 0.99) selectedTier = PET_TIERS[3];
+      else selectedTier = PET_TIERS[4];
     }
     const tierPets = PET_POOL.filter(p => p.tier === selectedTier.id);
     const pet = tierPets[Math.floor(Math.random() * tierPets.length)];
