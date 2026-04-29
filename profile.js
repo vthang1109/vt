@@ -3,7 +3,7 @@ import { db, auth } from './points.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import {
   doc, onSnapshot, updateDoc, getDocs, collection,
-  orderBy, query, limit, runTransaction
+  orderBy, query, limit, getDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { renderAvatar } from './avatar.js';
 import { renderProfilePet, mountPetModal } from './pet-ui.js';
@@ -36,7 +36,7 @@ onAuthStateChanged(auth, async user => {
   if (nameEl) {
     if (isOwner) {
       nameEl.style.cursor = 'pointer';
-      nameEl.title = 'Nhấn để đổi tên (1000⭐)';
+      nameEl.title = 'Nhấn để đổi tên (miễn phí)';
       nameEl.onclick = () => showChangeNicknameModal(user.uid);
     } else {
       nameEl.style.cursor = 'default';
@@ -61,10 +61,10 @@ onAuthStateChanged(auth, async user => {
   });
 });
 
-// ── ĐỔI TÊN ──────────────────────────────────────────────
+// ── ĐỔI TÊN (MIỄN PHÍ) ──────────────────────────────────
 async function showChangeNicknameModal(uid) {
   const currentName = document.getElementById('pro-name')?.textContent || '';
-  const newName = prompt('Nhập tên mới (2–20 ký tự, phí 1000⭐):', currentName);
+  const newName = prompt('Nhập tên mới (2–20 ký tự):', currentName);
   if (!newName || newName.trim().length < 2 || newName.trim().length > 20) {
     alert('Tên phải từ 2 đến 20 ký tự!');
     return;
@@ -73,8 +73,6 @@ async function showChangeNicknameModal(uid) {
     alert('Tên mới giống tên cũ!');
     return;
   }
-  if (!confirm(`Đổi tên thành "${newName.trim()}" sẽ tốn 1000 điểm. Tiếp tục?`)) return;
-
   try {
     await changeNickname(uid, newName.trim());
     alert('✅ Đổi tên thành công!');
@@ -86,17 +84,12 @@ async function showChangeNicknameModal(uid) {
 
 async function changeNickname(uid, newNickname) {
   const userRef = doc(db, 'users', uid);
-  return runTransaction(db, async (tx) => {
-    const snap = await tx.get(userRef);
-    if (!snap.exists()) throw new Error('Tài khoản không tồn tại');
-    const data = snap.data();
-    const points = data.points || 0;
-    if (points < 1000) throw new Error('Bạn không đủ 1000 điểm để đổi tên!');
-    tx.update(userRef, {
-      nickname: newNickname,
-      points: points - 1000
-    });
-  });
+  // Kiểm tra tài khoản tồn tại
+  const snap = await getDoc(userRef);
+  if (!snap.exists()) throw new Error('Tài khoản không tồn tại');
+  
+  // Chỉ cập nhật nickname, không trừ điểm
+  await updateDoc(userRef, { nickname: newNickname });
 }
 
 // ── RANK & TITLES ────────────────────────────────────────
