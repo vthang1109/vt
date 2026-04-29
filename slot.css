@@ -1,0 +1,183 @@
+/* ===================== LAYOUT CHUNG ===================== */
+.slot-wrap {
+  min-height: 100vh;
+  padding: 14px 12px 40px;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===================== HEADER & HAMBURGER ===================== */
+.slot-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.slot-head-left { display: flex; align-items: center; gap: 12px; }
+.slot-head-right { display: flex; align-items: center; gap: 10px; }
+
+/* ===================== BANK & JACKPOT ===================== */
+.slot-bank {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 11px 16px; border-radius: 14px;
+  background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.05));
+  border: 1px solid rgba(251,191,36,0.4);
+  margin-bottom: 14px;
+}
+.slot-bank-l { color:#fef3c7; font-weight:700; font-size:13px; }
+.slot-bank-r { color:#fbbf24; font-weight:900; font-size:18px; font-family:'Orbitron',monospace; }
+
+/* Jackpot */
+.slot-jackpot {
+  text-align: center;
+  background: linear-gradient(135deg, #dc2626, #111111);
+  border: 2px solid #fbbf24;
+  border-radius: 24px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 30px rgba(220,38,38,0.6);
+  animation: jpPulse 1.2s ease-in-out infinite alternate;
+}
+@keyframes jpPulse {
+  from { box-shadow: 0 0 20px rgba(220,38,38,0.6); }
+  to { box-shadow: 0 0 40px rgba(251,191,36,0.9); }
+}
+.jp-label {
+  font-size: 16px;
+  font-weight: 900;
+  color: #fef3c7;
+  letter-spacing: 3px;
+  display: block;
+  margin-bottom: 6px;
+  text-shadow: 0 0 10px #fbbf24;
+}
+.jp-value {
+  font-size: 28px;
+  font-weight: 900;
+  color: #ffd700;
+  font-family: 'Orbitron', monospace;
+  text-shadow: 0 0 20px #fbbf24, 0 0 40px #f59e0b;
+}
+
+/* ===================== SLOT MACHINE ===================== */
+.slot-machine {
+  display: flex;
+  flex-direction: column;  /* Xếp dọc: reel trên, kết quả dưới */
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.slot-reels {
+  display: flex;
+  gap: 12px;
+  background: rgba(0,0,0,0.4);
+  border: 2px solid rgba(251,191,36,0.4);
+  border-radius: 20px;
+  padding: 20px 16px;
+  box-shadow: 0 0 20px rgba(251,191,36,0.15);
+}
+
+.slot-reel {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(145deg, #1e293b, #0f172a);
+  border: 2px solid rgba(251,191,36,0.5);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: #fef3c7;
+  transition: transform 0.2s;
+}
+.slot-reel.spinning {
+  animation: spinReel 0.15s linear infinite;
+}
+@keyframes spinReel {
+  0%   { transform: rotateX(0deg); }
+  100% { transform: rotateX(360deg); }
+}
+
+/* ===================== Ô KẾT QUẢ (DƯỚI REEL) ===================== */
+.slot-result {
+  text-align: center;
+  margin-top: 14px;           /* Khoảng cách với reel */
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 14px;
+  color: #fbbf24;
+  font-weight: 800;
+  font-size: 16px;
+  min-height: 28px;
+  width: 100%;
+  max-width: 300px;
+  font-family: 'Orbitron', monospace;
+  border: 1px solid rgba(251,191,36,0.3);
+  box-shadow: 0 0 10px rgba(251,191,36,0.1);
+  transition: all 0.3s;
+  box-sizing: border-box;
+}
+
+/* ===================== ĐẶT CƯỢC & QUAY ===================== */
+.slot-bet-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.slot-bet-row label {
+  color: #cbd5e1;
+  font-weight: 700;
+  font-size: 14px;
+}
+.slot-bet-row input {
+  width: 120px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(56,189,248,0.3);
+  background: rgba(0,0,0,0.3);
+  color: #e0f2fe;
+  font-family: 'Orbitron', monospace;
+  font-weight: 800;
+  text-align: center;
+}
+#btn-spin {
+  padding: 12px 28px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(245,158,11,0.5);
+  transition: all 0.2s;
+}
+#btn-spin:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===================== NÚT RỜI GAME ===================== */
+.slot-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+.btn-slot-leave {
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(239,68,68,0.4);
+  background: rgba(239,68,68,0.1);
+  color: #f87171;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+}
