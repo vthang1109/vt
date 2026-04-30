@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Thật Hay Thách</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="thathaythach.css"/>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div class="tt-wrap">
+    <!-- HEADER -->
+    <nav class="tt-nav">
+      <div class="logo" style="cursor:pointer" onclick="location.href='games.html'">
+        <span class="logo-vt">VT</span><span class="logo-world">World</span>
+      </div>
+      <div class="nav-right-menu">
+        <button class="nav-hamburger" onclick="toggleNavMenu()">☰</button>
+        <div class="nav-dropdown" id="navDropdown">
+          <a class="nav-dropdown-item" href="index.html">
+            <span class="dd-icon">🏠</span> Trang chủ
+          </a>
+          <a class="nav-dropdown-item" href="games.html">
+            <span class="dd-icon">🎮</span> Game
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- TIÊU ĐỀ -->
+    <div class="tt-title">
+      <h1>🎭 THẬT HAY THÁCH</h1>
+      <p>Dám nói thật hay dám làm thử thách?</p>
+    </div>
+
+    <!-- KHU VỰC HIỂN THỊ -->
+    <div class="tt-card" id="tt-card">
+      <div class="tt-card-label" id="tt-card-label">THẬT</div>
+      <div class="tt-card-text" id="tt-card-text">
+        Hãy chọn Thật hoặc Thách để bắt đầu!
+      </div>
+    </div>
+
+    <!-- 2 NÚT LỰA CHỌN -->
+    <div class="tt-buttons">
+      <button class="btn-truth" id="btn-truth" onclick="window.game.pickTruth()">
+        ✅ THẬT
+      </button>
+      <button class="btn-dare" id="btn-dare" onclick="window.game.pickDare()">
+        🔥 THÁCH
+      </button>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
+
+  <script>
+    // Particle & toast
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(52,211,153,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast=function(msg,type='info'){const c={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};const t=document.createElement('div');t.style.cssText=`pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;t.innerHTML=msg;toastContainer.appendChild(t);setTimeout(()=>t.remove(),3500)};
+    function toggleNavMenu() { document.getElementById('navDropdown').classList.toggle('open'); }
+    document.addEventListener('click', (e) => { if (!e.target.closest('.nav-right-menu')) { document.getElementById('navDropdown')?.classList.remove('open'); } });
+  </script>
+  <script src="thathaythach.js"></script>
+</body>
+</html>
