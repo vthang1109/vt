@@ -10,6 +10,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 const GAMES = {
   xidach:    { id: 'xidach',    name: 'Xì dách',     icon: '♣️', max: 5, min: 2, page: 'xidach-mp.html',    ready: true },
   baucua:    { id: 'baucua',    name: 'Bầu Cua',     icon: '🎲', max: 8, min: 2, page: 'baucua-mp.html',    ready: true },
+  pickso: { id: 'pickso', name: 'Pick Số', icon: '🔢', max: 6, min: 2, page: 'pickso-mp.html', ready: true },
   caro:      { id: 'caro',      name: 'Caro',     icon: '♟️', max: 2, min: 2, page: 'caro-mp.html',      ready: true },
   tictactoe: { id: 'tictactoe', name: 'Tic-Tac-Toe',     icon: '⭕', max: 2, min: 2, page: 'tictactoe-mp.html', ready: true },
 };
