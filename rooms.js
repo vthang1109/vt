@@ -10,9 +10,9 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 const GAMES = {
   xidach:    { id: 'xidach',    name: 'Xì dách',     icon: '♣️', max: 5, min: 2, page: 'xidach-mp.html',    ready: true },
   baucua:    { id: 'baucua',    name: 'Bầu Cua',     icon: '🎲', max: 8, min: 2, page: 'baucua-mp.html',    ready: true },
-  pickso: { id: 'pickso', name: 'Pick Số', icon: '🔢', max: 6, min: 2, page: 'pickso-mp.html', ready: true },
   caro:      { id: 'caro',      name: 'Caro',     icon: '♟️', max: 2, min: 2, page: 'caro-mp.html',      ready: true },
   tictactoe: { id: 'tictactoe', name: 'Tic-Tac-Toe',     icon: '⭕', max: 2, min: 2, page: 'tictactoe-mp.html', ready: true },
+  pickso:    { id: 'pickso',    name: 'Pick Số',      icon: '🔢', max: 6, min: 2, page: 'pickso-mp.html',    ready: true },
 };
 
 let _user = null;
@@ -333,6 +333,8 @@ window.startGame = async function(){
     gameState = { phase: 'betting', round: 1, dice: [null,null,null], bets: {} };
   } else if (data.gameType === 'xidach'){
     gameState = { phase: 'betting', round: 1, hands: {}, bets: {}, stands: {}, turnOrder: [], turnIdx: 0, results: {}, deck: [], revealed: {}, dealerChecked: {} };
+  } else if (data.gameType === 'pickso'){
+    gameState = { phase: 'betting', round: 1, bets: {}, picks: {}, turnOrder: [], turnIdx: 0, winners: [], deltas: {} };
   }
   await updateDoc(doc(db,'rooms',_currentRoomId), {
     status: 'playing',

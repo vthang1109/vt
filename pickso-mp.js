@@ -53,7 +53,9 @@ function startListen() {
     }
     const r = snap.data();
     document.getElementById('ps-room').textContent = '#' + (r.code || '------');
-    if (r.gameType !== 'pickso' || !r.gameState) return;
+    if (!r.gameState) {
+      r.gameState = { phase: 'betting', bets: {}, picks: {}, turnOrder: [], turnIdx: 0, winners: [], deltas: {}, round: 1 };
+    }
     render(r);
   });
 }
@@ -70,21 +72,22 @@ function render(r) {
 
   // Phase text
   const phEl = document.getElementById('ps-phase');
-  if (gs.phase === 'betting') {
+  const phase = gs.phase || 'betting';
+  if (phase === 'betting') {
     const myBet = gs.bets?.[_user.uid] || 0;
     phEl.textContent = myBet > 0 ? '✅ Đã đặt cược — Chờ người khác...' : '🎰 Đặt cược để bắt đầu';
-  } else if (gs.phase === 'playing') {
+  } else if (phase === 'playing') {
     const turnUid = members[gs.turnIdx % members.length];
     if (turnUid === _user.uid) phEl.textContent = '🎯 Đến lượt BẠN — Chọn một ô!';
     else phEl.textContent = `⏳ Chờ ${esc(r.memberInfo?.[turnUid]?.name || '...')} chọn...`;
-  } else if (gs.phase === 'result') {
+  } else if (phase === 'result') {
     phEl.textContent = '🏆 Kết quả!';
   }
 
   // Bet row
   const betRow = document.getElementById('ps-bet-row');
   const myBet = gs.bets?.[_user.uid] || 0;
-  betRow.style.display = (gs.phase === 'betting' && myBet === 0) ? 'flex' : 'none';
+  betRow.style.display = phase === 'betting' && myBet === 0 ? 'flex' : 'none';
 
   // Scoreboard
   renderScores(r, colorMap);
@@ -94,7 +97,7 @@ function render(r) {
   const turnBar = document.getElementById('ps-turn-bar');
   const legend = document.getElementById('ps-legend');
 
-  if (gs.phase === 'playing' || gs.phase === 'result') {
+  if (phase === 'playing' || phase === 'result') {
     gridWrap.style.display = 'block';
     turnBar.style.display = 'block';
     legend.style.display = 'flex';
@@ -109,7 +112,7 @@ function render(r) {
 
   // Result
   const resEl = document.getElementById('ps-result');
-  if (gs.phase === 'result') {
+  if (phase === 'result') {
     resEl.style.display = 'block';
     renderResult(r, colorMap);
     // Settle points (chỉ 1 lần)
@@ -179,7 +182,7 @@ function renderGrid(r, colorMap) {
       cell.style.background = col.bg;
       cell.style.borderColor = col.border;
       cell.style.color = col.text;
-    } else if (gs.phase === 'playing') {
+    } else if (phase === 'playing') {
       if (!isMyTurn) cell.classList.add('disabled');
       else cell.onclick = () => pickNumber(n);
     }
@@ -250,7 +253,7 @@ function renderActions(r, isHost, colorMap) {
   const gs = r.gameState;
   const el = document.getElementById('ps-actions');
   el.innerHTML = '';
-  if (gs.phase === 'betting' && isHost) {
+  if ((gs.phase === 'betting' || !gs.phase) && isHost) {
     // Host có thể start khi tất cả đã bet
     const members = r.members || [];
     const allBet = members.every(uid => (gs.bets?.[uid] || 0) > 0);
