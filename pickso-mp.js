@@ -77,7 +77,8 @@ function render(r) {
     const myBet = gs.bets?.[_user.uid] || 0;
     phEl.textContent = myBet > 0 ? '✅ Đã đặt cược — Chờ người khác...' : '🎰 Đặt cược để bắt đầu';
   } else if (phase === 'playing') {
-    const turnUid = members[gs.turnIdx % members.length];
+    const turnOrder = gs.turnOrder?.length ? gs.turnOrder : members;
+  const turnUid = turnOrder[gs.turnIdx % turnOrder.length];
     if (turnUid === _user.uid) phEl.textContent = '🎯 Đến lượt BẠN — Chọn một ô!';
     else phEl.textContent = `⏳ Chờ ${esc(r.memberInfo?.[turnUid]?.name || '...')} chọn...`;
   } else if (phase === 'result') {
@@ -140,7 +141,8 @@ function renderScores(r, colorMap) {
     const name = r.memberInfo?.[uid]?.name || '?';
     const count = (picks[uid] || []).length;
     const bet = gs.bets?.[uid] || 0;
-    const isMyTurn = gs.phase === 'playing' && members[gs.turnIdx % members.length] === uid;
+    const _tOrder = gs.turnOrder?.length ? gs.turnOrder : members;
+    const isMyTurn = gs.phase === 'playing' && _tOrder[gs.turnIdx % _tOrder.length] === uid;
     const isWinner = gs.phase === 'result' && gs.winners?.includes(uid);
     const div = document.createElement('div');
     div.className = 'ps-score-card' + (isMyTurn ? ' my-turn' : '') + (isWinner ? ' winner' : '');
@@ -159,7 +161,8 @@ function renderGrid(r, colorMap) {
   const gs = r.gameState;
   const members = r.members || [];
   const picks = gs.picks || {};
-  const isMyTurn = gs.phase === 'playing' && members[gs.turnIdx % members.length] === _user.uid;
+  const _tOrd = gs.turnOrder?.length ? gs.turnOrder : members;
+  const isMyTurn = gs.phase === 'playing' && _tOrd[gs.turnIdx % _tOrd.length] === _user.uid;
 
   // Build reverse map: number → uid
   const numOwner = {};
@@ -211,7 +214,8 @@ function renderTurnBar(r, colorMap) {
   const el = document.getElementById('ps-turn-bar');
   if (gs.phase !== 'playing') { el.style.display = 'none'; return; }
   const totalPicked = Object.values(gs.picks || {}).reduce((s, arr) => s + arr.length, 0);
-  const turnUid = members[gs.turnIdx % members.length];
+  const turnOrder = gs.turnOrder?.length ? gs.turnOrder : members;
+  const turnUid = turnOrder[gs.turnIdx % turnOrder.length];
   const col = colorMap[turnUid];
   const name = turnUid === _user.uid ? 'Bạn' : (r.memberInfo?.[turnUid]?.name || '?');
   el.style.display = 'block';
@@ -318,7 +322,8 @@ async function pickNumber(n) {
   const r = snap.data();
   const gs = r.gameState;
   const members = r.members || [];
-  const turnUid = (gs.turnOrder || members)[gs.turnIdx % members.length];
+  const _pickTOrder = gs.turnOrder?.length ? gs.turnOrder : members;
+  const turnUid = _pickTOrder[gs.turnIdx % _pickTOrder.length];
   if (turnUid !== _user.uid) { showToast('Chưa đến lượt bạn!', 'warn'); return; }
 
   const allPicks = gs.picks || {};
