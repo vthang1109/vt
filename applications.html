@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -8,21 +7,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="games.css"/>
+
+  <!-- Top & Bottom Nav -->
+  <script src="top-nav.js"></script>
+  <script src="bottom-nav.js"></script>
+  <script>
+    // Khởi tạo nav sau khi DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.TopNav) TopNav.init();
+      if (window.BottomNav) BottomNav.init({ active: 'apps' });
+    });
+  </script>
 </head>
-<body>
+<body data-bottom-nav="apps">
+  <!-- TopNav sẽ tự động chèn vào đây nếu có #top-nav-root -->
+  <div id="top-nav-root"></div>
+
   <canvas id="bg-canvas"></canvas>
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
   <div class="games-page">
-
+    <!-- Hero -->
     <div class="games-hero">
       <h1>📴 <span>Ứng Dụng</span> Offline</h1>
       <p>Không cần đăng nhập · Chơi ngay · Miễn phí</p>
     </div>
 
+    <!-- Tab chuyển đổi với gạch dưới -->
+    <div class="nav-tabs">
+      <a class="nav-tab" href="games.html">🎮 GAMES</a>
+      <a class="nav-tab active" href="applications.html">📱 ỨNG DỤNG</a>
+    </div>
 
-    <!-- Tiệc Tùng & Giải Trí -->
+    <!-- Nội dung ứng dụng -->
     <div class="category-section">
       <div class="category-label"><span class="cat-icon">🎉</span><span class="cat-name">Tiệc Tùng & Giải Trí</span><div class="cat-line"></div></div>
       <div class="game-lobby-grid">
@@ -47,7 +65,6 @@
       </div>
     </div>
 
-    <!-- Tiện Ích -->
     <div class="category-section">
       <div class="category-label"><span class="cat-icon">🛠️</span><span class="cat-name">Tiện Ích</span><div class="cat-line"></div></div>
       <div class="game-lobby-grid">
@@ -59,37 +76,58 @@
     </div>
   </div>
 
-
+  <!-- Background particles -->
   <script>
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    for (let i = 0; i < 40; i++) { particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-.5)*.4, vy: (Math.random()-.5)*.4, r: Math.random()*1.5+.5 }); }
-    function drawParticles() {
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      particles.forEach(p => {
-        p.x += p.vx; p.y += p.vy;
-        if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
-        if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0;
-        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        ctx.fillStyle='rgba(56,189,248,0.5)'; ctx.fill();
-      });
-      for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
-        const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
-        if(d<100){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(56,189,248,${0.07*(1-d/100)})`; ctx.lineWidth=.5; ctx.stroke(); }
+    (function initParticles() {
+      const canvas = document.getElementById('bg-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resize();
+      window.addEventListener('resize', resize);
+      for (let i = 0; i < 40; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          r: Math.random() * 1.5 + 0.5
+        });
       }
-      requestAnimationFrame(drawParticles);
-    }
-    drawParticles();
-  </script>
-<script src="top-nav.js"></script>
-  <script src="bottom-nav.js"></script>
-  <script>
-    TopNav.init();
-    BottomNav.init({ active: 'apps' });
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0) p.x = canvas.width;
+          if (p.x > canvas.width) p.x = 0;
+          if (p.y < 0) p.y = canvas.height;
+          if (p.y > canvas.height) p.y = 0;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(56,189,248,0.5)';
+          ctx.fill();
+        });
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d < 100) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(56,189,248,${0.07 * (1 - d / 100)})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
   </script>
 </body>
 </html>

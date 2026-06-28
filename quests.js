@@ -142,7 +142,12 @@ async function updateBadge() {
 
 // ====== PANEL RENDERING (trong bottom-nav panel) ======
 async function renderPanelProfile() {
-  const user = auth.currentUser;
+  let user = auth.currentUser;
+  // Retry nếu auth chưa sẵn
+  if (!user) {
+    await new Promise(res => setTimeout(res, 800));
+    user = auth.currentUser;
+  }
   if (!user) return;
   try {
     const snap = await getDoc(userRef(user.uid));
@@ -167,7 +172,11 @@ async function renderPanelProfile() {
 }
 
 async function renderPanelStreak() {
-  const user = auth.currentUser;
+  let user = auth.currentUser;
+  if (!user) {
+    await new Promise(res => setTimeout(res, 800));
+    user = auth.currentUser;
+  }
   if (!user) return;
   try {
     const uSnap = await getDoc(userRef(user.uid));
@@ -179,7 +188,7 @@ async function renderPanelStreak() {
     const numEl = document.getElementById('vtPpStreakNum');
     const lblEl = document.getElementById('vtPpStreakLabel');
     const btnEl = document.getElementById('vtPpStreakBtn');
-    if (numEl) numEl.textContent = streak.current || 0;
+    if (numEl) { numEl.textContent = ''; numEl.textContent = String(streak.current || 0); }
     if (lblEl) lblEl.textContent = claimed
       ? `Quay lại ngày mai để +${STREAK_REWARDS[(streak.current||0)+1] || 50}đ`
       : `Nhận ngay +${STREAK_REWARDS[(streak.current||0)+1] || 50}đ`;
@@ -199,8 +208,18 @@ async function renderPanelStreak() {
 }
 
 async function renderPanelQuests() {
-  const user = auth.currentUser;
-  if (!user) return;
+  let user = auth.currentUser;
+  if (!user) {
+    await new Promise(res => setTimeout(res, 800));
+    user = auth.currentUser;
+  }
+  if (!user) {
+    const list = document.getElementById('vtPpQuestList');
+    if (list) {
+      list.innerHTML = '<div style="padding:8px 0;text-align:center;color:#f87171;font-size:13px;font-weight:700">Vui lòng đăng nhập để xem nhiệm vụ</div>';
+    }
+    return;
+  }
   const list = document.getElementById('vtPpQuestList');
   const countEl = document.getElementById('vtPpQuestCount');
   if (!list) return;
@@ -217,17 +236,29 @@ async function renderPanelQuests() {
       if (done && !claimed) claimable++;
 
       const row = document.createElement('div');
-      row.className = 'vt-pp-quest-row' + (claimed ? ' q-claimed' : done ? ' q-done' : '');
+      // Style dùng inline để không bị style.css override
+      const rowBg    = claimed ? 'rgba(52,211,153,0.05)' : done ? 'rgba(52,211,153,0.08)' : 'rgba(56,189,248,0.04)';
+      const rowBord  = claimed ? 'rgba(52,211,153,0.15)' : done ? 'rgba(52,211,153,0.3)' : 'rgba(56,189,248,0.1)';
+      const rowOpac  = claimed ? '0.55' : '1';
+      const iconBg   = done ? 'rgba(52,211,153,0.15)' : 'rgba(56,189,248,0.08)';
+      const barFill  = done ? 'linear-gradient(90deg,#34d399,#059669)' : 'linear-gradient(90deg,#38bdf8,#0ea5e9)';
+      const claimBg  = claimed ? 'rgba(52,211,153,0.1)' : done ? 'linear-gradient(135deg,#34d399,#059669)' : 'rgba(255,255,255,0.05)';
+      const claimClr = claimed ? '#34d399' : done ? '#fff' : '#64748b';
+      const claimBrd = claimed ? '1px solid rgba(52,211,153,0.25)' : 'none';
+      row.style.cssText = `display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:${rowBg};border:1px solid ${rowBord};opacity:${rowOpac};font-family:'Nunito',sans-serif`;
       row.innerHTML = `
-        <div class="vt-pp-quest-icon">${q.icon}</div>
-        <div class="vt-pp-quest-info">
-          <div class="vt-pp-quest-name">${q.title}</div>
-          <div class="vt-pp-quest-bar-wrap">
-            <div class="vt-pp-quest-bar"><div class="vt-pp-quest-bar-fill" style="width:${pct}%"></div></div>
-            <span class="vt-pp-quest-prog">${prog}/${q.target}</span>
+        <div style="width:34px;height:34px;border-radius:10px;background:${iconBg};display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">${q.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12.5px;font-weight:800;color:#e0f2fe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Nunito',sans-serif">${q.title}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:5px">
+            <div style="flex:1;height:4px;border-radius:999px;background:rgba(255,255,255,0.06);overflow:hidden">
+              <div style="height:100%;border-radius:999px;background:${barFill};width:${pct}%;transition:width .4s"></div>
+            </div>
+            <span style="font-size:10px;color:#94a3b8;font-weight:700;white-space:nowrap;font-family:'Nunito',sans-serif">${prog}/${q.target}</span>
           </div>
         </div>
-        <button class="vt-pp-quest-claim" data-q="${q.id}" ${(!done || claimed) ? 'disabled' : ''}>
+        <button class="vt-pp-quest-claim" data-q="${q.id}" ${(!done || claimed) ? 'disabled' : ''}
+          style="padding:6px 11px;border-radius:8px;border:${claimBrd};background:${claimBg};color:${claimClr};font-weight:800;font-size:11px;cursor:${(!done||claimed)?'not-allowed':'pointer'};font-family:'Nunito',sans-serif;flex-shrink:0;min-width:52px">
           ${claimed ? '✓' : done ? `+${q.reward}đ` : '🔒'}
         </button>`;
       list.appendChild(row);
@@ -252,9 +283,12 @@ async function renderPanelQuests() {
 // ====== EXPOSE cho BottomNav ======
 window.VTPanelQuests = {
   refresh() {
-    renderPanelProfile();
-    renderPanelStreak();
-    renderPanelQuests();
+    // Delay nhỏ để DOM panel đã render xong
+    setTimeout(() => {
+      renderPanelProfile();
+      renderPanelStreak();
+      renderPanelQuests();
+    }, 80);
   }
 };
 
@@ -293,6 +327,11 @@ onAuthStateChanged(auth, (user) => {
     autoTrackPlay();
     onSnapshot(userRef(user.uid), () => updateBadge());
     onSnapshot(dayRef(user.uid),  () => updateBadge());
+    // Nếu panel đang mở thì refresh ngay khi auth xong
+    const panel = document.getElementById('vtProfilePanel');
+    if (panel && panel.classList.contains('open')) {
+      window.VTPanelQuests?.refresh();
+    }
   } else {
     window.BottomNav?.setBadge('profile', 0);
   }

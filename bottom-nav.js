@@ -104,7 +104,72 @@ window.BottomNav = (() => {
     .vt-profile-panel::-webkit-scrollbar { display: none; }
     .vt-profile-panel.open { transform: translateY(0); }
 
-    /* Backdrop */
+    /* Apps Panel */
+    .vt-apps-panel {
+      position: fixed;
+      left: 0; right: 0;
+      bottom: 58px;
+      z-index: 99998;
+      background: rgba(8, 13, 28, 0.98);
+      border-top: 1px solid rgba(2,136,209,0.2);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
+      transform: translateY(100%);
+      transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .vt-apps-panel.open { transform: translateY(0); }
+
+    .vt-ap-handle {
+      width: 36px; height: 4px; border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      margin: 10px auto 4px;
+    }
+    .vt-ap-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 12px; font-weight: 900;
+      color: #7dd3fc; letter-spacing: 0.5px;
+      padding: 8px 18px 14px; display: block;
+    }
+    .vt-ap-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 0 14px 18px;
+    }
+    .vt-ap-card {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 10px; padding: 18px 12px;
+      border-radius: 16px; text-decoration: none;
+      border: 1px solid rgba(2,136,209,0.15);
+      background: rgba(2,136,209,0.06);
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      cursor: pointer;
+    }
+    .vt-ap-card:active { transform: scale(0.96); }
+    .vt-ap-card:hover {
+      background: rgba(2,136,209,0.12);
+      border-color: rgba(2,136,209,0.3);
+    }
+    .vt-ap-card-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+    }
+    .vt-ap-card-icon.apps-icon { background: linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2)); }
+    .vt-ap-card-icon.games-icon { background: linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2)); }
+    .vt-ap-card-label {
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px; font-weight: 800; color: #e0f2fe;
+    }
+    .vt-ap-card-sub {
+      font-size: 11px; color: #4a7a9b; font-weight: 600; text-align: center;
+    }
+
+    /* Backdrop - đã sửa lỗi CSS lặp */
     .vt-panel-backdrop {
       position: fixed;
       inset: 0;
@@ -114,7 +179,10 @@ window.BottomNav = (() => {
       pointer-events: none;
       transition: opacity 0.28s;
     }
-    .vt-panel-backdrop.open { opacity: 1; pointer-events: all; }
+    .vt-panel-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
 
     /* Panel inner */
     .vt-pp-inner {
@@ -371,7 +439,7 @@ window.BottomNav = (() => {
     {
       key: 'apps',
       label: 'Ứng dụng',
-      href: 'applications.html',
+      href: null, // handled by apps panel
       svg: `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
     },
     {
@@ -395,6 +463,7 @@ window.BottomNav = (() => {
   ];
 
   let _panelOpen = false;
+  let _appsPanelOpen = false;
 
   function injectStyles() {
     if (document.getElementById('vt-bottom-nav-styles')) return;
@@ -417,6 +486,16 @@ window.BottomNav = (() => {
           <span class="vt-bn-label">${tab.label}</span>
         </button>`;
       }
+      // Apps tab: opens panel
+      if (tab.key === 'apps') {
+        return `<button class="vt-bn-tab${isActive ? ' active' : ''}" id="vt-apps-tab" data-key="apps" aria-label="Ứng dụng">
+          <span class="vt-bn-icon">
+            ${tab.svg}
+            <span class="vt-bn-badge" id="vt-badge-apps"></span>
+          </span>
+          <span class="vt-bn-label">${tab.label}</span>
+        </button>`;
+      }
       return `<a class="vt-bn-tab${isActive ? ' active' : ''}" href="${tab.href}" data-key="${tab.key}">
         <span class="vt-bn-icon">
           ${tab.svg}
@@ -428,42 +507,62 @@ window.BottomNav = (() => {
 
     return `
       <div class="vt-panel-backdrop" id="vtPanelBackdrop"></div>
-      <div class="vt-profile-panel" id="vtProfilePanel">
-        <div class="vt-pp-inner">
-          <div class="vt-pp-handle"></div>
 
-          <div class="vt-pp-section-head">
-            <span class="vt-pp-section-title">👤 Hồ sơ</span>
-            <a href="profile.html" class="vt-pp-section-link">Xem đầy đủ →</a>
+      <!-- APPS PANEL -->
+      <div class="vt-apps-panel" id="vtAppsPanel">
+        <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 4px"></div>
+        <div style="font-family:'Orbitron',monospace;font-size:12px;font-weight:900;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">📱 Ứng dụng & Trò chơi</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 18px">
+          <a href="applications.html" onclick="BottomNav.closeAppsPanel()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))">📱</div>
+            <span style="font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#e0f2fe">Ứng dụng</span>
+            <span style="font-family:'Nunito',sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Offline · Không cần login</span>
+          </a>
+          <a href="games.html" onclick="BottomNav.closeAppsPanel()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2))">🎮</div>
+            <span style="font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#e0f2fe">Game</span>
+            <span style="font-family:'Nunito',sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Mini games · Xếp hạng</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- PROFILE PANEL -->
+      <div class="vt-profile-panel" id="vtProfilePanel">
+        <div style="padding:0 0 env(safe-area-inset-bottom,0px)">
+          <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 0"></div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px">
+            <span style="font-family:'Orbitron',monospace;font-size:13px;font-weight:900;letter-spacing:.5px;color:#7dd3fc">👤 Hồ sơ</span>
+            <a href="profile.html" style="font-size:12px;font-weight:700;color:#0288D1;text-decoration:none;font-family:'Nunito',sans-serif">Xem đầy đủ →</a>
           </div>
 
-          <a href="profile.html" class="vt-pp-profile-card" id="vtPpProfileCard">
-            <div class="vt-pp-avatar" id="vtPpAvatar">?</div>
-            <div class="vt-pp-user-info">
-              <div class="vt-pp-username" id="vtPpUsername">Đang tải...</div>
-              <div class="vt-pp-points" id="vtPpPoints">⭐ —</div>
+          <a href="profile.html" id="vtPpProfileCard" style="display:flex;align-items:center;gap:14px;margin:0 14px 14px;padding:14px 16px;background:rgba(2,136,209,0.07);border:1px solid rgba(2,136,209,0.18);border-radius:16px;text-decoration:none;cursor:pointer">
+            <div id="vtPpAvatar" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0288d1,#38bdf8);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;color:#fff;flex-shrink:0;border:2px solid rgba(2,136,209,0.4)">?</div>
+            <div style="flex:1;min-width:0">
+              <div id="vtPpUsername" style="font-weight:900;font-size:16px;color:#e0f2fe;font-family:'Nunito',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Đang tải...</div>
+              <div id="vtPpPoints" style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#fbbf24;margin-top:3px">⭐ —</div>
             </div>
-            <svg class="vt-pp-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.5)" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
           </a>
 
-          <div class="vt-pp-divider"></div>
+          <div style="height:1px;background:rgba(255,255,255,0.05);margin:2px 0 6px"></div>
 
-          <div class="vt-pp-quests-head">
-            <span class="vt-pp-quests-title">📅 Nhiệm vụ hôm nay</span>
-            <span class="vt-pp-quest-count" id="vtPpQuestCount"></span>
+          <div class="vt-pp-quests-head" style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px 8px">
+            <span class="vt-pp-quests-title" style="font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#e0f2fe">📅 Nhiệm vụ hôm nay</span>
+            <span class="vt-pp-quest-count" id="vtPpQuestCount" style="font-family:'Nunito',sans-serif;font-size:12px;color:#34d399;font-weight:700"></span>
           </div>
 
-          <div class="vt-pp-streak" id="vtPpStreak">
-            <div class="vt-pp-streak-fire">🔥</div>
-            <div class="vt-pp-streak-info">
-              <div class="vt-pp-streak-num" id="vtPpStreakNum">0</div>
-              <div class="vt-pp-streak-label" id="vtPpStreakLabel">ngày liên tiếp</div>
+          <div id="vtPpStreak" class="vt-pp-streak" style="display:flex;align-items:center;gap:10px;margin:0 14px 10px;padding:10px 14px;background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px">
+            <div style="font-size:22px;flex-shrink:0">🔥</div>
+            <div style="flex:1">
+              <div id="vtPpStreakNum" class="vt-pp-streak-num" style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#fb923c">0</div>
+              <div id="vtPpStreakLabel" class="vt-pp-streak-label" style="font-size:11px;color:#fdba74;font-weight:700;font-family:'Nunito',sans-serif;margin-top:1px">ngày liên tiếp</div>
             </div>
-            <button class="vt-pp-streak-btn" id="vtPpStreakBtn">Nhận</button>
+            <button id="vtPpStreakBtn" class="vt-pp-streak-btn" style="padding:7px 14px;border-radius:10px;border:none;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;font-weight:800;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;flex-shrink:0">Nhận</button>
           </div>
 
-          <div class="vt-pp-quest-list" id="vtPpQuestList">
-            <div style="padding:10px 0;text-align:center;color:#4a7a9b;font-size:12px;font-weight:700">Đang tải...</div>
+          <div id="vtPpQuestList" class="vt-pp-quest-list" style="display:flex;flex-direction:column;gap:7px;padding:0 14px 16px">
+            <div style="padding:10px 0;text-align:center;color:#4a7a9b;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif">Đang tải...</div>
           </div>
         </div>
       </div>
@@ -476,7 +575,16 @@ window.BottomNav = (() => {
     document.getElementById('vtPanelBackdrop').classList.add('open');
     document.getElementById('vt-profile-tab')?.classList.add('active');
     // Tell quests module to render into panel
-    window.VTPanelQuests && window.VTPanelQuests.refresh();
+    if (window.VTPanelQuests && typeof window.VTPanelQuests.refresh === 'function') {
+      window.VTPanelQuests.refresh();
+    } else {
+      console.warn('VTPanelQuests chưa sẵn sàng, thử lại sau 500ms');
+      setTimeout(() => {
+        if (window.VTPanelQuests && typeof window.VTPanelQuests.refresh === 'function') {
+          window.VTPanelQuests.refresh();
+        }
+      }, 500);
+    }
   }
 
   function closePanel() {
@@ -494,12 +602,44 @@ window.BottomNav = (() => {
     _panelOpen ? closePanel() : openPanel();
   }
 
+  function openAppsPanel() {
+    _appsPanelOpen = true;
+    // Đóng profile panel nếu đang mở
+    if (_panelOpen) closePanel();
+    document.getElementById('vtAppsPanel').classList.add('open');
+    document.getElementById('vtPanelBackdrop').classList.add('open');
+    document.getElementById('vt-apps-tab')?.classList.add('active');
+  }
+
+  function closeAppsPanel() {
+    _appsPanelOpen = false;
+    document.getElementById('vtAppsPanel').classList.remove('open');
+    document.getElementById('vtPanelBackdrop').classList.remove('open');
+    const activeKey = document.getElementById('vtBottomNav')?.dataset?.activeKey;
+    if (activeKey !== 'apps') {
+      document.getElementById('vt-apps-tab')?.classList.remove('active');
+    }
+  }
+
+  function toggleAppsPanel() {
+    _appsPanelOpen ? closeAppsPanel() : openAppsPanel();
+  }
+
   function bindEvents() {
+    document.getElementById('vt-apps-tab')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleAppsPanel();
+    });
     document.getElementById('vt-profile-tab')?.addEventListener('click', (e) => {
       e.preventDefault();
+      // Đóng apps panel nếu đang mở
+      if (_appsPanelOpen) closeAppsPanel();
       togglePanel();
     });
-    document.getElementById('vtPanelBackdrop')?.addEventListener('click', closePanel);
+    document.getElementById('vtPanelBackdrop')?.addEventListener('click', () => {
+      closePanel();
+      closeAppsPanel();
+    });
   }
 
   function init(opts = {}) {
@@ -523,7 +663,7 @@ window.BottomNav = (() => {
     }
   }
 
-  return { init, setBadge, openPanel, closePanel };
+  return { init, setBadge, openPanel, closePanel, openAppsPanel, closeAppsPanel };
 })();
 
 document.addEventListener('DOMContentLoaded', () => {

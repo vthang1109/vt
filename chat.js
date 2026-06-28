@@ -99,14 +99,10 @@ async function _initChat() {
     const serverRef = doc(db, 'chats', 'server');
     const serverSnap = await getDoc(serverRef);
     if (!serverSnap.exists()) {
-      console.log('Tạo room __server__...');
       await setDoc(serverRef, { createdAt: serverTimestamp(), name: 'Global Chat', members: [] });
-      console.log('✅ Room __server__ đã tạo');
     } else {
-      console.log('✅ Room __server__ đã tồn tại');
     }
   } catch(e) { 
-    console.error('❌ Lỗi tạo server room:', e);
     window.showToast('❌ Lỗi tạo room chat: ' + e.message, 'error');
   }
 
@@ -168,7 +164,6 @@ async function sendMessage(convoId, text) {
   const senderName = snap.exists() && snap.data().nickname
     ? snap.data().nickname
     : (_currentUser.displayName || _currentUser.email.split('@')[0]);
-  console.log('Gửi vào roomId:', roomId, 'senderName:', senderName);
   const result = await addDoc(collection(db, 'chats', roomId, 'messages'), {
     text,
     senderUid:  _currentUser.uid,
@@ -266,7 +261,7 @@ function _listenIncomingDMs() {
                   badge = document.createElement('span');
                   badge.className = 'dm-badge';
                   badge.style.cssText = 'background:#f87171;color:#fff;border-radius:999px;font-size:10px;font-weight:800;padding:1px 6px;margin-left:4px';
-                  contactEl.querySelector('.chat-contact-name')?.appendChild(badge);
+                  contactEl.querySelector('.contact-name')?.appendChild(badge);
                 }
                 badge.textContent = '●';
               }
@@ -349,8 +344,7 @@ if (!isMe && m.senderUid) {
     box.scrollTop = box.scrollHeight;
   });
 
-  document.getElementById('chatWindow').classList.add('active');
-  document.getElementById('chatSidebar').classList.add('mobile-hidden');
+  // Mobile handled by patch in html
 };
 
 window.sendWindowChat = function() {
@@ -358,7 +352,6 @@ window.sendWindowChat = function() {
   const val   = input.value.trim();
   if (!val) return;
   if (!_currentUser) { window.showToast('⚠️ Đăng nhập để chat!', 'warn'); return; }
-  console.log('Gửi tin vào:', currentConvoId, 'Text:', val);
   sendMessage(currentConvoId, val).catch(e => {
     console.error('Lỗi gửi tin:', e);
     window.showToast('❌ Gửi thất bại: ' + e.message, 'error');
@@ -370,7 +363,7 @@ window.sendWindowChat = function() {
 window.filterContacts = function() {
   const q = document.getElementById('chatSearchInput').value.toLowerCase();
   document.querySelectorAll('#chatContactList .chat-contact').forEach(c => {
-    const nm = c.querySelector('.chat-contact-name');
+    const nm = c.querySelector('.contact-name');
     c.style.display = nm && nm.textContent.toLowerCase().includes(q) ? '' : 'none';
   });
 };
@@ -424,13 +417,13 @@ function _renderFriendsInChatFromList(friends) {
     div.id        = 'contact-' + f.uid;
     div.onclick   = () => window.openConvo(f.uid, name, f.avatarUrl || name[0].toUpperCase(), 'dm');
     div.innerHTML = `
-      <div class="chat-contact-avatar">${name[0].toUpperCase()}</div>
-      <div class="chat-contact-info">
-        <span class="chat-contact-name">${escHtml(name)} <span class="chat-online-dot"></span></span>
-        <span class="chat-contact-preview">Nhấn để nhắn tin</span>
+      <div class="contact-av">${name[0].toUpperCase()}</div>
+      <div class="contact-info">
+        <span class="contact-name">${escHtml(name)} <span class="chat-online-dot"></span></span>
+        <span class="contact-preview">Nhấn để nhắn tin</span>
       </div>`;
     el.appendChild(div);
-    renderContactAvatar(div.querySelector('.chat-contact-avatar'), f);
+    renderContactAvatar(div.querySelector('.contact-av'), f);
   });
 }
 
@@ -457,13 +450,13 @@ function renderAllUsersInChat() {
       div.className = 'chat-contact';
       div.onclick   = () => viewUserProfile(u.uid);
       div.innerHTML = `
-        <div class="chat-contact-avatar">${name[0].toUpperCase()}</div>
-        <div class="chat-contact-info">
-          <span class="chat-contact-name">${escHtml(name)}</span>
-          <span class="chat-contact-preview" style="color:#a78bfa">Nhấn để xem profile</span>
+        <div class="contact-av">${name[0].toUpperCase()}</div>
+        <div class="contact-info">
+          <span class="contact-name">${escHtml(name)}</span>
+          <span class="contact-preview" style="color:#a78bfa">Nhấn để xem profile</span>
         </div>`;
       el.appendChild(div);
-      renderContactAvatar(div.querySelector('.chat-contact-avatar'), u);
+      renderContactAvatar(div.querySelector('.contact-av'), u);
     });
   });
 }

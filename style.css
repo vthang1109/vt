@@ -634,3 +634,88 @@ nav.vt-top-nav {
 
 body.has-top-nav { padding-top: 56px !important; }
 body.has-bottom-nav { padding-bottom: 58px !important; }
+
+/* ===== VT NAV PANEL FIX ===== */
+/* Isolate all panel elements from global resets */
+
+.vt-profile-panel *,
+.vt-apps-panel * {
+  font-family: 'Nunito', sans-serif;
+  box-sizing: border-box;
+}
+
+/* Profile card link */
+.vt-pp-profile-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+/* Stats row */
+.vt-pp-stats-row {
+  display: flex !important;
+}
+
+/* Avatar */
+.vt-pp-avatar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+/* Section heads */
+.vt-pp-section-head,
+.vt-pp-quests-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* Streak row */
+.vt-pp-streak {
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Quest rows */
+.vt-pp-quest-row {
+  display: flex !important;
+  align-items: center !important;
+}
+.vt-pp-quest-list {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.vt-pp-quest-bar-wrap {
+  display: flex !important;
+  align-items: center !important;
+}
+.vt-pp-section-link {
+  text-decoration: none !important;
+  color: #0288D1 !important;
+}
+
+/* Apps panel grid */
+.vt-ap-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+}
+.vt-ap-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  color: inherit !important;
+}
+.vt-ap-card-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.vt-ap-handle, .vt-pp-handle {
+  display: block !important;
+}

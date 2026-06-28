@@ -1,56 +1,51 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VTWorld — Games</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="games.css"/>
-  <link rel="stylesheet" href="quests.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="games.css" />
+  <link rel="stylesheet" href="quests.css" />
+
+  <!-- Top & Bottom Nav (sẽ load sau) -->
+  <script src="top-nav.js"></script>
+  <script src="bottom-nav.js"></script>
+
+  <!-- Firebase + Quests + Points (module) -->
+  <script type="module" src="points.js"></script>
   <script type="module" src="quests.js"></script>
 </head>
-<body>
+<body data-bottom-nav="home">
+  <!-- TopNav sẽ tự động chèn vào đây nếu có #top-nav-root -->
+  <div id="top-nav-root"></div>
+
   <canvas id="bg-canvas"></canvas>
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
   <div class="games-page">
-    <nav>
-      <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer">
-        <span class="logo-vt">VT</span><span class="logo-world">World</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700">⭐ 0</span>
-        <div class="nav-right-menu">
-          <button class="nav-hamburger" onclick="toggleNavMenu()">☰</button>
-          <div class="nav-dropdown" id="navDropdown">
-            <a class="nav-dropdown-item" href="shop.html"><span class="dd-icon">🛒</span> Shop</a>
-            <a class="nav-dropdown-item" href="bag.html"><span class="dd-icon">🎒</span> Bag</a>
-            <a class="nav-dropdown-item" href="profile.html"><span class="dd-icon">👤</span> Profile</a>
-            <a class="nav-dropdown-item" href="#" onclick="history.back(); return false;"><span class="dd-icon">←</span> Quay lại</a>
-          </div>
-        </div>
-      </div>
-    </nav>
-
+    <!-- Hero -->
     <div class="games-hero">
       <h1>🎮 <span>Game</span> Center</h1>
       <p>Chơi game · Kiếm điểm · Leo rank</p>
     </div>
 
+    <!-- Tab chuyển đổi -->
     <div class="nav-tabs">
       <a class="nav-tab active" href="games.html">🎮 GAMES</a>
       <a class="nav-tab" href="applications.html">📱 ỨNG DỤNG</a>
     </div>
 
+    <!-- Thanh điểm (vẫn giữ để hiển thị rõ) -->
     <div class="points-bar">
       <span class="pts-icon">⭐</span>
       <span class="pts-label">Điểm của bạn:</span>
       <span class="pts-val" id="userPoints">0 đ</span>
     </div>
 
-    <!-- Bảng Xếp Hạng & Online -->
+    <!-- Bảng xếp hạng & Phòng chơi -->
     <div class="category-section">
       <div class="category-label"><span class="cat-icon">🏆</span><span class="cat-name">Bảng Xếp Hạng & Online</span><div class="cat-line"></div></div>
       <div class="game-lobby-grid">
@@ -68,12 +63,12 @@
         </a>
       </div>
     </div>
-    
-        <!-- Casino -->
+
+    <!-- Casino -->
     <div class="category-section">
       <div class="category-label"><span class="cat-icon">🃏</span><span class="cat-name">CASINO</span><div class="cat-line"></div></div>
       <div class="game-lobby-grid">
-                <a class="game-lobby-card" href="slot.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🎇</span><span class="glc-name">No Hu</span><span class="glc-pts">777</span></a>
+        <a class="game-lobby-card" href="slot.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🎇</span><span class="glc-name">No Hu</span><span class="glc-pts">777</span></a>
         <a class="game-lobby-card" href="xidach.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">♣️</span><span class="glc-name">Xì dách</span><span class="glc-pts">Cược & Thắng</span></a>
         <a class="game-lobby-card" href="baicao.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🃏</span><span class="glc-name">Bài Cào</span><span class="glc-pts">Sáp - Liêng</span></a>
         <a class="game-lobby-card" href="baucua.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🦞</span><span class="glc-name">Bầu Cua</span><span class="glc-pts">Thử vận may</span></a>
@@ -81,7 +76,6 @@
         <a class="game-lobby-card" href="poker.html"><span class="glc-badge ready">Mới</span><span class="glc-emoji">♠️</span><span class="glc-name">Poker</span><span class="glc-pts">Cược & Tố</span></a>
       </div>
     </div>
-  </div>
 
     <!-- Trí Tuệ -->
     <div class="category-section">
@@ -104,60 +98,95 @@
         <a class="game-lobby-card" href="football.html"><span class="glc-badge ready">Mới</span><span class="glc-emoji">⚽</span><span class="glc-name">Bóng Đá</span><span class="glc-pts">+5~50đ</span></a>
       </div>
     </div>
+  </div>
 
+  <!-- Background particles -->
   <script>
-    function toggleNavMenu() {
-      document.getElementById('navDropdown').classList.toggle('open');
-    }
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.nav-right-menu')) {
-        document.getElementById('navDropdown')?.classList.remove('open');
+    (function initParticles() {
+      const canvas = document.getElementById('bg-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resize();
+      window.addEventListener('resize', resize);
+      for (let i = 0; i < 40; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          r: Math.random() * 1.5 + 0.5
+        });
       }
-    });
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0) p.x = canvas.width;
+          if (p.x > canvas.width) p.x = 0;
+          if (p.y < 0) p.y = canvas.height;
+          if (p.y > canvas.height) p.y = 0;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(56,189,248,0.5)';
+          ctx.fill();
+        });
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d < 100) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(56,189,248,${0.07 * (1 - d / 100)})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
   </script>
 
+  <!-- Đồng bộ điểm và gọi TopNav -->
   <script type="module">
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { auth, db, claimDailyLogin } from './points.js';
 
-    // Vẽ background particles
-    const canvas = document.getElementById('bg-canvas');
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      let particles = [];
-      function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
-      for (let i = 0; i < 40; i++) { particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-.5)*.4, vy: (Math.random()-.5)*.4, r: Math.random()*1.5+.5 }); }
-      function drawParticles() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        particles.forEach(p => {
-          p.x += p.vx; p.y += p.vy;
-          if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
-          if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0;
-          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-          ctx.fillStyle='rgba(56,189,248,0.5)'; ctx.fill();
-        });
-        for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
-          const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
-          if(d<100){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(56,189,248,${0.07*(1-d/100)})`; ctx.lineWidth=.5; ctx.stroke(); }
-        }
-        requestAnimationFrame(drawParticles);
-      }
-      drawParticles();
-    }
-
+    // Cập nhật điểm trên top-nav và điểm-bar
     onAuthStateChanged(auth, async (user) => {
-      if (!user) { window.location.href = 'index.html'; return; }
-      onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
-        if (docSnap.exists()) {
-          const pts = docSnap.data().points || 0;
+      if (!user) {
+        // Nếu chưa đăng nhập, chuyển về trang chủ (hoặc giữ nguyên)
+        // window.location.href = 'index.html';
+        return;
+      }
+
+      const userRef = doc(db, 'users', user.uid);
+      onSnapshot(userRef, (snap) => {
+        if (snap.exists()) {
+          const pts = snap.data().points || 0;
+          // Cập nhật thanh điểm
           document.getElementById('userPoints').textContent = pts.toLocaleString() + ' đ';
-          document.getElementById('nav-pts').textContent = '⭐ ' + pts.toLocaleString();
+          // Cập nhật top-nav
+          if (window.TopNav && typeof window.TopNav.setPoints === 'function') {
+            window.TopNav.setPoints(pts);
+          }
         }
       });
-      try { await claimDailyLogin(); } catch(e){}
+
+      // Nhận quà đăng nhập hàng ngày (nếu có)
+      try {
+        await claimDailyLogin();
+      } catch (e) {
+        console.warn('claimDailyLogin error:', e);
+      }
     });
   </script>
 </body>
