@@ -105,6 +105,8 @@
         <span class="cw-name" id="chatWinName">Chat toàn server</span>
         <span class="cw-status">● Online</span>
       </div>
+      <!-- Thêm nút xoá tất cả tin nhắn -->
+      <button id="clearMessagesBtn" class="cw-clear-btn" style="display:none; background:none; border:none; color:#f87171; cursor:pointer; font-size:18px; padding:0 6px;" title="Xoá tất cả tin nhắn">🗑</button>
       <button id="sendPointsBtn" class="cw-pts-btn" onclick="sendPointsToCurrent()" style="display:none">💸 Gửi điểm</button>
     </div>
 
@@ -125,7 +127,6 @@
   </div>
 
 </div><!-- end chat-layout -->
-
 <!-- Scripts -->
 <script type="module" src="chat.js"></script>
 <script type="module" src="send-points.js"></script>
@@ -193,9 +194,11 @@
             document.getElementById('chatWindow').classList.add('cw-active');
             document.getElementById('cwBack').style.display = 'flex';
           }
-          // Nút gửi điểm
+          // Nút gửi điểm và xoá tin nhắn
           const btn = document.getElementById('sendPointsBtn');
+          const clearBtn = document.getElementById('clearMessagesBtn');
           if (btn) btn.style.display = window.currentConvoUid ? 'inline-flex' : 'none';
+          if (clearBtn) clearBtn.style.display = window.currentConvoUid ? 'inline-block' : 'none';
           return r;
         };
         window.openConvo.__patched = true;

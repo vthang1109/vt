@@ -1,4 +1,4 @@
-// ===== chat.js – Toàn bộ logic trang Chat =====
+// ===== chat.js – Phần 1 =====
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
   getAuth, onAuthStateChanged
@@ -6,7 +6,8 @@ import {
 import {
   getFirestore, doc, getDoc, getDocs, updateDoc,
   collection, query, orderBy, limit, onSnapshot,
-  addDoc, serverTimestamp, deleteDoc, arrayUnion, arrayRemove, setDoc
+  addDoc, serverTimestamp, deleteDoc, arrayUnion, arrayRemove, setDoc,
+  writeBatch
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // ===== FIREBASE CONFIG =====
@@ -96,58 +97,13 @@ let currentConvoName = '🌐 Chat toàn server';
 let currentConvoUid  = null;
 let _chatUnsubscribe = null;
 let _currentUser     = null;
-
-// ===== AUTH GUARD =====
-onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.href = 'index.html'; return; }
-  _currentUser = user;
-  await _initChat();
-});
-
-// ===== INIT =====
-async function _initChat() {
-  // FIX 1: onSnapshot lời mời → tự re-render khi lời mời bị xóa (sau accept/decline)
-  _listenFriendRequests(_currentUser.uid);
-
-  // FIX 2: onSnapshot doc user của mình → khi phía kia accept → friends array thay đổi
-  // → snapshot bắn → fetch fresh data → re-render sidebar ngay, không dùng cache
-  onSnapshot(doc(db, 'users', _currentUser.uid), async (snap) => {
-    if (!snap.exists()) return;
-    const friendUids = snap.data().friends || [];
-    const friends = [];
-    for (const fuid of friendUids) {
-      const fs = await getDoc(doc(db, 'users', fuid));
-      if (fs.exists()) friends.push({ uid: fuid, ...fs.data() });
-    }
-    _renderFriendsInChatFromList(friends);
-  });
-
-  renderAllUsersInChat();
-  _listenIncomingDMs();
-
-  // Đảm bảo room __server__ tồn tại (chat.html không load app.js)
-  try {
-    const serverRef = doc(db, 'chats', 'server');
-    const serverSnap = await getDoc(serverRef);
-    if (!serverSnap.exists()) {
-      await setDoc(serverRef, { createdAt: serverTimestamp(), name: 'Global Chat', members: [] });
-    } else {
-    }
-  } catch(e) { 
-    window.showToast('❌ Lỗi tạo room chat: ' + e.message, 'error');
-  }
-
-  // Chỉ tự mở server chat trên desktop, mobile thì để user tự chọn
-  const isMobile = window.innerWidth <= 640;
-  if (!isMobile) {
-    openConvo('server', '🌐 Chat toàn server', null, 'server');
-  }
-}
+let _otherReadTime   = null;
+let _readUnsubscribe = null;
+let _lastMessages    = [];
+let _currentRoomId   = null;
 
 // ===== FIRESTORE HELPERS =====
 function getDmId(uid1, uid2) { return [uid1, uid2].sort().join('_'); }
-
-// ===== SEEN TRACKING (per room, lưu local) =====
 function _seenKey(roomId) { return 'vt_lastSeen_' + roomId; }
 function _getLastSeen(roomId) {
   return parseInt(localStorage.getItem(_seenKey(roomId)) || '0', 10);
@@ -156,13 +112,85 @@ function _setLastSeen(roomId, ms) {
   if (ms > _getLastSeen(roomId)) localStorage.setItem(_seenKey(roomId), String(ms));
 }
 
+// Cập nhật read receipt của mình
+async function updateReadReceipt(roomId) {
+  if (!_currentUser || !roomId) return;
+  try {
+    await setDoc(doc(db, 'chats', roomId, 'readReceipts', _currentUser.uid), {
+      lastReadAt: serverTimestamp()
+    }, { merge: true });
+  } catch(e) { /* bỏ qua */ }
+}
+
+// Lắng nghe read receipt của người khác
+function listenReadReceipt(roomId, otherUid, callback) {
+  return onSnapshot(doc(db, 'chats', roomId, 'readReceipts', otherUid), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      const ts = data.lastReadAt?.toDate?.() || null;
+      callback(ts ? ts.getTime() : null);
+    } else {
+      callback(null);
+    }
+  });
+}
+
+// Xoá toàn bộ tin nhắn: ẩn với người xoá, nếu cả 2 cùng xoá thì xoá hẳn
+async function clearMessages(roomId) {
+  if (!_currentUser) return;
+  const msgsRef = collection(db, 'chats', roomId, 'messages');
+  const snapshot = await getDocs(msgsRef);
+  if (snapshot.empty) return;
+  
+  const batch = writeBatch(db);
+  for (const docSnap of snapshot.docs) {
+    const data = docSnap.data();
+    const hiddenFor = data.hiddenFor || [];
+    
+    // Nếu đã có cả 2 người trong hiddenFor -> xoá hẳn
+    if (hiddenFor.includes(_currentUser.uid)) {
+      batch.delete(docSnap.ref);
+    } else {
+      // Nếu chưa có -> thêm mình vào hiddenFor
+      batch.update(docSnap.ref, {
+        hiddenFor: arrayUnion(_currentUser.uid)
+      });
+    }
+  }
+  await batch.commit();
+}
+
+// Xoá từng tin nhắn: xoá hoàn toàn
+window.deleteMessage = async function(msgId) {
+  if (!_currentUser) {
+    window.showToast('❌ Bạn chưa đăng nhập.', 'error');
+    return;
+  }
+  if (!msgId) {
+    window.showToast('❌ ID tin nhắn không hợp lệ.', 'error');
+    return;
+  }
+  if (!_currentRoomId || _currentRoomId === 'server') {
+    window.showToast('❌ Không thể xoá tin nhắn ở server chat.', 'warn');
+    return;
+  }
+  if (!confirm('Xoá tin nhắn này?')) return;
+
+  try {
+    await deleteDoc(doc(db, 'chats', _currentRoomId, 'messages', msgId));
+    window.showToast('✅ Đã xoá tin nhắn.', 'success');
+  } catch (e) {
+    console.error('❌ Lỗi xoá tin nhắn:', e);
+    window.showToast('❌ Xoá thất bại: ' + (e.message || 'Lỗi không xác định'), 'error');
+  }
+};
+
 async function getUserData(uid, callback) {
   try {
     const snap = await getDoc(doc(db, 'users', uid));
     callback(snap.exists() ? snap.data() : null);
   } catch(e) { callback(null); }
 }
-
 async function getAllUsers(callback) {
   try {
     const snap = await getDocs(collection(db, 'users'));
@@ -172,6 +200,7 @@ async function getAllUsers(callback) {
   } catch(e) { callback([]); }
 }
 
+// Lắng nghe tin nhắn – lọc tin nhắn bị ẩn với người dùng hiện tại
 function listenMessages(convoId, callback) {
   const roomId = convoId === 'server'
     ? 'server'
@@ -185,6 +214,10 @@ function listenMessages(convoId, callback) {
     const msgs = [];
     snap.forEach(d => {
       const data = d.data();
+      // Bỏ qua nếu tin nhắn bị ẩn với người dùng hiện tại
+      if (data.hiddenFor && data.hiddenFor.includes(_currentUser.uid)) {
+        return;
+      }
       const ts   = data.createdAt?.toDate();
       const time = ts
         ? ts.getHours().toString().padStart(2,'0') + ':' + ts.getMinutes().toString().padStart(2,'0')
@@ -208,25 +241,12 @@ async function sendMessage(convoId, text) {
     text,
     senderUid:  _currentUser.uid,
     senderName,
-    createdAt:  serverTimestamp()
+    createdAt:  serverTimestamp(),
+    hiddenFor: []   // mảng những người đã ẩn tin nhắn này
   });
-  // Hook nhiệm vụ hằng ngày
   try { window.VTQuests && window.VTQuests.trackChat(); } catch(e) {}
   return result;
 }
-
-window.deleteMessage = async function(msgId) {
-  if (!_currentUser || !msgId) return;
-  if (!confirm('Xoá tin nhắn này?')) return;
-  const roomId = currentConvoId === 'server'
-    ? 'server'
-    : getDmId(_currentUser.uid, currentConvoId);
-  try {
-    await deleteDoc(doc(db, 'chats', roomId, 'messages', msgId));
-  } catch(e) {
-    window.showToast('❌ Xoá thất bại: ' + e.message, 'error');
-  }
-};
 
 // ===== FRIEND HELPERS =====
 async function getMyFriends(uid, callback) {
@@ -242,7 +262,6 @@ async function getMyFriends(uid, callback) {
     callback(friends);
   } catch(e) { callback([]); }
 }
-
 async function getFriendRequests(uid, callback) {
   try {
     const snap = await getDocs(collection(db, 'friendRequests', uid, 'requests'));
@@ -255,7 +274,6 @@ async function getFriendRequests(uid, callback) {
     callback(reqs);
   } catch(e) { callback([]); }
 }
-
 async function getFriendStatus(myUid, otherUid, callback) {
   try {
     const mySnap = await getDoc(doc(db, 'users', myUid));
@@ -270,63 +288,107 @@ async function getFriendStatus(myUid, otherUid, callback) {
     callback('none');
   } catch(e) { callback('none'); }
 }
+// ===== chat.js – Phần 2 =====
 
-// FIX 1: onSnapshot lời mời → gọi renderFriendRequestsList() mỗi khi có thay đổi
-// Khi deleteDoc lời mời sau accept/decline → snapshot fire → list tự xóa lời mời đó
-function _listenFriendRequests(uid) {
-  onSnapshot(collection(db, 'friendRequests', uid, 'requests'), (snap) => {
-    // Luôn re-render danh sách lời mời
-    window._renderFriendRequestsList && window._renderFriendRequestsList();
+// ===== AUTH GUARD =====
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = 'index.html'; return; }
+  _currentUser = user;
+  await _initChat();
+});
 
-    // Chỉ toast khi có lời mời MỚI
-    snap.docChanges().forEach(async change => {
-      if (change.type === 'added') {
-        const fromUid  = change.doc.data().fromUid;
-        const userSnap = await getDoc(doc(db, 'users', fromUid));
-        const name     = userSnap.exists() ? (userSnap.data().nickname || 'Ai đó') : 'Ai đó';
-        window.showToast(`📨 <strong>${escHtml(name)}</strong> muốn kết bạn với bạn!`, 'warn');
-      }
-    });
+// ===== INIT =====
+async function _initChat() {
+  _listenFriendRequests(_currentUser.uid);
+  onSnapshot(doc(db, 'users', _currentUser.uid), async (snap) => {
+    if (!snap.exists()) return;
+    const friendUids = snap.data().friends || [];
+    const friends = [];
+    for (const fuid of friendUids) {
+      const fs = await getDoc(doc(db, 'users', fuid));
+      if (fs.exists()) friends.push({ uid: fuid, ...fs.data() });
+    }
+    _renderFriendsInChatFromList(friends);
   });
+  renderAllUsersInChat();
+  _listenIncomingDMs();
+  try {
+    const serverRef = doc(db, 'chats', 'server');
+    const serverSnap = await getDoc(serverRef);
+    if (!serverSnap.exists()) {
+      await setDoc(serverRef, { createdAt: serverTimestamp(), name: 'Global Chat', members: [] });
+    }
+  } catch(e) { 
+    window.showToast('❌ Lỗi tạo room chat: ' + e.message, 'error');
+  }
+
+  // Sự kiện xoá toàn bộ tin nhắn (ẩn với người xoá)
+  document.getElementById('clearMessagesBtn')?.addEventListener('click', async function() {
+    if (!_currentRoomId || currentConvoId === 'server') {
+      window.showToast('Không thể xoá tin nhắn server.', 'warn');
+      return;
+    }
+    if (!confirm('Ẩn tất cả tin nhắn với bạn? (Nếu cả 2 cùng xoá sẽ xoá hẳn)')) return;
+    try {
+      await clearMessages(_currentRoomId);
+      window.showToast('✅ Đã ẩn tất cả tin nhắn (chỉ bạn không thấy).', 'success');
+      if (_chatUnsubscribe) {
+        _lastMessages = _lastMessages.filter(m => !m.hiddenFor || !m.hiddenFor.includes(_currentUser.uid));
+        renderMessages(_lastMessages);
+      }
+    } catch(e) {
+      window.showToast('❌ Lỗi xoá tin nhắn.', 'error');
+    }
+  });
+
+  const isMobile = window.innerWidth <= 640;
+  if (!isMobile) {
+    openConvo('server', '🌐 Chat toàn server', null, 'server');
+  }
 }
 
-// Lắng nghe DM đến – toast + badge đỏ
-function _listenIncomingDMs() {
-  getMyFriends(_currentUser.uid, (friends) => {
-    friends.forEach(f => {
-      const roomId = getDmId(_currentUser.uid, f.uid);
-      const q = query(
-        collection(db, 'chats', roomId, 'messages'),
-        orderBy('createdAt', 'desc'),
-        limit(1)
-      );
-      onSnapshot(q, (snap) => {
-        snap.docChanges().forEach(change => {
-          if (change.type === 'added') {
-            const msg = change.doc.data();
-            const ts  = msg.createdAt?.toDate();
-            const ms  = ts ? ts.getTime() : Date.now();
-            if (msg.senderUid === _currentUser.uid) return;
-            if (currentConvoId === f.uid) { _setLastSeen(roomId, ms); return; }
-            if (ms <= _getLastSeen(roomId)) return; // đã xem rồi, không báo lại
-            const name = f.nickname || '?';
-            window.showToast(`💬 <strong>${escHtml(name)}</strong>: ${escHtml((msg.text||'').slice(0,40))}`, 'info');
-            const contactEl = document.getElementById('contact-' + f.uid);
-            if (contactEl) {
-              let badge = contactEl.querySelector('.dm-badge');
-              if (!badge) {
-                badge = document.createElement('span');
-                badge.className = 'dm-badge';
-                badge.style.cssText = 'background:#f87171;color:#fff;border-radius:999px;font-size:10px;font-weight:800;padding:1px 6px;margin-left:4px';
-                contactEl.querySelector('.contact-name')?.appendChild(badge);
-              }
-              badge.textContent = '●';
-            }
+// ===== RENDER MESSAGES (có seen) =====
+function renderMessages(messages) {
+  const box = document.getElementById('chatWindowMessages');
+  if (!box) return;
+  if (!messages.length) {
+    box.innerHTML = '<div class="cwm-msg system-msg">Chưa có tin nhắn nào 👋</div>';
+    return;
+  }
+  box.innerHTML = '';
+  messages.forEach(m => {
+    const isMe = _currentUser && m.senderUid === _currentUser.uid;
+    const div = document.createElement('div');
+    div.className = 'cwm-msg ' + (isMe ? 'mine-msg' : 'other-msg');
+    
+    let seenHtml = '';
+    if (isMe && _otherReadTime !== null && m.ms && m.ms <= _otherReadTime) {
+      seenHtml = ' <span class="seen-status" style="font-size:10px;color:#34d399;font-weight:700;">✓ Đã xem</span>';
+    }
+
+    if (isMe) {
+      div.innerHTML = `<span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time} ${seenHtml} <button class="cwm-del" onclick="window.deleteMessage('${m.id}')" title="Xoá tin nhắn">🗑</button></span>`;
+      box.appendChild(div);
+    } else {
+      div.innerHTML = `<div class="cwm-av" onclick="window.showProfileCard && window.showProfileCard('${m.senderUid}')" style="cursor:pointer" title="Xem hồ sơ"></div><div class="cwm-content"><span class="cwm-user">${escHtml(m.senderName)}</span><span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time}</span></div>`;
+      box.appendChild(div);
+      const avEl = div.querySelector('.cwm-av');
+      if (avEl && m.senderUid) {
+        getDoc(doc(db, 'users', m.senderUid)).then(s => {
+          if (!s.exists()) return;
+          const d = s.data();
+          if (d.avatarUrl) {
+            avEl.style.backgroundImage = `url(${d.avatarUrl})`;
+            avEl.style.backgroundSize = 'cover';
+            avEl.style.backgroundPosition = 'center';
+          } else {
+            avEl.textContent = (d.nickname || '?')[0].toUpperCase();
           }
-        });
-      });
-    });
+        }).catch(() => {});
+      }
+    }
   });
+  box.scrollTop = box.scrollHeight;
 }
 
 // ===== OPEN CONVO =====
@@ -334,8 +396,8 @@ window.openConvo = function(uid, name, avatarChar, type) {
   currentConvoId   = uid;
   currentConvoName = name;
   currentConvoUid  = (type === 'server') ? null : uid;
+  _currentRoomId   = uid === 'server' ? 'server' : getDmId(_currentUser.uid, uid);
 
-  // Xóa badge khi mở chat
   const badgeEl = document.getElementById('contact-' + uid);
   if (badgeEl) { const b = badgeEl.querySelector('.dm-badge'); if (b) b.remove(); }
 
@@ -346,7 +408,6 @@ window.openConvo = function(uid, name, avatarChar, type) {
   const av = document.getElementById('chatWinAvatar');
   document.getElementById('chatWinName').textContent = name;
   if (avatarChar) {
-    // avatarChar có thể là URL hoặc chữ cái
     if (avatarChar.startsWith('data:') || avatarChar.startsWith('http')) {
       av.style.background = `url(${avatarChar}) center/cover`;
       av.textContent = '';
@@ -365,48 +426,36 @@ window.openConvo = function(uid, name, avatarChar, type) {
   box.innerHTML = '<div class="cwm-msg system-msg">Đang tải...</div>';
 
   if (_chatUnsubscribe) { _chatUnsubscribe(); _chatUnsubscribe = null; }
+  if (_readUnsubscribe) { _readUnsubscribe(); _readUnsubscribe = null; }
+  _otherReadTime = null;
+  _lastMessages = [];
+
+  const clearBtn = document.getElementById('clearMessagesBtn');
+  const ptsBtn = document.getElementById('sendPointsBtn');
+  if (type === 'server') {
+    clearBtn.style.display = 'none';
+    ptsBtn.style.display = 'none';
+  } else {
+    clearBtn.style.display = 'inline-block';
+    ptsBtn.style.display = 'inline-flex';
+    const roomId = getDmId(_currentUser.uid, uid);
+    _readUnsubscribe = listenReadReceipt(roomId, uid, (time) => {
+      _otherReadTime = time;
+      if (_lastMessages.length) renderMessages(_lastMessages);
+    });
+    updateReadReceipt(roomId);
+  }
 
   _chatUnsubscribe = listenMessages(uid, (msgs) => {
-    box.innerHTML = '';
-    if (!msgs.length) {
-      box.innerHTML = '<div class="cwm-msg system-msg">Chưa có tin nhắn nào 👋</div>';
-    }
-    msgs.forEach(m => {
-      const div   = document.createElement('div');
-      const isMe  = _currentUser && m.senderUid === _currentUser.uid;
-      div.className = 'cwm-msg ' + (isMe ? 'mine-msg' : 'other-msg');
-      div.innerHTML = isMe
-  ? `<span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time} <button class="cwm-del" onclick="window.deleteMessage('${m.id}')" title="Xoá tin nhắn">🗑</button></span>`
-  : `<div class="cwm-av" onclick="window.showProfileCard && window.showProfileCard('${m.senderUid}')" style="cursor:pointer" title="Xem hồ sơ"></div><div class="cwm-content"><span class="cwm-user">${escHtml(m.senderName)}</span><span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time}</span></div>`;
-      box.appendChild(div);
-      // Load avatar cho tin nhắn người khác
-if (!isMe && m.senderUid) {
-        const avEl = div.querySelector('.cwm-av');
-        if (avEl) {
-          getDoc(doc(db, 'users', m.senderUid)).then(s => {
-            if (!s.exists()) return;
-            const d = s.data();
-            if (d.avatarUrl) {
-              avEl.style.backgroundImage = `url(${d.avatarUrl})`;
-              avEl.style.backgroundSize = 'cover';
-              avEl.style.backgroundPosition = 'center';
-            } else {
-              avEl.textContent = (d.nickname || '?')[0].toUpperCase();
-            }
-          }).catch(() => {});
-        }
+    _lastMessages = msgs;
+    renderMessages(msgs);
+    if (msgs.length && type !== 'server') {
+      const last = msgs[msgs.length - 1];
+      if (last.senderUid !== _currentUser.uid && _currentRoomId) {
+        updateReadReceipt(_currentRoomId);
       }
-    });
-    box.scrollTop = box.scrollHeight;
-
-    // Đang mở phòng này → coi như đã xem hết tới tin mới nhất
-    if (msgs.length) {
-      const roomId = uid === 'server' ? 'server' : getDmId(_currentUser.uid, uid);
-      _setLastSeen(roomId, msgs[msgs.length - 1].ms);
     }
   });
-
-  // Mobile handled by patch in html
 };
 
 window.sendWindowChat = function() {
@@ -451,8 +500,6 @@ window.switchTab = function(tab) {
 };
 
 // ===== RENDER: FRIENDS IN SIDEBAR =====
-// FIX 2: Nhận list trực tiếp từ onSnapshot data (không dùng cache getDoc cũ)
-// Helper: render avatar cho contact
 function renderContactAvatar(el, user) {
   if (!el) return;
   if (user.avatarUrl) {
@@ -494,7 +541,6 @@ function renderFriendsInChat() {
   getMyFriends(_currentUser.uid, (friends) => _renderFriendsInChatFromList(friends));
 }
 
-// ===== RENDER: ALL USERS IN SIDEBAR =====
 function renderAllUsersInChat() {
   if (!_currentUser) return;
   getAllUsers((users) => {
@@ -524,7 +570,6 @@ function renderAllUsersInChat() {
 }
 
 // ===== RENDER: FRIEND REQUESTS =====
-// FIX 1: Được gọi từ onSnapshot → tự xóa lời mời khỏi UI sau khi accept/decline
 window._renderFriendRequestsList = function renderFriendRequestsList() {
   if (!_currentUser) return;
   getFriendRequests(_currentUser.uid, (reqs) => {
@@ -549,7 +594,6 @@ window._renderFriendRequestsList = function renderFriendRequestsList() {
   });
 }
 
-// ===== RENDER: MY FRIENDS LIST (tab bạn bè) =====
 window._renderMyFriendsList = function renderMyFriendsList() {
   if (!_currentUser) return;
   getMyFriends(_currentUser.uid, (friends) => {
@@ -573,6 +617,7 @@ window._renderMyFriendsList = function renderMyFriendsList() {
     });
   });
 }
+// ===== chat.js – Phần 3 =====
 
 // ===== VIEW PROFILE =====
 window.viewCurrentProfile = function() {
@@ -585,8 +630,6 @@ function viewUserProfile(uid) {
   getUserData(uid, (data) => {
     if (!data) { window.showToast('Không tìm thấy người dùng.', 'error'); return; }
     const nickname = data.nickname || data.email?.split('@')[0] || '?';
-
-    // Avatar / nhân vật
     const colors = ['#a78bfa,#7c3aed','#38bdf8,#0ea5e9','#34d399,#059669','#fbbf24,#f59e0b','#f87171,#ef4444'];
     const colorIdx = uid.charCodeAt(0) % colors.length;
     const avEl = document.getElementById('vp-avatar');
@@ -598,22 +641,14 @@ function viewUserProfile(uid) {
       avEl.textContent = nickname[0].toUpperCase();
     }
     document.getElementById('vp-character-frame').style.background = `linear-gradient(135deg,${colors[colorIdx]})`;
-
     document.getElementById('vp-name').textContent  = nickname;
     document.getElementById('vp-email').textContent = data.email || '';
-
-    // Điểm
     document.getElementById('vp-points').textContent = (data.points ?? 0).toLocaleString('vi');
-
-    // Số bạn bè
-    const friendsArr = data.friends || [];
-    document.getElementById('vp-friends-count').textContent = friendsArr.length;
-
+    document.getElementById('vp-friends-count').textContent = (data.friends || []).length;
     renderViewProfileActions(uid, { ...data, nickname });
     document.getElementById('viewProfileModal').classList.add('open');
   });
 }
-
 
 function renderViewProfileActions(uid, data) {
   const area = document.getElementById('vp-action-area');
@@ -655,9 +690,7 @@ window.closeViewProfile = function(e) {
 // ===== FRIEND ACTIONS =====
 window.openConvoWithUid = function(uid, name) {
   window.closeViewProfile();
-  // Về tab chat trước
   window.switchChatTab && window.switchChatTab('world');
-  // Mở convo sau khi tab đã switch
   setTimeout(() => {
     window.openConvo(uid, name, name[0].toUpperCase(), 'dm');
   }, 200);
@@ -679,7 +712,6 @@ window.acceptFriend = async function(fromUid) {
   try {
     await updateDoc(doc(db, 'users', myUid), { friends: arrayUnion(fromUid) });
     await updateDoc(doc(db, 'users', fromUid), { friends: arrayUnion(myUid) });
-    // FIX 1: deleteDoc → onSnapshot friendRequests tự fire → renderFriendRequestsList() tự chạy
     await deleteDoc(doc(db, 'friendRequests', myUid, 'requests', fromUid));
     window.showToast('🎉 Đã kết bạn thành công!', 'success');
     window.closeViewProfile();
@@ -691,7 +723,6 @@ window.acceptFriend = async function(fromUid) {
 window.declineFriend = async function(fromUid) {
   const myUid = _currentUser.uid;
   try {
-    // FIX 1: deleteDoc → onSnapshot friendRequests tự fire → renderFriendRequestsList() tự chạy
     await deleteDoc(doc(db, 'friendRequests', myUid, 'requests', fromUid));
     window.showToast('Đã từ chối.', 'info');
     window.closeViewProfile();
@@ -708,3 +739,56 @@ window.unfriend = async function(uid) {
     window._renderMyFriendsList && window._renderMyFriendsList();
   } catch(e) {}
 };
+
+// ===== LISTENERS =====
+function _listenFriendRequests(uid) {
+  onSnapshot(collection(db, 'friendRequests', uid, 'requests'), (snap) => {
+    window._renderFriendRequestsList && window._renderFriendRequestsList();
+    snap.docChanges().forEach(async change => {
+      if (change.type === 'added') {
+        const fromUid  = change.doc.data().fromUid;
+        const userSnap = await getDoc(doc(db, 'users', fromUid));
+        const name     = userSnap.exists() ? (userSnap.data().nickname || 'Ai đó') : 'Ai đó';
+        window.showToast(`📨 <strong>${escHtml(name)}</strong> muốn kết bạn với bạn!`, 'warn');
+      }
+    });
+  });
+}
+
+function _listenIncomingDMs() {
+  getMyFriends(_currentUser.uid, (friends) => {
+    friends.forEach(f => {
+      const roomId = getDmId(_currentUser.uid, f.uid);
+      const q = query(
+        collection(db, 'chats', roomId, 'messages'),
+        orderBy('createdAt', 'desc'),
+        limit(1)
+      );
+      onSnapshot(q, (snap) => {
+        snap.docChanges().forEach(change => {
+          if (change.type === 'added') {
+            const msg = change.doc.data();
+            const ts  = msg.createdAt?.toDate();
+            const ms  = ts ? ts.getTime() : Date.now();
+            if (msg.senderUid === _currentUser.uid) return;
+            if (currentConvoId === f.uid) { _setLastSeen(roomId, ms); return; }
+            if (ms <= _getLastSeen(roomId)) return;
+            const name = f.nickname || '?';
+            window.showToast(`💬 <strong>${escHtml(name)}</strong>: ${escHtml((msg.text||'').slice(0,40))}`, 'info');
+            const contactEl = document.getElementById('contact-' + f.uid);
+            if (contactEl) {
+              let badge = contactEl.querySelector('.dm-badge');
+              if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'dm-badge';
+                badge.style.cssText = 'background:#f87171;color:#fff;border-radius:999px;font-size:10px;font-weight:800;padding:1px 6px;margin-left:4px';
+                contactEl.querySelector('.contact-name')?.appendChild(badge);
+              }
+              badge.textContent = '●';
+            }
+          }
+        });
+      });
+    });
+  });
+}
