@@ -135,85 +135,95 @@ function listenReadReceipt(roomId, otherUid, callback) {
   });
 }
 
-// Xoá toàn bộ tin nhắn: ẩn với người xoá, nếu cả 2 cùng xoá thì xoá hẳn
+// ===== SỬA: Xoá toàn bộ tin nhắn - CHỈ xoá/ẩn tin nhắn của mình =====
 async function clearMessages(roomId) {
   if (!_currentUser) return;
   const msgsRef = collection(db, 'chats', roomId, 'messages');
   const snapshot = await getDocs(msgsRef);
-  if (snapshot.empty) return;
+  if (snapshot.empty) {
+    window.showToast('Không có tin nhắn nào để xoá.', 'info');
+    return;
+  }
   
   const batch = writeBatch(db);
+  let myMsgCount = 0;
+  
   for (const docSnap of snapshot.docs) {
     const data = docSnap.data();
+    // Chỉ xử lý tin nhắn của mình
+    if (data.senderUid !== _currentUser.uid) continue;
+    
+    myMsgCount++;
     const hiddenFor = data.hiddenFor || [];
     
-    // Nếu đã có cả 2 người trong hiddenFor -> xoá hẳn
+    // Nếu đã có mình trong hiddenFor (tức cả 2 đều ẩn) -> xoá hẳn
     if (hiddenFor.includes(_currentUser.uid)) {
       batch.delete(docSnap.ref);
     } else {
-      // Nếu chưa có -> thêm mình vào hiddenFor
+      // Chưa có mình -> thêm mình vào hiddenFor
       batch.update(docSnap.ref, {
         hiddenFor: arrayUnion(_currentUser.uid)
       });
     }
   }
+  
+  if (myMsgCount === 0) {
+    window.showToast('Bạn chưa gửi tin nhắn nào trong cuộc trò chuyện này.', 'info');
+    return;
+  }
+  
   await batch.commit();
+  window.showToast(`✅ Đã xoá ${myMsgCount} tin nhắn của bạn.`, 'success');
 }
 
-// === FIX: Xoá từng tin nhắn - kiểm tra kỹ lưỡng ===
+// ===== SỬA: Xoá từng tin nhắn =====
 window.deleteMessage = async function(msgId) {
-  console.log('🗑️ deleteMessage called with msgId:', msgId);
-  
-  // 1. Kiểm tra đăng nhập
   if (!_currentUser) {
     window.showToast('❌ Bạn chưa đăng nhập.', 'error');
-    console.error('❌ No user logged in');
     return;
   }
-
-  // 2. Kiểm tra msgId
-  if (!msgId || msgId === 'undefined' || msgId === 'null') {
-    window.showToast('❌ ID tin nhắn không hợp lệ.', 'error');
-    console.error('❌ Invalid msgId:', msgId);
+  if (!msgId || msgId === 'undefined' || msgId === 'null' || msgId === '') {
+    window.showToast('❌ Không tìm thấy tin nhắn.', 'error');
     return;
   }
-
-  // 3. Kiểm tra phòng chat
   if (!_currentRoomId || _currentRoomId === 'server') {
-    window.showToast('❌ Không thể xoá tin nhắn ở server chat.', 'warn');
-    console.error('❌ Cannot delete in room:', _currentRoomId);
+    window.showToast('❌ Không thể xoá tin nhắn server.', 'warn');
     return;
   }
+  if (!confirm('Xoá tin nhắn này?')) return;
 
-  // 4. Xác nhận
-  if (!confirm('Xoá tin nhắn này?')) {
-    console.log('🚫 User cancelled delete');
-    return;
-  }
+  const msgRef = doc(db, 'chats', _currentRoomId, 'messages', msgId);
 
-  // 5. Thực hiện xoá
+  // 1. Thử xoá thật
   try {
-    const msgRef = doc(db, 'chats', _currentRoomId, 'messages', msgId);
-    console.log('📡 Deleting document:', msgRef.path);
-    
     await deleteDoc(msgRef);
     window.showToast('✅ Đã xoá tin nhắn.', 'success');
-    console.log('✅ Message deleted successfully');
+    return;
   } catch (e) {
-    console.error('❌ Firestore delete error:', e);
-    console.error('❌ Error code:', e.code);
-    console.error('❌ Error message:', e.message);
-    
-    // Hiển thị lỗi chi tiết
-    let errorMsg = 'Lỗi không xác định';
-    if (e.code === 'permission-denied') {
-      errorMsg = 'Bạn không có quyền xoá tin nhắn này (chỉ xoá được tin nhắn của chính bạn)';
-    } else if (e.code === 'not-found') {
-      errorMsg = 'Tin nhắn không tồn tại hoặc đã bị xoá';
-    } else if (e.message) {
-      errorMsg = e.message;
-    }
-    window.showToast('❌ Xoá thất bại: ' + errorMsg, 'error');
+    console.warn('⚠️ Xoá thật thất bại, thử cách khác:', e.message);
+  }
+
+  // 2. Thử cập nhật text thành "[Đã xoá]"
+  try {
+    await updateDoc(msgRef, {
+      text: '[Đã xoá]',
+      isDeleted: true
+    });
+    window.showToast('✅ Đã xoá tin nhắn.', 'success');
+    return;
+  } catch (e2) {
+    console.warn('⚠️ Cập nhật text thất bại:', e2.message);
+  }
+
+  // 3. Fallback cuối: ẩn tin nhắn
+  try {
+    await updateDoc(msgRef, {
+      hiddenFor: arrayUnion(_currentUser.uid)
+    });
+    window.showToast('✅ Đã ẩn tin nhắn (chỉ bạn không thấy).', 'success');
+  } catch (e3) {
+    console.error('❌ Tất cả cách đều thất bại:', e3);
+    window.showToast('❌ Không thể xoá tin nhắn. Vui lòng thử lại sau.', 'error');
   }
 };
 
@@ -260,6 +270,7 @@ function listenMessages(convoId, callback) {
   });
 }
 
+// ===== SỬA: Thêm export sendMessage ra window =====
 async function sendMessage(convoId, text) {
   if (!_currentUser) throw new Error('Not logged in');
   const roomId = convoId === 'server'
@@ -279,6 +290,9 @@ async function sendMessage(convoId, text) {
   try { window.VTQuests && window.VTQuests.trackChat(); } catch(e) {}
   return result;
 }
+
+// ===== THÊM: Export sendMessage ra window để send-points.js gọi =====
+window.sendMessage = sendMessage;
 
 // ===== FRIEND HELPERS =====
 async function getMyFriends(uid, callback) {
@@ -354,21 +368,24 @@ async function _initChat() {
     window.showToast('❌ Lỗi tạo room chat: ' + e.message, 'error');
   }
 
-  // Sự kiện xoá toàn bộ tin nhắn (ẩn với người xoá)
+  // ===== SỬA: Sự kiện xoá toàn bộ tin nhắn =====
   document.getElementById('clearMessagesBtn')?.addEventListener('click', async function() {
     if (!_currentRoomId || currentConvoId === 'server') {
       window.showToast('Không thể xoá tin nhắn server.', 'warn');
       return;
     }
-    if (!confirm('Ẩn tất cả tin nhắn với bạn? (Nếu cả 2 cùng xoá sẽ xoá hẳn)')) return;
+    if (!confirm('Xoá tất cả tin nhắn của bạn trong cuộc trò chuyện này?')) return;
     try {
       await clearMessages(_currentRoomId);
-      window.showToast('✅ Đã ẩn tất cả tin nhắn (chỉ bạn không thấy).', 'success');
+      // Cập nhật lại danh sách tin nhắn
       if (_chatUnsubscribe) {
-        _lastMessages = _lastMessages.filter(m => !m.hiddenFor || !m.hiddenFor.includes(_currentUser.uid));
+        // onSnapshot sẽ tự cập nhật, nhưng để chắc chắn, lọc lại tin nhắn hiện tại
+        _lastMessages = _lastMessages.filter(m => m.senderUid !== _currentUser.uid || 
+          (m.hiddenFor && m.hiddenFor.includes(_currentUser.uid)));
         renderMessages(_lastMessages);
       }
     } catch(e) {
+      console.error(e);
       window.showToast('❌ Lỗi xoá tin nhắn.', 'error');
     }
   });
@@ -379,8 +396,7 @@ async function _initChat() {
   }
 }
 
-// ===== RENDER MESSAGES (có seen) =====
-// === FIX: Thêm data-msgid để lấy ID chính xác ===
+// ===== SỬA: RENDER MESSAGES (có seen + xoá mềm + hỗ trợ HTML) =====
 function renderMessages(messages) {
   const box = document.getElementById('chatWindowMessages');
   if (!box) return;
@@ -399,18 +415,34 @@ function renderMessages(messages) {
       seenHtml = ' <span class="seen-status" style="font-size:10px;color:#34d399;font-weight:700;">✓ Đã xem</span>';
     }
 
-    // === FIX: Kiểm tra m.id tồn tại ===
     const msgId = m.id || '';
     const deleteBtn = msgId ? `<button class="cwm-del" onclick="window.deleteMessage('${msgId}')" title="Xoá tin nhắn">🗑</button>` : '';
 
+    // Kiểm tra tin nhắn đã bị xoá mềm
+    const isDeleted = m.isDeleted === true;
+    
+    // === SỬA: Hiển thị HTML nếu tin nhắn chứa thẻ HTML (gửi điểm) ===
+    let displayText;
+    let deletedStyle = isDeleted ? 'opacity:0.5;font-style:italic;color:#4a7a9b;' : '';
+    
+    if (isDeleted) {
+      displayText = '🗑️ Tin nhắn đã bị xoá';
+    } else if (m.text && (m.text.includes('<b') || m.text.includes('<span') || m.text.includes('style=') || m.text.includes('🟡'))) {
+      // Nếu tin nhắn chứa HTML hoặc biểu tượng đặc biệt -> hiển thị trực tiếp
+      displayText = m.text;
+    } else {
+      // Tin nhắn thường -> escape để an toàn
+      displayText = escHtml(m.text);
+    }
+
     if (isMe) {
-      div.innerHTML = `<span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time} ${seenHtml} ${deleteBtn}</span>`;
+      div.innerHTML = `<span class="cwm-bubble" style="${deletedStyle}">${displayText}</span><span class="cwm-time">${m.time} ${seenHtml} ${deleteBtn}</span>`;
       box.appendChild(div);
     } else {
-      div.innerHTML = `<div class="cwm-av" onclick="window.showProfileCard && window.showProfileCard('${m.senderUid}')" style="cursor:pointer" title="Xem hồ sơ"></div><div class="cwm-content"><span class="cwm-user">${escHtml(m.senderName)}</span><span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time}</span></div>`;
+      div.innerHTML = `<div class="cwm-av" onclick="window.showProfileCard && window.showProfileCard('${m.senderUid}')" style="cursor:pointer" title="Xem hồ sơ"></div><div class="cwm-content"><span class="cwm-user">${escHtml(m.senderName)}</span><span class="cwm-bubble" style="${deletedStyle}">${displayText}</span><span class="cwm-time">${m.time}</span></div>`;
       box.appendChild(div);
       const avEl = div.querySelector('.cwm-av');
-      if (avEl && m.senderUid) {
+      if (avEl && m.senderUid && !isDeleted) {
         getDoc(doc(db, 'users', m.senderUid)).then(s => {
           if (!s.exists()) return;
           const d = s.data();

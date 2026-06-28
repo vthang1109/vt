@@ -1,13 +1,7 @@
 // ===== send-points.js =====
-// Logic gửi điểm (points) cho bạn bè trong chat.
-// Yêu cầu: trang nào dùng phải có Firebase init (chat.js đã init sẵn).
-// Cách dùng:
-//   <script type="module" src="send-points.js"></script>
-// Sau đó gọi: window.openSendPointsModal(toUid, toName)
-
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
-  getFirestore, doc, getDoc, runTransaction,
+  getFirestore, doc, getDoc, updateDoc,
   collection, addDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -26,7 +20,7 @@ const auth = getAuth(app);
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// ===== TẠO MODAL DOM (1 lần) =====
+// ===== TẠO MODAL =====
 function ensureModal() {
   if (document.getElementById('sendPointsModal')) return;
   const wrap = document.createElement('div');
@@ -41,15 +35,12 @@ function ensureModal() {
           <div id="spm-target" style="font-size:12px;color:#7dd3fc;margin-top:2px">—</div>
         </div>
       </div>
-
       <div style="display:flex;justify-content:space-between;font-size:12px;color:#7dd3fc;margin-bottom:6px">
         <span>Số điểm hiện có</span>
         <span id="spm-balance" style="font-weight:800;color:#38bdf8">0 đ</span>
       </div>
-
       <input id="spm-amount" type="number" min="1" placeholder="Nhập số điểm muốn gửi"
         style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid rgba(56,189,248,0.25);background:rgba(56,189,248,0.06);color:#e0f2fe;font-size:15px;font-weight:700;outline:none;font-family:'Nunito',sans-serif"/>
-
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
         <button data-q="100"  class="spm-quick">+100</button>
         <button data-q="500"  class="spm-quick">+500</button>
@@ -57,10 +48,8 @@ function ensureModal() {
         <button data-q="5000" class="spm-quick">+5K</button>
         <button data-q="all"  class="spm-quick">Tất cả</button>
       </div>
-
       <input id="spm-note" type="text" maxlength="80" placeholder="Lời nhắn (tuỳ chọn)…"
         style="width:100%;margin-top:10px;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:#e0f2fe;font-size:13px;outline:none;font-family:'Nunito',sans-serif"/>
-
       <div style="display:flex;gap:8px;margin-top:14px">
         <button id="spm-cancel" style="flex:1;padding:11px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">Huỷ</button>
         <button id="spm-confirm" style="flex:2;padding:11px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);border:none;color:#fff;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">💸 Gửi ngay</button>
@@ -69,7 +58,6 @@ function ensureModal() {
   `;
   document.body.appendChild(wrap);
 
-  // Style nhanh cho nút quick
   const style = document.createElement('style');
   style.textContent = `
     .spm-quick{flex:1;min-width:60px;padding:7px 6px;border-radius:10px;border:1px solid rgba(56,189,248,0.25);background:rgba(56,189,248,0.07);color:#7dd3fc;font-weight:800;cursor:pointer;font-size:12px;font-family:'Nunito',sans-serif;transition:all .15s}
@@ -77,7 +65,6 @@ function ensureModal() {
   `;
   document.head.appendChild(style);
 
-  // Events
   wrap.addEventListener('click', (e) => { if (e.target === wrap) closeModal(); });
   wrap.querySelector('#spm-cancel').onclick = closeModal;
   wrap.querySelector('#spm-confirm').onclick = doSend;
@@ -113,7 +100,6 @@ window.openSendPointsModal = async function(toUid, toName) {
   m.querySelector('#spm-amount').value = '';
   m.querySelector('#spm-note').value   = '';
 
-  // Lấy số dư hiện tại
   try {
     const snap = await getDoc(doc(db, 'users', auth.currentUser.uid));
     const bal  = snap.exists() ? (snap.data().points || 0) : 0;
@@ -127,7 +113,7 @@ window.openSendPointsModal = async function(toUid, toName) {
   setTimeout(() => m.querySelector('#spm-amount').focus(), 100);
 };
 
-// ===== XỬ LÝ GỬI =====
+// ===== XỬ LÝ GỬI (có rollback + tin nhắn màu vàng) =====
 async function doSend() {
   const m = document.getElementById('sendPointsModal');
   const fromUid = auth.currentUser?.uid;
@@ -144,49 +130,101 @@ async function doSend() {
   const btn = m.querySelector('#spm-confirm');
   btn.disabled = true; btn.textContent = 'Đang gửi…';
 
+  let fromPoints, toPoints;
+
   try {
-    // Transaction: trừ người gửi, cộng người nhận (an toàn race condition)
-    await runTransaction(db, async (tx) => {
-      const fromRef = doc(db, 'users', fromUid);
-      const toRef   = doc(db, 'users', toUid);
-      const fromSnap = await tx.get(fromRef);
-      const toSnap   = await tx.get(toRef);
+    // === B1: Lấy dữ liệu người gửi ===
+    const fromRef = doc(db, 'users', fromUid);
+    const fromSnap = await getDoc(fromRef);
+    if (!fromSnap.exists()) throw new Error('Tài khoản của bạn không tồn tại');
+    fromPoints = fromSnap.data().points || 0;
+    
+    if (fromPoints < amount) throw new Error(`Không đủ điểm! Bạn có ${fromPoints.toLocaleString()} đ`);
 
-      if (!fromSnap.exists()) throw new Error('Tài khoản của bạn không tồn tại');
-      if (!toSnap.exists())   throw new Error('Người nhận không tồn tại');
+    // === B2: Lấy dữ liệu người nhận ===
+    const toRef = doc(db, 'users', toUid);
+    const toSnap = await getDoc(toRef);
+    if (!toSnap.exists()) throw new Error('Người nhận không tồn tại');
+    toPoints = toSnap.data().points || 0;
 
-      const fromPoints = fromSnap.data().points || 0;
-      const toPoints   = toSnap.data().points   || 0;
+    // === B3: Trừ điểm người gửi ===
+    await updateDoc(fromRef, { points: fromPoints - amount });
 
-      if (fromPoints < amount) throw new Error('Không đủ điểm để gửi');
+    // === B4: Cộng điểm người nhận ===
+    await updateDoc(toRef, { points: toPoints + amount });
 
-      tx.update(fromRef, { points: fromPoints - amount });
-      tx.update(toRef,   { points: toPoints   + amount });
-    });
-
-    // Ghi log giao dịch
+    // === B5: Ghi log ===
     try {
       await addDoc(collection(db, 'transactions'), {
         fromUid, toUid, amount, note,
         createdAt: serverTimestamp(),
         type: 'transfer'
       });
-    } catch(e) { /* không chặn nếu log lỗi */ }
+    } catch(e) { console.warn('⚠️ Không ghi log:', e); }
 
-    // Gửi tin nhắn hệ thống vào DM (nếu hàm sendMessage có sẵn từ chat.js)
+    // === B6: Gửi tin nhắn (màu vàng) ===
     try {
+      const msg = `🟡 <b style="color:#fbbf24;">💸 Đã gửi ${amount.toLocaleString()} điểm</b>${note ? ' — “'+note+'”' : ''}`;
+      
+      // Thử gọi window.sendMessage (từ chat.js)
       if (typeof window.sendMessage === 'function') {
-        const msg = `💸 Đã gửi ${amount.toLocaleString()} đ${note ? ' — “'+note+'”' : ''}`;
         await window.sendMessage(toUid, msg);
+        console.log('✅ Đã gửi tin nhắn qua window.sendMessage');
+      } else {
+        // Fallback: gửi trực tiếp qua Firestore
+        console.warn('⚠️ window.sendMessage không tồn tại, gửi trực tiếp...');
+        const roomId = [auth.currentUser.uid, toUid].sort().join('_');
+        const snap = await getDoc(doc(db, 'users', auth.currentUser.uid));
+        const senderName = snap.exists() && snap.data().nickname
+          ? snap.data().nickname
+          : (auth.currentUser.displayName || auth.currentUser.email.split('@')[0]);
+        await addDoc(collection(db, 'chats', roomId, 'messages'), {
+          text: msg,
+          senderUid: auth.currentUser.uid,
+          senderName: senderName,
+          createdAt: serverTimestamp(),
+          hiddenFor: []
+        });
+        console.log('✅ Đã gửi tin nhắn trực tiếp');
       }
-    } catch(e) {}
+    } catch(e) { 
+      console.warn('⚠️ Không gửi được tin nhắn:', e); 
+    }
 
     toast(`✅ Đã gửi <b>${amount.toLocaleString()}</b> đ cho ${esc(toName)}!`, 'success');
     closeModal();
+
   } catch(e) {
-    console.error(e);
-    toast('❌ ' + (e.message || 'Gửi thất bại!'), 'error');
+    console.error('❌ LỖI:', e);
+    
+    // === ROLLBACK: hoàn lại điểm nếu lỗi ===
+    if (fromPoints !== undefined && amount) {
+      try {
+        const fromRef = doc(db, 'users', fromUid);
+        await updateDoc(fromRef, { points: fromPoints });
+        toast('⚠️ Gửi điểm thất bại, điểm đã được hoàn lại.', 'warn');
+      } catch(rollbackErr) {
+        console.error('❌ Rollback thất bại:', rollbackErr);
+        toast('❌ Lỗi nghiêm trọng! Vui lòng liên hệ admin.', 'error');
+      }
+    } else {
+      let errorMsg = e.message || 'Gửi điểm thất bại!';
+      if (e.code === 'permission-denied') {
+        errorMsg = 'Bạn không có quyền gửi điểm! Vui lòng liên hệ admin.';
+      }
+      toast('❌ ' + errorMsg, 'error');
+    }
+
+    // Cập nhật số dư
+    try {
+      const snap = await getDoc(doc(db, 'users', fromUid));
+      const bal = snap.exists() ? (snap.data().points || 0) : 0;
+      m.dataset.balance = bal;
+      m.querySelector('#spm-balance').textContent = bal.toLocaleString() + ' đ';
+    } catch(e) {}
+
   } finally {
-    btn.disabled = false; btn.textContent = '💸 Gửi ngay';
+    btn.disabled = false; 
+    btn.textContent = '💸 Gửi ngay';
   }
 }
