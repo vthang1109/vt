@@ -25,11 +25,25 @@ export function mountPetModal() {
   </div>`);
 }
 
-window.openPetModal = async () => {
-  mountPetModal();
-  document.getElementById('petModalOverlay').classList.add('open');
-  await renderCollection();
-};
+// ── EXPORT openPetModal ────────────────────────────────────
+export async function openPetModal() {
+  try {
+    mountPetModal();
+    const overlay = document.getElementById('petModalOverlay');
+    if (overlay) {
+      overlay.classList.add('open');
+      await renderCollection();
+    } else {
+      console.warn('Pet modal overlay not found');
+    }
+  } catch (e) {
+    console.error('openPetModal error:', e);
+    alert('🐾 Chức năng thú cưng đang được phát triển');
+  }
+}
+
+// Gán vào window để dùng từ HTML
+window.openPetModal = openPetModal;
 
 // ── COLLECTION GRID ────────────────────────────────────────
 async function renderCollection() {
@@ -37,42 +51,49 @@ async function renderCollection() {
   if (!grid) return;
   grid.innerHTML = '<div class="pet-empty-msg">Đang tải...</div>';
 
-  const data        = await getPetData();
-  const owned       = data.collection || {};  // { petId: qty }
-  const activePetId = data.activePet;
+  try {
+    const data        = await getPetData();
+    const owned       = data.collection || {};  // { petId: qty }
+    const activePetId = data.activePet;
 
-  grid.innerHTML = PET_POOL.map(pet => {
-    const isOwned = (owned[pet.id] || 0) > 0;
-    const qty     = owned[pet.id] || 0;
-    const isAct   = pet.id === activePetId;
-    const tier    = getTierById(pet.tier);
-    // Dùng ảnh đầu tiên làm thumbnail, fallback emoji
-    const thumb   = pet.images?.[0] || '';
+    grid.innerHTML = PET_POOL.map(pet => {
+      const isOwned = (owned[pet.id] || 0) > 0;
+      const qty     = owned[pet.id] || 0;
+      const isAct   = pet.id === activePetId;
+      const tier    = getTierById(pet.tier);
+      const thumb   = pet.images?.[0] || '';
 
-    return `
-    <div class="pet-card ${isOwned ? '' : 'locked'} ${isAct ? 'active' : ''}"
-         ${isOwned ? `onclick="window.selectPet('${pet.id}')"` : ''}
-         style="border-color:${isOwned ? tier.color+'66' : 'rgba(255,255,255,0.08)'}">
-      ${thumb
-        ? `<img src="${thumb}" alt="${pet.name}"
-               style="width:52px;height:52px;object-fit:contain;border-radius:8px;
-                      ${!isOwned ? 'filter:grayscale(1);opacity:.4' : ''}"
-               onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
-           <span style="font-size:32px;display:none">${pet.emoji||'🐾'}</span>`
-        : `<span style="font-size:32px">${pet.emoji||'🐾'}</span>`}
-      <div class="pet-card-name" style="color:${isOwned ? tier.color : '#2d4a6a'}">${pet.name}</div>
-      ${isOwned ? `<div style="color:#38bdf8;font-size:11px;font-weight:700">x${qty}</div>` : ''}
-      ${isAct   ? '<div class="pet-card-tag">Đang chọn</div>' : ''}
-    </div>`;
-  }).join('');
+      return `
+      <div class="pet-card ${isOwned ? '' : 'locked'} ${isAct ? 'active' : ''}"
+           ${isOwned ? `onclick="window.selectPet('${pet.id}')"` : ''}
+           style="border-color:${isOwned ? tier.color+'66' : 'rgba(255,255,255,0.08)'}">
+        ${thumb
+          ? `<img src="${thumb}" alt="${pet.name}"
+                 style="width:52px;height:52px;object-fit:contain;border-radius:8px;
+                        ${!isOwned ? 'filter:grayscale(1);opacity:.4' : ''}"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+             <span style="font-size:32px;display:none">${pet.emoji||'🐾'}</span>`
+          : `<span style="font-size:32px">${pet.emoji||'🐾'}</span>`}
+        <div class="pet-card-name" style="color:${isOwned ? tier.color : '#2d4a6a'}">${pet.name}</div>
+        ${isOwned ? `<div style="color:#38bdf8;font-size:11px;font-weight:700">x${qty}</div>` : ''}
+        ${isAct   ? '<div class="pet-card-tag">Đang chọn</div>' : ''}
+      </div>`;
+    }).join('');
+  } catch (e) {
+    console.error('renderCollection error:', e);
+    grid.innerHTML = `<div class="pet-empty-msg">Lỗi tải dữ liệu: ${e.message}</div>`;
+  }
 }
 
+// ── SELECT PET ─────────────────────────────────────────────
 window.selectPet = async (petId) => {
   try {
     await setActivePet(petId);
     await renderCollection();
     if (window._renderProfilePetFn) window._renderProfilePetFn();
-  } catch(e) { alert(e.message); }
+  } catch(e) { 
+    alert('Lỗi: ' + e.message);
+  }
 };
 
 // ── RENDER Ô PET NGOÀI PROFILE ─────────────────────────────
@@ -170,4 +191,12 @@ export async function renderProfilePet(viewUid, petCollection, activePetId) {
   } catch(e) {
     console.error('renderProfilePet:', e);
   }
+}
+
+// ── MOUNT KHI IMPORT ──────────────────────────────────────
+// Tự động mount modal khi import
+try {
+  mountPetModal();
+} catch(e) {
+  console.warn('mountPetModal auto error:', e);
 }
