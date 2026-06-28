@@ -11,51 +11,31 @@
 </head>
 <body>
 
+  <div id="top-nav-root"></div>
+
   <canvas id="bg-canvas"></canvas>
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
   <!-- ===== LANDING PAGE ===== -->
   <div id="page-landing" class="page active">
-    <nav>
-      <div class="logo">
-        <span class="logo-vt">VT</span><span class="logo-world">World</span>
-      </div>
-      
-      <!-- Nút 3 gạch -->
-      <div class="nav-right-menu">
-        <button class="nav-hamburger" onclick="toggleNavMenu()">☰</button>
-        <div class="nav-dropdown" id="navDropdown">
-          <a class="nav-dropdown-item" href="applications.html">
-            <span class="dd-icon">📱</span> App
-          </a>
-          <a class="nav-dropdown-item" href="games.html">
-            <span class="dd-icon">🎮</span> Game
-          </a>
-          <a class="nav-dropdown-item" href="shop.html">
-            <span class="dd-icon">🛒</span> Shop
-          </a>
-          <a class="nav-dropdown-item" href="bag.html">
-            <span class="dd-icon">🎒</span> Bag
-          </a>
-        </div>
-      </div>
-    </nav>
-
     <div class="hero">
       <div class="badge">🎮 Nền tảng game giải trí</div>
       <h1 class="hero-title">Chào mừng đến<br/><span>VTWorld</span></h1>
       <p class="hero-sub">Mini games · Liên Quân · Bài · Quiz · Chat toàn server</p>
 
-      <div class="owner-card">
-        <img src="https://avatars.githubusercontent.com/vthang1109" alt="VTWorld Owner" class="owner-avatar"/>
-        <div class="owner-info">
-          <span class="owner-name">VanThang</span>
-          <span class="owner-role">👑 Chủ web</span>
+      <!-- USER INFO BAR -->
+      <div class="qbtn-wrap" style="display:flex;justify-content:center;margin-bottom:12px">
+        <button class="qbtn owner-btn" onclick="toggleOwner(event)" style="position:relative">
+          <span class="qbtn-icon">👑</span><span>Chủ web</span><span class="qbtn-arrow">▾</span>
+        </button>
+        <div class="owner-dropdown" id="ownerDropdown" style="position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);min-width:200px;background:rgba(8,13,28,0.98);border:1px solid rgba(2,136,209,0.2);border-radius:14px;padding:6px 0;z-index:1000;display:none;flex-direction:column">
+          <a href="https://facebook.com/vthang.1109" target="_blank" class="social-link fb" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#94a3b8;text-decoration:none;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700">📘 Facebook</a>
+          <a href="https://zalo.me/0123456789" target="_blank" class="social-link zl" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#94a3b8;text-decoration:none;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700">💬 Zalo</a>
+          <a href="https://tiktok.com/@vthang1109" target="_blank" class="social-link tt" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#94a3b8;text-decoration:none;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700">🎵 TikTok</a>
+          <a href="https://instagram.com/vthang1109" target="_blank" class="social-link ig" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#94a3b8;text-decoration:none;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700">📸 Instagram</a>
         </div>
       </div>
-
-      <!-- USER INFO BAR -->
       <div id="user-info-bar" style="display:none;align-items:center;gap:14px;padding:12px 22px;border-radius:50px;background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.25);margin-bottom:20px;animation:fadeUp 0.6s both">
         <div id="user-avatar-char" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#38bdf8);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:#fff;flex-shrink:0">U</div>
         <div style="display:flex;flex-direction:column;text-align:left">
@@ -68,32 +48,13 @@
 
       <div class="quick-btns">
         <div class="qbtn-wrap">
-          <button class="qbtn owner-btn" onclick="toggleOwner(event)">
-            <span class="qbtn-icon">👑</span><span>Chủ sở hữu</span><span class="qbtn-arrow">▾</span>
-          </button>
-          <div class="owner-dropdown" id="ownerDropdown">
-            <a href="https://facebook.com/vthang.1109" target="_blank" class="social-link fb">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>Facebook
-            </a>
-            <a href="https://zalo.me/0123456789" target="_blank" class="social-link zl">
-              <svg width="20" height="20" viewBox="0 0 48 48" fill="currentColor"><rect width="48" height="48" rx="10" fill="#0068ff"/><text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-size="18" font-weight="bold" fill="white" font-family="Arial">Z</text></svg>Zalo
-            </a>
-            <a href="https://tiktok.com/@vthang1109" target="_blank" class="social-link tt">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.97a8.24 8.24 0 004.83 1.55V7.07a4.85 4.85 0 01-1.06-.38z"/></svg>TikTok
-            </a>
-            <a href="https://instagram.com/vthang1109" target="_blank" class="social-link ig">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>Instagram
-            </a>
-          </div>
-        </div>
-        <div class="qbtn-wrap">
-          <button class="qbtn game-btn" onclick="window.location.href='games.html'">
-            <span class="qbtn-icon">🎮📱</span><span>Game & App</span>
+          <button class="qbtn chat-btn" onclick="window.location.href='applications.html'">
+            <span class="qbtn-icon">📱</span><span>Applications</span>
           </button>
         </div>
         <div class="qbtn-wrap">
-          <button class="qbtn chat-btn" onclick="window.location.href='chat.html'">
-            <span class="qbtn-icon">💬</span><span>Chat</span>
+          <button class="qbtn owner-btn" onclick="window.location.href='games.html'">
+            <span class="qbtn-icon">🎮</span><span>On Game</span>
           </button>
         </div>
       </div>
@@ -275,14 +236,17 @@
 <!-- Firebase -->
   <script type="module" src="app.js"></script>
   <script>
-    function toggleNavMenu() {
-      document.getElementById('navDropdown').classList.toggle('open');
+    function goOnlineChat() {
+      // Kiểm tra đã đăng nhập chưa qua Firebase auth
+      import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js").then(({ getAuth }) => {
+        const user = getAuth().currentUser;
+        if (user) {
+          window.location.href = 'chat.html';
+        } else {
+          showPage('login');
+        }
+      });
     }
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.nav-right-menu')) {
-        document.getElementById('navDropdown').classList.remove('open');
-      }
-    });
     // ... (phần script còn lại giữ nguyên)
   </script>
 
@@ -300,6 +264,21 @@
           btn.style.display = 'none';
         }
       }
+    });
+  </script>
+  <script src="top-nav.js"></script>
+  <script src="bottom-nav.js"></script>
+  <script>
+    TopNav.init();
+    BottomNav.init({ active: 'home' });
+    function toggleOwner(e) {
+      e.stopPropagation();
+      const dd = document.getElementById('ownerDropdown');
+      dd.style.display = dd.style.display === 'flex' ? 'none' : 'flex';
+    }
+    document.addEventListener('click', () => {
+      const dd = document.getElementById('ownerDropdown');
+      if (dd) dd.style.display = 'none';
     });
   </script>
 </body>

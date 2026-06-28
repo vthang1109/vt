@@ -57,14 +57,7 @@ if (canvas) {
 function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-window.showToast = function(msg, type = 'info') {
-  const colors = { info:'#38bdf8', success:'#34d399', warn:'#fbbf24', error:'#f87171' };
-  const t = document.createElement('div');
-  t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${colors[type]||'#38bdf8'};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:fadeUp 0.3s both;max-width:280px`;
-  t.innerHTML = msg;
-  document.getElementById('toastContainer').appendChild(t);
-  setTimeout(() => t.remove(), 3800);
-};
+window.showToast = function() {};
 
 // ===== CHAT STATE =====
 let currentConvoId   = 'server';
@@ -235,7 +228,7 @@ async function getFriendStatus(myUid, otherUid, callback) {
 function _listenFriendRequests(uid) {
   onSnapshot(collection(db, 'friendRequests', uid, 'requests'), (snap) => {
     // Luôn re-render danh sách lời mời
-    renderFriendRequestsList();
+    window._renderFriendRequestsList && window._renderFriendRequestsList();
 
     // Chỉ toast khi có lời mời MỚI
     snap.docChanges().forEach(async change => {
@@ -360,11 +353,6 @@ if (!isMe && m.senderUid) {
   document.getElementById('chatSidebar').classList.add('mobile-hidden');
 };
 
-window.backToSidebar = function() {
-  document.getElementById('chatWindow').classList.remove('active');
-  document.getElementById('chatSidebar').classList.remove('mobile-hidden');
-};
-
 window.sendWindowChat = function() {
   const input = document.getElementById('chatWindowInput');
   const val   = input.value.trim();
@@ -396,9 +384,9 @@ window.switchTab = function(tab) {
     document.getElementById('tab-chat-panel').style.display    = 'none';
     document.getElementById('tab-friends-panel').style.display = 'flex';
     btn.textContent = '💬 Chat';
-    btn.onclick = () => window.switchTab('chat');
-    renderFriendRequestsList();
-    renderMyFriendsList();
+    btn.onclick = () => window.switchChatTab && window.switchChatTab('world');
+    window._renderFriendRequestsList && window._renderFriendRequestsList();
+    window._renderMyFriendsList && window._renderMyFriendsList();
   } else {
     document.getElementById('tab-chat-panel').style.display    = 'flex';
     document.getElementById('tab-friends-panel').style.display = 'none';
@@ -482,7 +470,7 @@ function renderAllUsersInChat() {
 
 // ===== RENDER: FRIEND REQUESTS =====
 // FIX 1: Được gọi từ onSnapshot → tự xóa lời mời khỏi UI sau khi accept/decline
-function renderFriendRequestsList() {
+window._renderFriendRequestsList = function renderFriendRequestsList() {
   if (!_currentUser) return;
   getFriendRequests(_currentUser.uid, (reqs) => {
     const el = document.getElementById('friendRequestsList');
@@ -507,7 +495,7 @@ function renderFriendRequestsList() {
 }
 
 // ===== RENDER: MY FRIENDS LIST (tab bạn bè) =====
-function renderMyFriendsList() {
+window._renderMyFriendsList = function renderMyFriendsList() {
   if (!_currentUser) return;
   getMyFriends(_currentUser.uid, (friends) => {
     const el = document.getElementById('myFriendsList');
@@ -613,7 +601,7 @@ window.closeViewProfile = function(e) {
 window.openConvoWithUid = function(uid, name) {
   window.closeViewProfile();
   // Về tab chat trước
-  window.switchTab('chat');
+  window.switchChatTab && window.switchChatTab('world');
   // Mở convo sau khi tab đã switch
   setTimeout(() => {
     window.openConvo(uid, name, name[0].toUpperCase(), 'dm');
@@ -640,7 +628,7 @@ window.acceptFriend = async function(fromUid) {
     await deleteDoc(doc(db, 'friendRequests', myUid, 'requests', fromUid));
     window.showToast('🎉 Đã kết bạn thành công!', 'success');
     window.closeViewProfile();
-    renderMyFriendsList();
+    window._renderMyFriendsList && window._renderMyFriendsList();
     _listenIncomingDMs();
   } catch(e) { window.showToast('❌ Lỗi!', 'error'); }
 };
@@ -662,6 +650,6 @@ window.unfriend = async function(uid) {
     await updateDoc(doc(db, 'users', uid),   { friends: arrayRemove(myUid) });
     window.showToast('Đã hủy kết bạn.', 'info');
     window.closeViewProfile();
-    renderMyFriendsList();
+    window._renderMyFriendsList && window._renderMyFriendsList();
   } catch(e) {}
 };
