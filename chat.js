@@ -57,7 +57,38 @@ if (canvas) {
 function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-window.showToast = function() {};
+window.showToast = function(msg, type) {
+  let host = document.getElementById('vtToastHost');
+  if (!host) {
+    host = document.createElement('div');
+    host.id = 'vtToastHost';
+    host.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:100000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:100%;padding:0 16px;box-sizing:border-box;';
+    document.body.appendChild(host);
+  }
+  const colors = {
+    success: ['rgba(52,211,153,0.95)', '#fff'],
+    error:   ['rgba(248,113,113,0.95)', '#fff'],
+    warn:    ['rgba(251,191,36,0.95)', '#1a0a00'],
+    info:    ['rgba(2,136,209,0.95)', '#fff']
+  };
+  const [bg, fg] = colors[type] || colors.info;
+  const el = document.createElement('div');
+  el.style.cssText = `background:${bg};color:${fg};padding:10px 18px;border-radius:50px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,0.35);max-width:90%;text-align:center;animation:vtToastIn 0.2s ease;`;
+  el.innerHTML = msg;
+  host.appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'opacity 0.25s, transform 0.25s';
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(6px)';
+    setTimeout(() => el.remove(), 250);
+  }, 2600);
+};
+if (!document.getElementById('vtToastKeyframes')) {
+  const s = document.createElement('style');
+  s.id = 'vtToastKeyframes';
+  s.textContent = '@keyframes vtToastIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }';
+  document.head.appendChild(s);
+}
 
 // ===== CHAT STATE =====
 let currentConvoId   = 'server';
@@ -149,7 +180,7 @@ function listenMessages(convoId, callback) {
       const time = ts
         ? ts.getHours().toString().padStart(2,'0') + ':' + ts.getMinutes().toString().padStart(2,'0')
         : '';
-      msgs.push({ ...data, time });
+      msgs.push({ ...data, time, id: d.id });
     });
     callback(msgs);
   });
@@ -174,6 +205,19 @@ async function sendMessage(convoId, text) {
   try { window.VTQuests && window.VTQuests.trackChat(); } catch(e) {}
   return result;
 }
+
+window.deleteMessage = async function(msgId) {
+  if (!_currentUser || !msgId) return;
+  if (!confirm('Xoá tin nhắn này?')) return;
+  const roomId = currentConvoId === 'server'
+    ? 'server'
+    : getDmId(_currentUser.uid, currentConvoId);
+  try {
+    await deleteDoc(doc(db, 'chats', roomId, 'messages', msgId));
+  } catch(e) {
+    window.showToast('❌ Xoá thất bại: ' + e.message, 'error');
+  }
+};
 
 // ===== FRIEND HELPERS =====
 async function getMyFriends(uid, callback) {
@@ -320,7 +364,7 @@ window.openConvo = function(uid, name, avatarChar, type) {
       const isMe  = _currentUser && m.senderUid === _currentUser.uid;
       div.className = 'cwm-msg ' + (isMe ? 'mine-msg' : 'other-msg');
       div.innerHTML = isMe
-  ? `<span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time}</span>`
+  ? `<span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time} <button class="cwm-del" onclick="window.deleteMessage('${m.id}')" title="Xoá tin nhắn">🗑</button></span>`
   : `<div class="cwm-av" onclick="window.showProfileCard && window.showProfileCard('${m.senderUid}')" style="cursor:pointer" title="Xem hồ sơ"></div><div class="cwm-content"><span class="cwm-user">${escHtml(m.senderName)}</span><span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time}</span></div>`;
       box.appendChild(div);
       // Load avatar cho tin nhắn người khác

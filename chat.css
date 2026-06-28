@@ -203,6 +203,12 @@ body { overflow: hidden; height: 100dvh; }
   border: 1px solid rgba(2,136,209,0.28); border-bottom-right-radius: 4px;
 }
 .cwm-time { font-size: 10px; color: #4a7a9b; margin-top: 2px; }
+.cwm-del {
+  background: none; border: none; cursor: pointer; padding: 0;
+  margin-left: 4px; font-size: 10px; color: #4a7a9b; opacity: 0.6;
+  vertical-align: middle; transition: opacity 0.15s, color 0.15s;
+}
+.cwm-del:hover { opacity: 1; color: #f87171; }
 
 /* Input */
 .cw-input-row {
