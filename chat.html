@@ -14,6 +14,19 @@
   <script src="bottom-nav.js"></script>
 </head>
 <body data-bottom-nav="chat">
+  <div id="errBox" style="position:fixed;top:60px;left:0;right:0;z-index:99999;background:#7f1d1d;color:#fff;font-size:12px;padding:8px;white-space:pre-wrap;display:none"></div>
+  <script>
+    window.onerror = function(msg, src, line, col) {
+      const b = document.getElementById('errBox');
+      b.style.display = 'block';
+      b.textContent += `[JS] ${msg} (${src}:${line}:${col})\n`;
+    };
+    window.addEventListener('unhandledrejection', e => {
+      const b = document.getElementById('errBox');
+      b.style.display = 'block';
+      b.textContent += `[Promise] ${e.reason}\n`;
+    });
+  </script>
 
   <div id="top-nav-root"></div>
   <canvas id="bg-canvas"></canvas>
