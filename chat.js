@@ -160,28 +160,60 @@ async function clearMessages(roomId) {
   await batch.commit();
 }
 
-// Xoá từng tin nhắn: xoá hoàn toàn
+// === FIX: Xoá từng tin nhắn - kiểm tra kỹ lưỡng ===
 window.deleteMessage = async function(msgId) {
+  console.log('🗑️ deleteMessage called with msgId:', msgId);
+  
+  // 1. Kiểm tra đăng nhập
   if (!_currentUser) {
     window.showToast('❌ Bạn chưa đăng nhập.', 'error');
+    console.error('❌ No user logged in');
     return;
   }
-  if (!msgId) {
+
+  // 2. Kiểm tra msgId
+  if (!msgId || msgId === 'undefined' || msgId === 'null') {
     window.showToast('❌ ID tin nhắn không hợp lệ.', 'error');
+    console.error('❌ Invalid msgId:', msgId);
     return;
   }
+
+  // 3. Kiểm tra phòng chat
   if (!_currentRoomId || _currentRoomId === 'server') {
     window.showToast('❌ Không thể xoá tin nhắn ở server chat.', 'warn');
+    console.error('❌ Cannot delete in room:', _currentRoomId);
     return;
   }
-  if (!confirm('Xoá tin nhắn này?')) return;
 
+  // 4. Xác nhận
+  if (!confirm('Xoá tin nhắn này?')) {
+    console.log('🚫 User cancelled delete');
+    return;
+  }
+
+  // 5. Thực hiện xoá
   try {
-    await deleteDoc(doc(db, 'chats', _currentRoomId, 'messages', msgId));
+    const msgRef = doc(db, 'chats', _currentRoomId, 'messages', msgId);
+    console.log('📡 Deleting document:', msgRef.path);
+    
+    await deleteDoc(msgRef);
     window.showToast('✅ Đã xoá tin nhắn.', 'success');
+    console.log('✅ Message deleted successfully');
   } catch (e) {
-    console.error('❌ Lỗi xoá tin nhắn:', e);
-    window.showToast('❌ Xoá thất bại: ' + (e.message || 'Lỗi không xác định'), 'error');
+    console.error('❌ Firestore delete error:', e);
+    console.error('❌ Error code:', e.code);
+    console.error('❌ Error message:', e.message);
+    
+    // Hiển thị lỗi chi tiết
+    let errorMsg = 'Lỗi không xác định';
+    if (e.code === 'permission-denied') {
+      errorMsg = 'Bạn không có quyền xoá tin nhắn này (chỉ xoá được tin nhắn của chính bạn)';
+    } else if (e.code === 'not-found') {
+      errorMsg = 'Tin nhắn không tồn tại hoặc đã bị xoá';
+    } else if (e.message) {
+      errorMsg = e.message;
+    }
+    window.showToast('❌ Xoá thất bại: ' + errorMsg, 'error');
   }
 };
 
@@ -348,6 +380,7 @@ async function _initChat() {
 }
 
 // ===== RENDER MESSAGES (có seen) =====
+// === FIX: Thêm data-msgid để lấy ID chính xác ===
 function renderMessages(messages) {
   const box = document.getElementById('chatWindowMessages');
   if (!box) return;
@@ -366,8 +399,12 @@ function renderMessages(messages) {
       seenHtml = ' <span class="seen-status" style="font-size:10px;color:#34d399;font-weight:700;">✓ Đã xem</span>';
     }
 
+    // === FIX: Kiểm tra m.id tồn tại ===
+    const msgId = m.id || '';
+    const deleteBtn = msgId ? `<button class="cwm-del" onclick="window.deleteMessage('${msgId}')" title="Xoá tin nhắn">🗑</button>` : '';
+
     if (isMe) {
-      div.innerHTML = `<span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time} ${seenHtml} <button class="cwm-del" onclick="window.deleteMessage('${m.id}')" title="Xoá tin nhắn">🗑</button></span>`;
+      div.innerHTML = `<span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time} ${seenHtml} ${deleteBtn}</span>`;
       box.appendChild(div);
     } else {
       div.innerHTML = `<div class="cwm-av" onclick="window.showProfileCard && window.showProfileCard('${m.senderUid}')" style="cursor:pointer" title="Xem hồ sơ"></div><div class="cwm-content"><span class="cwm-user">${escHtml(m.senderName)}</span><span class="cwm-bubble">${escHtml(m.text)}</span><span class="cwm-time">${m.time}</span></div>`;
@@ -393,10 +430,14 @@ function renderMessages(messages) {
 
 // ===== OPEN CONVO =====
 window.openConvo = function(uid, name, avatarChar, type) {
+  console.log('📂 Opening convo:', uid, name, type);
+  
   currentConvoId   = uid;
   currentConvoName = name;
   currentConvoUid  = (type === 'server') ? null : uid;
   _currentRoomId   = uid === 'server' ? 'server' : getDmId(_currentUser.uid, uid);
+  
+  console.log('📂 Current room ID:', _currentRoomId);
 
   const badgeEl = document.getElementById('contact-' + uid);
   if (badgeEl) { const b = badgeEl.querySelector('.dm-badge'); if (b) b.remove(); }
