@@ -363,3 +363,22 @@
 .btn-deal { background: linear-gradient(135deg,#34d399,#059669); color: #fff; }
 .btn-leave-xd { display: none !important; } /* Ẩn nút rời phòng dưới cùng */
 .xd-actions button:disabled { opacity:.5; cursor: not-allowed; }
+/* ===== THÊM VÀO CUỐI FILE xidach-mp.css ===== */
+
+/* ===== ROOM ID TRÊN NAV ===== */
+.vt-top-nav .vt-nav-logo .vt-room-id {
+  font-family: 'Orbitron', monospace;
+  color: #fbbf24 !important;
+  font-weight: 900;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(251,191,36,.1);
+  border: 1px solid rgba(251,191,36,.4);
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+.vt-top-nav .vt-nav-logo .vt-room-id .room-icon {
+  margin-right: 4px;
+  font-size: 14px;
+}

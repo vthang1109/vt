@@ -1,4 +1,6 @@
-// ===== XÌ DÁCH MULTIPLAYER (LUẬT MỚI) - PHẦN 1/3 =====
+// ============================================================
+// ===== XÌ DÁCH MULTIPLAYER - PHẦN 1/2 =====
+// ============================================================
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -23,20 +25,7 @@ let _settledRound = -1;
 
 if (!ROOM_ID) document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">⚠️ Thiếu mã phòng.</div>';
 
-onAuthStateChanged(auth, async (u) => {
-  if (!u) { location.href = 'index.html'; return; }
-  _user = u;
-  _unsubMe = onSnapshot(doc(db, 'users', _user.uid), (s) => {
-    if (s.exists()) {
-      _myBalance = s.data().points || 0;
-      const el = document.getElementById('xd-balance');
-      if (el) el.textContent = _myBalance.toLocaleString('vi-VN') + ' đ';
-    }
-  });
-  if (ROOM_ID) start();
-});
-
-/* ========== UTILS ========== */
+// ========== UTILS ==========
 function cardPoints(card) {
   const v = card.v;
   if (v === 'A') return 0;
@@ -95,6 +84,85 @@ function handStatus(hand) {
   return { score, tag: 'ok' };
 }
 
+function compareHands(playerHand, dealerHand, bet) {
+  const pStat = handStatus(playerHand);
+  const dStat = handStatus(dealerHand);
+
+  if (pStat.tag === 'bust' && dStat.tag === 'bust') {
+    return { outcome: 'draw', delta: 0 };
+  }
+  if (pStat.tag === 'bust') {
+    return { outcome: 'lose', delta: -bet };
+  }
+  if (dStat.tag === 'bust') {
+    return { outcome: 'win', delta: bet };
+  }
+
+  const pSpecial = (pStat.tag === 'xi_bang' || pStat.tag === 'xi_dach');
+  const dSpecial = (dStat.tag === 'xi_bang' || dStat.tag === 'xi_dach');
+
+  if (pSpecial && !dSpecial) {
+    return { outcome: 'win', delta: bet };
+  }
+  if (dSpecial && !pSpecial) {
+    return { outcome: 'lose', delta: -bet };
+  }
+  if (pSpecial && dSpecial) {
+    return { outcome: 'draw', delta: 0 };
+  }
+
+  if (pStat.tag === 'ngu_linh' && dStat.tag === 'ngu_linh') {
+    if (pStat.score < dStat.score) return { outcome: 'win', delta: bet };
+    if (pStat.score > dStat.score) return { outcome: 'lose', delta: -bet };
+    return { outcome: 'draw', delta: 0 };
+  }
+  if (pStat.tag === 'ngu_linh') {
+    return { outcome: 'win', delta: bet };
+  }
+  if (dStat.tag === 'ngu_linh') {
+    return { outcome: 'lose', delta: -bet };
+  }
+
+  if (pStat.score > dStat.score) {
+    return { outcome: 'win', delta: bet };
+  }
+  if (pStat.score < dStat.score) {
+    return { outcome: 'lose', delta: -bet };
+  }
+  return { outcome: 'draw', delta: 0 };
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Cập nhật room ID lên nav giống baucua
+function updateNavRoom(roomCode) {
+  if (!roomCode) return;
+  const logo = document.querySelector('.vt-top-nav .vt-nav-logo');
+  if (!logo) return;
+  let roomEl = logo.querySelector('.vt-room-id');
+  if (!roomEl) {
+    roomEl = document.createElement('span');
+    roomEl.className = 'vt-room-id';
+    logo.innerHTML = '';
+    logo.appendChild(roomEl);
+  }
+  roomEl.innerHTML = `<span class="room-icon">🃏</span> #${roomCode}`;
+}
+
+onAuthStateChanged(auth, async (u) => {
+  if (!u) { location.href = 'index.html'; return; }
+  _user = u;
+  _unsubMe = onSnapshot(doc(db, 'users', _user.uid), (s) => {
+    if (s.exists()) {
+      _myBalance = s.data().points || 0;
+      if (window.TopNav) window.TopNav.setPoints(_myBalance);
+    }
+  });
+  if (ROOM_ID) start();
+});
+
 /* ========== FIREBASE LISTENER ========== */
 function start() {
   if (_unsub) _unsub();
@@ -104,12 +172,13 @@ function start() {
       return;
     }
     const r = snap.data();
-    document.getElementById('xd-room').textContent = '#' + (r.code || '------');
+    updateNavRoom(r.code || '------');
     if (r.gameType !== 'xidach' || !r.gameState) return;
     render(r);
   });
 }
-// ===== XÌ DÁCH MULTIPLAYER - PHẦN 2/3 (RENDER) =====
+
+/* ========== RENDER ========== */
 function render(r) {
   const gs = r.gameState;
   const isHost = r.hostUid === _user.uid;
@@ -155,7 +224,6 @@ function render(r) {
     const isMe = (uid === _user.uid);
     const hand = gs.hands?.[uid] || [];
     const stat = hand.length ? handStatus(hand) : null;
-    const standed = !!gs.stands?.[uid];
     const isTurn = gs.phase === 'playing' && gs.turnOrder?.[gs.turnIdx] === uid;
     const betAmt = gs.bets?.[uid] || 0;
     const checked = !!gs.dealerChecked?.[uid];
@@ -166,8 +234,7 @@ function render(r) {
     } else if (isDealer) {
       visibleCount = dealerOpen ? hand.length : 0;
     } else {
-      // Lật bài ngay khi có kết quả (dù chưa đến phase result)
-visibleCount = (gs.phase === 'result' || (gs.phase === 'dealer' && checked) || gs.results?.[uid]) ? hand.length : 0;
+      visibleCount = (gs.phase === 'result' || (gs.phase === 'dealer' && checked) || gs.results?.[uid]) ? hand.length : 0;
     }
 
     let cardsHtml = hand.length === 0
@@ -184,7 +251,6 @@ visibleCount = (gs.phase === 'result' || (gs.phase === 'dealer' && checked) || g
     if (isMe || (isHost && isDealer)) cls += ' me';
     if (isDealer) cls += ' dealer';
 
-    // Tên + Điểm
     let nameHtml = isDealer
       ? `👑 Nhà Cái${isHost ? ' <span style="color:#fbbf24;font-size:12px">(bạn)</span>' : ''}`
       : `${esc(r.memberInfo?.[uid]?.name || '?')}${isMe ? ' <span style="color:#fbbf24">(bạn)</span>' : ''}`;
@@ -201,7 +267,6 @@ visibleCount = (gs.phase === 'result' || (gs.phase === 'dealer' && checked) || g
       nameHtml += ` <span class="xd-score-inline">${scoreText}</span>`;
     }
 
-    // Nút xét bài
     let checkBtnHtml = '';
     if (isHost && gs.phase === 'dealer' && !isDealer && !checked) {
       const dScore = dealerStat ? dealerStat.score : 0;
@@ -212,113 +277,57 @@ visibleCount = (gs.phase === 'result' || (gs.phase === 'dealer' && checked) || g
       }
     }
 
-    // // Result overlay
-    // let resultOverlayHtml = '';
-    // if (gs.phase === 'result') {
-    //   if (isDealer) {
-    //     // Nhà cái
-    //     if (dealerStat) {
-    //       if (dealerStat.tag === 'xi_bang') {
-    //         resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ BÀN</div>';
-    //       } else if (dealerStat.tag === 'xi_dach') {
-    //         resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ DÁCH</div>';
-    //       } else if (dealerStat.tag === 'ngu_linh') {
-    //         resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">NGŨ LINH</div>';
-    //       } else if (dealerStat.tag === 'bust') {
-    //         resultOverlayHtml = '<div class="xd-result-overlay xd-result-bust">QUẮC</div>';
-    //       }
-    //     }
-    //     if (!resultOverlayHtml) {
-    //       const delta = gs.dealerDelta || 0;
-    //       if (delta > 0) {
-    //         resultOverlayHtml = `<div class="xd-result-overlay xd-result-win">+${delta.toLocaleString('vi-VN')}đ</div>`;
-    //       } else if (delta < 0) {
-    //         resultOverlayHtml = `<div class="xd-result-overlay xd-result-lose">${delta.toLocaleString('vi-VN')}đ</div>`;
-    //       } else {
-    //         resultOverlayHtml = '<div class="xd-result-overlay xd-result-draw">HÒA</div>';
-    //       }
-    //     }
-    //   } else if (gs.results?.[uid]) {
-    //     // Nhà con
-    //     const res = gs.results[uid];
-    //     let overlayClass = '', overlayText = '';
-    //     if (stat?.tag === 'xi_bang') {
-    //       overlayClass = 'xd-result-special'; overlayText = 'XÌ BÀN';
-    //     } else if (stat?.tag === 'xi_dach') {
-    //       overlayClass = 'xd-result-special'; overlayText = 'XÌ DÁCH';
-    //     } else if (stat?.tag === 'ngu_linh') {
-    //       overlayClass = 'xd-result-special'; overlayText = 'NGŨ LINH';
-    //     } else if (stat?.tag === 'bust') {
-    //       overlayClass = 'xd-result-bust'; overlayText = 'QUẮC';
-    //     } else if (res.outcome === 'win') {
-    //       overlayClass = 'xd-result-win';
-    //       overlayText = `+${res.delta.toLocaleString('vi-VN')}đ`;
-    //     } else if (res.outcome === 'lose') {
-    //       overlayClass = 'xd-result-lose';
-    //       overlayText = `${res.delta.toLocaleString('vi-VN')}đ`; // delta đã âm
-    //     } else {
-    //       overlayClass = 'xd-result-draw';
-    //       overlayText = 'HÒA';
-    //     }
-    //     resultOverlayHtml = `<div class="xd-result-overlay ${overlayClass}">${overlayText}</div>`;
-    //   }
-    // }
-    
-    // Result overlay (hiển thị ngay khi có kết quả, không cần chờ phase result)
-let resultOverlayHtml = '';
-if (gs.phase === 'result' || gs.results?.[uid]) { // ← THÊM || gs.results?.[uid]
-  if (isDealer) {
-    // Giữ nguyên phần code cho nhà cái (chỉ hiện ở phase result)
-    if (gs.phase === 'result') {
-      if (dealerStat) {
-        if (dealerStat.tag === 'xi_bang') {
-          resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ BÀN</div>';
-        } else if (dealerStat.tag === 'xi_dach') {
-          resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ DÁCH</div>';
-        } else if (dealerStat.tag === 'ngu_linh') {
-          resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">NGŨ LINH</div>';
-        } else if (dealerStat.tag === 'bust') {
-          resultOverlayHtml = '<div class="xd-result-overlay xd-result-bust">QUẮC</div>';
+    let resultOverlayHtml = '';
+    if (gs.phase === 'result' || gs.results?.[uid]) {
+      if (isDealer) {
+        if (gs.phase === 'result') {
+          if (dealerStat) {
+            if (dealerStat.tag === 'xi_bang') {
+              resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ BÀN</div>';
+            } else if (dealerStat.tag === 'xi_dach') {
+              resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">XÌ DÁCH</div>';
+            } else if (dealerStat.tag === 'ngu_linh') {
+              resultOverlayHtml = '<div class="xd-result-overlay xd-result-special">NGŨ LINH</div>';
+            } else if (dealerStat.tag === 'bust') {
+              resultOverlayHtml = '<div class="xd-result-overlay xd-result-bust">QUẮC</div>';
+            }
+          }
+          if (!resultOverlayHtml) {
+            const delta = gs.dealerDelta || 0;
+            if (delta > 0) {
+              resultOverlayHtml = `<div class="xd-result-overlay xd-result-win">+${delta.toLocaleString('vi-VN')}đ</div>`;
+            } else if (delta < 0) {
+              resultOverlayHtml = `<div class="xd-result-overlay xd-result-lose">${delta.toLocaleString('vi-VN')}đ</div>`;
+            } else {
+              resultOverlayHtml = '<div class="xd-result-overlay xd-result-draw">HÒA</div>';
+            }
+          }
         }
-      }
-      if (!resultOverlayHtml) {
-        const delta = gs.dealerDelta || 0;
-        if (delta > 0) {
-          resultOverlayHtml = `<div class="xd-result-overlay xd-result-win">+${delta.toLocaleString('vi-VN')}đ</div>`;
-        } else if (delta < 0) {
-          resultOverlayHtml = `<div class="xd-result-overlay xd-result-lose">${delta.toLocaleString('vi-VN')}đ</div>`;
+      } else if (gs.results?.[uid]) {
+        const res = gs.results[uid];
+        let overlayClass = '', overlayText = '';
+        if (stat?.tag === 'xi_bang') {
+          overlayClass = 'xd-result-special'; overlayText = 'XÌ BÀN';
+        } else if (stat?.tag === 'xi_dach') {
+          overlayClass = 'xd-result-special'; overlayText = 'XÌ DÁCH';
+        } else if (stat?.tag === 'ngu_linh') {
+          overlayClass = 'xd-result-special'; overlayText = 'NGŨ LINH';
+        } else if (stat?.tag === 'bust') {
+          overlayClass = 'xd-result-bust'; overlayText = 'QUẮC';
+        } else if (res.outcome === 'win') {
+          overlayClass = 'xd-result-win';
+          overlayText = `+${res.delta.toLocaleString('vi-VN')}đ`;
+        } else if (res.outcome === 'lose') {
+          overlayClass = 'xd-result-lose';
+          overlayText = `${res.delta.toLocaleString('vi-VN')}đ`;
         } else {
-          resultOverlayHtml = '<div class="xd-result-overlay xd-result-draw">HÒA</div>';
+          overlayClass = 'xd-result-draw';
+          overlayText = 'HÒA';
         }
+        resultOverlayHtml = `<div class="xd-result-overlay ${overlayClass}">${overlayText}</div>`;
       }
     }
-  } else if (gs.results?.[uid]) {
-    // Nhà con – hiện ngay khi có kết quả (kể cả khi phase chưa phải result)
-    const res = gs.results[uid];
-    let overlayClass = '', overlayText = '';
-    if (stat?.tag === 'xi_bang') {
-      overlayClass = 'xd-result-special'; overlayText = 'XÌ BÀN';
-    } else if (stat?.tag === 'xi_dach') {
-      overlayClass = 'xd-result-special'; overlayText = 'XÌ DÁCH';
-    } else if (stat?.tag === 'ngu_linh') {
-      overlayClass = 'xd-result-special'; overlayText = 'NGŨ LINH';
-    } else if (stat?.tag === 'bust') {
-      overlayClass = 'xd-result-bust'; overlayText = 'QUẮC';
-    } else if (res.outcome === 'win') {
-      overlayClass = 'xd-result-win';
-      overlayText = `+${res.delta.toLocaleString('vi-VN')}đ`;
-    } else if (res.outcome === 'lose') {
-      overlayClass = 'xd-result-lose';
-      overlayText = `${res.delta.toLocaleString('vi-VN')}đ`; // delta đã âm
-    } else {
-      overlayClass = 'xd-result-draw';
-      overlayText = 'HÒA';
-    }
-    resultOverlayHtml = `<div class="xd-result-overlay ${overlayClass}">${overlayText}</div>`;
-  }
-}
 
-    // Badge tiền cược
     let betBadgeHtml = '';
     if (!isDealer && betAmt > 0) {
       betBadgeHtml = `<div class="xd-bet-badge">${betAmt.toLocaleString('vi-VN')}đ</div>`;
@@ -360,7 +369,7 @@ if (gs.phase === 'result' || gs.results?.[uid]) { // ← THÊM || gs.results?.[u
     dealerDrawBtn.className = 'btn-deal';
     dealerDrawBtn.style.cssText = 'background:linear-gradient(135deg,#0ea5e9,#38bdf8);color:#fff;';
     dealerDrawBtn.onclick = hostDealerDraw;
-    document.querySelector('.xd-actions').insertBefore(dealerDrawBtn, document.querySelector('.btn-leave-xd'));
+    document.querySelector('.xd-actions').insertBefore(dealerDrawBtn, document.querySelector('.btn-leave'));
   }
   if (!dealerEndBtn) {
     dealerEndBtn = document.createElement('button');
@@ -368,7 +377,7 @@ if (gs.phase === 'result' || gs.results?.[uid]) { // ← THÊM || gs.results?.[u
     dealerEndBtn.className = 'btn-deal';
     dealerEndBtn.style.cssText = 'background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1f1f1f;';
     dealerEndBtn.onclick = hostEndDealerTurn;
-    document.querySelector('.xd-actions').insertBefore(dealerEndBtn, document.querySelector('.btn-leave-xd'));
+    document.querySelector('.xd-actions').insertBefore(dealerEndBtn, document.querySelector('.btn-leave'));
   }
   if (isHost && gs.phase === 'dealer') {
     dealerDrawBtn.style.display = 'inline-block';
@@ -388,8 +397,11 @@ if (gs.phase === 'result' || gs.results?.[uid]) { // ← THÊM || gs.results?.[u
     _settledRound = gs.round;
     settleMyResult(r, gs);
   }
-}
-// ===== XÌ DÁCH MULTIPLAYER - PHẦN 3/3 (HÀNH ĐỘNG) =====
+}// ============================================================
+// ===== XÌ DÁCH MULTIPLAYER - PHẦN 2/2 =====
+// ============================================================
+
+/* ========== HÀNH ĐỘNG ========== */
 window.placeBet = async function() {
   const amt = parseInt(document.getElementById('xd-bet-input').value);
   if (!amt || amt < 50) { showToast('Cược tối thiểu 50', 'warn'); return; }
@@ -431,7 +443,6 @@ window.hostDeal = async function() {
 
   let dealerDelta = 0;
 
-  // Nếu nhà cái có Xì Bàng / Xì Dách => kết thúc luôn
   if (dealerStat.tag === 'xi_bang' || dealerStat.tag === 'xi_dach') {
     updates['gameState.phase'] = 'result';
     updates['gameState.dealerChecked'] = Object.fromEntries(players.map(u => [u, true]));
@@ -454,7 +465,6 @@ window.hostDeal = async function() {
     for (const res of Object.values(results)) dealerDelta -= res.delta;
     updates['gameState.dealerDelta'] = dealerDelta;
   } else {
-    // Nhà cái không có Xì Bàng/Xì Dách, kiểm tra từng nhà con
     const results = {};
     const checked = {};
     const newTurnOrder = [];
@@ -462,11 +472,9 @@ window.hostDeal = async function() {
       const playerHand = hands[uid];
       const playerStat = handStatus(playerHand);
       if (playerStat.tag === 'xi_bang' || playerStat.tag === 'xi_dach') {
-        // Người chơi có Xì Bàng / Xì Dách -> thắng ngay, mở bài
         const bet = gs.bets?.[uid] || 0;
         results[uid] = { outcome: 'win', delta: bet };
-        checked[uid] = true; // Đã xét, không cần vào lượt
-        // Không thêm vào turnOrder
+        checked[uid] = true;
       } else {
         newTurnOrder.push(uid);
       }
@@ -477,14 +485,10 @@ window.hostDeal = async function() {
       for (const res of Object.values(results)) dealerDelta -= res.delta;
       updates['gameState.dealerDelta'] = dealerDelta;
     }
-    // Cập nhật turnOrder mới (chỉ những người chưa có kết quả)
     updates['gameState.turnOrder'] = newTurnOrder;
     updates['gameState.turnIdx'] = 0;
-    // Nếu không còn ai trong turnOrder, chuyển sang phase dealer (hoặc result nếu cần)
     if (newTurnOrder.length === 0) {
       updates['gameState.phase'] = 'dealer';
-      // Nhưng vẫn cần dealer đánh tiếp? Nếu dealer chưa đủ điểm thì tự động bốc? 
-      // Tạm thời chuyển sang dealer để host có thể bốc hoặc kết thúc.
     }
   }
 
@@ -640,61 +644,6 @@ async function finalizeBustDealer(r, dealerHand, deck) {
   });
 }
 
-function compareHands(playerHand, dealerHand, bet) {
-  const pStat = handStatus(playerHand);
-  const dStat = handStatus(dealerHand);
-
-  if (pStat.tag === 'bust' && dStat.tag === 'bust') {
-    return { outcome: 'draw', delta: 0 };
-  }
-  if (pStat.tag === 'bust') {
-    return { outcome: 'lose', delta: -bet };
-  }
-  if (dStat.tag === 'bust') {
-    return { outcome: 'win', delta: bet };
-  }
-
-  const pSpecial = (pStat.tag === 'xi_bang' || pStat.tag === 'xi_dach');
-  const dSpecial = (dStat.tag === 'xi_bang' || dStat.tag === 'xi_dach');
-
-  if (pSpecial && !dSpecial) {
-    return { outcome: 'win', delta: bet };
-  }
-  if (dSpecial && !pSpecial) {
-    return { outcome: 'lose', delta: -bet };
-  }
-  if (pSpecial && dSpecial) {
-    return { outcome: 'draw', delta: 0 };
-  }
-
-  if (pStat.tag === 'ngu_linh' && dStat.tag === 'ngu_linh') {
-    if (pStat.score < dStat.score) return { outcome: 'win', delta: bet };
-    if (pStat.score > dStat.score) return { outcome: 'lose', delta: -bet };
-    return { outcome: 'draw', delta: 0 };
-  }
-  if (pStat.tag === 'ngu_linh') {
-    return { outcome: 'win', delta: bet };
-  }
-  if (dStat.tag === 'ngu_linh') {
-    return { outcome: 'lose', delta: -bet };
-  }
-
-  if (pStat.score > dStat.score) {
-    return { outcome: 'win', delta: bet };
-  }
-  if (pStat.score < dStat.score) {
-    return { outcome: 'lose', delta: -bet };
-  }
-  return { outcome: 'draw', delta: 0 };
-}
-
-function getRank(stat) {
-  if (stat.tag === 'xi_bang') return 5;
-  if (stat.tag === 'xi_dach') return 4;
-  if (stat.tag === 'ngu_linh') return 3;
-  return 1;
-}
-
 async function settleMyResult(r, gs) {
   if (r.hostUid === _user.uid) {
     const dealerDelta = gs.dealerDelta || 0;
@@ -712,23 +661,21 @@ async function settleMyResult(r, gs) {
   const bet = gs.bets?.[_user.uid] || 0;
 
   if (res.outcome === 'win') {
-    // Áp dụng pet buff: chỉ bonus trên phần THẮNG (delta), không tính tiền hoàn cược
-    let winAmount = res.delta; // tiền thắng gốc
+    let winAmount = res.delta;
     let buffBonus = 0;
     let buffPct = 0;
     try {
-      buffPct = await getActiveBuff(); // % buff từ pet đang trang bị
+      buffPct = await getActiveBuff();
       if (buffPct > 0) {
         buffBonus = Math.round(winAmount * buffPct / 100);
       }
     } catch {}
-    const totalRefund = bet + winAmount + buffBonus; // hoàn cược + thắng + bonus pet
+    const totalRefund = bet + winAmount + buffBonus;
     const us = await getDoc(doc(db, 'users', _user.uid));
     const cur = us.exists() ? (us.data().points || 0) : 0;
     await updateDoc(doc(db, 'users', _user.uid), { points: cur + totalRefund });
 
     if (buffBonus > 0) {
-      // Lấy tên pet để hiển thị
       const petData = await (async () => {
         try {
           const ud = await getDoc(doc(db, 'users', _user.uid));
@@ -747,11 +694,9 @@ async function settleMyResult(r, gs) {
     if (window.VTQuests) { window.VTQuests.trackEarn(winAmount + buffBonus); window.VTQuests.trackWinSmart(); }
 
   } else if (res.outcome === 'lose') {
-    // Thua: không hoàn tiền, không buff
     showToast(`💸 Thua ${bet.toLocaleString('vi-VN')}đ`, 'warn');
 
   } else {
-    // Hoà: hoàn lại tiền cược
     const us = await getDoc(doc(db, 'users', _user.uid));
     const cur = us.exists() ? (us.data().points || 0) : 0;
     await updateDoc(doc(db, 'users', _user.uid), { points: cur + bet });
@@ -808,6 +753,3 @@ window.quitGame = async function() {
   } catch (e) {}
   location.href = 'rooms.html';
 };
-
-function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-

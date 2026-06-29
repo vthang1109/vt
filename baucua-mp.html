@@ -171,16 +171,101 @@
     .btn-roll:disabled { opacity:.5; cursor:not-allowed; box-shadow:none; }
     .btn-next { background:linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; }
 
-    .bc-players { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:8px; margin-top:14px; }
-    .bc-pl { padding:9px 12px; border-radius:12px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); transition:all .3s; position:relative; }
-    .bc-pl.win { border-color:rgba(52,211,153,.6); box-shadow: 0 0 20px rgba(52,211,153,.3); background:rgba(52,211,153,.08); }
-    .bc-pl.lose { border-color:rgba(248,113,113,.4); box-shadow: 0 0 20px rgba(248,113,113,.2); background:rgba(248,113,113,.06); }
-    .bc-pl-name { font-weight:800; color:#e0f2fe; font-size:12.5px; }
-    .bc-pl-bet { font-size:11px; color:#fbbf24; font-weight:700; margin-top:2px; }
-    .bc-pl-result { font-size:12px; font-weight:800; margin-top:2px; }
-    .bc-pl-result.win { color:#34d399; }
-    .bc-pl-result.lose { color:#f87171; }
-    .bc-pl .pl-status { position:absolute; top:4px; right:6px; font-size:14px; }
+    /* ===== PLAYER CARD - TO HƠN, TÊN SÁT GÓC TRÊN TRÁI ===== */
+    .bc-players { 
+      display:grid; 
+      grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); 
+      gap:12px; 
+      margin-top:14px; 
+    }
+
+    .bc-pl { 
+      padding: 10px 12px 32px 12px;
+      border-radius: 12px; 
+      background: rgba(255,255,255,.03); 
+      border: 1px solid rgba(255,255,255,.06); 
+      transition: all .3s; 
+      position: relative; 
+      min-height: 70px;
+    }
+
+    .bc-pl.win { 
+      border-color: rgba(52,211,153,.6); 
+      box-shadow: 0 0 20px rgba(52,211,153,.3); 
+      background: rgba(52,211,153,.08); 
+    }
+    .bc-pl.lose { 
+      border-color: rgba(248,113,113,.4); 
+      box-shadow: 0 0 20px rgba(248,113,113,.2); 
+      background: rgba(248,113,113,.06); 
+    }
+
+    /* TÊN SÁT GÓC TRÊN BÊN TRÁI */
+    .bc-pl-name { 
+      font-weight: 800; 
+      color: #e0f2fe; 
+      font-size: 14px; 
+      padding-right: 40px;
+      line-height: 1.4;
+      text-align: left;
+    }
+
+    /* === ICON TRÒN GÓC TRÊN PHẢI (THẮNG/THUA) === */
+    .bc-pl-status {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 18px;
+      pointer-events: none;
+    }
+
+    /* === BADGE TIỀN CƯỢC - GÓC DƯỚI BÊN PHẢI === */
+    .bc-pl-bet-badge {
+      position: absolute;
+      bottom: 6px;
+      right: 8px;
+      padding: 3px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(251,191,36,0.4);
+      background: rgba(251,191,36,0.1);
+      color: #fbbf24;
+      font-family: 'Orbitron', monospace;
+      font-weight: 800;
+      font-size: 12px;
+      pointer-events: none;
+    }
+
+    /* === BADGE KẾT QUẢ (THẮNG/THUA) - GÓC DƯỚI BÊN TRÁI === */
+    .bc-pl-result-badge {
+      position: absolute;
+      bottom: 6px;
+      left: 8px;
+      padding: 3px 12px;
+      border-radius: 6px;
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: 13px;
+      pointer-events: none;
+    }
+    .bc-pl-result-badge.win {
+      color: #34d399;
+      border: 1px solid rgba(52,211,153,0.4);
+      background: rgba(52,211,153,0.1);
+    }
+    .bc-pl-result-badge.lose {
+      color: #f87171;
+      border: 1px solid rgba(248,113,113,0.4);
+      background: rgba(248,113,113,0.1);
+    }
+    .bc-pl-result-badge.draw {
+      color: #94a3b8;
+      border: 1px solid rgba(148,163,184,0.3);
+      background: rgba(148,163,184,0.08);
+    }
+
+    /* Xóa style cũ */
+    .bc-pl-bet { display: none !important; }
+    .bc-pl-result { display: none !important; }
 
     /* Nav override - room id style */
     .vt-top-nav .vt-nav-logo .vt-room-id {
@@ -220,6 +305,12 @@
       }
       .bc-tile { min-height:65px; padding:10px 4px; }
       .bc-tile-icon { font-size:30px; }
+      .bc-players { grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:8px; }
+      .bc-pl { min-height:60px; padding:8px 10px 28px 10px; }
+      .bc-pl-name { font-size:12px; }
+      .bc-pl-status { font-size:15px; }
+      .bc-pl-bet-badge { font-size:10px; padding:2px 8px; }
+      .bc-pl-result-badge { font-size:11px; padding:2px 8px; }
     }
   </style>
 </head>

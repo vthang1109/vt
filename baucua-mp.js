@@ -105,7 +105,6 @@ function updateStatusBar(round, phase, profit) {
   const roundEl = document.getElementById('bc-round');
   const profitEl = document.getElementById('bc-profit');
   
-  // Xoá class rolling
   statusEl.classList.remove('rolling');
   
   if (phase === 'betting') {
@@ -114,7 +113,6 @@ function updateStatusBar(round, phase, profit) {
     statusEl.style.borderColor = 'rgba(56,189,248,.1)';
   } else if (phase === 'rolling') {
     roundEl.textContent = `🎲 Vòng ${round} — Đang lắc...`;
-    // THÊM CLASS ROLLING - MÀU VÀNG
     statusEl.classList.add('rolling');
     statusEl.style.background = 'rgba(251,191,36,.12)';
     statusEl.style.borderColor = 'rgba(251,191,36,.5)';
@@ -124,7 +122,6 @@ function updateStatusBar(round, phase, profit) {
     statusEl.style.borderColor = 'rgba(52,211,153,.3)';
   }
   
-  // Profit
   if (profit > 0) {
     profitEl.textContent = `+${profit.toLocaleString('vi-VN')}đ`;
     profitEl.className = 'bc-profit positive';
@@ -205,6 +202,7 @@ function render(r){
     let resultHtml = '';
     let isWin = false;
     let net = 0;
+    let statusIcon = '';
     
     if (isResult && dice.every(Boolean)){
       let payout = 0;
@@ -214,8 +212,21 @@ function render(r){
       net = payout - total;
       isWin = net > 0;
       
+      // ICON TRÒN GÓC TRÊN PHẢI
+      if (total > 0 && net !== 0) {
+        statusIcon = isWin ? '🟢' : '🔴';
+      } else if (total > 0 && net === 0) {
+        statusIcon = '⚪';
+      }
+      
       if (total > 0) {
-        resultHtml = `<div class="bc-pl-result ${isWin ? 'win' : 'lose'}">${isWin ? '+' : ''}${net.toLocaleString('vi-VN')}đ</div>`;
+        if (net > 0) {
+          resultHtml = `<div class="bc-pl-result-badge win">+${net.toLocaleString('vi-VN')}</div>`;
+        } else if (net < 0) {
+          resultHtml = `<div class="bc-pl-result-badge lose">${net.toLocaleString('vi-VN')}</div>`;
+        } else {
+          resultHtml = `<div class="bc-pl-result-badge draw">0</div>`;
+        }
       }
     }
     
@@ -229,14 +240,12 @@ function render(r){
       div.classList.add(isWin ? 'win' : 'lose');
     }
     
-    const statusIcon = isResult && total > 0 && net !== 0 ? (isWin ? '🟢' : '🔴') : '';
-    
     div.innerHTML = `
       <div class="bc-pl-name">
         ${esc(info.name||'?')} ${isMe ? '<span style="color:#fbbf24">(bạn)</span>' : ''} ${uid===r.hostUid?'👑':''}
-        <span class="pl-status">${statusIcon}</span>
       </div>
-      ${total>0 ? `<div class="bc-pl-bet">Đặt: ${total.toLocaleString('vi-VN')}đ</div>` : ''}
+      ${statusIcon ? `<div class="bc-pl-status">${statusIcon}</div>` : ''}
+      ${total > 0 ? `<div class="bc-pl-bet-badge">${total.toLocaleString('vi-VN')}</div>` : ''}
       ${resultHtml}
     `;
     pEl.appendChild(div);
