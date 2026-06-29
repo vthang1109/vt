@@ -1,48 +1,57 @@
-/* ===== CARO GAME STYLES ===== */
-
-.caro-container {
-  max-width: 560px;
+/* ===================== LAYOUT ===================== */
+.caro-wrap {
+  min-height: 100vh;
+  padding: 14px 12px 40px;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 20px 16px 60px;
-  position: relative; z-index: 1;
+  position: relative;
+  z-index: 1;
 }
 
-/* SCREENS */
+/* ===================== SCREENS ===================== */
 .caro-screen { animation: fadeUp 0.4s both; }
 .caro-screen.hidden { display: none; }
 
-.caro-screen-title {
-  font-family: 'Orbitron', monospace;
-  font-size: 18px; font-weight: 900;
-  color: #e0f2fe; text-align: center;
-  margin: 24px 0 24px;
+/* ===================== PHASE BAR (đồng bộ xd-phase) ===================== */
+.caro-phase {
+  text-align: center;
+  padding: 12px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  font-weight: 800;
+  font-size: 14px;
+  background: rgba(56, 189, 248, 0.08);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  font-family: 'Nunito', sans-serif;
 }
 
-/* MODE GRID */
+/* ===================== MODE GRID ===================== */
 .mode-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px; margin-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .mode-card {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
-  padding: 24px 12px; border-radius: 20px; cursor: pointer;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(56,189,248,0.15);
+  padding: 24px 12px; border-radius: 14px; cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(56, 189, 248, 0.15);
   transition: all 0.25s; text-align: center;
 }
 .mode-card:hover {
   transform: translateY(-5px);
-  border-color: rgba(56,189,248,0.5);
-  background: rgba(56,189,248,0.08);
-  box-shadow: 0 12px 32px rgba(56,189,248,0.15);
+  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(56, 189, 248, 0.08);
+  box-shadow: 0 12px 32px rgba(56, 189, 248, 0.15);
 }
 .mode-emoji { font-size: 36px; line-height: 1; }
 .mode-name  { font-weight: 800; font-size: 15px; color: #e0f2fe; }
 .mode-desc  { font-size: 12px; color: #7dd3fc; opacity: 0.8; }
 
-/* BACK BUTTON */
+/* ===================== BACK BUTTON ===================== */
 .caro-back-btn {
   display: block; margin: 16px auto 0;
   background: none; border: none;
@@ -52,96 +61,131 @@
 }
 .caro-back-btn:hover { color: #38bdf8; }
 
-/* GAME HEADER */
-.caro-header { margin-bottom: 16px; }
-.caro-players {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 10px;
+/* ===================== PLAYERS ROW (bank-style) ===================== */
+.caro-players-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(14, 165, 233, 0.04));
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  margin-bottom: 14px;
+  gap: 8px;
 }
-.player-tag {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 14px; border-radius: 50px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(56,189,248,0.15);
-  font-weight: 700; font-size: 13px; color: #e0f2fe;
+
+.caro-player-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 13px;
+  color: #e0f2fe;
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
   transition: all 0.3s;
 }
-.player-tag.active {
-  border-color: rgba(56,189,248,0.5);
-  background: rgba(56,189,248,0.1);
-  box-shadow: 0 0 16px rgba(56,189,248,0.2);
+.caro-player-tag.active {
+  border-color: rgba(56, 189, 248, 0.55);
+  background: rgba(56, 189, 248, 0.1);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+  animation: playerPulse 1s ease-in-out infinite alternate;
 }
-.player-tag.right { flex-direction: row-reverse; }
-.player-symbol {
-  font-size: 16px; font-weight: 900; font-family: 'Orbitron', monospace;
+@keyframes playerPulse {
+  from { box-shadow: 0 0 10px rgba(56, 189, 248, 0.15); }
+  to   { box-shadow: 0 0 24px rgba(56, 189, 248, 0.45); }
 }
-.player-symbol.x { color: #38bdf8; }
-.player-symbol.o { color: #f87171; }
+.caro-player-tag.right { flex-direction: row-reverse; }
 
-.caro-score {
-  display: flex; align-items: center; gap: 8px;
+.caro-player-symbol {
+  font-size: 16px; font-weight: 900;
   font-family: 'Orbitron', monospace;
-  font-size: 20px; font-weight: 900; color: #e0f2fe;
 }
-.score-sep { color: #4a7a9b; }
+.caro-player-symbol.x { color: #38bdf8; }
+.caro-player-symbol.o { color: #f87171; }
+
+.caro-player-score {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 18px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1px 8px;
+  border-radius: 8px;
+}
 #score-p1 { color: #38bdf8; }
 #score-p2 { color: #f87171; }
 
-.caro-status {
-  text-align: center; padding: 8px 16px; border-radius: 10px;
-  background: rgba(56,189,248,0.06);
-  border: 1px solid rgba(56,189,248,0.15);
-  font-size: 14px; font-weight: 700; color: #7dd3fc;
+.caro-vs {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 13px;
+  color: #4a7a9b;
+  flex-shrink: 0;
 }
 
-/* BOARD */
+/* ===================== BOARD ===================== */
 .caro-board-wrap {
-  display: flex; justify-content: center;
-  margin-bottom: 16px; overflow: auto;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+  overflow: auto;
 }
 #caro-canvas {
-  border-radius: 12px;
-  border: 1px solid rgba(56,189,248,0.2);
-  background: rgba(4,20,40,0.8);
+  border-radius: 14px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: rgba(4, 20, 40, 0.85);
   cursor: pointer;
   touch-action: none;
   max-width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-/* CONTROLS */
-.caro-controls {
-  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+/* ===================== ACTIONS (đồng bộ xd-actions) ===================== */
+.caro-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
-.caro-btn {
-  padding: 11px 24px; border-radius: 12px; border: none; cursor: pointer;
-  background: rgba(56,189,248,0.08);
-  border: 1px solid rgba(56,189,248,0.25);
-  color: #7dd3fc; font-size: 14px; font-weight: 700;
-  font-family: 'Nunito', sans-serif; transition: all 0.2s;
+.caro-actions button {
+  padding: 11px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  transition: opacity 0.2s, transform 0.15s;
 }
-.caro-btn:hover { background: rgba(56,189,248,0.18); transform: translateY(-2px); }
-.caro-btn.green {
-  background: rgba(52,211,153,0.1);
-  border-color: rgba(52,211,153,0.3); color: #34d399;
-}
-.caro-btn.green:hover { background: rgba(52,211,153,0.2); }
+.caro-actions button:hover { transform: translateY(-2px); }
+.caro-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* RESULT MODAL */
+.btn-restart { background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #fff; }
+.btn-home    { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; }
+
+/* ===================== RESULT MODAL ===================== */
 .result-modal {
   position: fixed; inset: 0; z-index: 500;
-  background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center;
 }
 .result-modal.hidden { display: none; }
+
 .result-box {
-  background: rgba(4,20,40,0.97);
-  border: 1px solid rgba(56,189,248,0.3);
+  background: rgba(4, 20, 40, 0.97);
+  border: 1px solid rgba(56, 189, 248, 0.3);
   border-radius: 24px; padding: 36px 28px;
   text-align: center; min-width: 260px;
   display: flex; flex-direction: column; gap: 14px;
-  animation: slideUp 0.35s both;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+  animation: popResult 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
 }
+@keyframes popResult {
+  0%   { transform: scale(0.4); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
 .result-emoji { font-size: 56px; line-height: 1; }
 .result-title {
   font-family: 'Orbitron', monospace;
@@ -149,16 +193,8 @@
 }
 .result-pts { font-size: 15px; font-weight: 700; color: #38bdf8; }
 
-/* TOAST */
-.caro-toast {
-  position: fixed; bottom: 30px; left: 50%;
-  transform: translateX(-50%);
-  background: rgba(52,211,153,0.15);
-  border: 1px solid rgba(52,211,153,0.4);
-  color: #34d399; padding: 11px 24px;
-  border-radius: 50px; font-weight: 800; font-size: 14px;
-  z-index: 9999; pointer-events: none;
-  opacity: 0; transition: opacity 0.3s;
-  white-space: nowrap;
+/* ===================== ANIMATIONS ===================== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.caro-toast.show { opacity: 1; }

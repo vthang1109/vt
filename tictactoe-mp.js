@@ -32,6 +32,7 @@ let currentBet = 100;
 
 let canvas, ctx;
 let _unsubRoom = null;
+let _canvasReady = false; // guard initCanvas
 
 // ============================================================
 //  DOM REFS
@@ -247,6 +248,7 @@ function handleGameState(data) {
   if (data.status !== 'playing') {
     gameActive = false;
     gameOver = false;
+    _canvasReady = false;
     return;
   }
 
@@ -272,9 +274,10 @@ function handleGameState(data) {
   }
 
   currentTurn = gs.currentTurn || null;
-  gameActive = true;
-  gameOver = gs.winner !== null && gs.winner !== undefined && gs.winner !== 'draw';
-  
+  // FIX: gameOver cover cả draw
+  gameOver = gs.winner !== null && gs.winner !== undefined;
+  gameActive = !gameOver;
+
   const symbols = gs.symbols || {};
   mySymbol = symbols[myUid] || null;
   
@@ -294,9 +297,13 @@ function handleGameState(data) {
     }
   }
 
-  isMyTurn = currentTurn === myUid && !gameOver && gameActive;
+  isMyTurn = currentTurn === myUid && !gameOver;
 
-  initCanvas();
+  // FIX: chỉ init canvas một lần, không reset mỗi snapshot
+  if (!_canvasReady) {
+    initCanvas();
+    _canvasReady = true;
+  }
   drawBoard();
 
   if (winLine && winLine.length > 0) {
@@ -305,11 +312,10 @@ function handleGameState(data) {
 
   renderRoomInfo();
 
-  if (gameOver || gs.winner === 'draw') {
-    if (gs.winner && gs.winner !== 'draw') {
-      const resultGs = { ...gs, winLine: winLine };
-      showResultFromState(resultGs);
-    } else if (gs.winner === 'draw') {
+  if (gs.winner) {
+    if (gs.winner !== 'draw') {
+      showResultFromState(gs);
+    } else {
       showResult('🤝', 'Hòa!', '', 'Không còn nước đi');
     }
   }
@@ -416,7 +422,7 @@ function handleClick(e) {
 
 async function handleMove(px, py) {
   if (!gameActive || gameOver || !isMyTurn || isProcessingMove) {
-    if (!isMyTurn && gameActive) {
+    if (!isMyTurn && gameActive && !gameOver) {
       window.showToast('🔴 Chưa đến lượt bạn!', 'warn');
     }
     return;
@@ -457,6 +463,9 @@ async function sendMove(r, c) {
 
     board = boardArr.slice();
 
+    // FIX: vẽ ngay local trước khi await, tránh flash trống
+    drawBoard();
+
     const winCells = checkWin(r, c, val);
     
     let boardStr = '';
@@ -484,8 +493,8 @@ async function sendMove(r, c) {
       newGs.winLineStr = JSON.stringify(winCells);
       gameOver = true;
       gameActive = false;
-      
-      drawBoard();
+
+      // FIX: highlight ngay sau drawBoard local (không drawBoard lại)
       highlightWin(winCells);
       
       try {
@@ -519,6 +528,10 @@ async function sendMove(r, c) {
     if (winCells) {
       setTimeout(() => {
         showResult('🏆', '🎉 Bạn thắng!', `+${(currentBet * 2).toLocaleString('vi-VN')} điểm`, `Thắng cược ${currentBet.toLocaleString('vi-VN')}`);
+      }, 500);
+    } else if (newGs.winner === 'draw') {
+      setTimeout(() => {
+        showResult('🤝', 'Hòa!', `+${currentBet.toLocaleString('vi-VN')} (hoàn cược)`, 'Không ai thắng');
       }, 500);
     }
 
@@ -631,6 +644,8 @@ async function resetGameState() {
     board = Array(9).fill(0);
     gameOver = false;
     gameActive = true;
+    isProcessingMove = false; // FIX: reset flag khi bắt đầu ván mới
+    _canvasReady = false;     // FIX: cho phép initCanvas lại cho ván mới
     currentTurn = p1;
     isMyTurn = p1 === myUid;
     
@@ -657,6 +672,7 @@ async function resetGameState() {
     });
     
     initCanvas();
+    _canvasReady = true;
     drawBoard();
     renderRoomInfo();
     
@@ -727,6 +743,7 @@ window.startMpGame = async function() {
     bet: currentBet
   };
 
+  _canvasReady = false; // reset canvas guard cho game mới
   await updateDoc(doc(db, 'rooms', roomId), {
     status: 'playing',
     gameState,
