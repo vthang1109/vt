@@ -12,6 +12,7 @@ let roomId = null;
 let roomData = null;
 let myUid = null;
 let myName = 'Bạn';
+let myPoints = 0;
 
 let BOARD_SIZE = 15;
 let WIN_COUNT = 5;
@@ -26,6 +27,10 @@ let gameOver = false;
 let lastMove = null;
 let moveCount = 0;
 let isProcessingMove = false;
+
+// ===== TIỀN CƯỢC =====
+let BET_AMOUNT = 100;
+let currentBet = 100;
 
 let canvas, ctx;
 let _unsubRoom = null;
@@ -59,6 +64,7 @@ onAuthStateChanged(auth, async (user) => {
   myUid = user.uid;
   const snap = await getDoc(doc(db, 'users', user.uid));
   myName = snap.exists() ? (snap.data().nickname || user.email.split('@')[0]) : user.email.split('@')[0];
+  myPoints = snap.exists() ? (snap.data().points || 0) : 0;
 
   const params = new URLSearchParams(window.location.search);
   roomId = params.get('room');
@@ -67,7 +73,48 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
   initRoom();
+  
+  // Cập nhật điểm lên nav
+  updateNavPoints();
 });
+
+// ============================================================
+//  UPDATE NAV POINTS
+// ============================================================
+function updateNavPoints() {
+  const apply = () => {
+    const ptsStr = myPoints.toLocaleString('vi-VN');
+    document.querySelectorAll('[data-points]').forEach(el => {
+      el.textContent = ptsStr;
+    });
+
+    // top-nav.js dùng id "vtNavPts" qua API TopNav.setPoints()
+    if (window.TopNav && typeof window.TopNav.setPoints === 'function') {
+      window.TopNav.setPoints(myPoints);
+    } else {
+      const vtPts = document.getElementById('vtNavPts');
+      if (vtPts) {
+        vtPts.textContent = '⭐ ' + ptsStr;
+        vtPts.classList.add('visible');
+      }
+    }
+
+    ['user-points-home', 'status-pts', 'pro-points', 'wd-pts', 'shPts'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = ptsStr;
+    });
+  };
+
+  apply();
+
+  // top-nav.js inject bằng root.outerHTML (thay thế hẳn #top-nav-root) lúc DOMContentLoaded,
+  // có thể chạy SAU lần apply() đầu -> theo dõi document.body để bắt lúc nav vừa được chèn.
+  if (!document.body._ptsObserver) {
+    const observer = new MutationObserver(() => apply());
+    observer.observe(document.body, { childList: true, subtree: false });
+    document.body._ptsObserver = observer;
+  }
+}
 
 // ============================================================
 //  ROOM LISTENER
@@ -155,14 +202,48 @@ function renderRoomInfo() {
     waitingOverlay.classList.add('hidden');
   }
 
-  if (roomData.status === 'lobby') {
-    statusEl.innerHTML = `🔄 Đang trong phòng chờ · ${members.length}/${roomData.maxPlayers || 2} người`;
+  // Cập nhật status với layout 2 cột
+  updateStatusBar();
+}
+
+// ============================================================
+//  UPDATE STATUS BAR
+// ============================================================
+function updateStatusBar() {
+  const members = roomData?.members || [];
+  const memberInfo = roomData?.memberInfo || {};
+  
+  if (roomData?.status === 'lobby') {
+    statusEl.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+        <span>🔄 Đang trong phòng chờ · ${members.length}/${roomData.maxPlayers || 2} người</span>
+        <span style="color:#fbbf24;font-weight:700;">🪙 ${currentBet.toLocaleString('vi-VN')}</span>
+      </div>
+    `;
     statusEl.style.color = '#94a3b8';
-  } else if (roomData.status === 'playing') {
+  } else if (roomData?.status === 'playing') {
     if (gameActive && !gameOver) {
       const turnName = currentTurn === myUid ? 'bạn' : (memberInfo[currentTurn]?.name || 'đối thủ');
-      statusEl.innerHTML = `⚔️ Lượt của ${turnName} ${mySymbol ? '(' + mySymbol + ')' : ''}`;
-      statusEl.style.color = currentTurn === myUid ? '#38bdf8' : '#f87171';
+      const symbolText = mySymbol ? ` (${mySymbol})` : '';
+      const turnColor = currentTurn === myUid ? '#38bdf8' : '#f87171';
+      
+      statusEl.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+          <span style="color:${turnColor};font-weight:800;">⚔️ Lượt của ${turnName}${symbolText}</span>
+          <span style="color:#fbbf24;font-weight:700;">🪙 ${currentBet.toLocaleString('vi-VN')}</span>
+        </div>
+      `;
+      statusEl.style.color = turnColor;
+    } else if (gameOver) {
+      // Không cần cập nhật
+    } else {
+      statusEl.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+          <span>⏳ Đang tải trận đấu...</span>
+          <span style="color:#fbbf24;font-weight:700;">🪙 ${currentBet.toLocaleString('vi-VN')}</span>
+        </div>
+      `;
+      statusEl.style.color = '#94a3b8';
     }
   }
 }
@@ -179,6 +260,11 @@ function handleGameState(data) {
 
   const gs = data.gameState || {};
   if (!gs.board) return;
+
+  // Lấy tiền cược từ gameState
+  if (gs.bet) {
+    currentBet = gs.bet;
+  }
 
   // Parse board
   const boardStr = gs.board || '';
@@ -212,20 +298,31 @@ function handleGameState(data) {
     else if (myUid === p2) mySymbol = 'O';
   }
 
+  // Khôi phục winLine từ string
+  let winLine = null;
+  if (gs.winLineStr) {
+    try {
+      winLine = JSON.parse(gs.winLineStr);
+    } catch(e) {
+      winLine = null;
+    }
+  }
+
   isMyTurn = currentTurn === myUid && !gameOver && gameActive;
 
   initCanvas();
   drawBoard();
 
-  if (gs.winLine && gs.winLine.length > 0) {
-    highlightWin(gs.winLine);
+  if (winLine && winLine.length > 0) {
+    highlightWin(winLine);
   }
 
   renderRoomInfo();
 
   if (gameOver || gs.winner === 'draw') {
     if (gs.winner && gs.winner !== 'draw') {
-      showResultFromState(gs);
+      const resultGs = { ...gs, winLine: winLine };
+      showResultFromState(resultGs);
     } else if (gs.winner === 'draw') {
       showResult('🤝', 'Hòa!', '', 'Không còn nước đi');
     }
@@ -392,17 +489,20 @@ async function sendMove(r, c) {
     }
 
     const newGs = {
-      ...gs,
       board: boardStr,
       currentTurn: getOpponentUid(),
       lastMove: [r, c],
-      moveCount: (gs.moveCount || 0) + 1
+      moveCount: (gs.moveCount || 0) + 1,
+      bet: currentBet
     };
+
+    if (gs.symbols) newGs.symbols = gs.symbols;
+    if (gs.players) newGs.players = gs.players;
 
     if (winCells) {
       console.log('🎉 THẮNG! Win cells:', winCells);
       newGs.winner = myUid;
-      newGs.winLine = winCells;
+      newGs.winLineStr = JSON.stringify(winCells);
       gameOver = true;
       gameActive = false;
       
@@ -411,7 +511,10 @@ async function sendMove(r, c) {
       
       try {
         const { addPoints } = await import('./points.js');
-        await addPoints('Caro', 'Thắng game MP', 100);
+        const winAmount = currentBet * 2;
+        await addPoints('Caro', `Thắng game MP (cược ${currentBet.toLocaleString('vi-VN')})`, winAmount);
+        myPoints += winAmount;
+        updateNavPoints();
       } catch (e) {
         console.log('Không thể cộng điểm:', e);
       }
@@ -420,6 +523,14 @@ async function sendMove(r, c) {
       newGs.winner = 'draw';
       gameOver = true;
       gameActive = false;
+      try {
+        const { addPoints } = await import('./points.js');
+        await addPoints('Caro', `Hoàn cược (hòa)`, currentBet);
+        myPoints += currentBet;
+        updateNavPoints();
+      } catch (e) {
+        console.log('Không thể hoàn tiền:', e);
+      }
     }
 
     await updateDoc(doc(db, 'rooms', roomId), {
@@ -428,7 +539,7 @@ async function sendMove(r, c) {
 
     if (winCells) {
       setTimeout(() => {
-        showResult('🏆', '🎉 Bạn thắng!', '+100 điểm', 'Chơi hay quá!');
+        showResult('🏆', '🎉 Bạn thắng!', `+${(currentBet * 2).toLocaleString('vi-VN')} điểm`, `Thắng cược ${currentBet.toLocaleString('vi-VN')}`);
       }, 500);
     }
 
@@ -526,7 +637,7 @@ function checkWin(r, c, player) {
 function showResultFromState(gs) {
   const winner = gs.winner;
   if (winner === 'draw') {
-    showResult('🤝', 'Hòa!', '', 'Cả hai đều chơi hay!');
+    showResult('🤝', 'Hòa!', `+${currentBet.toLocaleString('vi-VN')} (hoàn cược)`, 'Không ai thắng');
     return;
   }
   const isMe = winner === myUid;
@@ -534,9 +645,9 @@ function showResultFromState(gs) {
   const winnerName = isMe ? 'Bạn' : (memberInfo[winner]?.name || 'Người chơi');
 
   if (isMe) {
-    showResult('🏆', '🎉 Bạn thắng!', '+100 điểm', `Thắng ${winnerName}`);
+    showResult('🏆', '🎉 Bạn thắng!', `+${(currentBet * 2).toLocaleString('vi-VN')} điểm`, `Thắng cược ${currentBet.toLocaleString('vi-VN')}`);
   } else {
-    showResult('😔', `${winnerName} thắng!`, '', 'Lần sau cố gắng nhé!');
+    showResult('😔', `${winnerName} thắng!`, `-${currentBet.toLocaleString('vi-VN')} điểm`, 'Lần sau cố gắng nhé!');
   }
 }
 
@@ -580,11 +691,12 @@ async function resetGameState() {
       board: boardStr,
       currentTurn: p1,
       winner: null,
-      winLine: null,
+      winLineStr: null,
       lastMove: null,
       moveCount: 0,
       symbols: symbols,
-      players: [p1, p2]
+      players: members,
+      bet: currentBet
     };
     
     await updateDoc(doc(db, 'rooms', roomId), {
@@ -595,7 +707,7 @@ async function resetGameState() {
     drawBoard();
     renderRoomInfo();
     
-    window.showToast('🔄 Bàn mới!', 'success');
+    window.showToast(`🔄 Bàn mới! Cược ${currentBet.toLocaleString('vi-VN')}`, 'success');
     
   } catch (err) {
     console.error('resetGameState error:', err);
@@ -627,6 +739,21 @@ window.startMpGame = async function() {
     return;
   }
 
+  if (myPoints < currentBet) {
+    window.showToast(`❌ Bạn không đủ tiền! Cần ${currentBet.toLocaleString('vi-VN')}, bạn có ${myPoints.toLocaleString('vi-VN')}`, 'error');
+    return;
+  }
+
+  try {
+    const { addPoints } = await import('./points.js');
+    await addPoints('Caro', `Đặt cược ${currentBet.toLocaleString('vi-VN')}`, -currentBet);
+    myPoints -= currentBet;
+    updateNavPoints();
+  } catch (e) {
+    window.showToast('❌ Không thể trừ tiền cược!', 'error');
+    return;
+  }
+
   const p1 = members[0];
   const p2 = members[1];
   const boardStr = '.'.repeat(BOARD_SIZE * BOARD_SIZE);
@@ -639,11 +766,12 @@ window.startMpGame = async function() {
     board: boardStr,
     currentTurn: p1,
     symbols: symbols,
-    players: [p1, p2],
+    players: members,
     winner: null,
-    winLine: null,
+    winLineStr: null,
     lastMove: null,
-    moveCount: 0
+    moveCount: 0,
+    bet: currentBet
   };
 
   await updateDoc(doc(db, 'rooms', roomId), {
@@ -652,7 +780,7 @@ window.startMpGame = async function() {
     startedAt: serverTimestamp()
   });
   
-  window.showToast('🚀 Trận đấu bắt đầu!', 'success');
+  window.showToast(`🚀 Trận đấu bắt đầu! Cược ${currentBet.toLocaleString('vi-VN')}`, 'success');
 };
 
 // ============================================================
@@ -708,3 +836,4 @@ window.showToast = function(msg, type = 'info') {
 };
 
 console.log('🎮 Caro Multiplayer loaded');
+console.log(`🪙 Mức cược mặc định: ${currentBet.toLocaleString('vi-VN')}`);
