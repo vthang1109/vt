@@ -1,24 +1,12 @@
 /* ===================== LAYOUT CHUNG ===================== */
 .slot-wrap {
-  min-height: 100vh;
-  padding: 14px 12px 40px;
+  min-height: 100dvh;
+  padding: 14px 12px calc(58px + 40px);
   max-width: 600px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
 }
-
-/* ===================== HEADER & HAMBURGER ===================== */
-.slot-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.slot-head-left { display: flex; align-items: center; gap: 12px; }
-.slot-head-right { display: flex; align-items: center; gap: 10px; }
 
 /* ===================== BANK & JACKPOT ===================== */
 .slot-bank {
@@ -66,7 +54,7 @@
 /* ===================== SLOT MACHINE ===================== */
 .slot-machine {
   display: flex;
-  flex-direction: column;  /* Xếp dọc: reel trên, kết quả dưới */
+  flex-direction: column;
   align-items: center;
   margin-bottom: 24px;
 }
@@ -105,21 +93,55 @@
 /* ===================== Ô KẾT QUẢ (DƯỚI REEL) ===================== */
 .slot-result {
   text-align: center;
-  margin-top: 14px;           /* Khoảng cách với reel */
+  margin-top: 14px;
   padding: 12px 16px;
   background: rgba(0,0,0,0.4);
   border-radius: 14px;
-  color: #fbbf24;
-  font-weight: 800;
+  color: #94a3b8;
+  font-weight: 900;
   font-size: 16px;
-  min-height: 28px;
+  min-height: 44px;
   width: 100%;
   max-width: 300px;
   font-family: 'Orbitron', monospace;
-  border: 1px solid rgba(251,191,36,0.3);
-  box-shadow: 0 0 10px rgba(251,191,36,0.1);
+  border: 1px solid rgba(255,255,255,0.08);
   transition: all 0.3s;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: popResult 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes popResult {
+  0%   { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+/* Mất trắng — đỏ */
+.slot-result.result-lose {
+  background: rgba(239,68,68,0.9);
+  color: #fff;
+  border-color: #ef4444;
+  box-shadow: 0 0 30px #ef4444, 0 0 60px rgba(239,68,68,0.4);
+  text-shadow: 0 0 10px #fff, 0 0 20px #ef4444;
+}
+
+/* x3 — xanh lá */
+.slot-result.result-win {
+  background: rgba(34,197,94,0.9);
+  color: #fff;
+  border-color: #22c55e;
+  box-shadow: 0 0 30px #22c55e, 0 0 60px rgba(34,197,94,0.4);
+  text-shadow: 0 0 10px #fff, 0 0 20px #22c55e;
+}
+
+/* Nổ hũ — vàng */
+.slot-result.result-jackpot {
+  background: linear-gradient(45deg, #facc15, #fb923c);
+  color: #000;
+  border-color: #facc15;
+  box-shadow: 0 0 40px #facc15, 0 0 80px rgba(250,204,21,0.5);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
 /* ===================== ĐẶT CƯỢC & QUAY ===================== */
@@ -180,4 +202,27 @@
   font-weight: 800;
   font-family: 'Nunito', sans-serif;
   cursor: pointer;
+}
+
+/* ===================== KHUNG CHÍNH ===================== */
+.slot-card {
+  background: rgba(10, 20, 40, 0.7);
+  border: 1px solid rgba(251,191,36,0.3);
+  border-radius: 24px;
+  padding: 20px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  box-shadow: 0 4px 40px rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+}
+
+.slot-card .slot-jackpot {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.slot-card .slot-bet-row {
+  margin-bottom: 0;
 }

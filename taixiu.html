@@ -9,61 +9,60 @@
     <link rel="stylesheet" href="xucxac.css">
     <link rel="stylesheet" href="quests.css">
     <script src="xucxac.js"></script>
+    <script src="top-nav.js"></script>
+    <script src="bottom-nav.js"></script>
     <script type="module" src="quests.js"></script>
 </head>
-<body>
-    <nav class="casino-nav">
-        <div class="logo" onclick="location.href='games.html'" style="cursor:pointer">
-            <span style="color:#0ea5e9">VT</span><span>World</span>
-        </div>
-        <div class="nav-center">
-            <div id="nav-pts">⭐ 0</div>
-        </div>
-        <div class="nav-right">
-            <button class="nav-btn exit-btn" onclick="location.href='games.html'">SẢNH</button>
-        </div>
-    </nav>
+<body data-bottom-nav="games">
+    <canvas id="bg-canvas"></canvas>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+
+    <div id="top-nav-root"></div>
 
     <div class="game-container">
-        <!-- Bát ở trên -->
-        <div class="bowl-wrapper">
-            <div id="bowl" class="bowl">
-                <div id="bowl-lid" class="bowl-lid"></div>
-                <div id="dice-container" class="dices">
-                    <xuc-xac id="dice-0" value="1"></xuc-xac>
-                    <div class="dice-row">
-                        <xuc-xac id="dice-1" value="1"></xuc-xac>
-                        <xuc-xac id="dice-2" value="1"></xuc-xac>
+        <!-- Bank số dư kiểu xidach -->
+        <div class="bc-bank">
+            <span class="bc-bank-l">💰 Số dư của bạn</span>
+            <span class="bc-bank-r" id="bc-balance-detail">0 đ</span>
+        </div>
+
+        <!-- Khu vực chính: 70% bát (nhấn để lắc) | 30% tổng điểm + tổng cược + xoá -->
+        <div class="bowl-row">
+            <div class="bowl-side">
+                <div id="bowl" class="bowl">
+                    <div id="bowl-lid" class="bowl-lid"></div>
+                    <div id="dice-container" class="dices">
+                        <xuc-xac id="dice-0" value="1"></xuc-xac>
+                        <div class="dice-row">
+                            <xuc-xac id="dice-1" value="1"></xuc-xac>
+                            <xuc-xac id="dice-2" value="1"></xuc-xac>
+                        </div>
                     </div>
                 </div>
+                <div class="bowl-hint">👆 Nhấn vào bát để lắc</div>
             </div>
-        </div>
 
-        <!-- Hàng ngang: Tổng điểm và Lời/Lỗ -->
-        <div class="info-row">
-            <div id="total-score" class="info-box">Tổng:<br>--</div>
-            <div id="result-notice" class="info-box" style="display:none">--</div>
-        </div>
-
-        <!-- Nút lắc -->
-        <button id="btn-roll" class="main-btn">🎲 LẮC TÀI XỈU</button>
-
-        <!-- Tổng cược -->
-        <div class="total-bet-display">
-            TỔNG CƯỢC: <span id="total-bet-val">0</span>
+            <div class="side-panel">
+                <div id="total-score" class="info-box">Tổng<br>--</div>
+                <div id="result-notice" class="info-box" style="display:none">--</div>
+                <div class="total-bet-box">
+                    <span class="total-bet-label">TỔNG CƯỢC</span>
+                    <span id="total-bet-val">0</span>
+                </div>
+                <button id="btn-clear" class="chip-clear">🗑️ Xoá cược</button>
+            </div>
         </div>
 
         <!-- Bàn cược -->
         <div class="bet-board">
             <div class="bet-card tai" data-id="tai">
                 <span class="emoji">🔴</span>
-                <span class="name">TÀI</span>
                 <div class="bet-info">11-17</div>
                 <div class="my-bet" id="bet-tai">0</div>
             </div>
             <div class="bet-card xiu" data-id="xiu">
                 <span class="emoji">🔵</span>
-                <span class="name">XỈU</span>
                 <div class="bet-info">4-10</div>
                 <div class="my-bet" id="bet-xiu">0</div>
             </div>
@@ -75,9 +74,21 @@
             <button class="chip" data-amt="500">500</button>
             <button class="chip active" data-amt="1000">1k</button>
             <button class="chip" data-amt="5000">5k</button>
-            <button id="btn-clear" class="chip-clear">🗑️ Xoá cược</button>
         </div>
     </div>
+
+    <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
+
+    <script>
+        // Particle nền (đồng bộ xidach)
+        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+        function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+        for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+        (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(251,191,36,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+
+        // Toast
+        window.showToast=function(msg,type='info'){const c={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};const t=document.createElement('div');t.style.cssText=`pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;t.innerHTML=msg;toastContainer.appendChild(t);setTimeout(()=>t.remove(),3500)};
+    </script>
 
     <script type="module" src="taixiu.js"></script>
 </body>

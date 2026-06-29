@@ -1,13 +1,12 @@
 // ============================================================
 //  caro.js — Game logic cho Caro & TicTacToe
-//  Chế độ: vs Bot | 2 người local | Online (Firestore)
+//  Chế độ: vs Bot | 2 người local
 //  Luật Caro: 5 liên tiếp thắng, 5 bị chặn 2 đầu = chưa thắng
 // ============================================================
 
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { addPoints, getPoints } from './points.js';
-import { createRoom, joinRoom, listenRoom, updateRoomState, deleteRoom } from './room.js';
 
 const POINTS = { WIN_CARO: 100 }; // fallback vì points.js chưa export POINTS
 const updateMission = async () => {}; // stub vì points.js chưa export updateMission
@@ -44,7 +43,7 @@ drawBg();
 //  GAME STATE
 // ============================================================
 let gameMode   = '';      // 'tictactoe' | 'caro'
-let gameType   = '';      // 'bot' | 'local' | 'online'
+let gameType   = '';      // 'bot' | 'local'
 let difficulty = 'medium';
 let board      = [];
 let BOARD_SIZE = 15;
@@ -53,10 +52,6 @@ let CELL_SIZE  = 36;
 let currentPlayer = 1;   // 1 = X (người), 2 = O (bot/p2)
 let gameOver   = false;
 let scores     = { p1: 0, p2: 0 };
-let myRole     = '';      // 'host' | 'guest' (online)
-let roomId     = '';
-let unsubRoom  = null;
-let mySymbol   = 1;       // online: số ký hiệu của mình
 
 const canvas  = document.getElementById('caro-canvas');
 const ctx     = canvas.getContext('2d');
@@ -82,7 +77,6 @@ window.selectType = function(type) {
   gameType = type;
   if (type === 'bot')    showScreen('screen-difficulty');
   if (type === 'local')  { difficulty = 'local'; startGame('local'); }
-  if (type === 'online') showScreen('screen-online');
 }
 
 window.goBack = function(screenId) {
@@ -90,91 +84,8 @@ window.goBack = function(screenId) {
 }
 
 window.goToModeSelect = function() {
-  if (unsubRoom) { unsubRoom(); unsubRoom = null; }
-  if (roomId && myRole === 'host') deleteRoom(roomId);
   showScreen('screen-mode');
   document.getElementById('result-modal').classList.add('hidden');
-}
-
-// ============================================================
-//  ONLINE ROOM
-// ============================================================
-window.doCreateRoom = async function() {
-  const err = document.getElementById('online-err');
-  err.textContent = '';
-  if (!auth.currentUser) { err.textContent = 'Vui lòng đăng nhập!'; return; }
-
-  const initState = { board: Array(BOARD_SIZE * BOARD_SIZE).fill(0), turn: 1, over: false };
-  const result = await createRoom(gameMode, initState);
-  if (result.error) { err.textContent = result.error; return; }
-
-  roomId = result.roomId;
-  myRole = 'host';
-  mySymbol = 1;
-  document.getElementById('waiting-room-id').textContent = roomId;
-  showScreen('screen-waiting');
-
-  // Lắng nghe khi guest vào
-  unsubRoom = listenRoom(roomId, (data) => {
-    if (data.status === 'playing') {
-      unsubRoom();
-      startOnlineGame(data);
-    }
-  });
-}
-
-window.doJoinRoom = async function() {
-  const id  = document.getElementById('room-input').value.trim();
-  const err = document.getElementById('online-err');
-  err.textContent = '';
-  if (!id || id.length !== 6) { err.textContent = 'Nhập đúng Room ID 6 số!'; return; }
-  if (!auth.currentUser) { err.textContent = 'Vui lòng đăng nhập!'; return; }
-
-  const result = await joinRoom(id);
-  if (result.error) { err.textContent = result.error; return; }
-
-  roomId = id;
-  myRole = 'guest';
-  mySymbol = 2;
-  startOnlineGame(result.data);
-}
-
-window.cancelRoom = async function() {
-  if (unsubRoom) { unsubRoom(); unsubRoom = null; }
-  if (roomId) await deleteRoom(roomId);
-  roomId = '';
-  showScreen('screen-online');
-}
-
-window.copyRoomId = function() {
-  navigator.clipboard.writeText(roomId);
-  showToast('📋 Đã copy Room ID!');
-}
-
-function startOnlineGame(roomData) {
-  const host  = roomData.host?.name  || 'Host';
-  const guest = roomData.guest?.name || 'Guest';
-  document.getElementById('player1-name').textContent = myRole === 'host' ? `${host} (Bạn)` : host;
-  document.getElementById('player2-name').textContent = myRole === 'guest' ? `${guest} (Bạn)` : guest;
-
-  board = roomData.state.board.slice();
-  currentPlayer = roomData.state.turn;
-  gameOver = false;
-  showScreen('screen-game');
-  initCanvas();
-  drawBoard();
-  updateStatus();
-
-  unsubRoom = listenRoom(roomId, (data) => {
-    if (data.state) {
-      board = data.state.board.slice();
-      currentPlayer = data.state.turn;
-      gameOver = data.state.over || false;
-      drawBoard();
-      updateStatus();
-      if (data.status === 'finished') handleOnlineFinish(data.state.winner);
-    }
-  });
 }
 
 // ============================================================
@@ -317,10 +228,6 @@ function handleClick(e) {
 async function handleMove(px, py) {
   if (gameOver) return;
 
-  // Online: chỉ đánh khi đến lượt mình
-  if (gameType === 'online') {
-    if (currentPlayer !== mySymbol) return;
-  }
   // Bot: chỉ đánh khi lượt người (player 1)
   if (gameType === 'bot' && currentPlayer !== 1) return;
 
@@ -347,15 +254,6 @@ async function placeMove(r, c) {
   if (board.every(v => v !== 0)) {
     gameOver = true;
     handleDraw();
-    return;
-  }
-
-  // Online: sync lên Firestore
-  if (gameType === 'online') {
-    const nextTurn = currentPlayer === 1 ? 2 : 1;
-    await updateRoomState(roomId, { board: board.slice(), turn: nextTurn, over: false }, nextTurn === 1 ? 'host' : 'guest');
-    currentPlayer = nextTurn;
-    updateStatus();
     return;
   }
 
@@ -483,16 +381,11 @@ function checkWin(r, c, player) {
 //  XỬ LÝ KẾT QUẢ
 // ============================================================
 async function handleWin(player) {
-  const isMe = gameType === 'online' ? player === mySymbol : player === 1;
+  const isMe = player === 1;
   if (player === 1) { scores.p1++; document.getElementById('score-p1').textContent = scores.p1; }
   else              { scores.p2++; document.getElementById('score-p2').textContent = scores.p2; }
 
   setPlayerActive(0);
-
-  if (gameType === 'online') {
-    const winnerRole = player === 1 ? 'host' : 'guest';
-    await updateRoomState(roomId, { board: board.slice(), turn: player, over: true, winner: player }, winnerRole, 'finished');
-  }
 
   if (isMe && gameType !== 'local') {
     const pts = gameMode === 'caro' ? POINTS.WIN_CARO : POINTS.WIN_CARO;
@@ -516,11 +409,6 @@ function handleDraw() {
   showResult('🤝', 'Hòa!', '');
 }
 
-function handleOnlineFinish(winner) {
-  if (winner === mySymbol) showResult('🏆', 'Bạn thắng!', '');
-  else showResult('😔', 'Đối thủ thắng!', '');
-}
-
 function showResult(emoji, title, pts) {
   document.getElementById('result-emoji').textContent = emoji;
   document.getElementById('result-title').textContent = title;
@@ -534,14 +422,6 @@ function showResult(emoji, title, pts) {
 function updateStatus() {
   const el = document.getElementById('caro-status');
   if (gameOver) return;
-
-  if (gameType === 'online') {
-    const myTurn = currentPlayer === mySymbol;
-    el.textContent = myTurn ? '⚔️ Lượt của bạn' : '⏳ Chờ đối thủ...';
-    el.style.color = myTurn ? '#34d399' : '#7dd3fc';
-    setPlayerActive(currentPlayer);
-    return;
-  }
 
   const names = ['', document.getElementById('player1-name').textContent, document.getElementById('player2-name').textContent];
   el.textContent = `⚔️ Lượt: ${names[currentPlayer]}`;
@@ -564,8 +444,7 @@ function showToast(msg) {
 async function refreshPoints() {
   try {
     const pts = await getPoints();
-    const nav = document.getElementById('nav-pts');
-    if (nav) nav.textContent = '⭐ ' + pts.toLocaleString();
+    if (window.TopNav) window.TopNav.setPoints(pts);
   } catch(e) {}
 }
 
@@ -575,6 +454,5 @@ async function refreshPoints() {
 onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = 'index.html'; return; }
   const pts = await getPoints();
-  const nav = document.getElementById('nav-pts');
-  if (nav) nav.textContent = '⭐ ' + pts.toLocaleString();
+  if (window.TopNav) window.TopNav.setPoints(pts);
 });

@@ -464,6 +464,25 @@
 .pro-title-badge.blue   { background: rgba(56,189,248,0.1);  border-color: rgba(56,189,248,0.3);  color: #38bdf8; }
 .pro-title-badge.green  { background: rgba(52,211,153,0.1);  border-color: rgba(52,211,153,0.3);  color: #34d399; }
 .pro-title-badge.purple { background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.3); color: #a78bfa; }
+.pro-title-badge.red    { background: rgba(244,63,94,0.1);   border-color: rgba(244,63,94,0.35);  color: #f87171; }
+.pro-title-badge.rainbow {
+  position: relative;
+  background:
+    linear-gradient(rgba(15,23,42,0.35), rgba(15,23,42,0.35)) padding-box,
+    linear-gradient(90deg,#f43f5e,#fbbf24,#34d399,#38bdf8,#a78bfa,#f43f5e) border-box;
+  background-size: 100% 100%, 300% 100%;
+  border: 2px solid transparent;
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  animation: titleRainbowRun 3s linear infinite;
+  color: #f1f5f9;
+  font-weight: 900;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+@keyframes titleRainbowRun {
+  0%   { background-position: 0% 0%, 0% 50%; }
+  100% { background-position: 0% 0%, 300% 50%; }
+}
 
 .pro-title-empty { font-size: 12px; color: #4a7a9b; font-weight: 600; }
 
@@ -624,3 +643,4 @@
   .pro-pet-frame { width: 70px; height: 70px; }
   .rank-badge { width: 26px; height: 26px; font-size: 13px; }
 }
+/* → title badge styles chuyển sang titles.css */

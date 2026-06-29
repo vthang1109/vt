@@ -27,18 +27,43 @@ class BauCua {
     async init() {
         await this.refreshPts();
         this.bindEvents();
+        this.watchNavPts();
 
         // Ẩn thông báo kết quả ban đầu
         const notice = document.getElementById('result-notice');
         if (notice) notice.style.display = 'none';
     }
 
+    // points.js tự ghi điểm vào #nav-pts (ẩn) qua onSnapshot realtime.
+    // Theo dõi để đồng bộ sang TopNav.setPoints() và ô bank số dư kiểu xidach.
+    watchNavPts() {
+        const navEl = document.getElementById('nav-pts');
+        if (!navEl) return;
+        const sync = () => {
+            const num = parseInt(navEl.textContent.replace(/[^\d]/g, '')) || 0;
+            if (window.TopNav) window.TopNav.setPoints(num);
+            const bankEl = document.getElementById('bc-balance-detail');
+            if (bankEl) bankEl.textContent = num.toLocaleString('vi-VN') + ' đ';
+        };
+        sync();
+        new MutationObserver(sync).observe(navEl, { childList: true, characterData: true, subtree: true });
+    }
+
     // ========== HIỂN THỊ ĐIỂM ==========
     async refreshPts() {
         const pts = await getPoints();
-        const el = document.getElementById('nav-pts');
-        // Đồng bộ với Xì Dách: hiển thị "⭐ 1000"
-        if (el) el.textContent = '⭐ ' + (pts || 0).toLocaleString('vi-VN');
+        let el = document.getElementById('nav-pts');
+        if (!el) {
+            // Tạo phần tử ẩn để points.js (không sửa) vẫn có chỗ ghi điểm realtime
+            el = document.createElement('div');
+            el.id = 'nav-pts';
+            el.style.display = 'none';
+            document.body.appendChild(el);
+        }
+        el.textContent = '⭐ ' + (pts || 0).toLocaleString('vi-VN');
+        if (window.TopNav) window.TopNav.setPoints(pts || 0);
+        const bankEl = document.getElementById('bc-balance-detail');
+        if (bankEl) bankEl.textContent = (pts || 0).toLocaleString('vi-VN') + ' đ';
     }
 
     // ========== GÁN SỰ KIỆN ==========
@@ -57,8 +82,8 @@ class BauCua {
             });
         });
 
-        // Nút Lắc
-        document.getElementById('btn-roll').addEventListener('click', () => this.roll());
+        // Nhấn vào bát để lắc
+        document.getElementById('bowl').addEventListener('click', () => this.roll());
 
         // Nút Xoá cược
         document.getElementById('btn-clear').addEventListener('click', () => this.resetBoard());
@@ -75,7 +100,8 @@ class BauCua {
         // Kiểm tra số dư
         const bal = await getPoints();
         if (bal < this.currentChip) {
-            alert('Không đủ điểm để đặt cược!');
+            if (window.showToast) window.showToast('⚠️ Không đủ điểm để đặt cược!', 'warn');
+            else alert('Không đủ điểm để đặt cược!');
             return;
         }
 
@@ -131,7 +157,8 @@ class BauCua {
 
         const totalBet = Object.values(this.bets).reduce((a, b) => a + b, 0);
         if (totalBet === 0) {
-            alert('Vui lòng đặt cược trước khi lắc!');
+            if (window.showToast) window.showToast('⚠️ Vui lòng đặt cược trước khi lắc!', 'warn');
+            else alert('Vui lòng đặt cược trước khi lắc!');
             return;
         }
 
@@ -147,8 +174,7 @@ class BauCua {
         diceEls.forEach(el => el.classList.remove('reveal'));
 
         // Rung bát
-        bowl.classList.add('rolling');
-        document.getElementById('btn-roll').disabled = true;
+        bowl.classList.add('rolling', 'disabled');
 
         // Giả lập xúc xắc nhảy trong 1.2 giây
         let count = 0;
@@ -232,7 +258,7 @@ class BauCua {
         this.renderBets();
         this.updateTotalBet();
         this.isRolling = false;
-        document.getElementById('btn-roll').disabled = false;
+        document.getElementById('bowl').classList.remove('disabled');
         await this.refreshPts();
     }
 

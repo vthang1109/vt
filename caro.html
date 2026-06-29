@@ -10,20 +10,13 @@
   <link rel="stylesheet" href="quests.css"/>
   <script type="module" src="quests.js"></script>
 </head>
-<body>
+<body data-bottom-nav="games">
   <canvas id="bg-canvas"></canvas>
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
-  <nav>
-    <div class="logo" onclick="window.location.href='games.html'" style="cursor:pointer">
-      <span class="logo-vt">VT</span><span class="logo-world">World</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700"></span>
-      <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="window.location.href='games.html'">← Games</button>
-    </div>
-  </nav>
+  <div id="top-nav-root"></div>
+  <script src="top-nav.js"></script>
 
   <div class="caro-container">
 
@@ -58,11 +51,6 @@
           <span class="mode-name">2 Người</span>
           <span class="mode-desc">Cùng 1 màn hình</span>
         </div>
-        <div class="mode-card" onclick="selectType('online')">
-          <span class="mode-emoji">🌐</span>
-          <span class="mode-name">Online</span>
-          <span class="mode-desc">Chơi với bạn bè</span>
-        </div>
       </div>
       <button class="caro-back-btn" onclick="goBack('screen-mode')">← Quay lại</button>
     </div>
@@ -88,36 +76,6 @@
         </div>
       </div>
       <button class="caro-back-btn" onclick="goBack('screen-type')">← Quay lại</button>
-    </div>
-
-    <!-- ONLINE ROOM -->
-    <div id="screen-online" class="caro-screen hidden">
-      <h2 class="caro-screen-title">🌐 Chơi Online</h2>
-      <div class="online-box">
-        <button class="caro-btn green" onclick="doCreateRoom()">➕ Tạo phòng mới</button>
-        <div class="online-divider">hoặc</div>
-        <div class="online-join-row">
-          <input id="room-input" class="caro-input" placeholder="Nhập Room ID (6 số)..." maxlength="6" type="number"/>
-          <button class="caro-btn" onclick="doJoinRoom()">Vào phòng</button>
-        </div>
-        <p id="online-err" class="caro-err"></p>
-      </div>
-      <button class="caro-back-btn" onclick="goBack('screen-type')">← Quay lại</button>
-    </div>
-
-    <!-- PHÒNG CHỜ -->
-    <div id="screen-waiting" class="caro-screen hidden">
-      <h2 class="caro-screen-title">⏳ Chờ đối thủ...</h2>
-      <div class="waiting-box">
-        <div class="room-id-display">
-          <span class="room-id-label">Room ID</span>
-          <span class="room-id-val" id="waiting-room-id">------</span>
-          <button class="copy-btn" onclick="copyRoomId()">📋 Copy</button>
-        </div>
-        <p style="color:#7dd3fc;font-size:13px;margin-top:8px">Gửi Room ID cho bạn bè để vào phòng</p>
-        <div class="waiting-spinner"></div>
-      </div>
-      <button class="caro-back-btn" onclick="cancelRoom()">✕ Huỷ phòng</button>
     </div>
 
     <!-- GAME BOARD -->
@@ -167,6 +125,7 @@
   <!-- TOAST -->
   <div id="toast" class="caro-toast"></div>
 
+  <script src="bottom-nav.js"></script>
   <script type="module" src="caro.js"></script>
 </body>
 </html>

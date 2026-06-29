@@ -6,58 +6,235 @@
   <title>VTWorld — Bảng xếp hạng tiền</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
+  
+  <!-- Sử dụng nav chung -->
+  <script src="top-nav.js"></script>
+  <script src="bottom-nav.js"></script>
+  
   <style>
-    .lb-page { min-height:100vh; position:relative; z-index:1; padding-bottom:60px; }
-    .lb-hero { text-align:center; padding:48px 20px 24px; animation:fadeUp .7s both; }
-    .lb-hero h1 { font-family:'Orbitron',monospace; font-size:clamp(28px,7vw,52px); font-weight:900; color:#e0f2fe; margin-bottom:8px; }
-    .lb-hero h1 span { color:#fbbf24; text-shadow:0 0 30px rgba(251,191,36,0.7); }
-    .lb-hero p { color:#fcd34d; font-size:14px; font-weight:600; }
+    /* Fix cứng cho bottom nav */
+    .vt-bottom-nav {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 99999 !important;
+      height: 58px !important;
+      background: #0a1020 !important;
+      border-top: 2px solid #0288D1 !important;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.8) !important;
+    }
+    
+    /* Đảm bảo content không bị che */
+    body {
+      padding-bottom: 70px !important;
+      padding-top: 60px !important;
+    }
+    
+    .lb-page { 
+      min-height:100vh; 
+      position:relative; 
+      z-index:1; 
+      padding-bottom:60px; 
+    }
+    .lb-hero { 
+      text-align:center; 
+      padding:48px 20px 24px; 
+      animation:fadeUp .7s both; 
+    }
+    .lb-hero h1 { 
+      font-family:'Orbitron',monospace; 
+      font-size:clamp(28px,7vw,52px); 
+      font-weight:900; 
+      color:#e0f2fe; 
+      margin-bottom:8px; 
+    }
+    .lb-hero h1 span { 
+      color:#fbbf24; 
+      text-shadow:0 0 30px rgba(251,191,36,0.7); 
+    }
+    .lb-hero p { 
+      color:#fcd34d; 
+      font-size:14px; 
+      font-weight:600; 
+    }
 
-    .lb-podium { max-width:780px; margin:24px auto 32px; padding:0 16px; display:grid; grid-template-columns:1fr 1.2fr 1fr; gap:14px; align-items:end; }
-    .pod-card { background:rgba(255,255,255,0.04); border:1px solid rgba(56,189,248,0.18); border-radius:18px; padding:20px 14px; text-align:center; transition:transform .25s; }
-    .pod-card:hover { transform:translateY(-4px); }
-    .pod-card .rank { font-family:'Orbitron',monospace; font-size:22px; font-weight:900; }
-    .pod-card .ava { width:64px; height:64px; border-radius:50%; margin:10px auto; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:900; color:#fff; }
-    .pod-card .nm { font-weight:800; color:#e0f2fe; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .pod-card .pts { margin-top:6px; font-family:'Orbitron',monospace; font-weight:900; font-size:15px; color:#fbbf24; }
-    .pod-1 { transform:translateY(-12px); border-color:rgba(251,191,36,0.5); box-shadow:0 0 40px rgba(251,191,36,0.18); }
-    .pod-1 .rank { color:#fbbf24; }
-    .pod-1 .ava { background:linear-gradient(135deg,#fbbf24,#f59e0b); }
-    .pod-2 .rank { color:#cbd5e1; }
-    .pod-2 .ava { background:linear-gradient(135deg,#cbd5e1,#94a3b8); }
-    .pod-3 .rank { color:#fb923c; }
-    .pod-3 .ava { background:linear-gradient(135deg,#fb923c,#c2410c); }
+    .lb-podium { 
+      max-width:780px; 
+      margin:24px auto 32px; 
+      padding:0 16px; 
+      display:grid; 
+      grid-template-columns:1fr 1.2fr 1fr; 
+      gap:14px; 
+      align-items:end; 
+    }
+    .pod-card { 
+      background:rgba(255,255,255,0.04); 
+      border:1px solid rgba(56,189,248,0.18); 
+      border-radius:18px; 
+      padding:20px 14px; 
+      text-align:center; 
+      transition:transform .25s; 
+    }
+    .pod-card:hover { 
+      transform:translateY(-4px); 
+    }
+    .pod-card .rank { 
+      font-family:'Orbitron',monospace; 
+      font-size:22px; 
+      font-weight:900; 
+    }
+    .pod-card .ava { 
+      width:64px; 
+      height:64px; 
+      border-radius:50%; 
+      margin:10px auto; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      font-size:24px; 
+      font-weight:900; 
+      color:#fff; 
+    }
+    .pod-card .nm { 
+      font-weight:800; 
+      color:#e0f2fe; 
+      font-size:14px; 
+      white-space:nowrap; 
+      overflow:hidden; 
+      text-overflow:ellipsis; 
+    }
+    .pod-card .pts { 
+      margin-top:6px; 
+      font-family:'Orbitron',monospace; 
+      font-weight:900; 
+      font-size:15px; 
+      color:#fbbf24; 
+    }
+    .pod-1 { 
+      transform:translateY(-12px); 
+      border-color:rgba(251,191,36,0.5); 
+      box-shadow:0 0 40px rgba(251,191,36,0.18); 
+    }
+    .pod-1 .rank { 
+      color:#fbbf24; 
+    }
+    .pod-1 .ava { 
+      background:linear-gradient(135deg,#fbbf24,#f59e0b); 
+    }
+    .pod-2 .rank { 
+      color:#cbd5e1; 
+    }
+    .pod-2 .ava { 
+      background:linear-gradient(135deg,#cbd5e1,#94a3b8); 
+    }
+    .pod-3 .rank { 
+      color:#fb923c; 
+    }
+    .pod-3 .ava { 
+      background:linear-gradient(135deg,#fb923c,#c2410c); 
+    }
 
-    .lb-tbl-wrap { max-width:780px; margin:0 auto; padding:0 16px; animation:fadeUp .7s .15s both; }
-    .lb-row { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:14px; background:rgba(255,255,255,0.025); border:1px solid rgba(56,189,248,0.08); margin-bottom:8px; transition:background .15s; }
-    .lb-row:hover { background:rgba(56,189,248,0.06); }
-    .lb-row.me { background:linear-gradient(90deg,rgba(52,211,153,0.10),rgba(52,211,153,0.04)); border-color:rgba(52,211,153,0.4); }
-    .lb-rank { width:34px; font-family:'Orbitron',monospace; font-weight:900; color:#7dd3fc; font-size:14px; text-align:center; flex-shrink:0; }
-    .lb-ava { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-size:14px; flex-shrink:0; background:linear-gradient(135deg,#a78bfa,#7c3aed); }
-    .lb-name { flex:1; min-width:0; font-weight:700; color:#e0f2fe; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .lb-pts { font-family:'Orbitron',monospace; font-weight:900; font-size:14px; color:#fbbf24; }
-    .lb-loading { text-align:center; padding:40px; color:#7dd3fc; font-size:14px; }
+    .lb-tbl-wrap { 
+      max-width:780px; 
+      margin:0 auto; 
+      padding:0 16px 20px; 
+      animation:fadeUp .7s .15s both; 
+    }
+    .lb-row { 
+      display:flex; 
+      align-items:center; 
+      gap:12px; 
+      padding:12px 14px; 
+      border-radius:14px; 
+      background:rgba(255,255,255,0.025); 
+      border:1px solid rgba(56,189,248,0.08); 
+      margin-bottom:8px; 
+      transition:background .15s; 
+    }
+    .lb-row:hover { 
+      background:rgba(56,189,248,0.06); 
+    }
+    .lb-row.me { 
+      background:linear-gradient(90deg,rgba(52,211,153,0.10),rgba(52,211,153,0.04)); 
+      border-color:rgba(52,211,153,0.4); 
+    }
+    .lb-rank { 
+      width:34px; 
+      font-family:'Orbitron',monospace; 
+      font-weight:900; 
+      color:#7dd3fc; 
+      font-size:14px; 
+      text-align:center; 
+      flex-shrink:0; 
+    }
+    .lb-ava { 
+      width:38px; 
+      height:38px; 
+      border-radius:50%; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      font-weight:800; 
+      color:#fff; 
+      font-size:14px; 
+      flex-shrink:0; 
+      background:linear-gradient(135deg,#a78bfa,#7c3aed); 
+    }
+    .lb-name { 
+      flex:1; 
+      min-width:0; 
+      font-weight:700; 
+      color:#e0f2fe; 
+      font-size:14px; 
+      white-space:nowrap; 
+      overflow:hidden; 
+      text-overflow:ellipsis; 
+    }
+    .lb-pts { 
+      font-family:'Orbitron',monospace; 
+      font-weight:900; 
+      font-size:14px; 
+      color:#fbbf24; 
+    }
+    .lb-loading { 
+      text-align:center; 
+      padding:40px; 
+      color:#7dd3fc; 
+      font-size:14px; 
+    }
 
-    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeUp { 
+      from{opacity:0;transform:translateY(20px)} 
+      to{opacity:1;transform:translateY(0)} 
+    }
+
+    /* Override cho top-nav */
+    .vt-top-nav {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 999 !important;
+      height: 56px !important;
+      background: rgba(8, 13, 28, 0.97) !important;
+      backdrop-filter: blur(16px) !important;
+      border-bottom: 1px solid rgba(2, 136, 209, 0.18) !important;
+    }
   </style>
   <link rel="stylesheet" href="quests.css"/>
   <script type="module" src="quests.js"></script>
 </head>
-<body>
+<body data-bottom-nav="leaderboard">
   <canvas id="bg-canvas"></canvas>
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
   <div class="lb-page">
-    <nav>
-      <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer">
-        <span class="logo-vt">VT</span><span class="logo-world">World</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="window.location.href='games.html'">← Game Center</button>
-      </div>
-    </nav>
+    <!-- Top Nav sẽ được inject tự động bởi top-nav.js -->
+    <div id="top-nav-root"></div>
 
+    <!-- Đã bỏ nav cũ -->
     <div class="lb-hero">
       <h1>🏆 Bảng <span>Xếp Hạng</span> Tiền</h1>
       <p>Top những người giàu nhất VTWorld</p>
@@ -69,10 +246,12 @@
     </div>
   </div>
 
+  <!-- Bottom Nav sẽ được inject tự động bởi bottom-nav.js -->
+
   <script type="module">
     import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, query, orderBy, limit, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -103,9 +282,20 @@
     function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
     let myUid = null;
-    onAuthStateChanged(auth, (u) => {
+    onAuthStateChanged(auth, async (u) => {
       if (!u) { window.location.href = 'index.html'; return; }
       myUid = u.uid;
+      
+      // Cập nhật điểm cho top-nav
+      try {
+        const userDoc = await getDoc(doc(db, 'users', u.uid));
+        if (userDoc.exists() && window.TopNav) {
+          window.TopNav.setPoints(userDoc.data().points || 0);
+        }
+      } catch (e) {
+        console.log('Không thể lấy điểm user:', e);
+      }
+      
       subscribeLeaderboard();
     });
 
@@ -123,7 +313,7 @@
     }
 
     function renderPodium(top3) {
-      const order = [1, 0, 2]; // hiển thị: 2 - 1 - 3
+      const order = [1, 0, 2];
       const pod = document.getElementById('podium');
       pod.innerHTML = '';
       order.forEach(idx => {

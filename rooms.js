@@ -23,6 +23,7 @@ let _unsubChat = null;
 let _currentRoomId = null;
 
 function $(id){ return document.getElementById(id); }
+function setText(id, text){ const el = document.getElementById(id); if (el) el.textContent = text; }
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function genCode(){ return String(Math.floor(100000 + Math.random() * 900000)); }
 function toast(msg, type='info'){
@@ -32,14 +33,40 @@ function toast(msg, type='info'){
   c.textContent = msg; document.body.appendChild(c); setTimeout(()=>c.remove(),2800);
 }
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.href = 'index.html'; return; }
-  _user = user;
-  const ps = await getDoc(doc(db, 'users', user.uid));
-  _myProfile = ps.exists() ? ps.data() : { nickname: user.email.split('@')[0] };
-  $('me-name').textContent = _myProfile.nickname || user.email.split('@')[0];
-  startListeningPublicRooms();
-});
+function showDebugError(stage, err){
+  console.error('[rooms.js] lỗi ở giai đoạn:', stage, err);
+  const list = document.getElementById('rooms-list');
+  if (list) {
+    list.innerHTML = `<div class="rm-empty" style="color:#f87171;text-align:left;white-space:pre-wrap;font-size:12px">⚠️ LỖI (${stage}):\n${(err && (err.message || err.code)) || String(err)}</div>`;
+  }
+}
+
+try {
+  onAuthStateChanged(auth, async (user) => {
+    try {
+      if (!user) { window.location.href = 'index.html'; return; }
+      _user = user;
+      const ps = await getDoc(doc(db, 'users', user.uid));
+      _myProfile = ps.exists() ? ps.data() : { nickname: user.email.split('@')[0] };
+      setText('me-name', _myProfile.nickname || user.email.split('@')[0]);
+      startListeningPublicRooms();
+    } catch (err) {
+      showDebugError('onAuthStateChanged callback', err);
+    }
+  }, (err) => {
+    showDebugError('onAuthStateChanged error', err);
+  });
+} catch (err) {
+  showDebugError('khởi tạo onAuthStateChanged', err);
+}
+
+// Nếu sau 6 giây vẫn chưa có gì xảy ra (vẫn "Đang tải..."), báo rõ để biết module có chạy hay không
+setTimeout(() => {
+  const list = document.getElementById('rooms-list');
+  if (list && list.textContent.includes('Đang tải')) {
+    showDebugError('timeout 6s', 'onAuthStateChanged không bao giờ được gọi — kiểm tra import ./points.js, cấu hình Firebase, hoặc lỗi cú pháp trong rooms.js.');
+  }
+}, 6000);
 
 function startListeningPublicRooms(){
   if (_unsubRooms) _unsubRooms();

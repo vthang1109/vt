@@ -11,16 +11,43 @@ class TaiXiu {
     async init() {
         await this.refreshPts();
         this.bindEvents();
-        document.getElementById('total-score').textContent = 'Tổng: --';
+        this.watchNavPts();
+        document.getElementById('total-score').innerHTML = 'Tổng<br>--';
         const notice = document.getElementById('result-notice');
         notice.style.display = 'block';
         notice.textContent = 'Đang lắc...';
         notice.className = 'info-box waiting';
     }
 
+    // points.js tự ghi điểm vào #nav-pts (ẩn) qua onSnapshot realtime.
+    // Theo dõi để đồng bộ sang TopNav.setPoints() và ô bank số dư kiểu xidach.
+    watchNavPts() {
+        const navEl = document.getElementById('nav-pts');
+        if (!navEl) return;
+        const sync = () => {
+            const num = parseInt(navEl.textContent.replace(/[^\d]/g, '')) || 0;
+            if (window.TopNav) window.TopNav.setPoints(num);
+            const bankEl = document.getElementById('bc-balance-detail');
+            if (bankEl) bankEl.textContent = num.toLocaleString('vi-VN') + ' đ';
+        };
+        sync();
+        new MutationObserver(sync).observe(navEl, { childList: true, characterData: true, subtree: true });
+    }
+
     async refreshPts() {
         const pts = await getPoints();
-        document.getElementById('nav-pts').textContent = '⭐ ' + (pts || 0).toLocaleString('vi-VN');
+        let el = document.getElementById('nav-pts');
+        if (!el) {
+            // Tạo phần tử ẩn để points.js (không sửa) vẫn có chỗ ghi điểm realtime
+            el = document.createElement('div');
+            el.id = 'nav-pts';
+            el.style.display = 'none';
+            document.body.appendChild(el);
+        }
+        el.textContent = '⭐ ' + (pts || 0).toLocaleString('vi-VN');
+        if (window.TopNav) window.TopNav.setPoints(pts || 0);
+        const bankEl = document.getElementById('bc-balance-detail');
+        if (bankEl) bankEl.textContent = (pts || 0).toLocaleString('vi-VN') + ' đ';
     }
 
     bindEvents() {
@@ -34,7 +61,8 @@ class TaiXiu {
                 this.currentChip = parseInt(chip.dataset.amt);
             });
         });
-        document.getElementById('btn-roll').addEventListener('click', () => this.roll());
+        // Nhấn vào bát để lắc
+        document.getElementById('bowl').addEventListener('click', () => this.roll());
         document.getElementById('btn-clear').addEventListener('click', () => this.resetBoard());
     }
 
@@ -44,7 +72,11 @@ class TaiXiu {
         notice.textContent = 'Đang lắc...';
         notice.className = 'info-box waiting';
         const bal = await getPoints();
-        if (bal < this.currentChip) { alert('Không đủ điểm!'); return; }
+        if (bal < this.currentChip) {
+            if (window.showToast) window.showToast('⚠️ Không đủ điểm để đặt cược!', 'warn');
+            else alert('Không đủ điểm!');
+            return;
+        }
         await addPoints('Tài Xỉu', `Đặt ${choice}`, -this.currentChip);
         this.bets[choice] += this.currentChip;
         this.renderBets();
@@ -81,17 +113,19 @@ class TaiXiu {
     async roll() {
         if (this.isRolling) return;
         if (Object.values(this.bets).reduce((a,b)=>a+b, 0) === 0) {
-            alert('Vui lòng đặt cược!'); return;
+            if (window.showToast) window.showToast('⚠️ Vui lòng đặt cược trước khi lắc!', 'warn');
+            else alert('Vui lòng đặt cược!');
+            return;
         }
         this.isRolling = true;
         const bowl = document.getElementById('bowl');
         const lid = document.getElementById('bowl-lid');
         const diceEls = Array.from(document.querySelectorAll('xuc-xac'));
-        document.getElementById('total-score').textContent = 'Tổng: --';
+        document.getElementById('total-score').innerHTML = 'Tổng<br>--';
         const notice = document.getElementById('result-notice');
         notice.textContent = 'Đang lắc...';
         notice.className = 'info-box waiting';
-        document.getElementById('btn-roll').disabled = true;
+        bowl.classList.add('disabled');
 
         lid.classList.remove('open');
         bowl.classList.add('shaking');
@@ -118,7 +152,7 @@ class TaiXiu {
 
         await new Promise(r => setTimeout(r, 400));
         lid.classList.add('open');
-        document.getElementById('total-score').textContent = `Tổng: ${total}`;
+        document.getElementById('total-score').innerHTML = `Tổng<br>${total}`;
         await new Promise(r => setTimeout(r, 200));
 
         const totalBet = Object.values(this.bets).reduce((a,b)=>a+b,0);
@@ -148,7 +182,7 @@ class TaiXiu {
         this.renderBets();
         this.updateTotalBet();
         this.isRolling = false;
-        document.getElementById('btn-roll').disabled = false;
+        bowl.classList.remove('disabled');
         await this.refreshPts();
     }
 }
