@@ -37,10 +37,10 @@ export async function addPoints(source, reason, amount, applyBuff = true) {
         const userSnap = await getDoc(userRef);
         let current = userSnap.exists() ? (userSnap.data().points || 0) : 0;
 
-let finalAmount = amount;
+        let finalAmount = amount;
         if (amount > 0) {
             const rsn = String(reason || '').toLowerCase();
-            const isBet = rsn.includes('hoàn') || rsn.includes('refund') || rsn.includes('cược');
+            const isBet = rsn.includes('hoàn') || rsn.includes('refund') || rsn.includes('cược') || rsn.includes('đặt');
             if (!isBet) {
                 try {
                     const { getActiveBuff } = await import('./pet.js');
@@ -52,6 +52,11 @@ let finalAmount = amount;
         let newTotal = current + finalAmount;
         if (newTotal < 0) newTotal = 0;
         await updateDoc(userRef, { points: newTotal, lastUpdate: serverTimestamp() });
+
+        // Cập nhật TopNav (dùng đúng API của top-nav.js)
+        if (window.TopNav) {
+            window.TopNav.setPoints(newTotal);
+        }
 
         if (window.VTQuests && finalAmount > 0) {
             window.VTQuests.trackEarn(finalAmount);
@@ -76,7 +81,7 @@ export async function claimDailyLogin() {
     } catch (e) { return { claimed: false }; }
 }
 
-// ========== ĐỒNG BỘ ĐIỂM TỰ ĐỘNG (LISTENER DUY NHẤT) ==========
+// ========== ĐỒNG BỘ ĐIỂM TỰ ĐỘNG ==========
 export function initPointsSync() {
     onAuthStateChanged(auth, user => {
         if (!user) return;
@@ -84,10 +89,17 @@ export function initPointsSync() {
         onSnapshot(userRef, snap => {
             if (!snap.exists()) return;
             const pts = snap.data().points || 0;
+            
+            // Cập nhật TopNav (dùng đúng API)
+            if (window.TopNav) {
+                window.TopNav.setPoints(pts);
+            }
+            
+            // Cập nhật các element khác (nếu có)
             const ptsStr = pts.toLocaleString('vi-VN');
-            ['nav-pts', 'user-points-home', 'status-pts', 'pro-points', 'wd-pts', 'shPts'].forEach(id => {
+            ['user-points-home', 'status-pts', 'pro-points', 'wd-pts', 'shPts'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.textContent = id === 'nav-pts' ? '⭐ ' + ptsStr : ptsStr;
+                if (el) el.textContent = ptsStr;
             });
         });
     });

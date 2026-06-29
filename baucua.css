@@ -19,7 +19,7 @@ body {
     pointer-events: none;
 }
 
-/* Orb nền trang trí (đồng bộ xidach) */
+/* Orb nền trang trí */
 .orb {
     position: fixed;
     border-radius: 50%;
@@ -33,232 +33,112 @@ body {
 
 /* ---- Khu vực game ---- */
 .game-container {
-    max-width: 600px;
+    max-width: 760px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 14px 12px 40px;
     box-sizing: border-box;
     position: relative;
     z-index: 1;
 }
 
-/* Bank số dư kiểu xidach */
-.bc-bank {
+/* ===== STATUS BAR ===== */
+.bc-status {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 11px 16px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.05));
-    border: 1px solid rgba(251, 191, 36, 0.4);
-    margin-bottom: 14px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-weight: 700;
+    font-size: 13px;
+    background: rgba(56, 189, 248, 0.05);
+    border: 1px solid rgba(56, 189, 248, 0.1);
+    min-height: 42px;
+    transition: all 0.3s;
 }
-.bc-bank-l { color: #fef3c7; font-weight: 700; font-size: 13px; }
-.bc-bank-r {
-    color: #fbbf24;
-    font-weight: 900;
-    font-size: 18px;
-    font-family: 'Orbitron', monospace;
+.bc-status.rolling {
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.5);
+    box-shadow: 0 0 30px rgba(251, 191, 36, 0.15);
 }
 
-/* ---- Khu vực chính: bát (70%) | tổng cược + xoá (30%) ---- */
-.bowl-row {
+.bc-status .bc-round {
+    color: #fbbf24;
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+.bc-status .bc-profit {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 15px;
+}
+.bc-status .bc-profit.positive { color: #34d399; }
+.bc-status .bc-profit.negative { color: #f87171; }
+.bc-status .bc-profit.zero { color: #94a3b8; }
+.bc-status.rolling .bc-profit {
+    color: #fbbf24 !important;
+}
+
+/* ===== XÚC XẮC (KÍCH THƯỚC SIÊU TO) ===== */
+.bc-dice-container {
     display: flex;
-    gap: 12px;
-    align-items: stretch;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 20px;
 }
 
-.bowl-side {
-    flex: 0 0 70%;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 20px 10px 14px;
+.bc-dice {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 6px;
+}
+.bc-die {
+    width: 130px;
+    height: 130px;
+    border-radius: 28px;
+    background: linear-gradient(160deg, #fef3c7, #fbbf24);
+    display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
+    font-size: 78px;
+    box-shadow: 0 8px 40px rgba(251,191,36,.5), inset 0 -4px 12px rgba(0,0,0,.15);
+    transition: all .3s;
+}
+.bc-die.rolling {
+    animation: bcRoll 0.12s infinite linear;
+}
+@keyframes bcRoll {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.bc-die.win {
+    /* Bỏ hiệu ứng win - không viền xanh */
 }
 
-.bowl-hint {
-    margin-top: 10px;
-    font-size: 12px;
-    color: #94a3b8;
-    font-weight: 700;
-}
-
-.side-panel {
-    flex: 1;
+/* ===== BOARD ===== */
+.bc-board-wrap {
     display: flex;
-    flex-direction: column;
     gap: 10px;
+    margin-bottom: 14px;
+    align-items: stretch;
 }
 
-.bowl {
-    width: 100%;
-    max-width: 220px;
-    aspect-ratio: 1 / 1;
-    background: radial-gradient(circle at 40% 40%, #1e293b, #0f172a);
-    border: 4px solid #fbbf24;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(251,191,36,0.3), inset 0 0 30px rgba(0,0,0,0.8);
-    transition: border-color 0.3s, transform 0.15s;
-    cursor: pointer;
-}
-.bowl:active:not(.rolling) {
-    transform: scale(0.96);
-}
-.bowl.disabled {
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.bowl-lid {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: linear-gradient(135deg, #334155, #1e293b);
-    border-radius: 50%;
-    z-index: 10;
-    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s;
-    border: 2px solid rgba(251,191,36,0.3);
-}
-.bowl-lid::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 36px; height: 36px;
-    background: #0f172a;
-    border: 2px solid #fbbf24;
-    border-radius: 50%;
-}
-.bowl-lid.open {
-    transform: translateY(-100%);
-    opacity: 0;
-}
-
-.bowl.rolling {
-    animation: bowlShake 0.08s infinite;
-}
-@keyframes bowlShake {
-    0% { transform: translate(2px, 2px); }
-    50% { transform: translate(-2px, -1px); }
-    100% { transform: translate(1px, 2px); }
-}
-
-/* Xúc xắc */
-.dices {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    z-index: 2;
-}
-.dice {
-    width: 58px;
-    height: 58px;
-    background: #fff;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-    color: #000;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: opacity 0.25s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-.dice.reveal {
-    opacity: 1;
-    transform: scale(1);
-}
-
-/* Kết quả neon trong bát */
-.result-notice {
-    position: absolute;
-    bottom: 15%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: 18px;
-    z-index: 20;
-    padding: 10px 20px;
-    border-radius: 12px;
-    display: none;
-    white-space: nowrap;
-    pointer-events: none;
-    line-height: 1.3;
-    text-align: center;
-    animation: noticePop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-@keyframes noticePop {
-    0%   { transform: translateX(-50%) scale(0.4); opacity: 0; }
-    100% { transform: translateX(-50%) scale(1);   opacity: 1; }
-}
-.notice-profit {
-    background: rgba(34, 197, 94, 0.9);
-    color: #fff;
-    box-shadow: 0 0 30px #22c55e, 0 0 60px rgba(34, 197, 94, 0.5);
-    text-shadow: 0 0 10px #fff, 0 0 20px #22c55e;
-}
-.notice-lost {
-    background: rgba(239, 68, 68, 0.9);
-    color: #fff;
-    box-shadow: 0 0 30px #ef4444, 0 0 60px rgba(239, 68, 68, 0.5);
-    text-shadow: 0 0 10px #fff, 0 0 20px #ef4444;
-}
-
-.total-bet-box {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    border-radius: 16px;
-    background: rgba(251,191,36,0.08);
-    border: 1px solid rgba(251,191,36,0.25);
-}
-.total-bet-label {
-    font-family: 'Orbitron';
-    font-size: 11px;
-    color: #94a3b8;
-    letter-spacing: 0.5px;
-    text-align: center;
-}
-#total-bet-val {
-    font-family: 'Orbitron';
-    font-size: 22px;
-    font-weight: 900;
-    color: #fbbf24;
-}
-
-.side-panel .chip-clear {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 16px;
-    font-size: 13px;
-}
-
-/* Bàn cược */
-.bet-board {
+.bc-board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    margin-bottom: 15px;
+    flex: 0 0 90%;
+    max-width: 90%;
+}
+@media (min-width: 600px) { 
+    .bc-board { grid-template-columns: repeat(6, 1fr); } 
 }
 
-.bet-card {
+.bc-tile { 
     background: rgba(15,23,42,0.6);
     border: 2px solid rgba(251,191,36,0.1);
     border-radius: 16px;
@@ -268,20 +148,28 @@ body {
     text-align: center;
     font-family: 'Nunito', sans-serif;
     font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    position: relative;
 }
-.bet-card:hover {
-    background: rgba(251,191,36,0.08);
-    border-color: #fbbf24;
-}
-.bet-card.has-bet {
-    border-color: #fbbf24;
-    background: rgba(251,191,36,0.12);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(251,191,36,0.2);
-}
-.emoji { font-size: 34px; display: block; }
+.bc-tile:hover { background: rgba(251,191,36,0.08); border-color: #fbbf24; }
 
-.my-bet {
+.bc-tile.has-bet {
+    border-color: #fbbf24 !important;
+    box-shadow: 0 0 24px rgba(251,191,36,0.35), inset 0 0 30px rgba(251,191,36,0.05) !important;
+    transform: translateY(-3px);
+}
+
+.bc-tile.hot { 
+    background: linear-gradient(135deg,rgba(52,211,153,.18),rgba(5,150,105,.06)); 
+    border-color: rgba(52,211,153,.6); 
+    box-shadow: 0 0 24px rgba(52,211,153,.3); 
+}
+.bc-tile-icon { font-size: 38px; display: block; }
+.bc-tile-bet {
     margin-top: 8px;
     background: #1e293b;
     color: #fbbf24;
@@ -290,56 +178,190 @@ body {
     font-size: 13px;
     font-weight: 800;
     font-family: 'Orbitron', sans-serif;
+    min-height: 22px;
+}
+.bc-tile.disabled { opacity: 0.55; cursor: not-allowed; }
+.bc-tile.disabled:hover { transform: none; background: rgba(15,23,42,0.6); border-color: rgba(251,191,36,0.1); }
+.bc-tile-mult { 
+    position: absolute; 
+    top: 4px; 
+    right: 6px; 
+    font-family: 'Orbitron', monospace; 
+    font-weight: 900; 
+    color: #34d399; 
+    font-size: 12px; 
+    text-shadow: 0 0 8px rgba(52,211,153,.6); 
 }
 
-/* Chip selector — vẫn giữ màu vàng khi chọn mức tiền */
-.chip-selector {
+/* Chips bên phải */
+.bc-chips-side {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 10px;
+    flex: 1;
+    min-width: 50px;
+    justify-content: center;
 }
-
-.chip {
-    padding: 10px 14px;
+.bc-chip {
+    padding: 10px 4px;
     border-radius: 10px;
     border: 1px solid rgba(255,255,255,0.1);
     background: #1e293b;
     color: #fff;
-    cursor: pointer;
     font-weight: 700;
+    cursor: pointer;
     font-family: 'Orbitron', sans-serif;
-    transition: 0.2s;
+    font-size: 12px;
+    transition: all .2s;
+    text-align: center;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
 }
-.chip.active {
+.bc-chip:hover { border-color: rgba(251,191,36,0.5); }
+.bc-chip.active { 
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
     border-color: #fff;
     box-shadow: 0 0 12px #fbbf24;
     color: #1e293b;
 }
 
-.chip-clear {
-    padding: 10px 18px;
-    border-radius: 10px;
-    border: none;
-    background: #ef4444;
-    color: #fff;
-    cursor: pointer;
-    font-weight: 700;
-    font-family: 'Orbitron', sans-serif;
-    transition: 0.2s;
+/* Hàng nút bên dưới */
+.bc-bottom-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
-.chip-clear:hover { background: #dc2626; }
 
-/* Responsive */
+.btn-action {
+    padding: 12px 28px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 800;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+.btn-action:active {
+    transform: scale(0.95);
+}
+
+/* Nút Lắc - MÀU XANH LÁ */
+.btn-roll {
+    background: linear-gradient(135deg, #34d399, #059669);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(5, 150, 105, 0.4);
+}
+.btn-roll:hover:not(:disabled) {
+    box-shadow: 0 6px 24px rgba(5, 150, 105, 0.5);
+    transform: translateY(-1px);
+}
+.btn-roll:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Nút Ván mới - MÀU XANH DƯƠNG */
+.btn-newgame {
+    background: linear-gradient(135deg, #60a5fa, #2563eb);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+}
+.btn-newgame:hover:not(:disabled) {
+    box-shadow: 0 6px 24px rgba(37, 99, 235, 0.5);
+    transform: translateY(-1px);
+}
+.btn-newgame:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Nút Xoá - giữ nguyên màu trung tính */
+.btn-clear { 
+    background: rgba(255,255,255,.08); 
+    color: #cbd5e1; 
+}
+.btn-clear:hover {
+    background: rgba(255,255,255,.14);
+}
+
+.bc-players { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+    gap: 8px; 
+    margin-top: 14px; 
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+    .bc-die { 
+        width: 100px; 
+        height: 100px; 
+        font-size: 60px; 
+        border-radius: 22px; 
+    }
+    .bc-dice { gap: 18px; }
+    .bc-status .bc-round { font-size: 16px; }
+}
+
 @media (max-width: 480px) {
     .game-container { padding: 12px; }
-    .bowl-row { gap: 8px; }
-    .bowl { max-width: 160px; }
-    .dice { width: 42px; height: 42px; font-size: 24px; }
-    .total-bet-label { font-size: 10px; }
-    #total-bet-val { font-size: 18px; }
-    .side-panel .chip-clear { font-size: 11px; }
-    .bowl-hint { font-size: 10px; }
+    .bc-die { 
+        width: 80px; 
+        height: 80px; 
+        font-size: 48px; 
+        border-radius: 18px; 
+    }
+    .bc-dice { gap: 12px; }
+    .bc-board-wrap { flex-direction: column; }
+    .bc-board { flex: 1; max-width: 100%; }
+    .bc-chips-side { 
+        flex-direction: row; 
+        justify-content: center; 
+        flex-wrap: wrap; 
+        gap: 6px; 
+    }
+    .bc-chip { 
+        flex: 1; 
+        min-width: 50px; 
+        max-width: 80px; 
+        min-height: 36px; 
+        padding: 6px 8px; 
+        font-size: 11px; 
+    }
+    .bc-tile { min-height: 65px; padding: 10px 4px; }
+    .bc-tile-icon { font-size: 30px; }
+    .bc-bottom-row { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+    .btn-action { 
+        padding: 10px 16px; 
+        font-size: 13px; 
+    }
+    .bc-status { font-size: 12px; }
+    .bc-status .bc-round { font-size: 14px; }
+}
+
+@media (max-width: 380px) {
+    .bc-die { 
+        width: 65px; 
+        height: 65px; 
+        font-size: 38px; 
+        border-radius: 14px; 
+    }
+    .bc-dice { gap: 8px; }
+    .btn-action { 
+        padding: 8px 12px; 
+        font-size: 11px; 
+    }
+    .bc-status .bc-round { font-size: 12px; }
 }
