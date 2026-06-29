@@ -26,6 +26,7 @@ let isMyTurn = false;
 let gameOver = false;
 let lastMove = null;
 let moveCount = 0;
+let isProcessingMove = false; // chống spam
 
 let canvas, ctx;
 let _unsubRoom = null;
@@ -125,8 +126,8 @@ function renderRoomInfo() {
   }
 
   // Highlight turn
-  p1El.classList.toggle('active', currentTurn === p1Uid && gameActive);
-  p2El.classList.toggle('active', currentTurn === p2Uid && gameActive);
+  p1El.classList.toggle('active', currentTurn === p1Uid && gameActive && !gameOver);
+  p2El.classList.toggle('active', currentTurn === p2Uid && gameActive && !gameOver);
 
   // Nút Ready / Start
   const isHost = roomData.hostUid === myUid;
@@ -161,6 +162,7 @@ function renderRoomInfo() {
   // Cập nhật status
   if (roomData.status === 'lobby') {
     statusEl.innerHTML = `🔄 Đang trong phòng chờ · ${members.length}/${roomData.maxPlayers || 2} người`;
+    statusEl.style.color = '#94a3b8';
   } else if (roomData.status === 'playing') {
     if (gameActive && !gameOver) {
       const turnName = currentTurn === myUid ? 'bạn' : (memberInfo[currentTurn]?.name || 'đối thủ');
@@ -170,6 +172,7 @@ function renderRoomInfo() {
       // đã có result modal
     } else {
       statusEl.innerHTML = '⏳ Đang tải trận đấu...';
+      statusEl.style.color = '#94a3b8';
     }
   }
 }
@@ -186,34 +189,23 @@ function handleGameState(data) {
 
   const gs = data.gameState || {};
   if (!gs.board) {
-    // Chưa có board → khởi tạo
-    if (data.hostUid === myUid) {
-      // host sẽ init game state khi bấm start
-    }
+    // Chưa có board → chờ host start
     return;
   }
 
-  // Parse game state
-  const members = data.members || [];
-  const p1Uid = members[0] || null;
-  const p2Uid = members[1] || null;
-
-  // Xác định symbol
-  const symbols = gs.symbols || {};
-  mySymbol = symbols[myUid] || null;
-
-  // Board
+  // Parse board từ chuỗi
   const boardStr = gs.board || '';
   board = [];
+  let valid = false;
   for (let i = 0; i < boardStr.length; i++) {
     const ch = boardStr[i];
-    if (ch === 'X') board.push(1);
-    else if (ch === 'O') board.push(2);
+    if (ch === 'X') { board.push(1); valid = true; }
+    else if (ch === 'O') { board.push(2); valid = true; }
     else board.push(0);
   }
 
-  // Nếu board rỗng thì init
-  if (board.length === 0) {
+  // Nếu board rỗng hoặc không hợp lệ, init lại
+  if (!valid || board.length === 0) {
     const size = data.gameType === 'tictactoe' ? 3 : 15;
     board = Array(size * size).fill(0);
   }
@@ -224,33 +216,30 @@ function handleGameState(data) {
 
   currentTurn = gs.currentTurn || null;
   gameActive = true;
-  gameOver = gs.winner !== null && gs.winner !== undefined;
+  gameOver = gs.winner !== null && gs.winner !== undefined && gs.winner !== 'draw';
   lastMove = gs.lastMove || null;
   moveCount = gs.moveCount || 0;
 
-  isMyTurn = currentTurn === myUid && !gameOver;
+  isMyTurn = currentTurn === myUid && !gameOver && gameActive;
 
-  // Render board
+  // Render
   initCanvas();
   drawBoard();
 
   // Highlight win
-  if (gs.winLine) {
+  if (gs.winLine && gs.winLine.length > 0) {
     highlightWin(gs.winLine);
   }
 
-  // Cập nhật UI
   renderRoomInfo();
 
-  // Nếu game over và chưa hiện result
-  if (gameOver && gs.winner) {
-    showResultFromState(gs);
-  }
-
-  // Nếu hết nước đi (hòa)
-  if (!gameOver && moveCount >= board.length) {
-    gameOver = true;
-    showResult('🤝', 'Hòa!', '', 'Không còn nước đi');
+  // Xử lý game over
+  if (gameOver || gs.winner === 'draw') {
+    if (gs.winner && gs.winner !== 'draw') {
+      showResultFromState(gs);
+    } else if (gs.winner === 'draw') {
+      showResult('🤝', 'Hòa!', '', 'Không còn nước đi');
+    }
   }
 }
 
@@ -323,7 +312,7 @@ function drawTicSymbol(cx, cy, val) {
 }
 
 function highlightWin(cells) {
-  if (!cells || !Array.isArray(cells)) return;
+  if (!cells || !Array.isArray(cells) || cells.length === 0) return;
   cells.forEach(([r, c]) => {
     const cx = c * CELL_SIZE + CELL_SIZE/2;
     const cy = r * CELL_SIZE + CELL_SIZE/2;
@@ -364,7 +353,7 @@ function handleClick(e) {
 }
 
 async function handleMove(px, py) {
-  if (!gameActive || gameOver || !isMyTurn) return;
+  if (!gameActive || gameOver || !isMyTurn || isProcessingMove) return;
   if (!roomId || !roomData) return;
 
   const c = Math.floor(px / CELL_SIZE);
@@ -372,17 +361,31 @@ async function handleMove(px, py) {
   if (r < 0 || r >= BOARD_SIZE || c < 0 || c >= BOARD_SIZE) return;
   if (board[r * BOARD_SIZE + c] !== 0) return;
 
-  // Gửi nước đi lên Firebase
   await sendMove(r, c);
 }
 
+// ============================================================
+//  SEND MOVE
+// ============================================================
 async function sendMove(r, c) {
+  if (isProcessingMove) return;
+  isProcessingMove = true;
+
   try {
     const gs = roomData.gameState || {};
+    
+    // Tạo board mới từ state hiện tại
     const boardArr = board.slice();
     const val = mySymbol === 'X' ? 1 : 2;
     boardArr[r * BOARD_SIZE + c] = val;
 
+    // Cập nhật board local trước khi kiểm tra
+    board = boardArr.slice();
+
+    // Kiểm tra thắng với board đã cập nhật
+    const winCells = checkWinLocal(r, c, val);
+    
+    // Chuyển board thành chuỗi
     let boardStr = '';
     for (let i = 0; i < boardArr.length; i++) {
       const v = boardArr[i];
@@ -399,23 +402,54 @@ async function sendMove(r, c) {
       moveCount: (gs.moveCount || 0) + 1
     };
 
-    // Kiểm tra thắng
-    const winCells = checkWinLocal(r, c, val);
     if (winCells) {
       newGs.winner = myUid;
       newGs.winLine = winCells;
+      gameOver = true;
+      gameActive = false;
+      // Cập nhật UI ngay
+      drawBoard();
+      highlightWin(winCells);
+      // Cộng điểm
+      import('./points.js').then(({ addPoints }) => {
+        addPoints('Caro', 'Thắng game MP', 100);
+      });
     } else if ((gs.moveCount || 0) + 1 >= boardArr.length) {
-      // Hòa
       newGs.winner = 'draw';
+      gameOver = true;
+      gameActive = false;
     }
 
     await updateDoc(doc(db, 'rooms', roomId), {
       gameState: newGs
     });
 
+    // Nếu thắng, show result
+    if (winCells) {
+      setTimeout(() => {
+        showResult('🏆', '🎉 Bạn thắng!', '+100 điểm', 'Chơi hay quá!');
+      }, 300);
+    }
+
+    isMyTurn = false;
+    renderRoomInfo();
+
   } catch (err) {
     console.error('sendMove error', err);
     window.showToast('Không gửi được nước đi', 'error');
+    // Rollback board
+    const gs = roomData.gameState || {};
+    const boardStr = gs.board || '';
+    board = [];
+    for (let i = 0; i < boardStr.length; i++) {
+      const ch = boardStr[i];
+      if (ch === 'X') board.push(1);
+      else if (ch === 'O') board.push(2);
+      else board.push(0);
+    }
+    drawBoard();
+  } finally {
+    isProcessingMove = false;
   }
 }
 
@@ -431,32 +465,44 @@ function checkWinLocal(r, c, player) {
   const dirs = [[0,1],[1,0],[1,1],[1,-1]];
   for (const [dr, dc] of dirs) {
     const cells = [[r, c]];
+    // Đếm chiều thuận
     for (let k = 1; k < WIN_COUNT; k++) {
       const nr = r + dr*k, nc = c + dc*k;
       if (nr>=0 && nr<BOARD_SIZE && nc>=0 && nc<BOARD_SIZE && board[nr*BOARD_SIZE+nc] === player)
         cells.push([nr, nc]);
       else break;
     }
+    // Đếm chiều ngược
     for (let k = 1; k < WIN_COUNT; k++) {
       const nr = r - dr*k, nc = c - dc*k;
       if (nr>=0 && nr<BOARD_SIZE && nc>=0 && nc<BOARD_SIZE && board[nr*BOARD_SIZE+nc] === player)
         cells.unshift([nr, nc]);
       else break;
     }
+    
     if (cells.length < WIN_COUNT) continue;
+    
+    // Kiểm tra từng đoạn WIN_COUNT ô liên tiếp
     for (let start = 0; start <= cells.length - WIN_COUNT; start++) {
       const seg = cells.slice(start, start + WIN_COUNT);
-      if (BOARD_SIZE > 3) {
-        const head = seg[0], tail = seg[seg.length-1];
+      
+      // Luật Caro: 5 ô liên tiếp, KHÔNG bị chặn 2 đầu
+      if (BOARD_SIZE > 3) { // TicTacToe không cần kiểm tra chặn
+        const head = seg[0];
+        const tail = seg[seg.length - 1];
         const beforeR = head[0] - dr, beforeC = head[1] - dc;
-        const afterR  = tail[0] + dr, afterC  = tail[1] + dc;
+        const afterR = tail[0] + dr, afterC = tail[1] + dc;
+        
         const headBlocked = beforeR < 0 || beforeR >= BOARD_SIZE || beforeC < 0 || beforeC >= BOARD_SIZE
           || board[beforeR * BOARD_SIZE + beforeC] !== 0;
-        const tailBlocked = afterR  < 0 || afterR  >= BOARD_SIZE || afterC  < 0 || afterC  >= BOARD_SIZE
-          || board[afterR  * BOARD_SIZE + afterC ] !== 0;
+        const tailBlocked = afterR < 0 || afterR >= BOARD_SIZE || afterC < 0 || afterC >= BOARD_SIZE
+          || board[afterR * BOARD_SIZE + afterC] !== 0;
+        
+        // Nếu bị chặn 2 đầu thì không thắng
         if (headBlocked && tailBlocked) continue;
       }
-      return seg;
+      
+      return seg; // Thắng!
     }
   }
   return null;
@@ -478,10 +524,6 @@ function showResultFromState(gs) {
 
   if (isMe) {
     showResult('🏆', '🎉 Bạn thắng!', '+100 điểm', `Thắng ${winnerName}`);
-    // Cộng điểm
-    import('./points.js').then(({ addPoints }) => {
-      addPoints('Caro', 'Thắng game MP', 100);
-    });
   } else {
     showResult('😔', `${winnerName} thắng!`, '', 'Lần sau cố gắng nhé!');
   }
@@ -497,34 +539,48 @@ function showResult(emoji, title, pts, sub) {
 
 window.closeResultAndContinue = function() {
   resultModal.classList.add('hidden');
-  // Reset game state để chơi tiếp
   resetGameState();
 };
 
 async function resetGameState() {
-  if (!roomId) return;
+  if (!roomId || !roomData) return;
   try {
-    const gs = roomData.gameState || {};
     const members = roomData.members || [];
     const p1 = members[0] || null;
     const p2 = members[1] || null;
     const size = BOARD_SIZE;
     const boardStr = '.'.repeat(size * size);
+    
+    // Reset board local
+    board = Array(size * size).fill(0);
+    gameOver = false;
+    gameActive = true;
+    currentTurn = p1;
+    isMyTurn = p1 === myUid;
+    
     const newGs = {
-      ...gs,
       board: boardStr,
       currentTurn: p1,
       winner: null,
       winLine: null,
       lastMove: null,
       moveCount: 0,
-      symbols: gs.symbols || { [p1]: 'X', [p2]: 'O' }
+      symbols: { [p1]: 'X', [p2]: 'O' },
+      players: [p1, p2]
     };
+    
     await updateDoc(doc(db, 'rooms', roomId), {
       gameState: newGs
     });
+    
+    // Cập nhật UI
+    initCanvas();
+    drawBoard();
+    renderRoomInfo();
+    
   } catch (err) {
     console.error('resetGameState error', err);
+    window.showToast('Không thể reset game', 'error');
   }
 }
 
@@ -542,9 +598,15 @@ window.toggleMpReady = async function() {
 
 window.startMpGame = async function() {
   if (!roomId || !roomData) return;
-  if (roomData.hostUid !== myUid) return;
+  if (roomData.hostUid !== myUid) {
+    window.showToast('Chỉ chủ phòng mới bắt đầu được', 'warn');
+    return;
+  }
   const members = roomData.members || [];
-  if (members.length < 2) { window.showToast('Cần ít nhất 2 người', 'warn'); return; }
+  if (members.length < 2) { 
+    window.showToast('Cần ít nhất 2 người', 'warn'); 
+    return;
+  }
 
   const p1 = members[0];
   const p2 = members[1];
@@ -567,6 +629,8 @@ window.startMpGame = async function() {
     gameState,
     startedAt: serverTimestamp()
   });
+  
+  window.showToast('🚀 Trận đấu bắt đầu!', 'success');
 };
 
 // ============================================================
@@ -620,3 +684,18 @@ window.showToast = function(msg, type = 'info') {
   document.getElementById('toastContainer').appendChild(t);
   setTimeout(() => t.remove(), 3500);
 };
+
+// ============================================================
+//  KEYBOARD SHORTCUTS (debug)
+// ============================================================
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'r' && e.ctrlKey) {
+    e.preventDefault();
+    if (roomData?.hostUid === myUid) {
+      resetGameState();
+    }
+  }
+});
+
+console.log('🎮 Caro Multiplayer loaded');
+console.log(`📱 Room: ${roomId || 'chưa có'}`);
