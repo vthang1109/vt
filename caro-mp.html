@@ -2,106 +2,291 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VTWorld — Caro Online</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Caro Multiplayer</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="quests.css"/>
-  <script type="module" src="quests.js"></script>
+  <link rel="stylesheet" href="caro.css"/>
   <style>
-    .mp-wrap { min-height:100vh; padding: 16px 12px 40px; max-width: 720px; margin: 0 auto; position:relative; z-index:1; }
-    .mp-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
-    .mp-room { font-family:'Orbitron',monospace; color:#a78bfa; font-weight:900; font-size:14px; padding:6px 14px; border-radius:999px; background: rgba(167,139,250,.1); border:1px solid rgba(167,139,250,.35); }
-    .mp-back { background:none; border:none; color:#a78bfa; font-weight:800; font-size:13px; cursor:pointer; font-family:'Nunito',sans-serif; }
+    /* ===== MP SPECIFIC ===== */
+    .mp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(56, 189, 248, 0.06);
+      border: 1px solid rgba(56, 189, 248, 0.15);
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .mp-header .mp-room-code {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      color: #7dd3fc;
+      background: rgba(0,0,0,0.3);
+      padding: 4px 12px;
+      border-radius: 8px;
+    }
+    .mp-header .mp-room-name {
+      font-weight: 800;
+      font-size: 14px;
+      color: #e0f2fe;
+    }
+    .mp-header .mp-leave-btn {
+      background: none;
+      border: 1px solid rgba(248,113,113,0.3);
+      color: #f87171;
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: all 0.2s;
+    }
+    .mp-header .mp-leave-btn:hover {
+      background: rgba(248,113,113,0.15);
+      border-color: #f87171;
+    }
 
-    .mp-players { display:flex; gap:10px; margin-bottom:14px; }
-    .mp-player { flex:1; padding:11px 14px; border-radius:14px; background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); display:flex; align-items:center; gap:10px; transition: all .3s; }
-    .mp-player.turn { background: linear-gradient(135deg, rgba(251,191,36,.12), rgba(251,146,60,.06)); border-color: rgba(251,191,36,.5); box-shadow: 0 0 20px rgba(251,191,36,.18); }
-    .mp-p-sym { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:18px; font-family:'Orbitron',monospace; flex-shrink:0; }
-    .mp-p-sym.X { background: rgba(56,189,248,.15); color:#38bdf8; border:2px solid #38bdf8; }
-    .mp-p-sym.O { background: rgba(248,113,113,.15); color:#f87171; border:2px solid #f87171; }
-    .mp-p-name { font-weight:800; color:#e0f2fe; font-size:13.5px; }
-    .mp-p-status { font-size:11px; color:#94a3b8; font-weight:600; margin-top:2px; }
-    .mp-player.turn .mp-p-status { color:#fbbf24; }
+    .mp-status {
+      text-align: center;
+      padding: 10px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      background: rgba(56, 189, 248, 0.05);
+      color: #94a3b8;
+      border: 1px solid rgba(56, 189, 248, 0.1);
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .mp-status .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(56,189,248,0.2);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .mp-board-wrap { background: rgba(0,0,0,.25); padding:10px; border-radius:18px; border:1px solid rgba(56,189,248,.18); overflow:auto; }
-    .mp-board { display:grid; grid-template-columns: repeat(15, 1fr); gap:1px; background: rgba(56,189,248,.15); padding:1px; border-radius:8px; min-width: 480px; }
-    .mp-cell { aspect-ratio:1; background: #0a1a35; cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:'Orbitron',monospace; font-weight:900; font-size: clamp(14px, 2.2vw, 22px); transition: background .15s; user-select:none; }
-    .mp-cell:hover:not(.filled) { background: rgba(56,189,248,.18); }
-    .mp-cell.filled { cursor:default; }
-    .mp-cell.X { color:#38bdf8; text-shadow: 0 0 12px rgba(56,189,248,.6); }
-    .mp-cell.O { color:#f87171; text-shadow: 0 0 12px rgba(248,113,113,.6); }
-    .mp-cell.win { background: rgba(52,211,153,.25) !important; }
-    .mp-cell.last { box-shadow: inset 0 0 0 2px #fbbf24; }
+    .mp-players-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(56, 189, 248, 0.1);
+      margin-bottom: 12px;
+      gap: 6px;
+    }
+    .mp-player-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 12px;
+      color: #e0f2fe;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      transition: all 0.3s;
+      flex: 1;
+    }
+    .mp-player-tag.active {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.08);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
+    }
+    .mp-player-tag .symbol {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: 16px;
+    }
+    .mp-player-tag .symbol.x { color: #38bdf8; }
+    .mp-player-tag .symbol.o { color: #f87171; }
+    .mp-player-tag .name { flex: 1; }
+    .mp-player-tag .ready-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(52,211,153,0.2);
+      color: #34d399;
+    }
+    .mp-player-tag .wait-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(251,191,36,0.15);
+      color: #fbbf24;
+    }
+    .mp-vs {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: 11px;
+      color: #4a7a9b;
+      flex-shrink: 0;
+    }
 
-    .mp-status { text-align:center; font-weight:800; padding:14px; border-radius:14px; margin: 14px 0 0; }
-    .mp-status.wait { background: rgba(56,189,248,.08); color:#7dd3fc; border:1px solid rgba(56,189,248,.25); }
-    .mp-status.your-turn { background: linear-gradient(135deg, rgba(251,191,36,.18), rgba(251,146,60,.08)); color:#fbbf24; border:1px solid rgba(251,191,36,.4); animation: mpPulse 1.4s infinite; }
-    .mp-status.win { background: linear-gradient(135deg, rgba(52,211,153,.2), rgba(5,150,105,.08)); color:#34d399; border:1px solid rgba(52,211,153,.5); font-size:18px; }
-    .mp-status.lose { background: rgba(248,113,113,.1); color:#f87171; border:1px solid rgba(248,113,113,.35); font-size:16px; }
-    @keyframes mpPulse { 0%,100% { opacity:1; } 50% { opacity:.7; } }
+    .mp-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .mp-actions button {
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    .mp-actions button:hover { transform: translateY(-2px); }
+    .mp-actions button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-ready-mp {
+      background: linear-gradient(135deg, #34d399, #10b981);
+      color: #fff;
+    }
+    .btn-ready-mp.on {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    }
+    .btn-start-mp {
+      background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+      color: #fff;
+    }
+    .btn-start-mp:disabled {
+      opacity: 0.4;
+    }
 
-    .mp-actions { display:flex; gap:10px; margin-top:14px; }
-    .mp-actions button { flex:1; padding:11px; border-radius:12px; border:none; cursor:pointer; font-weight:800; font-family:'Nunito',sans-serif; font-size:13px; }
-    .btn-rematch { background: linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; }
-    .btn-leave { background: rgba(248,113,113,.12); color:#f87171; border:1px solid rgba(248,113,113,.3); }
+    .mp-waiting-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    .mp-waiting-overlay.hidden { display: none; }
+    .mp-waiting-overlay .big-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(56,189,248,0.15);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    .mp-waiting-overlay .wait-text {
+      color: #e0f2fe;
+      font-weight: 700;
+      font-size: 16px;
+      font-family: 'Nunito', sans-serif;
+    }
 
-    .mp-error { text-align:center; padding:60px 20px; color:#94a3b8; font-weight:700; }
+    /* result modal override */
+    .result-box .mp-result-sub {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    @media (max-width: 420px) {
+      .mp-player-tag { font-size: 11px; padding: 3px 6px; }
+      .mp-player-tag .symbol { font-size: 14px; }
+      .mp-header .mp-room-name { font-size: 12px; }
+    }
   </style>
 </head>
-<body>
+<body data-bottom-nav="games">
   <canvas id="bg-canvas"></canvas>
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
-  <div class="mp-wrap">
-    <div class="mp-head">
-      <button class="mp-back" onclick="quitGame()">← Rời phòng</button>
-      <div class="logo" style="cursor:pointer" onclick="window.location.href='index.html'">
-        <span class="logo-vt">VT</span><span class="logo-world">World</span>
-      </div>
-      <span class="mp-room" id="mp-room">#------</span>
+  <div id="top-nav-root"></div>
+  <script src="top-nav.js"></script>
+
+  <div class="caro-wrap" id="mp-app">
+    <!-- HEADER -->
+    <div class="mp-header">
+      <span class="mp-room-name" id="mp-room-name">Phòng Caro</span>
+      <span class="mp-room-code" id="mp-room-code">#------</span>
+      <button class="mp-leave-btn" onclick="leaveMpRoom()">✕ Rời</button>
     </div>
 
-    <div id="mp-content">
-      <div class="mp-players" id="mp-players"></div>
-      <div class="mp-board-wrap"><div class="mp-board" id="mp-board"></div></div>
-      <div class="mp-status wait" id="mp-status">Đang tải bàn cờ...</div>
-      <div class="mp-actions" id="mp-actions" style="display:none">
-        <button class="btn-rematch" onclick="requestRematch()">🔄 Chơi lại</button>
-        <button class="btn-leave" onclick="quitGame()">🚪 Rời phòng</button>
+    <!-- STATUS -->
+    <div class="mp-status" id="mp-status">
+      <span class="spinner"></span> Đang kết nối...
+    </div>
+
+    <!-- PLAYERS -->
+    <div class="mp-players-row" id="mp-players-row">
+      <div class="mp-player-tag" id="mp-p1">
+        <span class="symbol x">✕</span>
+        <span class="name">...</span>
+        <span class="ready-badge" id="mp-p1-ready">✅</span>
+      </div>
+      <div class="mp-vs">VS</div>
+      <div class="mp-player-tag" id="mp-p2">
+        <span class="symbol o">○</span>
+        <span class="name">...</span>
+        <span class="wait-badge" id="mp-p2-ready">⏳</span>
+      </div>
+    </div>
+
+    <!-- BOARD -->
+    <div class="caro-board-wrap">
+      <canvas id="caro-canvas"></canvas>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="mp-actions">
+      <button class="btn-ready-mp" id="btn-ready-mp" onclick="toggleMpReady()">✅ Sẵn sàng</button>
+      <button class="btn-start-mp" id="btn-start-mp" onclick="startMpGame()" disabled>🚀 Bắt đầu</button>
+    </div>
+  </div>
+
+  <!-- RESULT MODAL -->
+  <div id="result-modal" class="result-modal hidden">
+    <div class="result-box">
+      <div class="result-emoji" id="result-emoji">🏆</div>
+      <div class="result-title" id="result-title">Bạn thắng!</div>
+      <div class="result-pts" id="result-pts"></div>
+      <div class="mp-result-sub" id="result-sub"></div>
+      <div class="caro-actions" style="justify-content:center">
+        <button class="btn-restart" onclick="closeResultAndContinue()">🔄 Tiếp tục</button>
+        <button class="btn-home"    onclick="leaveMpRoom()">🚪 Rời phòng</button>
       </div>
     </div>
   </div>
 
+  <!-- WAITING OVERLAY -->
+  <div class="mp-waiting-overlay hidden" id="mp-waiting-overlay">
+    <div class="big-spinner"></div>
+    <div class="wait-text">⏳ Đang chờ người chơi khác...</div>
+    <button onclick="leaveMpRoom()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#e0f2fe;padding:8px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;font-size:13px;">Rời phòng</button>
+  </div>
+
+  <!-- TOAST -->
   <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
 
-  <script>
-    // particles
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    for (let i = 0; i < 30; i++) particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-.5)*.4, vy: (Math.random()-.5)*.4, r: Math.random()*1.5+.5 });
-    function drawParticles() {
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      particles.forEach(p => { p.x+=p.vx; p.y+=p.vy; if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0; if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba(56,189,248,0.4)'; ctx.fill(); });
-      requestAnimationFrame(drawParticles);
-    }
-    drawParticles();
-
-    function showToast(msg, type='info'){
-      const colors = { info:'#38bdf8', success:'#34d399', warn:'#fbbf24', error:'#f87171' };
-      const t = document.createElement('div');
-      t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${colors[type]||'#38bdf8'};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;
-      t.innerHTML = msg;
-      document.getElementById('toastContainer').appendChild(t);
-      setTimeout(() => t.remove(), 3500);
-    }
-    window.showToast = showToast;
-  </script>
+  <script src="bottom-nav.js"></script>
   <script type="module" src="caro-mp.js"></script>
 </body>
 </html>
