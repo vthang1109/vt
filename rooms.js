@@ -10,6 +10,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 const GAMES = {
   xidach:    { id: 'xidach',    name: 'Xì dách',     icon: '♣️', max: 5, min: 2, page: 'xidach-mp.html',    ready: true },
   baucua:    { id: 'baucua',    name: 'Bầu Cua',     icon: '🎲', max: 8, min: 2, page: 'baucua-mp.html',    ready: true },
+  baicao:    { id: 'baicao',    name: 'Bài Cào',     icon: '🃏', max: 5, min: 2, page: 'baicao-mp.html',    ready: true },
   caro:      { id: 'caro',      name: 'Caro',     icon: '♟️', max: 2, min: 2, page: 'caro-mp.html',      ready: true },
   tictactoe: { id: 'tictactoe', name: 'Tic-Tac-Toe',     icon: '⭕', max: 2, min: 2, page: 'tictactoe-mp.html', ready: true },
   pickso:    { id: 'pickso',    name: 'Pick Số',      icon: '🔢', max: 6, min: 2, page: 'pickso-mp.html',    ready: true },
@@ -134,10 +135,10 @@ window.openCreateModal = function(){
     if (!g.ready) o.disabled = true;
     sel.appendChild(o);
   });
-  sel.value = 'caro';
+  sel.value = 'xidach';
   $('cr-name').value = (_myProfile.nickname || 'Phòng') + ' của ' + (_myProfile.nickname || 'tôi');
   $('cr-pw').value = '';
-  $('cr-max').value = 2;
+  $('cr-max').value = 4;
 };
 window.closeCreateModal = function(){ $('createModal').classList.remove('open'); };
 
@@ -145,7 +146,7 @@ window.doCreateRoom = async function(){
   const game = $('cr-game').value;
   const name = $('cr-name').value.trim() || 'Phòng vô danh';
   const pw = $('cr-pw').value.trim();
-  const max = Math.max(2, Math.min(8, parseInt($('cr-max').value) || 2));
+  const max = Math.max(2, Math.min(8, parseInt($('cr-max').value) || 4));
   const g = GAMES[game];
   if (!g || !g.ready) { toast('Game này chưa sẵn sàng', 'warn'); return; }
   const code = genCode();
@@ -360,6 +361,8 @@ window.startGame = async function(){
     gameState = { phase: 'betting', round: 1, dice: [null,null,null], bets: {} };
   } else if (data.gameType === 'xidach'){
     gameState = { phase: 'betting', round: 1, hands: {}, bets: {}, stands: {}, turnOrder: [], turnIdx: 0, results: {}, deck: [], revealed: {}, dealerChecked: {} };
+  } else if (data.gameType === 'baicao'){
+    gameState = { phase: 'betting', round: 1, hands: {}, bets: {}, results: {}, deck: [] };
   } else if (data.gameType === 'pickso'){
     gameState = { phase: 'betting', round: 1, bets: {}, picks: {}, turnOrder: [], turnIdx: 0, winners: [], deltas: {} };
   }
