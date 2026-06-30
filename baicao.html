@@ -22,21 +22,20 @@
   <div id="top-nav-root"></div>
 
   <div class="xd-wrap">
-    <!-- BANK -->
-    <div class="xd-bank">
-      <span class="xd-bank-l">💰 Số dư của bạn</span>
-      <span class="xd-bank-r" id="bc-balance">⭐ --</span>
+    <!-- STATUS BAR (đồng bộ xidach) -->
+    <div class="bc-status" id="bc-status">
+      <span class="stat-bet" id="bc-bet-stat"></span>
+      <span class="stat-score-wrap">
+        <span class="stat-score" id="bc-status-msg"></span>
+      </span>
+      <span class="stat-profit zero" id="bc-profit-stat"></span>
     </div>
-
-    <!-- PHASE -->
-    <div class="xd-phase" id="xd-phase">Đặt cược để bắt đầu</div>
 
     <!-- TABLE -->
     <div class="xd-table" id="xd-table"></div>
 
     <!-- BET ROW (nằm dưới bàn) -->
     <div class="xd-bet-row" id="bc-bet-row">
-      <label>Đặt cược:</label>
       <input id="bc-bet-input" type="number" min="50" step="50" value="100"/>
       <button id="btn-place-bet">✅ Đặt cược</button>
     </div>

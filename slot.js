@@ -29,15 +29,14 @@ class SlotGame {
       });
     });
 
-    // Khởi tạo TopNav
-    if (window.TopNav) TopNav.init();
+    // TopNav đã tự init() lúc DOMContentLoaded, không gọi lại để tránh tạo nav trùng
 
     const points = await getPoints();
     this.balance = points || 0;
-    document.getElementById('slot-balance').textContent = this.balance.toLocaleString('vi-VN') + ' ⭐';
 
-    // Hiển thị điểm trên top-nav
+    // Hiển thị điểm trên top-nav (tiền đã lên nav, không hiện bank riêng)
     if (window.TopNav) TopNav.setPoints(this.balance);
+    this.updateStatusBar(0, '--', null);
 
     // ===== TẠO DOCUMENT JACKPOT NẾU CHƯA CÓ =====
     try {
@@ -64,7 +63,7 @@ class SlotGame {
   // ========== HIỂN THỊ SỐ DƯ & HŨ LỚN ==========
   updateJackpotDisplay(value) {
     const el = document.getElementById('slot-jackpot-value');
-    if (el) el.textContent = value.toLocaleString('vi-VN') + ' ⭐';
+    if (el) el.textContent = value.toLocaleString('vi-VN') + ' đ';
   }
 
   updateResultDisplay(message, type = '') {
@@ -75,6 +74,42 @@ class SlotGame {
     el.style.animation = 'none';
     el.offsetHeight;
     el.style.animation = '';
+  }
+
+  // ========== CẬP NHẬT STATUS BAR: [cược] [Lose/Triple/777] [lời-lỗ] ==========
+  updateStatusBar(bet, mid, net) {
+    const betEl = document.getElementById('slot-bet-total');
+    const midEl = document.getElementById('slot-result-mid');
+    const profitEl = document.getElementById('slot-profit');
+    const statusEl = document.getElementById('bc-status');
+
+    if (betEl) betEl.textContent = bet > 0 ? bet.toLocaleString('vi-VN') : '0';
+    if (midEl) midEl.textContent = mid;
+
+    if (profitEl) {
+      if (net === null) {
+        profitEl.textContent = '+0';
+        profitEl.className = 'bc-profit zero';
+      } else if (net > 0) {
+        profitEl.textContent = `+${net.toLocaleString('vi-VN')}`;
+        profitEl.className = 'bc-profit positive';
+      } else if (net < 0) {
+        profitEl.textContent = `${net.toLocaleString('vi-VN')}`;
+        profitEl.className = 'bc-profit negative';
+      } else {
+        profitEl.textContent = 'Huề';
+        profitEl.className = 'bc-profit zero';
+      }
+    }
+
+    if (statusEl) {
+      statusEl.classList.remove('rolling', 'result-win', 'result-lose', 'result-jackpot');
+      if (net !== null) {
+        if (mid === '777') statusEl.classList.add('result-jackpot');
+        else if (net > 0) statusEl.classList.add('result-win');
+        else if (net < 0) statusEl.classList.add('result-lose');
+      }
+    }
   }
 
   // ========== HÀM QUAY CHÍNH ==========
@@ -101,6 +136,8 @@ class SlotGame {
     if (btnSpin) btnSpin.disabled = true;
 
     this.updateResultDisplay('');
+    this.updateStatusBar(bet, 'Đang quay...', null);
+    document.getElementById('bc-status')?.classList.add('rolling');
 
     try {
       await this.deductAndAddJackpot(bet);
@@ -112,7 +149,7 @@ class SlotGame {
     } finally {
       this.isSpinning = false;
       if (btnSpin) btnSpin.disabled = false;
-      document.getElementById('slot-balance').textContent = this.balance.toLocaleString('vi-VN') + ' ⭐';
+      document.getElementById('bc-status')?.classList.remove('rolling');
       if (window.TopNav) TopNav.setPoints(this.balance);
     }
   }
@@ -169,23 +206,24 @@ class SlotGame {
 
     if (a === '7️⃣' && b === '7️⃣' && c === '7️⃣') {
       this.updateResultDisplay('🔥 NỔ HŨ! 🔥', 'jackpot');
-      await this.triggerJackpotWin();
+      await this.triggerJackpotWin(betAmount);
       return;
     }
 
     if (a === b && b === c) {
       this.updateResultDisplay(`🎉 Trúng 3x ${result[0]}!`, 'win');
       const winAmount = betAmount * 3;
-      await this.grantNormalWin(winAmount, result[0]);
+      await this.grantNormalWin(winAmount, result[0], betAmount);
       return;
     }
 
     this.updateResultDisplay('❌ Không trúng', 'lose');
+    this.updateStatusBar(betAmount, 'Lose', -betAmount);
     window.showToast('Chúc bạn may mắn lần sau!', 'info');
   }
 
   // ========== NỔ HŨ: NHẬN TOÀN BỘ JACKPOT & RESET ==========
-  async triggerJackpotWin() {
+  async triggerJackpotWin(betAmount) {
     const userRef = doc(db, 'users', auth.currentUser.uid);
     let finalWin = 0;
 
@@ -226,14 +264,14 @@ class SlotGame {
     } catch (e) {}
 
     this.balance += finalWinWithBuff;
-    document.getElementById('slot-balance').textContent = this.balance.toLocaleString('vi-VN') + ' ⭐';
     if (window.TopNav) TopNav.setPoints(this.balance);
+    this.updateStatusBar(betAmount, '777', finalWinWithBuff - betAmount);
 
     window.showToast(`🎉🎉 NỔ HŨ! Bạn nhận ${finalWinWithBuff.toLocaleString('vi-VN')} ⭐ 🎉🎉`, 'success');
   }
 
   // ========== THẮNG THƯỜNG ==========
-  async grantNormalWin(baseAmount, symbol) {
+  async grantNormalWin(baseAmount, symbol, betAmount) {
     let finalAmount = baseAmount;
 
     try {
@@ -247,8 +285,8 @@ class SlotGame {
     await addPoints('Casino', `Trúng 3x ${symbol}`, finalAmount);
 
     this.balance += finalAmount;
-    document.getElementById('slot-balance').textContent = this.balance.toLocaleString('vi-VN') + ' ⭐';
     if (window.TopNav) TopNav.setPoints(this.balance);
+    this.updateStatusBar(betAmount, 'Triple', finalAmount - betAmount);
 
     window.showToast(
       `🎉 Trúng 3x ${symbol}! +${finalAmount.toLocaleString('vi-VN')} ⭐`,

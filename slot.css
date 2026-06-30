@@ -1,4 +1,25 @@
-/* ===================== LAYOUT CHUNG ===================== */
+/* ===================== NỀN & LAYOUT CHUNG (đồng bộ bầu cua/tài xỉu) ===================== */
+body {
+  background: radial-gradient(circle at center, #1e293b, #070b14);
+  min-height: 100vh;
+  margin: 0;
+  overflow-y: auto;
+  font-family: 'Nunito', sans-serif;
+  color: white;
+}
+#bg-canvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+}
+.orb {
+  position: fixed; border-radius: 50%;
+  filter: blur(60px); opacity: 0.25;
+  z-index: 0; pointer-events: none;
+}
+.orb1 { width: 300px; height: 300px; background: #fbbf24; top: -80px; left: -80px; }
+.orb2 { width: 320px; height: 320px; background: #38bdf8; bottom: -100px; right: -100px; }
+
 .slot-wrap {
   min-height: 100dvh;
   padding: 14px 12px calc(58px + 40px);
@@ -8,27 +29,109 @@
   z-index: 1;
 }
 
-/* ===================== BANK & JACKPOT ===================== */
-.slot-bank {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 11px 16px; border-radius: 14px;
-  background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.05));
-  border: 1px solid rgba(251,191,36,0.4);
-  margin-bottom: 14px;
+/* ===================== STATUS BAR (đồng bộ tài xỉu) ===================== */
+.bc-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  font-size: 13px;
+  --bc-right: rgba(148, 163, 184, 0.08);
+  --bc-left-border: rgba(251, 191, 36, 0.9);
+  --bc-right-border: rgba(56, 189, 248, 0.4);
+  background-image:
+    linear-gradient(135deg,
+      rgba(251, 191, 36, 0.1) 0%,
+      rgba(251, 191, 36, 0.1) 20%,
+      transparent 38%,
+      transparent 62%,
+      var(--bc-right) 80%,
+      var(--bc-right) 100%),
+    linear-gradient(#0a101e, #0a101e),
+    linear-gradient(135deg,
+      var(--bc-left-border) 0%,
+      var(--bc-left-border) 35%,
+      var(--bc-right-border) 65%,
+      var(--bc-right-border) 100%);
+  background-origin: padding-box, padding-box, border-box;
+  background-clip: padding-box, padding-box, border-box;
+  border: 1px solid transparent;
+  min-height: 64px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.3s;
+  gap: 8px;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.18);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.2;
 }
-.slot-bank-l { color:#fef3c7; font-weight:700; font-size:13px; }
-.slot-bank-r { color:#fbbf24; font-weight:900; font-size:18px; font-family:'Orbitron',monospace; }
+.bc-status.rolling {
+  --bc-right: rgba(120, 90, 10, 0.55);
+  --bc-right-border: rgba(251, 191, 36, 0.9);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.45);
+}
+.bc-status.result-win {
+  --bc-right: rgba(8, 60, 28, 0.7);
+  --bc-right-border: #22c55e;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+.bc-status.result-lose {
+  --bc-right: rgba(70, 12, 12, 0.7);
+  --bc-right-border: #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+.bc-status.result-jackpot {
+  --bc-right: rgba(80, 60, 5, 0.7);
+  --bc-right-border: #facc15;
+  box-shadow: 0 0 40px rgba(250, 204, 21, 0.5);
+}
+.bc-round {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 19px;
+  color: #fbbf24;
+  min-width: 65px;
+}
+.bc-mid {
+  flex: 1;
+  text-align: center;
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 22px;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(251,191,36,0.6);
+}
+.bc-status.result-win .bc-mid { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
+.bc-status.result-lose .bc-mid { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
+.bc-status.rolling .bc-mid { color: #fbbf24; }
+.bc-profit {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 19px;
+  text-align: right;
+  min-width: 65px;
+}
+.bc-profit.positive { color: #4ade80; }
+.bc-profit.negative { color: #f87171; }
+.bc-profit.zero { color: #ffffff; }
 
 /* Jackpot */
 .slot-jackpot {
   text-align: center;
-  background: linear-gradient(135deg, #dc2626, #111111);
+  background:
+    radial-gradient(circle at bottom left, #111111 0%, rgba(17,17,17,0) 45%),
+    radial-gradient(circle at bottom right, #111111 0%, rgba(17,17,17,0) 45%),
+    #dc2626;
   border: 2px solid #fbbf24;
   border-radius: 24px;
   padding: 16px 20px;
   margin-bottom: 20px;
   box-shadow: 0 0 30px rgba(220,38,38,0.6);
   animation: jpPulse 1.2s ease-in-out infinite alternate;
+  box-sizing: border-box;
 }
 @keyframes jpPulse {
   from { box-shadow: 0 0 20px rgba(220,38,38,0.6); }
@@ -42,6 +145,20 @@
   display: block;
   margin-bottom: 6px;
   text-shadow: 0 0 10px #fbbf24;
+}
+.jp-777 {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-family: 'Orbitron', monospace;
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+.jp-777 span {
+  color: #ffffff;
+  text-shadow: 0 0 14px rgba(255,255,255,0.8), 0 0 28px rgba(255,255,255,0.4);
 }
 .jp-value {
   font-size: 28px;
@@ -62,24 +179,25 @@
 .slot-reels {
   display: flex;
   gap: 12px;
-  background: rgba(0,0,0,0.4);
+  background: rgba(220, 38, 38, 0.25);
   border: 2px solid rgba(251,191,36,0.4);
   border-radius: 20px;
   padding: 20px 16px;
   box-shadow: 0 0 20px rgba(251,191,36,0.15);
+  box-sizing: border-box;
 }
 
 .slot-reel {
   width: 80px;
   height: 80px;
-  background: linear-gradient(145deg, #1e293b, #0f172a);
-  border: 2px solid rgba(251,191,36,0.5);
+  background: #000000;
+  border: 2px solid #ffffff;
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
-  color: #fef3c7;
+  color: #ffd700;
   transition: transform 0.2s;
 }
 .slot-reel.spinning {
@@ -88,60 +206,6 @@
 @keyframes spinReel {
   0%   { transform: rotateX(0deg); }
   100% { transform: rotateX(360deg); }
-}
-
-/* ===================== Ô KẾT QUẢ (DƯỚI REEL) ===================== */
-.slot-result {
-  text-align: center;
-  margin-top: 14px;
-  padding: 12px 16px;
-  background: rgba(0,0,0,0.4);
-  border-radius: 14px;
-  color: #94a3b8;
-  font-weight: 900;
-  font-size: 16px;
-  min-height: 44px;
-  width: 100%;
-  max-width: 300px;
-  font-family: 'Orbitron', monospace;
-  border: 1px solid rgba(255,255,255,0.08);
-  transition: all 0.3s;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: popResult 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-@keyframes popResult {
-  0%   { transform: scale(0.85); opacity: 0; }
-  100% { transform: scale(1);    opacity: 1; }
-}
-
-/* Mất trắng — đỏ */
-.slot-result.result-lose {
-  background: rgba(239,68,68,0.9);
-  color: #fff;
-  border-color: #ef4444;
-  box-shadow: 0 0 30px #ef4444, 0 0 60px rgba(239,68,68,0.4);
-  text-shadow: 0 0 10px #fff, 0 0 20px #ef4444;
-}
-
-/* x3 — xanh lá */
-.slot-result.result-win {
-  background: rgba(34,197,94,0.9);
-  color: #fff;
-  border-color: #22c55e;
-  box-shadow: 0 0 30px #22c55e, 0 0 60px rgba(34,197,94,0.4);
-  text-shadow: 0 0 10px #fff, 0 0 20px #22c55e;
-}
-
-/* Nổ hũ — vàng */
-.slot-result.result-jackpot {
-  background: linear-gradient(45deg, #facc15, #fb923c);
-  color: #000;
-  border-color: #facc15;
-  box-shadow: 0 0 40px #facc15, 0 0 80px rgba(250,204,21,0.5);
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
 /* ===================== ĐẶT CƯỢC & QUAY ===================== */
@@ -172,14 +236,14 @@
 #btn-spin {
   padding: 12px 28px;
   border-radius: 16px;
-  border: none;
+  border: 2px solid #ffffff;
   cursor: pointer;
   font-weight: 800;
   font-family: 'Nunito', sans-serif;
   font-size: 15px;
-  background: linear-gradient(135deg, #f59e0b, #ea580c);
-  color: #fff;
-  box-shadow: 0 0 20px rgba(245,158,11,0.5);
+  background: linear-gradient(180deg, #ffe27a 0%, #f5c518 45%, #d4960a 100%);
+  color: #000000;
+  box-shadow: 0 0 20px rgba(245,197,24,0.6), inset 0 1px 0 rgba(255,255,255,0.6);
   transition: all 0.2s;
 }
 #btn-spin:disabled {
@@ -216,6 +280,8 @@
   gap: 0;
   box-shadow: 0 4px 40px rgba(0,0,0,0.5);
   backdrop-filter: blur(8px);
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .slot-card .slot-jackpot {
@@ -225,4 +291,10 @@
 
 .slot-card .slot-bet-row {
   margin-bottom: 0;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 380px) {
+  .bc-round, .bc-profit { font-size: 14px; min-width: 50px; }
+  .bc-mid { font-size: 13px; }
 }

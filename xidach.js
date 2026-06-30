@@ -44,7 +44,7 @@ class XiDach {
         window.game = this;
 
         document.getElementById('xd-bet-row').style.display = 'flex';
-        document.getElementById('xd-phase').textContent = 'Đặt cược để bắt đầu';
+        this.updateStatusBar('--', null);
     }
 
     listenBalance() {
@@ -52,10 +52,53 @@ class XiDach {
         this.unsubBalance = onSnapshot(doc(db, 'users', auth.currentUser.uid), (snap) => {
             if (snap.exists()) {
                 this.balance = snap.data().points || 0;
-                const el = document.getElementById('xd-balance-detail');
-                if (el) el.textContent = this.balance.toLocaleString('vi-VN') + ' đ';
             }
         });
+    }
+
+    // ========== CẬP NHẬT STATUS BAR: [tổng cược] [thông báo + chi tiết] [lời-lỗ] ==========
+    updateStatusBar(mid, net, sub = '') {
+        const betEl = document.getElementById('xd-bet');
+        const scoreEl = document.getElementById('xd-score');
+        const subEl = document.getElementById('xd-score-sub');
+        const profitEl = document.getElementById('xd-profit');
+        const statusEl = document.getElementById('bc-status');
+
+        // Rút gọn nhãn hiển thị trên status bar: chỉ Thắng/Thua/Hoà, không hiện tên đặc biệt (Xì Bàn, Xì Dách, Ngũ Linh, Quắc...)
+        const winLabels = ['THẮNG', 'XÌ BÀN', 'XÌ DÁCH', 'NGŨ LINH'];
+        const loseLabels = ['THUA', 'QUẮC'];
+        let displayMid = mid;
+        let resultKind = null; // 'win' | 'lose' | 'draw' | null
+        if (winLabels.includes(mid)) { displayMid = 'WIN'; resultKind = 'win'; }
+        else if (loseLabels.includes(mid)) { displayMid = 'LOSE'; resultKind = 'lose'; }
+        else if (mid === 'HÒA') { displayMid = 'DRAW'; resultKind = 'draw'; }
+
+        if (betEl) betEl.textContent = this.currentBet > 0 ? this.currentBet.toLocaleString('vi-VN') : '0';
+        if (scoreEl) scoreEl.textContent = displayMid;
+        if (subEl) subEl.textContent = sub;
+
+        if (profitEl) {
+            if (net === null) {
+                profitEl.textContent = '+0';
+                profitEl.className = 'stat-profit zero';
+            } else if (net > 0) {
+                profitEl.textContent = `+${net.toLocaleString('vi-VN')}`;
+                profitEl.className = 'stat-profit positive';
+            } else if (net < 0) {
+                profitEl.textContent = `${net.toLocaleString('vi-VN')}`;
+                profitEl.className = 'stat-profit negative';
+            } else {
+                profitEl.textContent = 'Huề';
+                profitEl.className = 'stat-profit zero';
+            }
+        }
+
+        if (statusEl) {
+            statusEl.classList.remove('result-win', 'result-lose', 'result-draw', 'result-jackpot');
+            if (resultKind === 'win') statusEl.classList.add('result-win');
+            else if (resultKind === 'lose') statusEl.classList.add('result-lose');
+            else if (resultKind === 'draw') statusEl.classList.add('result-draw');
+        }
     }
 
     async placeBet() {
@@ -108,6 +151,8 @@ class XiDach {
 
         // Ẩn ô cược
         document.getElementById('xd-bet-row').style.display = 'none';
+        this.updateStatusBar('Đang chia bài', null);
+        document.getElementById('bc-status')?.classList.add('rolling');
 
         try {
             // Tạo bộ bài mới
@@ -126,7 +171,8 @@ class XiDach {
             } else {
                 this.render();
                 this.updateButtons(true);
-                document.getElementById('xd-phase').textContent = '🎯 Đến lượt BẠN';
+                this.updateStatusBar('Bạn', null, 'Bài úp');
+                document.getElementById('bc-status')?.classList.remove('rolling');
             }
         } catch (e) {
             console.error('Lỗi khi chia bài:', e);
@@ -190,6 +236,7 @@ class XiDach {
             this.isPlayerFlipped = true;
             this.render();
             this.updateButtons(true);
+            this.updateStatusBar('Bạn', null, `Điểm: ${this.getScore(this.players[0].hand)}`);
             return;
         }
         const hand = this.players[0].hand;
@@ -207,6 +254,7 @@ class XiDach {
         newCard.isNew = true;
         hand.push(newCard);
         this.render();
+        this.updateStatusBar('Bạn', null, `Điểm: ${this.getScore(hand)}`);
         if (this.getScore(hand) >= 21 || hand.length >= 5) await this.stand();
         else this.updateButtons(true);
     }
@@ -214,7 +262,8 @@ class XiDach {
     async stand() {
         this.isPlayerFlipped = true;
         this.phase = 'dealer';
-        document.getElementById('xd-phase').textContent = '🃏 Nhà cái đang chơi...';
+        this.updateStatusBar('Nhà cái', null, `Bạn: ${this.getScore(this.players[0].hand)}`);
+        document.getElementById('bc-status')?.classList.add('rolling');
         this.updateButtons(false);
         await new Promise(r => setTimeout(r, 1000));
         await this.dealerTurn();
@@ -310,10 +359,9 @@ class XiDach {
         this.render(true);
         this.updateButtons(false);
 
-        let msg = res;
-        if (delta > 0) msg += ` - Nhận ${delta.toLocaleString('vi-VN')}đ`;
-        else if (res === 'QUẮC' || res === 'THUA') msg += ` - Mất ${this.currentBet.toLocaleString('vi-VN')}đ`;
-        document.getElementById('xd-phase').textContent = `📢 ${msg}`;
+        const net = delta - this.currentBet;
+        document.getElementById('bc-status')?.classList.remove('rolling');
+        this.updateStatusBar(res, net, `Điểm: ${pStat.score}`);
 
         this.isBusy = false;
         this.phase = 'betting';

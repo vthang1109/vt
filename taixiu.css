@@ -1,4 +1,4 @@
-/* ===== TÀI XỈU — CASINO UI (ĐỒNG BỘ XÌ DÁCH, NAV CHUNG) ===== */
+/* ===== TÀI XỈU — ĐỒNG BỘ BẦU CUA ===== */
 body {
     background: radial-gradient(circle at center, #1e293b, #070b14);
     min-height: 100vh;
@@ -7,98 +7,150 @@ body {
     font-family: 'Nunito', sans-serif;
     color: white;
 }
-
-/* Canvas nền cố định, không chiếm layout */
 #bg-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0; pointer-events: none;
 }
-
-/* Orb nền trang trí (đồng bộ xidach) */
 .orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(60px);
-    opacity: 0.25;
-    z-index: 0;
-    pointer-events: none;
+    position: fixed; border-radius: 50%;
+    filter: blur(60px); opacity: 0.25;
+    z-index: 0; pointer-events: none;
 }
 .orb1 { width: 300px; height: 300px; background: #fbbf24; top: -80px; left: -80px; }
 .orb2 { width: 320px; height: 320px; background: #38bdf8; bottom: -100px; right: -100px; }
 
-/* Game container */
 .game-container {
     max-width: 600px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 14px 12px 40px;
     box-sizing: border-box;
     position: relative;
     z-index: 1;
 }
 
-/* Bank số dư kiểu xidach */
-.bc-bank {
+/* ===== STATUS BAR 3 cột ===== */
+.bc-status {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 11px 16px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.05));
-    border: 1px solid rgba(251, 191, 36, 0.4);
-    margin-bottom: 14px;
-}
-.bc-bank-l { color: #fef3c7; font-weight: 700; font-size: 13px; }
-.bc-bank-r {
-    color: #fbbf24;
-    font-weight: 900;
-    font-size: 18px;
-    font-family: 'Orbitron', monospace;
-}
-
-/* ---- Khu vực chính: bát (70%) | tổng điểm + tổng cược + xoá (30%) ---- */
-.bowl-row {
-    display: flex;
-    gap: 12px;
-    align-items: stretch;
-    margin-bottom: 20px;
-}
-
-.bowl-side {
-    flex: 0 0 70%;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 20px 10px 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-.bowl-hint {
-    margin-top: 10px;
-    font-size: 12px;
-    color: #94a3b8;
+    padding: 16px 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
     font-weight: 700;
+    font-size: 13px;
+    --bc-right: rgba(148, 163, 184, 0.08);
+    --bc-left-border: rgba(251, 191, 36, 0.9);
+    --bc-right-border: rgba(56, 189, 248, 0.4);
+    background-image:
+      linear-gradient(135deg,
+        rgba(251, 191, 36, 0.1) 0%,
+        rgba(251, 191, 36, 0.1) 20%,
+        transparent 38%,
+        transparent 62%,
+        var(--bc-right) 80%,
+        var(--bc-right) 100%),
+      linear-gradient(#0a101e, #0a101e),
+      linear-gradient(135deg,
+        var(--bc-left-border) 0%,
+        var(--bc-left-border) 35%,
+        var(--bc-right-border) 65%,
+        var(--bc-right-border) 100%);
+    background-origin: padding-box, padding-box, border-box;
+    background-clip: padding-box, padding-box, border-box;
+    border: 1px solid transparent;
+    min-height: 64px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.3s;
+    gap: 8px;
+    box-shadow: 0 0 16px rgba(251, 191, 36, 0.18);
 }
-
-.side-panel {
+.bc-status.rolling {
+    --bc-right: rgba(120, 90, 10, 0.55);
+    --bc-right-border: rgba(251, 191, 36, 0.9);
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.45);
+}
+.bc-status.result-win {
+    --bc-right: rgba(8, 60, 28, 0.7);
+    --bc-right-border: #22c55e;
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+.bc-status.result-lose {
+    --bc-right: rgba(70, 12, 12, 0.7);
+    --bc-right-border: #ef4444;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+.bc-status.result-draw {
+    --bc-right: rgba(40, 45, 55, 0.7);
+    --bc-right-border: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+}
+.bc-status *,
+.bc-status *::before,
+.bc-status *::after {
+    box-sizing: content-box;
+    margin: 0;
+    padding: 0;
+    font-family: inherit;
+}
+/* Trái: tổng cược */
+.stat-bet {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 19px;
+    color: #fbbf24;
+    min-width: 65px;
+}
+/* Giữa: tổng điểm xúc xắc + chi tiết tài/xỉu */
+.stat-score-wrap {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    align-items: center;
+    line-height: 1.1;
+}
+.stat-score {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 22px;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 0 12px rgba(251,191,36,0.6);
+}
+.stat-score-sub {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+    letter-spacing: 0.3px;
+}
+/* Phải: lời/lỗ */
+.stat-profit {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 19px;
+    text-align: right;
+    min-width: 65px;
+}
+.stat-profit.positive { color: #4ade80; }
+.stat-profit.negative { color: #f87171; }
+.stat-profit.zero { color: #ffffff; }
+.bc-status.rolling .stat-score { color: #fbbf24; }
+
+/* ===== BÁT LẮC (full width) ===== */
+.bowl-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 18px;
+    gap: 10px;
 }
 
 .bowl {
-    width: 100%;
-    max-width: 220px;
-    aspect-ratio: 1 / 1;
+    width: 200px;
+    height: 200px;
     background: radial-gradient(circle at 40% 40%, #1e293b, #0b1220);
     border: 4px solid #fbbf24;
     border-radius: 50%;
@@ -111,30 +163,20 @@ body {
     transition: transform 0.1s, border-color 0.3s;
     cursor: pointer;
 }
-.bowl:active:not(.shaking) {
-    transform: scale(0.96);
-}
-.bowl.disabled {
-    cursor: not-allowed;
-    opacity: 0.7;
-}
+.bowl:active:not(.shaking) { transform: scale(0.96); }
+.bowl.disabled { cursor: not-allowed; opacity: 0.7; }
 
-/* Rung khi lắc */
-.bowl.shaking {
-    animation: bowlShake 0.08s infinite;
-}
+.bowl.shaking { animation: bowlShake 0.08s infinite; }
 @keyframes bowlShake {
-    0% { transform: translate(2px, 2px); }
-    25% { transform: translate(-2px, -1px); }
-    50% { transform: translate(-1px, 2px); }
-    75% { transform: translate(1px, -2px); }
+    0%   { transform: translate(2px, 2px); }
+    25%  { transform: translate(-2px, -1px); }
+    50%  { transform: translate(-1px, 2px); }
+    75%  { transform: translate(1px, -2px); }
     100% { transform: translate(2px, 2px); }
 }
 
-/* Nắp */
 .bowl-lid {
-    position: absolute;
-    top: 0; left: 0;
+    position: absolute; top: 0; left: 0;
     width: 100%; height: 100%;
     background: linear-gradient(135deg, #334155, #1e293b);
     border-radius: 50%;
@@ -144,148 +186,75 @@ body {
 }
 .bowl-lid::after {
     content: '';
-    position: absolute;
-    top: 50%; left: 50%;
+    position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     width: 30px; height: 30px;
     background: #0f172a;
     border: 2px solid #fbbf24;
     border-radius: 50%;
 }
-.bowl-lid.open {
-    transform: translateY(-100%);
-    opacity: 0;
-}
+.bowl-lid.open { transform: translateY(-100%); opacity: 0; }
 
-/* Xúc xắc bên trong (tam giác) */
 .dices {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    z-index: 5;
-    padding: 20px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+    z-index: 5; padding: 20px;
 }
-.dice-row {
-    display: flex;
-    gap: 10px;
-}
+.dice-row { display: flex; gap: 10px; }
 
-/* Ô thông tin trong side-panel: Tổng điểm / Lời-Lỗ */
-.info-box {
-    flex: 1;
-    background: rgba(15, 23, 42, 0.8);
-    border: 2px solid rgba(251, 191, 36, 0.2);
-    border-radius: 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
-    font-size: 16px;
-    color: #facc15;
-    text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-    transition: all 0.3s ease;
-    line-height: 1.3;
-}
-
-/* Trạng thái chờ (Đang lắc...) */
-#result-notice.waiting {
-    color: #94a3b8;
-    text-shadow: none;
+.bowl-hint {
     font-size: 12px;
-    background: rgba(15, 23, 42, 0.8);
-    border-color: rgba(251, 191, 36, 0.2);
-    box-shadow: none;
-}
-
-/* Kết quả thắng */
-#result-notice.win {
-    background: rgba(34, 197, 94, 0.9);
-    border-color: #22c55e;
-    color: #fff;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    box-shadow: 0 0 20px #22c55e;
-}
-
-/* Kết quả thua */
-#result-notice.lose {
-    background: rgba(239, 68, 68, 0.9);
-    border-color: #ef4444;
-    color: #fff;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    box-shadow: 0 0 20px #ef4444;
-}
-
-/* Tổng cược trong side-panel */
-.total-bet-box {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    border-radius: 14px;
-    background: rgba(251,191,36,0.08);
-    border: 1px solid rgba(251,191,36,0.25);
-}
-.total-bet-label {
-    font-family: 'Orbitron';
-    font-size: 10px;
     color: #94a3b8;
-    letter-spacing: 0.5px;
-    text-align: center;
-}
-#total-bet-val {
-    font-family: 'Orbitron';
-    font-size: 18px;
-    font-weight: 900;
-    color: #fbbf24;
+    font-weight: 700;
+    margin-top: -4px;
 }
 
-.side-panel .chip-clear {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 14px;
-    font-size: 12px;
-    padding: 0;
-}
-
-/* Bàn cược */
+/* ===== BÀN CƯỢC ===== */
 .bet-board {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
-    width: 100%;
-    margin-bottom: 15px;
+    margin-bottom: 14px;
 }
 .bet-card {
     background: rgba(15,23,42,0.6);
     border: 2px solid rgba(251,191,36,0.1);
     border-radius: 20px;
-    padding: 18px 10px;
+    padding: 18px 10px 16px;
     cursor: pointer;
     transition: all 0.25s;
     text-align: center;
     font-weight: 700;
+    position: relative;
 }
-.bet-card:hover {
-    background: rgba(251,191,36,0.08);
-    border-color: #fbbf24;
-}
+.bet-card:hover { background: rgba(251,191,36,0.08); border-color: #fbbf24; }
 .bet-card.has-bet {
     border-color: #fbbf24;
     background: rgba(251,191,36,0.12);
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(251,191,36,0.2);
 }
-.emoji { font-size: 36px; display: block; margin-bottom: 6px; }
-.bet-info { font-size: 12px; color: #94a3b8; }
+.emoji { font-size: 36px; display: block; margin-bottom: 4px; }
+.bet-label {
+    position: absolute;
+    top: 10px;
+    left: 14px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 10px rgba(251,191,36,0.3);
+}
+.bet-card.tai .bet-label { color: #f87171; }
+.bet-card.xiu .bet-label { color: #38bdf8; }
+.bet-info {
+    font-size: 16px;
+    font-weight: 800;
+    color: #e2e8f0;
+    font-family: 'Orbitron', sans-serif;
+    margin-top: 2px;
+}
 .my-bet {
     margin-top: 8px;
     background: #1e293b;
@@ -298,13 +267,13 @@ body {
     display: inline-block;
 }
 
-/* Chip selector — vẫn giữ màu vàng khi chọn mức tiền */
-.chip-selector {
+/* ===== CHIP ROW (chips + nút xoá cùng hàng) ===== */
+.chip-row {
     display: flex;
     justify-content: center;
     gap: 8px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
-    width: 100%;
 }
 .chip {
     padding: 10px 14px;
@@ -324,26 +293,28 @@ body {
     color: #1e293b;
 }
 .chip-clear {
-    padding: 10px 18px;
+    padding: 10px 14px;
     border-radius: 10px;
     border: none;
-    background: #ef4444;
-    color: #fff;
+    background: rgba(255,255,255,0.08);
+    color: #cbd5e1;
     cursor: pointer;
     font-weight: 700;
     font-family: 'Orbitron', sans-serif;
+    font-size: 15px;
     transition: 0.2s;
 }
-.chip-clear:hover { background: #dc2626; }
+.chip-clear:hover { background: rgba(239,68,68,0.25); color: #f87171; }
 
-/* Responsive */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 500px) {
-    .game-container { padding: 12px; }
-    .bowl-row { gap: 8px; }
-    .bowl { max-width: 160px; }
-    .info-box { font-size: 13px; }
-    .total-bet-label { font-size: 9px; }
-    #total-bet-val { font-size: 15px; }
-    .side-panel .chip-clear { font-size: 10px; }
-    .bowl-hint { font-size: 10px; }
+    .game-container { padding: 12px 10px 40px; }
+    .bowl { width: 160px; height: 160px; }
+    .chip { padding: 9px 10px; font-size: 12px; }
+    .chip-clear { padding: 9px 12px; }
+    .stat-score { font-size: 18px; }
+    .stat-score-sub { font-size: 9px; }
+    .stat-bet, .stat-profit { font-size: 15px; min-width: 55px; }
+    .bet-label { font-size: 16px; top: 8px; left: 10px; }
+    .bet-info { font-size: 13px; }
 }

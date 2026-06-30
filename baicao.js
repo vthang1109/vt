@@ -33,13 +33,11 @@ class BaiCao {
             @keyframes flipIn { 0% { transform: rotateY(90deg) scale(0.8); opacity: 0; } 100% { transform: rotateY(0deg) scale(1); opacity: 1; } }
         `;
         document.head.appendChild(style);
-        if (window.TopNav) TopNav.init();
 
         this.listenBalance();
         this.renderEmpty();
         this.bindEvents();
         document.getElementById('bc-bet-row').style.display = 'flex';
-        document.getElementById('xd-phase').textContent = 'Đặt cược để bắt đầu';
         window.game = this;
     }
 
@@ -48,8 +46,6 @@ class BaiCao {
         this.unsubBalance = onSnapshot(doc(db, 'users', auth.currentUser.uid), (snap) => {
             if (snap.exists()) {
                 this.balance = snap.data().points || 0;
-                const el = document.getElementById('bc-balance');
-                if (el) el.textContent = '⭐ ' + this.balance.toLocaleString('vi-VN');
                 if (window.TopNav) TopNav.setPoints(this.balance);
             }
         });
@@ -98,6 +94,10 @@ class BaiCao {
         this.dealer.special = null;
 
         document.getElementById('bc-bet-row').style.display = 'none';
+        document.getElementById('bc-status').className = 'bc-status rolling zero-state';
+        document.getElementById('bc-bet-stat').textContent = this.currentBet.toLocaleString('vi-VN');
+        document.getElementById('bc-profit-stat').textContent = '0';
+        document.getElementById('bc-profit-stat').className = 'stat-profit zero';
 
         const deck = createDeck();
         this.dealer.hand = [deck.pop(), deck.pop(), deck.pop()];
@@ -108,7 +108,7 @@ class BaiCao {
         Object.assign(this.player, playerRes);
 
         this.renderTable();
-        document.getElementById('xd-phase').textContent = '🎴 Hãy lật từng lá để khám phá!';
+        document.getElementById('bc-status-msg').textContent = 'Lật';
         document.getElementById('btn-flip').style.display = 'inline-block';
         document.getElementById('btn-flip').disabled = false;
     }
@@ -165,7 +165,7 @@ class BaiCao {
         if (this.player.revealed.every(r => r)) {
             this.canFlip = false;
             document.getElementById('btn-flip').disabled = true;
-            document.getElementById('xd-phase').textContent = '🃏 Đã mở hết bài! Đang xem nhà cái...';
+            document.getElementById('bc-status-msg').textContent = 'Lật';
             await this.revealDealerCards();
         }
     }
@@ -182,22 +182,30 @@ class BaiCao {
 
     async endRound() {
         const result = this.compareHands();
-        let multiplier = 0, msg = '';
+        let multiplier = 0, profit = 0;
         if (result === 'win') {
             multiplier = this.player.special === 'SAP' ? 4 : (this.player.special === 'LIENG' ? 3 : (this.player.special === 'DONG_HOA' ? 3 : 2));
-            msg = `🎉 ${this.player.description} – Thắng!`;
+            profit = this.currentBet * (multiplier - 1);
             try { await addPoints('Casino', 'Thắng Bài Cào', this.currentBet * multiplier); } catch(e){}
             if (window.VTQuests) { window.VTQuests.trackPlay('baicao'); window.VTQuests.trackWinSmart(); window.VTQuests.trackEarn(this.currentBet * (multiplier - 1)); }
         } else if (result === 'lose') {
-            multiplier = 0; msg = `💸 ${this.player.description} – Thua`;
+            multiplier = 0;
+            profit = -this.currentBet;
             if (window.VTQuests) window.VTQuests.trackPlay('baicao');
         } else {
-            multiplier = 1; msg = `🤝 ${this.player.description} – Hòa`;
+            multiplier = 1;
+            profit = 0;
             try { await addPoints('Casino', 'Hòa Bài Cào', this.currentBet); } catch(e){}
             if (window.VTQuests) window.VTQuests.trackPlay('baicao');
         }
 
-        document.getElementById('xd-phase').textContent = msg + ' | Đặt cược để chơi tiếp';
+        const statusCls = result === 'win' ? 'result-win' : result === 'lose' ? 'result-lose' : 'result-draw';
+        const msg = result === 'win' ? 'WIN' : result === 'lose' ? 'LOSE' : 'DRAW';
+        document.getElementById('bc-status').className = 'bc-status ' + statusCls;
+        document.getElementById('bc-status-msg').textContent = msg;
+        const profitEl = document.getElementById('bc-profit-stat');
+        profitEl.textContent = (profit > 0 ? '+' : '') + profit.toLocaleString('vi-VN');
+        profitEl.className = 'stat-profit ' + (profit > 0 ? 'positive' : profit < 0 ? 'negative' : 'zero');
         document.getElementById('btn-flip').style.display = 'none';
         this.renderTable(null, null, result);
 
@@ -241,6 +249,8 @@ class BaiCao {
         const dScoreText = allDealerRevealed
             ? (d.special ? `<span class="hand-type ${this.getSpecialClass(d.special)}">${d.description}</span>` : d.description)
             : '?';
+        const pInlineCls = (allPlayerRevealed && p.special) ? 'xd-score-inline plain' : 'xd-score-inline';
+        const dInlineCls = (allDealerRevealed && d.special) ? 'xd-score-inline plain' : 'xd-score-inline';
 
         // result overlays
         let playerResultHtml = '', dealerResultHtml = '';
@@ -283,14 +293,14 @@ class BaiCao {
             <div class="xd-seat dealer">
                 ${dealerResultHtml}
                 <div class="xd-seat-head">
-                    <span class="xd-seat-name">👑 Nhà Cái <span class="xd-score-inline">${dScoreText}</span></span>
+                    <span class="xd-seat-name">👑 Nhà Cái <span class="${dInlineCls}">${dScoreText}</span></span>
                 </div>
                 <div class="xd-cards">${dealerCardsHtml}</div>
             </div>
             <div class="xd-seat me ${this.phase === 'playing' ? 'turn' : ''}">
                 ${playerResultHtml}
                 <div class="xd-seat-head">
-                    <span class="xd-seat-name">Bạn <span class="xd-score-inline">${pScoreText}</span></span>
+                    <span class="xd-seat-name">Bạn <span class="${pInlineCls}">${pScoreText}</span></span>
                 </div>
                 <div class="xd-cards">${playerCardsHtml}</div>
                 <div class="xd-bet-badge">${this.currentBet ? '⭐ ' + this.currentBet.toLocaleString('vi-VN') : ''}</div>

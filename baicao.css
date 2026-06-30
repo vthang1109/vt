@@ -1,46 +1,42 @@
 /* baicao.css — chỉ override/bổ sung, layout chính dùng xidach.css */
 
-/* ===================== HAND TYPE BADGES ===================== */
+/* ===================== HAND TYPE (chữ trơn, không khung) ===================== */
+.xd-score-inline.plain {
+  background: none;
+  padding: 0;
+  margin-left: 6px;
+}
 .hand-type {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 20px;
   font-weight: 900;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   font-size: 13px;
 }
-/* SÁP — mạnh nhất: vàng-đen cổ điển */
-.hand-type.sap {
-  background: linear-gradient(135deg,#ffd700,#ffaa00);
-  color: #1a1a2e;
-  border: 2px solid #ffd700;
-  box-shadow: 0 0 10px #ffd700;
+/* SÁP — vàng */
+.hand-type.sap { color: #ffd700; }
+/* LIÊNG — tím tươi */
+.hand-type.lieng { color: #a855f7; }
+/* TIÊN — xanh dương tươi */
+.hand-type.tien { color: #3b82f6; }
+
+.bc-status.zero-state {
+  --bc-right: rgba(255, 255, 255, 0.18);
+  --bc-right-border: rgba(255, 255, 255, 0.9);
 }
-/* LIÊNG — nhì: tím pha trắng */
-.hand-type.lieng {
-  background: linear-gradient(135deg,#fff,#c77dff 55%,#a855f7);
-  color: #2e1065;
-  border: 2px solid #fff;
-  box-shadow: 0 0 10px #c77dff;
+.stat-profit.zero {
+  color: #ffffff;
 }
-/* TIÊN — ba: xanh dương, chữ trơn không khung */
-.hand-type.tien {
-  background: none; border: none; box-shadow: none; padding: 0;
-  color: #3b82f6;
-}
-.hand-type.normal { color: #fbbf24; }
 
 /* ===================== BANNER KẾT QUẢ THẮNG ĐẶC BIỆT ===================== */
 /* Sáp dùng chung xd-result-special (vàng-đen) đã có sẵn trong xidach.css */
 .xd-result-lieng {
-  background: linear-gradient(45deg, #fff, #c77dff, #a855f7);
-  color: #2e1065;
-  box-shadow: 0 0 40px #fff, 0 0 80px rgba(199,125,255,0.7);
-  text-shadow: 0 0 10px #fff;
+  background: #a855f7;
+  color: #ffffff;
+  box-shadow: 0 0 40px #a855f7, 0 0 80px rgba(168,85,247,0.7);
+  text-shadow: 0 0 10px rgba(0,0,0,0.4);
 }
 .xd-result-tien {
-  background: linear-gradient(45deg, #2563eb, #3b82f6);
-  color: #fff;
-  box-shadow: 0 0 40px #3b82f6, 0 0 80px rgba(59,130,246,0.6);
-  text-shadow: 0 0 10px #fff, 0 0 20px #3b82f6;
+  background: #3b82f6;
+  color: #ffffff;
+  box-shadow: 0 0 40px #3b82f6, 0 0 80px rgba(59,130,246,0.7);
+  text-shadow: 0 0 10px rgba(0,0,0,0.4);
 }

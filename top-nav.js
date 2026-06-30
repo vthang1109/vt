@@ -136,6 +136,8 @@ window.TopNav = (() => {
     .vt-dd-action:hover { background: rgba(2,136,209,0.08); color: #38bdf8; }
     .vt-dd-action.back-btn { color: #7dd3fc; }
     .vt-dd-action.settings-btn { color: #94a3b8; }
+    .vt-dd-action.leave-btn { color: #f87171; display: none; }
+    .vt-dd-action.leave-btn.visible { display: flex; }
 
   `;
 
@@ -172,6 +174,9 @@ window.TopNav = (() => {
         </button>
         <button class="vt-dd-action settings-btn" onclick="window.location.href='settings.html'">
           <span>⚙️</span> Cài đặt
+        </button>
+        <button class="vt-dd-action leave-btn" id="vtDdLeave">
+          <span>🚪</span> Rời phòng
         </button>
         <div class="dd-divider"></div>
         ${menuHTML}
@@ -214,7 +219,18 @@ window.TopNav = (() => {
     el.classList.add('visible');
   }
 
-  return { init, setPoints };
+  function setLeaveAction(callback) {
+    const btn = document.getElementById('vtDdLeave');
+    if (!btn) return;
+    btn.classList.add('visible');
+    btn.onclick = () => {
+      document.getElementById('vtNavDropdown')?.classList.remove('open');
+      document.getElementById('vtHamburger')?.classList.remove('open');
+      callback();
+    };
+  }
+
+  return { init, setPoints, setLeaveAction };
 })();
 
 document.addEventListener('DOMContentLoaded', () => {

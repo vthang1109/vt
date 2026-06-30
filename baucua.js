@@ -116,7 +116,9 @@ class BauCua {
         const roundEl = document.getElementById('bc-round');
         const profitEl = document.getElementById('bc-profit');
         
-        statusEl.classList.remove('rolling');
+        statusEl.classList.remove('rolling', 'result-win', 'result-lose', 'result-draw');
+        statusEl.style.background = '';
+        statusEl.style.borderColor = '';
         
         const totalBet = this.getTotalBet();
         
@@ -128,14 +130,10 @@ class BauCua {
         
         if (phase === 'rolling') {
             statusEl.classList.add('rolling');
-            statusEl.style.background = 'rgba(251,191,36,.12)';
-            statusEl.style.borderColor = 'rgba(251,191,36,.5)';
         } else if (phase === 'result') {
-            statusEl.style.background = 'rgba(52,211,153,.08)';
-            statusEl.style.borderColor = 'rgba(52,211,153,.3)';
-        } else {
-            statusEl.style.background = 'rgba(56,189,248,.05)';
-            statusEl.style.borderColor = 'rgba(56,189,248,.1)';
+            if (profit > 0) statusEl.classList.add('result-win');
+            else if (profit < 0) statusEl.classList.add('result-lose');
+            else statusEl.classList.add('result-draw');
         }
         
         if (profit > 0) {

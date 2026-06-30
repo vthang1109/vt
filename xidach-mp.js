@@ -22,6 +22,8 @@ const auth = getAuth(app);
 const ROOM_ID = new URLSearchParams(location.search).get('room');
 let _user = null, _unsub = null, _unsubMe = null, _myBalance = 0;
 let _settledRound = -1;
+let _autoDealRound = -1;
+let _dealerModalShownFor = null;
 
 if (!ROOM_ID) document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">⚠️ Thiếu mã phòng.</div>';
 
@@ -154,6 +156,7 @@ function updateNavRoom(roomCode) {
 onAuthStateChanged(auth, async (u) => {
   if (!u) { location.href = 'index.html'; return; }
   _user = u;
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
   _unsubMe = onSnapshot(doc(db, 'users', _user.uid), (s) => {
     if (s.exists()) {
       _myBalance = s.data().points || 0;
@@ -183,22 +186,62 @@ function render(r) {
   const gs = r.gameState;
   const isHost = r.hostUid === _user.uid;
   const dealerUid = r.hostUid;
-  const phEl = document.getElementById('xd-phase');
+  const phEl = document.getElementById('bc-mid');
+  const leftEl = document.getElementById('bc-left');
+  const rightEl = document.getElementById('bc-right');
   const betRow = document.getElementById('xd-bet-row');
-  const btnHit = document.getElementById('btn-hit');
-  const btnStand = document.getElementById('btn-stand');
-  const btnDeal = document.getElementById('btn-deal');
-  const btnNext = document.getElementById('btn-next-round');
 
-  if (gs.phase === 'betting') phEl.textContent = `🎰 Vòng ${gs.round} — Hãy đặt cược`;
+  // Giữa: tên người đang tới lượt / trạng thái phase (không hiện số vòng)
+  if (gs.phase === 'betting') phEl.textContent = '';
   else if (gs.phase === 'playing') {
     const turnUid = gs.turnOrder?.[gs.turnIdx];
-    if (turnUid === _user.uid) phEl.textContent = '🎯 Đến lượt BẠN';
-    else if (turnUid) phEl.textContent = `⏳ Chờ ${esc(r.memberInfo?.[turnUid]?.name || '...')}`;
-    else phEl.textContent = '⏳ Đang chơi...';
+    if (turnUid === _user.uid) phEl.textContent = esc(r.memberInfo?.[_user.uid]?.name || _user.displayName || 'Bạn');
+    else if (turnUid) phEl.textContent = esc(r.memberInfo?.[turnUid]?.name || '...');
+    else phEl.textContent = 'Đang chơi...';
   }
-  else if (gs.phase === 'dealer') phEl.textContent = '🃏 Nhà cái đang xét bài';
-  else if (gs.phase === 'result') phEl.textContent = `📢 Kết quả vòng ${gs.round}`;
+  else if (gs.phase === 'dealer') phEl.textContent = 'Nhà Cái';
+  else if (gs.phase === 'result') {
+    let outcome;
+    if (isHost) {
+      const d = gs.dealerDelta || 0;
+      outcome = d > 0 ? 'win' : d < 0 ? 'lose' : 'draw';
+    } else {
+      outcome = gs.results?.[_user.uid]?.outcome || 'draw';
+    }
+    phEl.textContent = outcome === 'win' ? 'WIN' : outcome === 'lose' ? 'LOSE' : 'DRAW';
+  }
+
+  // Trái: icon vương miện nếu là Cái (host); Con → tiền cược của mình
+  if (isHost) {
+    leftEl.textContent = '👑';
+  } else {
+    const myBetAmt = gs.bets?.[_user.uid] || 0;
+    leftEl.textContent = myBetAmt ? myBetAmt.toLocaleString('vi-VN') : '';
+  }
+
+  // Phải: Cái → thắng/thua (dealerDelta); Con → tiền thắng/thua của mình
+  if (isHost) {
+    const delta = gs.dealerDelta || 0;
+    rightEl.textContent = delta === 0 ? '' : (delta > 0 ? '+' : '') + delta.toLocaleString('vi-VN');
+    rightEl.className = 'stat-profit ' + (delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'zero');
+  } else {
+    const myDelta = gs.results?.[_user.uid]?.delta || 0;
+    rightEl.textContent = myDelta === 0 ? '' : (myDelta > 0 ? '+' : '') + myDelta.toLocaleString('vi-VN');
+    rightEl.className = 'stat-profit ' + (myDelta > 0 ? 'positive' : myDelta < 0 ? 'negative' : 'zero');
+  }
+
+  let statusResultCls = '';
+  if (gs.phase === 'result') {
+    let outcome;
+    if (isHost) {
+      const d = gs.dealerDelta || 0;
+      outcome = d > 0 ? 'win' : d < 0 ? 'lose' : 'draw';
+    } else {
+      outcome = gs.results?.[_user.uid]?.outcome || 'draw';
+    }
+    statusResultCls = outcome === 'win' ? ' result-win' : outcome === 'lose' ? ' result-lose' : ' result-draw';
+  }
+  document.getElementById('bc-status').className = 'bc-status' + statusResultCls;
 
   const myBet = gs.bets?.[_user.uid] || 0;
   if (gs.phase === 'betting' && !isHost) {
@@ -333,10 +376,29 @@ function render(r) {
       betBadgeHtml = `<div class="xd-bet-badge">${betAmt.toLocaleString('vi-VN')}đ</div>`;
     }
 
+    let offerBtnHtml = '';
+    if (isHost && gs.phase === 'result' && !isDealer) {
+      offerBtnHtml = `<button class="xd-offer-btn-flat" onclick="hostOfferDealer('${uid}')">ĐỔI CÁI</button>`;
+    }
+
+    let offerConfirmHtml = '';
+    if (isMe && !isHost && gs.dealerOffer?.uid === uid) {
+      offerConfirmHtml = `
+        <div class="xd-offer-confirm">
+          <div class="xd-offer-text">Bạn có muốn làm Cái?</div>
+          <div class="xd-offer-actions">
+            <button class="xd-offer-decline" onclick="declineDealerOffer()">Từ chối</button>
+            <button class="xd-offer-accept" onclick="acceptDealerOffer()">Đồng ý</button>
+          </div>
+        </div>`;
+    }
+
     tEl.innerHTML += `
       <div class="${cls}">
         ${resultOverlayHtml}
         ${checkBtnHtml}
+        ${offerBtnHtml}
+        ${offerConfirmHtml}
         <div class="xd-seat-head">
           <span class="xd-seat-name">${nameHtml}</span>
         </div>
@@ -345,59 +407,86 @@ function render(r) {
       </div>`;
   }
 
-  const myTurn = !isHost && gs.phase === 'playing' && gs.turnOrder?.[gs.turnIdx] === _user.uid;
-  const myHand = gs.hands?.[_user.uid] || [];
-  const myScore = myHand.length ? bestScore(myHand) : 0;
-  const canStand = myScore >= 16 || myHand.length === 5;
-  btnHit.style.display = myTurn ? 'inline-block' : 'none';
-  btnStand.style.display = myTurn ? 'inline-block' : 'none';
-  btnStand.disabled = !canStand;
-
   const players = (r.members || []).filter(u => u !== dealerUid);
-  const allBet = players.every(u => (gs.bets?.[u] || 0) > 0);
-  btnDeal.style.display = (isHost && gs.phase === 'betting') ? 'inline-block' : 'none';
-  btnDeal.disabled = !allBet;
-  btnDeal.textContent = allBet ? '🃏 Chia bài' : '⏳ Chờ đặt cược';
+  const allBet = players.length > 0 && players.every(u => (gs.bets?.[u] || 0) > 0);
 
-  btnNext.style.display = (isHost && gs.phase === 'result') ? 'inline-block' : 'none';
+  // Tự động chia bài khi tất cả người chơi đã đặt cược xong
+  if (isHost && gs.phase === 'betting' && allBet && gs.round !== _autoDealRound) {
+    _autoDealRound = gs.round;
+    setTimeout(() => { window.hostDeal(); }, 400);
+  }
 
-  let dealerDrawBtn = document.getElementById('btn-dealer-draw');
-  let dealerEndBtn = document.getElementById('btn-dealer-end');
-  if (!dealerDrawBtn) {
-    dealerDrawBtn = document.createElement('button');
-    dealerDrawBtn.id = 'btn-dealer-draw';
-    dealerDrawBtn.className = 'btn-deal';
-    dealerDrawBtn.style.cssText = 'background:linear-gradient(135deg,#0ea5e9,#38bdf8);color:#fff;';
-    dealerDrawBtn.onclick = hostDealerDraw;
-    document.querySelector('.xd-actions').insertBefore(dealerDrawBtn, document.querySelector('.btn-leave'));
-  }
-  if (!dealerEndBtn) {
-    dealerEndBtn = document.createElement('button');
-    dealerEndBtn.id = 'btn-dealer-end';
-    dealerEndBtn.className = 'btn-deal';
-    dealerEndBtn.style.cssText = 'background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1f1f1f;';
-    dealerEndBtn.onclick = hostEndDealerTurn;
-    document.querySelector('.xd-actions').insertBefore(dealerEndBtn, document.querySelector('.btn-leave'));
-  }
-  if (isHost && gs.phase === 'dealer') {
-    dealerDrawBtn.style.display = 'inline-block';
-    dealerEndBtn.style.display = 'inline-block';
+  /* ===== Hàng nút hành động dưới cùng ===== */
+  const actEl = document.getElementById('xd-actions');
+  if (isHost) {
     const dScore = dealerStat ? dealerStat.score : 0;
     const dLen = dealerHand.length;
     const canStop = (dLen === 2 && dScore >= 15) || (dLen >= 3 && dScore >= 16);
-    dealerEndBtn.disabled = !canStop;
-    dealerEndBtn.textContent = canStop ? `🏁 Kết thúc lượt (${dScore}đ)` : `⏳ Chưa đủ điểm (${dScore}đ)`;
-    dealerDrawBtn.textContent = `🃏 Bốc thêm`;
+    const drawEnabled = gs.phase === 'dealer';
+    const checkAllEnabled = gs.phase === 'dealer' && canStop;
+    const nextRoundEnabled = gs.phase === 'result';
+    actEl.innerHTML = `
+      <button class="xd-act-btn xd-act-blue" ${drawEnabled ? '' : 'disabled'} onclick="hostDealerDraw()">Rút Bài</button>
+      <button class="xd-act-btn xd-act-orange" ${checkAllEnabled ? '' : 'disabled'} onclick="hostEndDealerTurn()">Xét Tất</button>
+      <button class="xd-act-btn xd-act-yellow" ${nextRoundEnabled ? '' : 'disabled'} onclick="hostNextRound()">Vòng mới</button>
+    `;
   } else {
-    dealerDrawBtn.style.display = 'none';
-    dealerEndBtn.style.display = 'none';
+    const myTurn = gs.phase === 'playing' && gs.turnOrder?.[gs.turnIdx] === _user.uid;
+    const myHand = gs.hands?.[_user.uid] || [];
+    const myScore = myHand.length ? bestScore(myHand) : 0;
+    const canStand = myScore >= 16 || myHand.length === 5;
+    const hitEnabled = myTurn;
+    const standEnabled = myTurn && canStand;
+    const reqPending = gs.dealerRequest?.uid === _user.uid;
+    const reqEnabled = (gs.phase === 'betting' || gs.phase === 'result') && !reqPending;
+    actEl.innerHTML = `
+      <button class="xd-act-btn xd-act-blue" ${hitEnabled ? '' : 'disabled'} onclick="hit()">Rút Bài</button>
+      <button class="xd-act-btn xd-act-purple" ${standEnabled ? '' : 'disabled'} onclick="stand()">Dằn</button>
+      <button class="xd-act-btn xd-act-yellow" ${reqEnabled ? '' : 'disabled'} onclick="requestDealer()">${reqPending ? 'Đã gửi...' : 'Làm Cái'}</button>
+    `;
+  }
+
+  /* ===== Popup yêu cầu đổi cái (chỉ host thấy) ===== */
+  if (isHost && gs.dealerRequest) {
+    showDealerRequestModal(r, gs.dealerRequest);
+  } else {
+    hideDealerRequestModal();
   }
 
   if (gs.phase === 'result' && gs.round !== _settledRound) {
     _settledRound = gs.round;
     settleMyResult(r, gs);
   }
-}// ============================================================
+}
+
+function showDealerRequestModal(r, req) {
+  if (_dealerModalShownFor === req.uid) return;
+  _dealerModalShownFor = req.uid;
+  let modal = document.getElementById('xd-dealer-req-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'xd-dealer-req-modal';
+    modal.className = 'xd-modal-overlay';
+    document.body.appendChild(modal);
+  }
+  const name = esc(req.name || r.memberInfo?.[req.uid]?.name || 'Người chơi');
+  modal.innerHTML = `
+    <div class="xd-modal-box">
+      <div class="xd-modal-title">${name} muốn làm Cái</div>
+      <div class="xd-modal-actions">
+        <button class="xd-modal-btn decline" onclick="declineDealerRequest()">Từ chối</button>
+        <button class="xd-modal-btn accept" onclick="acceptDealerRequest()">Đồng ý</button>
+      </div>
+    </div>`;
+  modal.style.display = 'flex';
+}
+
+function hideDealerRequestModal() {
+  _dealerModalShownFor = null;
+  const modal = document.getElementById('xd-dealer-req-modal');
+  if (modal) modal.style.display = 'none';
+}
+// ============================================================
 // ===== XÌ DÁCH MULTIPLAYER - PHẦN 2/2 =====
 // ============================================================
 
@@ -722,6 +811,106 @@ window.hostNextRound = async function() {
     'gameState.dealerChecked': {},
     'gameState.round': (r.gameState.round || 1) + 1
   });
+};
+
+window.hostTransferDealer = async function(targetUid) {
+  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
+  if (!snap.exists()) return;
+  const r = snap.data();
+  if (r.hostUid !== _user.uid) return;
+  const phase = r.gameState?.phase;
+  if (phase !== 'result' && phase !== 'betting') return;
+  if (!targetUid || targetUid === r.hostUid) return;
+  await updateDoc(doc(db, 'rooms', ROOM_ID), {
+    hostUid: targetUid,
+    'gameState.phase': 'betting',
+    'gameState.hands': {},
+    'gameState.bets': {},
+    'gameState.stands': {},
+    'gameState.turnOrder': [],
+    'gameState.turnIdx': 0,
+    'gameState.results': {},
+    'gameState.deck': [],
+    'gameState.revealed': {},
+    'gameState.dealerChecked': {},
+    'gameState.dealerRequest': null,
+    'gameState.round': (r.gameState.round || 1) + 1
+  });
+};
+
+window.requestDealer = async function() {
+  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
+  if (!snap.exists()) return;
+  const r = snap.data();
+  if (r.hostUid === _user.uid) return;
+  const phase = r.gameState?.phase;
+  if (phase !== 'betting' && phase !== 'result') { showToast('Chờ ván kết thúc', 'warn'); return; }
+  await updateDoc(doc(db, 'rooms', ROOM_ID), {
+    'gameState.dealerRequest': { uid: _user.uid, name: r.memberInfo?.[_user.uid]?.name || 'Người chơi' }
+  });
+  showToast('✅ Đã gửi yêu cầu làm Cái', 'success');
+};
+
+window.acceptDealerRequest = async function() {
+  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
+  if (!snap.exists()) return;
+  const r = snap.data();
+  if (r.hostUid !== _user.uid) return;
+  const req = r.gameState?.dealerRequest;
+  if (!req) return;
+  await window.hostTransferDealer(req.uid);
+};
+
+window.declineDealerRequest = async function() {
+  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
+  if (!snap.exists()) return;
+  const r = snap.data();
+  if (r.hostUid !== _user.uid) return;
+  await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.dealerRequest': null });
+};
+
+window.hostOfferDealer = async function(targetUid) {
+  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
+  if (!snap.exists()) return;
+  const r = snap.data();
+  if (r.hostUid !== _user.uid) return;
+  if (r.gameState?.phase !== 'result') return;
+  await updateDoc(doc(db, 'rooms', ROOM_ID), {
+    'gameState.dealerOffer': { uid: targetUid, name: r.memberInfo?.[targetUid]?.name || 'Người chơi' }
+  });
+};
+
+window.acceptDealerOffer = async function() {
+  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
+  if (!snap.exists()) return;
+  const r = snap.data();
+  const offer = r.gameState?.dealerOffer;
+  if (!offer || offer.uid !== _user.uid) return;
+  await updateDoc(doc(db, 'rooms', ROOM_ID), {
+    hostUid: _user.uid,
+    'gameState.phase': 'betting',
+    'gameState.hands': {},
+    'gameState.bets': {},
+    'gameState.stands': {},
+    'gameState.turnOrder': [],
+    'gameState.turnIdx': 0,
+    'gameState.results': {},
+    'gameState.deck': [],
+    'gameState.revealed': {},
+    'gameState.dealerChecked': {},
+    'gameState.dealerOffer': null,
+    'gameState.dealerRequest': null,
+    'gameState.round': (r.gameState.round || 1) + 1
+  });
+};
+
+window.declineDealerOffer = async function() {
+  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
+  if (!snap.exists()) return;
+  const r = snap.data();
+  const offer = r.gameState?.dealerOffer;
+  if (!offer || offer.uid !== _user.uid) return;
+  await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.dealerOffer': null });
 };
 
 window.quitGame = async function() {
