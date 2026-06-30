@@ -198,6 +198,23 @@ window.TopNav = (() => {
         btn.classList.remove('open');
       }
     });
+
+    // Tự động hiện nút "Rời phòng" cho mọi trang có ?room= trên URL,
+    // kể cả khi game không gọi setLeaveAction riêng.
+    const params = new URLSearchParams(location.search);
+    if (params.get('room')) {
+      const leaveBtn = document.getElementById('vtDdLeave');
+      if (leaveBtn && !leaveBtn.classList.contains('visible')) {
+        leaveBtn.classList.add('visible');
+        leaveBtn.onclick = () => {
+          dd.classList.remove('open');
+          btn.classList.remove('open');
+          if (confirm('Rời phòng và thoát game?')) {
+            window.location.href = 'games.html';
+          }
+        };
+      }
+    }
   }
 
   function init() {

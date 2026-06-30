@@ -100,36 +100,35 @@ function start(){
   });
 }
 
-function updateStatusBar(round, phase, profit) {
+function updateStatusBar(stake, phase, profit) {
   const statusEl = document.getElementById('bc-status');
-  const roundEl = document.getElementById('bc-round');
+  const stakeEl = document.getElementById('bc-stake');
+  const phaseEl = document.getElementById('bc-phase');
   const profitEl = document.getElementById('bc-profit');
-  
-  statusEl.classList.remove('rolling');
-  
+
+  statusEl.classList.remove('rolling', 'result-win', 'result-lose', 'result-draw');
+
+  stakeEl.textContent = `${stake.toLocaleString('vi-VN')}`;
+
   if (phase === 'betting') {
-    roundEl.textContent = `🎰 Vòng ${round} — Đặt cược`;
-    statusEl.style.background = 'rgba(56,189,248,.05)';
-    statusEl.style.borderColor = 'rgba(56,189,248,.1)';
+    phaseEl.textContent = 'BET';
   } else if (phase === 'rolling') {
-    roundEl.textContent = `🎲 Vòng ${round} — Đang lắc...`;
+    phaseEl.textContent = 'LẮC';
     statusEl.classList.add('rolling');
-    statusEl.style.background = 'rgba(251,191,36,.12)';
-    statusEl.style.borderColor = 'rgba(251,191,36,.5)';
   } else if (phase === 'result') {
-    roundEl.textContent = `📢 Vòng ${round} — Kết quả`;
-    statusEl.style.background = 'rgba(52,211,153,.08)';
-    statusEl.style.borderColor = 'rgba(52,211,153,.3)';
+    if (profit > 0) { phaseEl.textContent = 'WIN'; statusEl.classList.add('result-win'); }
+    else if (profit < 0) { phaseEl.textContent = 'LOSE'; statusEl.classList.add('result-lose'); }
+    else { phaseEl.textContent = 'DRAW'; statusEl.classList.add('result-draw'); }
   }
-  
+
   if (profit > 0) {
-    profitEl.textContent = `+${profit.toLocaleString('vi-VN')}đ`;
+    profitEl.textContent = `+${profit.toLocaleString('vi-VN')}`;
     profitEl.className = 'bc-profit positive';
   } else if (profit < 0) {
-    profitEl.textContent = `${profit.toLocaleString('vi-VN')}đ`;
+    profitEl.textContent = `${profit.toLocaleString('vi-VN')}`;
     profitEl.className = 'bc-profit negative';
   } else {
-    profitEl.textContent = '+0đ';
+    profitEl.textContent = '+0';
     profitEl.className = 'bc-profit zero';
   }
 }
@@ -144,7 +143,11 @@ function render(r){
   let phaseText = 'betting';
   if (isRolling) phaseText = 'rolling';
   else if (isResult) phaseText = 'result';
-  updateStatusBar(gs.round, phaseText, _lastProfit);
+
+  const myUid = _user.uid;
+  const myBetsForStake = (gs.bets?.[myUid]) || {};
+  const stakeTotal = Object.values(myBetsForStake).reduce((a,b) => a+b, 0);
+  updateStatusBar(stakeTotal, phaseText, _lastProfit);
 
   const dEl = document.getElementById('bc-dice');
   const dice = gs.dice || [null,null,null];
@@ -161,8 +164,7 @@ function render(r){
   SYMBOLS.forEach(s => counts[s.k] = 0);
   if (isResult && dice.every(Boolean)) dice.forEach(d => counts[d]++);
 
-  const myUid = _user.uid;
-  const myBets = (gs.bets?.[myUid]) || {};
+  const myBets = myBetsForStake;
   _myBets = myBets;
   
   document.querySelectorAll('.bc-tile').forEach(t => {
