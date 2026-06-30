@@ -6,6 +6,7 @@ import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemov
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { createDeck, renderCardUI } from './cards.js';
 import { getActiveBuff, getPetById, getTierById } from './pet.js';
+import { initRoomChat } from './room-chat.js';
 
 const fbConfig = {
   apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -24,6 +25,7 @@ let _user = null, _unsub = null, _unsubMe = null, _myBalance = 0;
 let _settledRound = -1;
 let _autoDealRound = -1;
 let _dealerModalShownFor = null;
+let _actionLock = false;
 
 if (!ROOM_ID) document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">⚠️ Thiếu mã phòng.</div>';
 
@@ -153,6 +155,7 @@ function updateNavRoom(roomCode) {
   roomEl.innerHTML = `<span class="room-icon">🃏</span> #${roomCode}`;
 }
 
+// mới
 onAuthStateChanged(auth, async (u) => {
   if (!u) { location.href = 'index.html'; return; }
   _user = u;
@@ -163,7 +166,15 @@ onAuthStateChanged(auth, async (u) => {
       if (window.TopNav) window.TopNav.setPoints(_myBalance);
     }
   });
-  if (ROOM_ID) start();
+  if (ROOM_ID) {
+    start();
+    initRoomChat({
+      db,
+      roomId: ROOM_ID,
+      uid: _user.uid,
+      getName: () => _user.displayName || 'Bạn'
+    });
+  }
 });
 
 /* ========== FIREBASE LISTENER ========== */
@@ -585,23 +596,30 @@ window.hostDeal = async function() {
 };
 
 window.hit = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data(); const gs = r.gameState;
-  if (gs.turnOrder?.[gs.turnIdx] !== _user.uid) return;
-  const deck = [...(gs.deck || [])];
-  const hand = [...(gs.hands?.[_user.uid] || [])];
-  if (deck.length === 0) { showToast('Hết bài', 'warn'); return; }
-  hand.push(deck.pop());
-  const stat = handStatus(hand);
-  const updates = { 'gameState.deck': deck, [`gameState.hands.${_user.uid}`]: hand };
-  let advance = false;
-  if (stat.tag === 'bust' || hand.length >= 5 || stat.score >= 21) {
-    updates[`gameState.stands.${_user.uid}`] = true;
-    advance = true;
+  if (_actionLock) return;
+  _actionLock = true;
+  try {
+    const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
+    if (!snap.exists()) return;
+    const r = snap.data(); const gs = r.gameState;
+    if (gs.turnOrder?.[gs.turnIdx] !== _user.uid) return;
+    if ((gs.hands?.[_user.uid] || []).length >= 5) return;
+    const deck = [...(gs.deck || [])];
+    const hand = [...(gs.hands?.[_user.uid] || [])];
+    if (deck.length === 0) { showToast('Hết bài', 'warn'); return; }
+    hand.push(deck.pop());
+    const stat = handStatus(hand);
+    const updates = { 'gameState.deck': deck, [`gameState.hands.${_user.uid}`]: hand };
+    let advance = false;
+    if (stat.tag === 'bust' || hand.length >= 5 || stat.score >= 21) {
+      updates[`gameState.stands.${_user.uid}`] = true;
+      advance = true;
+    }
+    await updateDoc(doc(db, 'rooms', ROOM_ID), updates);
+    if (advance) await advanceTurn();
+  } finally {
+    _actionLock = false;
   }
-  await updateDoc(doc(db, 'rooms', ROOM_ID), updates);
-  if (advance) await advanceTurn();
 };
 
 window.stand = async function() {
@@ -631,19 +649,26 @@ async function advanceTurn() {
 }
 
 window.hostDealerDraw = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data(); const gs = r.gameState;
-  if (r.hostUid !== _user.uid || gs.phase !== 'dealer') return;
-  let deck = [...(gs.deck || [])];
-  let hand = [...(gs.hands?.[r.hostUid] || [])];
-  if (deck.length === 0) { showToast('Hết bài', 'warn'); return; }
-  hand.push(deck.pop());
-  await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.deck': deck, [`gameState.hands.${r.hostUid}`]: hand });
-  
-  const newStat = handStatus(hand);
-  if (newStat.tag === 'bust') {
-    await finalizeBustDealer(r, hand, deck);
+  if (_actionLock) return;
+  _actionLock = true;
+  try {
+    const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
+    if (!snap.exists()) return;
+    const r = snap.data(); const gs = r.gameState;
+    if (r.hostUid !== _user.uid || gs.phase !== 'dealer') return;
+    if ((gs.hands?.[r.hostUid] || []).length >= 5) return;
+    let deck = [...(gs.deck || [])];
+    let hand = [...(gs.hands?.[r.hostUid] || [])];
+    if (deck.length === 0) { showToast('Hết bài', 'warn'); return; }
+    hand.push(deck.pop());
+    await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.deck': deck, [`gameState.hands.${r.hostUid}`]: hand });
+
+    const newStat = handStatus(hand);
+    if (newStat.tag === 'bust') {
+      await finalizeBustDealer(r, hand, deck);
+    }
+  } finally {
+    _actionLock = false;
   }
 };
 
@@ -707,12 +732,14 @@ window.hostEndDealerTurn = async function() {
 };
 
 async function finalizeBustDealer(r, dealerHand, deck) {
+  const gs = r.gameState;
   const players = (r.members || []).filter(u => u !== r.hostUid);
-  const results = {};
+  const results = { ...(gs.results || {}) };
   for (const uid of players) {
-    const bet = r.gameState.bets?.[uid] || 0;
+    if (gs.dealerChecked?.[uid]) continue;
+    const bet = gs.bets?.[uid] || 0;
     if (bet === 0) continue;
-    const playerHand = r.gameState.hands?.[uid] || [];
+    const playerHand = gs.hands?.[uid] || [];
     const pStat = handStatus(playerHand);
     let outcome, delta;
     if (pStat.tag === 'bust') { outcome = 'draw'; delta = 0; }
