@@ -6,7 +6,7 @@ import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemov
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { createDeck, renderCardUI } from './cards.js';
 import { getActiveBuff, getPetById, getTierById } from './pet.js';
-import { initRoomChat } from './room-chat.js';
+import { initRoomChat, getMyNickname } from './room-chat.js';
 
 const fbConfig = {
   apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -168,11 +168,12 @@ onAuthStateChanged(auth, async (u) => {
   });
   if (ROOM_ID) {
     start();
+    const myName = await getMyNickname(db, _user.uid, _user.email);
     initRoomChat({
       db,
       roomId: ROOM_ID,
       uid: _user.uid,
-      getName: () => _user.displayName || 'Bạn'
+      getName: () => myName
     });
   }
 });

@@ -1,13 +1,32 @@
 // ============================================================
 // ===== ROOM CHAT - Module chat nổi dùng chung cho mọi phòng game =====
 // Giao diện kiểu Messenger/Facebook (xanh dương)
-// Cách dùng: import { initRoomChat } from './room-chat.js';
-// initRoomChat({ db, roomId: ROOM_ID, uid: _user.uid, getName: () => tenNguoiChoi });
+// Cách dùng:
+//   import { initRoomChat, getMyNickname } from './room-chat.js';
+//   const myName = await getMyNickname(db, _user.uid, _user.email);
+//   initRoomChat({ db, roomId: ROOM_ID, uid: _user.uid, getName: () => myName });
 // ============================================================
-import { collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let _chatUnsub = null;
 let _initialized = false;
+let _nicknameCache = {}; // cache theo uid để tránh getDoc lặp lại nhiều lần
+
+// Lấy nickname thật từ collection 'users' (KHÔNG dùng _user.displayName vì
+// Firebase Auth thường không có displayName -> hay rơi vào fallback "Bạn").
+// Dùng chung cho mọi game: const myName = await getMyNickname(db, _user.uid, _user.email);
+export async function getMyNickname(db, uid, fallbackEmail) {
+  if (_nicknameCache[uid]) return _nicknameCache[uid];
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    const name = (snap.exists() && snap.data().nickname) || fallbackEmail?.split('@')[0] || 'Người chơi';
+    _nicknameCache[uid] = name;
+    return name;
+  } catch (e) {
+    console.error('[room-chat] getMyNickname error:', e);
+    return fallbackEmail?.split('@')[0] || 'Người chơi';
+  }
+}
 
 // Các giá trị này luôn được CẬP NHẬT MỚI mỗi lần initRoomChat được gọi,
 // để tránh lỗi "ai nhắn cũng hiện là bạn" do uid cũ bị giữ lại trong closure
