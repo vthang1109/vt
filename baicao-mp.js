@@ -21,6 +21,8 @@ const auth = getAuth(app);
 
 const ROOM_ID = new URLSearchParams(location.search).get('room');
 let _user = null, _unsub = null, _unsubMe = null, _myBalance = 0;
+let _notifiedRound = 0;
+let _endingRound = false;
 let _betConfirmed = false;
 
 if (!ROOM_ID) document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">⚠️ Thiếu mã phòng.</div>';
@@ -69,6 +71,13 @@ function compareHands(playerHand, dealerHand) {
   if (pRank > dRank) return { outcome: 'win', playerSpecial: p.special, dealerSpecial: d.special };
   if (pRank < dRank) return { outcome: 'lose', playerSpecial: p.special, dealerSpecial: d.special };
   return { outcome: 'draw', playerSpecial: p.special, dealerSpecial: d.special };
+}
+
+function getMultiplier(special) {
+  if (special === 'SAP') return 4;
+  if (special === 'LIENG') return 3;
+  if (special === 'DONG_HOA') return 3;
+  return 2;
 }
 
 function getSpecialClass(special) {
@@ -145,22 +154,22 @@ function render(r) {
 
   // === STATUS BAR ===
   if (gs.phase === 'betting') {
-    phEl.textContent = 'Đặt cược';
+    phEl.textContent = 'BET';
     if (isHost) {
-      leftEl.textContent = `💰 ${gs.betAmount || 100}`;
+      leftEl.textContent = `${gs.betAmount || 100}`;
       rightEl.textContent = '';
       rightEl.className = 'stat-profit zero';
     } else {
       const myBet = gs.bets?.[_user.uid] || 0;
-      leftEl.textContent = myBet ? `${myBet}⭐` : 'Chờ cược';
+      leftEl.textContent = myBet ? `${myBet}` : 'Chờ cược';
       rightEl.textContent = '';
       rightEl.className = 'stat-profit zero';
     }
   } else if (gs.phase === 'playing') {
     phEl.textContent = 'Đang lật bài...';
-    leftEl.textContent = `💰 ${gs.betAmount || 100}`;
+    leftEl.textContent = `${gs.betAmount || 100}`;
     const myBet = gs.bets?.[_user.uid] || 0;
-    rightEl.textContent = myBet ? `${myBet}⭐` : '';
+    rightEl.textContent = myBet ? `${myBet}` : '';
     rightEl.className = 'stat-profit zero';
   } else if (gs.phase === 'result') {
     if (isHost) {
@@ -196,11 +205,34 @@ function render(r) {
   }
   document.getElementById('bc-status').className = 'bc-status' + statusCls;
 
+  // === THÔNG BÁO KẾT QUẢ VÁN (mỗi người 1 lần / round) ===
+  if (gs.phase === 'result' && gs.round !== _notifiedRound) {
+    _notifiedRound = gs.round;
+    if (isHost) {
+      const d = gs.dealerDelta || 0;
+      const msg = d > 0 ? `Bạn thắng +${d.toLocaleString('vi-VN')}` : d < 0 ? `Bạn thua ${d.toLocaleString('vi-VN')}` : 'Hòa';
+      showToast(msg, d > 0 ? 'success' : d < 0 ? 'error' : 'info');
+    } else {
+      const myResult = gs.results?.[_user.uid];
+      if (myResult) {
+        const d = myResult.delta || 0;
+        const msg = myResult.outcome === 'win' ? `Bạn thắng +${d.toLocaleString('vi-VN')}` : myResult.outcome === 'lose' ? `Bạn thua ${d.toLocaleString('vi-VN')}` : 'Hòa';
+        showToast(msg, myResult.outcome === 'win' ? 'success' : myResult.outcome === 'lose' ? 'error' : 'info');
+      }
+    }
+  }
+
   // === BET ROW (chỉ host hiện ở ván đầu) ===
   if (isHost && gs.phase === 'betting' && !gs.betConfirmed) {
     betRow.style.display = 'flex';
   } else {
     betRow.style.display = 'none';
+  }
+
+  // Host tự rà soát: nếu tất cả bài đã mở (do bất kỳ ai mở lá cuối) thì tự kết thúc ván
+  if (isHost && gs.phase === 'playing' && !_endingRound && isFullyRevealed(r)) {
+    _endingRound = true;
+    hostEndRound().finally(() => { _endingRound = false; });
   }
 
   // === TABLE ===
@@ -219,7 +251,11 @@ function render(r) {
     const isMe = uid === _user.uid;
     const hand = gs.hands?.[uid] || [];
     const revealed = allRevealed[uid] || [];
-    const result = gs.results?.[uid];
+    let result = gs.results?.[uid];
+    if (isDealer && gs.phase === 'result') {
+      const dd = gs.dealerDelta || 0;
+      result = { outcome: dd > 0 ? 'win' : dd < 0 ? 'lose' : 'draw', delta: dd };
+    }
 
     let cls = 'bc-seat';
     if (isDealer) cls += ' dealer';
@@ -261,16 +297,16 @@ function render(r) {
       if (result.outcome === 'win') {
         const pCalc = calculateScore(hand);
         const specialBanner = getSpecialBannerClass(pCalc.special);
-        if (specialBanner && isMe) {
+        if (specialBanner) {
           overlayClass = specialBanner;
           overlayText = pCalc.description;
         } else {
           overlayClass = 'bc-result-win';
-          overlayText = `+${result.delta.toLocaleString('vi-VN')}⭐`;
+          overlayText = `+${result.delta.toLocaleString('vi-VN')}`;
         }
       } else if (result.outcome === 'lose') {
         overlayClass = 'bc-result-lose';
-        overlayText = `${result.delta.toLocaleString('vi-VN')}⭐`;
+        overlayText = `${result.delta.toLocaleString('vi-VN')}`;
       } else {
         overlayClass = 'bc-result-draw';
         overlayText = 'HÒA';
@@ -281,7 +317,7 @@ function render(r) {
     // Bet badge
     let betBadgeHtml = '';
     if (!isDealer && gs.bets?.[uid] && gs.bets[uid] > 0) {
-      betBadgeHtml = `<div class="bc-bet-badge">${gs.bets[uid].toLocaleString('vi-VN')}⭐</div>`;
+      betBadgeHtml = `<div class="bc-bet-badge">${gs.bets[uid].toLocaleString('vi-VN')}</div>`;
     }
 
     // Name
@@ -319,22 +355,46 @@ function render(r) {
   const canNewRound = isResult && isHost;
 
   actEl.innerHTML = `
-    <button class="bc-act-btn bc-act-blue" ${canRevealOne ? '' : 'disabled'} onclick="revealOne()">🃏 Mở 1 lá</button>
-    <button class="bc-act-btn bc-act-green" ${canRevealAll ? '' : 'disabled'} onclick="revealAll()">🃏 Mở tất cả</button>
-    <button class="bc-act-btn bc-act-yellow" ${canNewRound ? '' : 'disabled'} onclick="hostNewRound()">🔄 Ván mới</button>
+    <button class="bc-act-btn bc-act-blue" ${canRevealOne ? '' : 'disabled'} onclick="revealOne()">Mở 1 lá</button>
+    <button class="bc-act-btn bc-act-green" ${canRevealAll ? '' : 'disabled'} onclick="revealAll()">Mở tất cả</button>
+    <button class="bc-act-btn bc-act-yellow" ${canNewRound ? '' : 'disabled'} onclick="hostNewRound()">Ván mới</button>
   `;
+}
 
-  // Nếu là host và phase playing, thêm nút kết thúc ván
-  if (isHost && isPlaying) {
-    const allPlayersRevealed = players.every(uid => {
-      const rev = allRevealed[uid] || [];
-      return rev.length === 3 && rev.every(r => r);
-    });
-    const dealerRevealed = (allRevealed[dealerUid] || []).length === 3 && (allRevealed[dealerUid] || []).every(r => r);
-    if (allPlayersRevealed && dealerRevealed) {
-      actEl.innerHTML += `<button class="bc-act-btn bc-act-orange" onclick="hostEndRound()">🏁 Kết thúc</button>`;
-    }
+// ========== CHIA BÀI (dùng chung cho ván đầu & ván mới) ==========
+function buildDealUpdates(r, betAmount, nextRound) {
+  const deck = createDeck();
+  const dealerUid = r.hostUid;
+  const players = (r.members || []).filter(u => u !== dealerUid);
+
+  const hands = {};
+  hands[dealerUid] = [deck.pop(), deck.pop(), deck.pop()];
+  for (const uid of players) {
+    hands[uid] = [deck.pop(), deck.pop(), deck.pop()];
   }
+
+  const revealed = {};
+  revealed[dealerUid] = [false, false, false];
+  for (const uid of players) {
+    revealed[uid] = [false, false, false];
+  }
+
+  const bets = {};
+  for (const uid of players) {
+    bets[uid] = betAmount;
+  }
+
+  return {
+    'gameState.phase': 'playing',
+    'gameState.hands': hands,
+    'gameState.revealed': revealed,
+    'gameState.bets': bets,
+    'gameState.results': {},
+    'gameState.dealerDelta': 0,
+    'gameState.round': nextRound,
+    'gameState.betAmount': betAmount,
+    'gameState.betConfirmed': true
+  };
 }
 
 // ========== HÀNH ĐỘNG ==========
@@ -347,13 +407,11 @@ window.confirmBet = async function() {
 
   const select = document.getElementById('bc-bet-select');
   const amount = parseInt(select.value);
-  if (!amount || amount < 50) { showToast('Mức cược tối thiểu 50⭐', 'warn'); return; }
+  if (!amount || amount < 50) { showToast('Mức cược tối thiểu 50', 'warn'); return; }
 
-  await updateDoc(doc(db, 'rooms', ROOM_ID), {
-    'gameState.betAmount': amount,
-    'gameState.betConfirmed': true
-  });
-  showToast(`✅ Mức cược ${amount}⭐ đã được xác nhận`, 'success');
+  const updates = buildDealUpdates(r, amount, 1);
+  await updateDoc(doc(db, 'rooms', ROOM_ID), updates);
+  showToast(`Mức cược ${amount} đã xác nhận, bài đã chia`, 'success');
 };
 
 window.revealOne = async function() {
@@ -372,6 +430,8 @@ window.revealOne = async function() {
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
     [`gameState.revealed.${_user.uid}`]: newRevealed
   });
+
+  await checkAllRevealed();
 };
 
 window.revealAll = async function() {
@@ -391,28 +451,28 @@ window.revealAll = async function() {
   await checkAllRevealed();
 };
 
+function isFullyRevealed(r) {
+  const gs = r.gameState;
+  const dealerUid = r.hostUid;
+  const players = (r.members || []).filter(u => u !== dealerUid);
+  const allRevealed = gs.revealed || {};
+  const allPlayersRevealed = players.every(uid => {
+    const rev = allRevealed[uid] || [];
+    return rev.length === 3 && rev.every(x => x);
+  });
+  const dealerRevealed = (allRevealed[dealerUid] || []).length === 3 && (allRevealed[dealerUid] || []).every(x => x);
+  return allPlayersRevealed && dealerRevealed;
+}
+
 async function checkAllRevealed() {
   const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
   if (!snap.exists()) return;
   const r = snap.data();
   const gs = r.gameState;
   if (gs.phase !== 'playing') return;
-  
-  const dealerUid = r.hostUid;
-  const players = (r.members || []).filter(u => u !== dealerUid);
-  
-  const allRevealed = gs.revealed || {};
-  const allPlayersRevealed = players.every(uid => {
-    const rev = allRevealed[uid] || [];
-    return rev.length === 3 && rev.every(r => r);
-  });
-  const dealerRevealed = (allRevealed[dealerUid] || []).length === 3 && (allRevealed[dealerUid] || []).every(r => r);
-  
-  if (allPlayersRevealed && dealerRevealed) {
-    // Tự động kết thúc nếu host
-    if (r.hostUid === _user.uid) {
-      await hostEndRound();
-    }
+
+  if (isFullyRevealed(r) && r.hostUid === _user.uid) {
+    await hostEndRound();
   }
 }
 
@@ -438,10 +498,11 @@ window.hostEndRound = async function() {
     const result = compareHands(playerHand, dealerHand);
     let delta = 0;
     if (result.outcome === 'win') {
-      const multiplier = result.playerSpecial === 'SAP' ? 4 : (result.playerSpecial === 'LIENG' ? 3 : (result.playerSpecial === 'DONG_HOA' ? 3 : 2));
+      const multiplier = getMultiplier(result.playerSpecial);
       delta = bet * (multiplier - 1);
     } else if (result.outcome === 'lose') {
-      delta = -bet;
+      const multiplier = getMultiplier(result.dealerSpecial);
+      delta = -bet * (multiplier - 1);
     } else {
       delta = 0;
     }
@@ -473,7 +534,6 @@ window.hostEndRound = async function() {
     }
   }
 
-  showToast('🏁 Ván đã kết thúc', 'info');
 };
 
 window.hostNewRound = async function() {
@@ -482,38 +542,10 @@ window.hostNewRound = async function() {
   const r = snap.data();
   if (r.hostUid !== _user.uid) return;
 
-  const deck = createDeck();
-  const dealerUid = r.hostUid;
-  const players = (r.members || []).filter(u => u !== dealerUid);
-  
-  const hands = {};
-  hands[dealerUid] = [deck.pop(), deck.pop(), deck.pop()];
-  for (const uid of players) {
-    hands[uid] = [deck.pop(), deck.pop(), deck.pop()];
-  }
-
-  const revealed = {};
-  revealed[dealerUid] = [false, false, false];
-  for (const uid of players) {
-    revealed[uid] = [false, false, false];
-  }
-
-  const bets = {};
   const betAmount = r.gameState?.betAmount || 100;
-  for (const uid of players) {
-    bets[uid] = betAmount;
-  }
-
-  await updateDoc(doc(db, 'rooms', ROOM_ID), {
-    'gameState.phase': 'playing',
-    'gameState.hands': hands,
-    'gameState.revealed': revealed,
-    'gameState.bets': bets,
-    'gameState.results': {},
-    'gameState.dealerDelta': 0,
-    'gameState.round': (r.gameState?.round || 0) + 1,
-    'gameState.betConfirmed': true
-  });
+  const nextRound = (r.gameState?.round || 0) + 1;
+  const updates = buildDealUpdates(r, betAmount, nextRound);
+  await updateDoc(doc(db, 'rooms', ROOM_ID), updates);
 };
 
 // ========== QUIT ==========
