@@ -1,0 +1,659 @@
+/* ===================== LAYOUT ===================== */
+.chess-wrap {
+  min-height: 100vh;
+  padding: 14px 12px 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===================== MÀN HÌNH CÀI ĐẶT (SETUP) ===================== */
+.chess-setup {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 24px;
+}
+
+.setup-card {
+  width: 100%;
+  max-width: 480px;
+  background: linear-gradient(160deg, rgba(20,26,43,0.9), rgba(10,16,30,0.9));
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: 18px;
+  padding: 24px 20px 28px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 24px rgba(251,191,36,0.12);
+}
+
+.setup-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: #fff;
+  text-align: center;
+  margin: 0 0 22px;
+  letter-spacing: 0.3px;
+}
+
+.setup-group {
+  margin-bottom: 22px;
+}
+
+.setup-label {
+  display: block;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #94a3b8;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* Dải 10 cấp độ */
+.level-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.level-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 15px;
+  padding: 10px 0;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s, border-color 0.2s;
+}
+.level-btn:active { transform: scale(0.94); }
+
+.level-btn.tier-easy.active { background: rgba(74,222,128,0.18); border-color: #4ade80; color: #bbf7d0; box-shadow: 0 0 14px rgba(74,222,128,0.35); }
+.level-btn.tier-medium.active { background: rgba(251,191,36,0.18); border-color: #fbbf24; color: #fde68a; box-shadow: 0 0 14px rgba(251,191,36,0.35); }
+.level-btn.tier-hard.active { background: rgba(248,113,113,0.18); border-color: #f87171; color: #fecaca; box-shadow: 0 0 14px rgba(248,113,113,0.35); }
+
+.level-info {
+  margin-top: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  font-size: 12.5px;
+  color: #94a3b8;
+  text-align: center;
+  min-height: 32px;
+}
+
+/* Chọn màu quân */
+.color-choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.color-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 8px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s, border-color 0.2s, background 0.2s;
+}
+.color-btn:active { transform: scale(0.96); }
+
+.color-piece {
+  font-size: 34px;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.color-name {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  color: #e2e8f0;
+}
+.color-note {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  font-size: 10.5px;
+  color: #94a3b8;
+}
+
+.color-btn.active {
+  border-color: #fbbf24;
+  background: rgba(251,191,36,0.12);
+  box-shadow: 0 0 16px rgba(251,191,36,0.3);
+}
+.color-btn.active .color-piece {
+  text-shadow: 0 0 12px rgba(251,191,36,0.7);
+}
+
+/* Ô đặt cược (đồng bộ Xì Dách) */
+.bet-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bet-input-row input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  background: rgba(0, 0, 0, 0.3);
+  color: #fde68a;
+  font-family: 'Orbitron', monospace;
+  font-weight: 800;
+  font-size: 14px;
+  text-align: center;
+}
+.bet-quick {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.bet-quick button {
+  flex: 1;
+  padding: 7px 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: #cbd5e1;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+.bet-quick button:active { transform: scale(0.95); }
+
+.btn-start {
+  width: 100%;
+  padding: 14px 0;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.8px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #0a101e;
+  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.35);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(251, 191, 36, 0.5);
+}
+.btn-start:active {
+  transform: scale(0.97);
+}
+
+/* ===================== STATUS BAR (đồng bộ Xì Dách) ===================== */
+.bc-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  font-size: 13px;
+  --bc-right: rgba(148, 163, 184, 0.08);
+  --bc-left-border: rgba(251, 191, 36, 0.9);
+  --bc-right-border: rgba(56, 189, 248, 0.4);
+  background-image:
+    linear-gradient(135deg,
+      rgba(251, 191, 36, 0.1) 0%,
+      rgba(251, 191, 36, 0.1) 20%,
+      transparent 38%,
+      transparent 62%,
+      var(--bc-right) 80%,
+      var(--bc-right) 100%),
+    linear-gradient(#0a101e, #0a101e),
+    linear-gradient(135deg,
+      var(--bc-left-border) 0%,
+      var(--bc-left-border) 35%,
+      var(--bc-right-border) 65%,
+      var(--bc-right-border) 100%);
+  background-origin: padding-box, padding-box, border-box;
+  background-clip: padding-box, padding-box, border-box;
+  border: 1px solid transparent;
+  min-height: 64px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.3s;
+  gap: 8px;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.18);
+}
+.bc-status.thinking {
+  --bc-right: rgba(120, 90, 10, 0.55);
+  --bc-right-border: rgba(251, 191, 36, 0.9);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.45);
+}
+
+/* Nhấp nháy vàng-đỏ toàn thanh status khi đang bị chiếu */
+.bc-status.in-check {
+  --bc-left-border: #fbbf24;
+  --bc-right-border: #ef4444;
+  animation: statusCheckBlink 0.9s ease-in-out infinite;
+}
+@keyframes statusCheckBlink {
+  0%, 100% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.3), 0 0 10px rgba(251, 191, 36, 0.15); }
+  50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.85), 0 0 34px rgba(239, 68, 68, 0.75), inset 0 0 18px rgba(239, 68, 68, 0.25); }
+}
+.bc-status *,
+.bc-status *::before,
+.bc-status *::after {
+  box-sizing: content-box;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+}
+.bc-status {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.2;
+}
+
+/* Khối bên trái (Người chơi) / bên phải (Máy) — khoanh sáng khi tới lượt */
+.stat-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+}
+.stat-side-machine {
+  align-items: flex-end;
+}
+.side-top {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.stat-side-machine .side-top {
+  flex-direction: row-reverse;
+}
+.side-avatar {
+  display: none;
+}
+.side-label {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 9.5px;
+  letter-spacing: 0.6px;
+  color: #94a3b8;
+}
+
+/* Khoanh sáng bên đang tới lượt */
+.stat-side.active-turn {
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.7);
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.35), inset 0 0 10px rgba(251, 191, 36, 0.12);
+}
+.stat-side.active-turn .side-label {
+  color: #fbbf24;
+}
+.stat-side-machine.active-turn {
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.7);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.35), inset 0 0 10px rgba(56, 189, 248, 0.12);
+}
+.stat-side-machine.active-turn .side-label {
+  color: #7dd3fc;
+}
+/* Chữ "BẠN" luôn màu trắng, không đổi theo trạng thái tới lượt */
+.stat-side-player .side-label,
+.stat-side-player.active-turn .side-label {
+  color: #ffffff !important;
+}
+/* Khi bên đang tới lượt lại đang bị chiếu -> khoanh đỏ nhấp nháy thay vì xanh */
+.bc-status.in-check .stat-side.active-turn {
+  animation: sideCheckBlink 0.9s ease-in-out infinite;
+}
+@keyframes sideCheckBlink {
+  0%, 100% {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.6);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+  }
+  50% {
+    background: rgba(251, 191, 36, 0.14);
+    border-color: rgba(251, 191, 36, 0.9);
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.65), 0 0 14px rgba(239, 68, 68, 0.5);
+  }
+}
+
+.stat-bet {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 19px;
+  color: #fbbf24;
+  min-width: 65px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+}
+.stat-bet small {
+  font-size: 9px;
+  font-weight: 600;
+  color: #94a3b8;
+  font-family: 'Nunito', sans-serif;
+}
+
+.stat-score-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+.stat-score {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 22px;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 0 12px rgba(251,191,36,0.6);
+  transition: color 0.3s;
+}
+.stat-score-sub {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+}
+
+.stat-profit {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 19px;
+  text-align: right;
+  min-width: 65px;
+}
+.stat-profit.positive { color: #4ade80; }
+.stat-profit.negative { color: #f87171; }
+.stat-profit.zero { color: #ffffff; }
+
+/* Trạng thái checkmate/thắng — viền đổi màu theo kết quả (đồng bộ Xì Dách) */
+.bc-status.result-win {
+  --bc-right: rgba(8, 60, 28, 0.7);
+  --bc-right-border: #22c55e;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+.bc-status.result-lose {
+  --bc-right: rgba(70, 12, 12, 0.7);
+  --bc-right-border: #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+.bc-status.result-draw {
+  --bc-right: rgba(40, 45, 55, 0.7);
+  --bc-right-border: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+}
+.bc-status.result-win .stat-score { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
+.bc-status.result-lose .stat-score { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
+.bc-status.result-draw .stat-score { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+.bc-status.thinking .stat-score { color: #fbbf24; animation: pulseText 0.8s ease-in-out infinite alternate; }
+
+/* Bỏ hẳn hiển thị tiền cược (kể cả khi ván đấu đã kết thúc) */
+.stat-bet {
+  display: none;
+}
+
+/* Ẩn tiền thưởng trong lúc ván đấu đang diễn ra, chỉ hiện khi kết thúc */
+.bc-status.in-progress .stat-profit {
+  display: none;
+}
+
+/* Khi ván đấu kết thúc: bỏ dòng phụ "Ván đấu kết thúc" và chữ "MÁY", chỉ giữ +/- tiền thắng thua */
+.bc-status.result-win .stat-score-sub,
+.bc-status.result-lose .stat-score-sub,
+.bc-status.result-draw .stat-score-sub {
+  display: none;
+}
+.bc-status.result-win .stat-side-machine .side-label,
+.bc-status.result-lose .stat-side-machine .side-label,
+.bc-status.result-draw .stat-side-machine .side-label {
+  display: none;
+}
+
+@keyframes pulseText {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
+/* ===================== BÀN CỜ ===================== */
+.chess-board-wrap {
+  position: relative;
+  border-radius: 16px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(56, 189, 248, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  margin-bottom: 16px;
+}
+
+.chess-elo-badge {
+  position: absolute;
+  top: -10px;
+  right: 8px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  color: #fbbf24;
+  font-family: 'Orbitron', monospace;
+  font-weight: 800;
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  z-index: 3;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  background: #1a1a2e;
+}
+
+.square {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(28px, 7vw, 52px);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, box-shadow 0.2s;
+  position: relative;
+  font-weight: 400;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.square.light {
+  background: rgba(240, 217, 181, 0.85);
+}
+.square.dark {
+  background: rgba(181, 136, 99, 0.85);
+}
+
+.square.selected {
+  box-shadow: inset 0 0 0 3px #fbbf24, inset 0 0 20px rgba(251, 191, 36, 0.3);
+  z-index: 2;
+}
+/* Nước đi hợp lệ: chấm xanh lá; nếu là ô ăn quân: vòng viền xanh lá quanh quân */
+.square.move::after {
+  content: '';
+  position: absolute;
+  width: 28%;
+  height: 28%;
+  background: radial-gradient(circle, rgba(74, 222, 128, 0.75) 0%, rgba(74, 222, 128, 0) 80%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: moveDot 0.4s ease-out;
+  z-index: 1;
+}
+.square.move.capture::after {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 4px rgba(74, 222, 128, 0.85), inset 0 0 16px rgba(74, 222, 128, 0.35);
+  animation: moveDot 0.25s ease-out;
+}
+@keyframes moveDot {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Ô đi không hợp lệ: nhấp nháy đỏ ngắn để báo hiệu */
+.square.invalid {
+  animation: invalidFlash 0.4s ease-out;
+}
+@keyframes invalidFlash {
+  0% { box-shadow: inset 0 0 0 4px rgba(239, 68, 68, 0.95), inset 0 0 22px rgba(239, 68, 68, 0.6); background-color: rgba(239, 68, 68, 0.25); }
+  100% { box-shadow: inset 0 0 0 0 rgba(239, 68, 68, 0); background-color: transparent; }
+}
+
+/* Ô có vua đang bị chiếu: ánh sáng đỏ nhấp nháy phía sau quân */
+.square.king-check::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 0;
+  animation: kingCheckGlow 0.9s ease-in-out infinite alternate;
+}
+@keyframes kingCheckGlow {
+  from { box-shadow: inset 0 0 14px 4px rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.12); }
+  to { box-shadow: inset 0 0 30px 10px rgba(239, 68, 68, 0.9); background: rgba(239, 68, 68, 0.32); }
+}
+.square.king-check .piece {
+  position: relative;
+  z-index: 1;
+}
+
+.square:active {
+  transform: scale(0.95);
+}
+
+.piece {
+  display: block;
+  width: 78%;
+  height: 78%;
+  margin: 0 auto;
+  pointer-events: none;
+}
+.piece img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.35));
+}
+
+/* ===================== ĐIỀU KHIỂN ===================== */
+.chess-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.btn-undo {
+  padding: 10px 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  cursor: pointer;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  background: rgba(56, 189, 248, 0.1);
+  color: #7dd3fc;
+  transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+}
+.btn-undo:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.3);
+}
+.btn-undo:active:not(:disabled) {
+  transform: scale(0.95);
+}
+.btn-undo:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-reset {
+  padding: 10px 24px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #0a101e;
+  transition: transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.25);
+}
+.btn-reset:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(251, 191, 36, 0.4);
+}
+.btn-reset:active {
+  transform: scale(0.95);
+}
+
+/* ===================== STATUS TEXT ===================== */
+#status {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #e2e8f0;
+  text-align: center;
+  padding: 6px 0 2px;
+  min-height: 28px;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 600px) {
+  .chess-board-wrap {
+    padding: 8px;
+  }
+
+  .square {
+    font-size: clamp(20px, 5.5vw, 38px);
+  }
+
+  .btn-reset, .btn-undo {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .square {
+    font-size: clamp(16px, 4.5vw, 28px);
+  }
+}
