@@ -109,6 +109,7 @@ let selected = null;
 let targets = [];
 let engine = null;
 let waiting = false;
+let lastMove = null; // { from, to } nước đi gần nhất, để tô sáng trên bàn cờ
 
 // --- DỰNG MÀN HÌNH CÀI ĐẶT ---
 function buildLevelStrip() {
@@ -185,6 +186,7 @@ function startGame() {
   targets = [];
   waiting = false;
   payoutSettled = false;
+  lastMove = null;
 
   setupScreen.style.display = 'none';
   gameScreen.style.display = '';
@@ -365,6 +367,7 @@ function render() {
       cell.dataset.square = sq;
 
       if (sq === selected) cell.classList.add('selected');
+      if (lastMove && (sq === lastMove.from || sq === lastMove.to)) cell.classList.add('last-move');
       if (targets.includes(sq)) {
         cell.classList.add('move');
         // Ô có quân đối phương -> đây là nước ăn quân, hiển thị vòng thay vì chấm
@@ -414,6 +417,7 @@ function onSquareClick(e) {
     if (move) {
       selected = null;
       targets = [];
+      lastMove = { from: move.from, to: move.to };
       render();
       if (!game.game_over()) makeEngineMove();
       return;
@@ -470,7 +474,10 @@ function makeEngineMove() {
       waiting = true;
       updateStatus();
       setTimeout(() => {
-        try { game.move(randomMove); } catch (_) {}
+        try {
+          const mv = game.move(randomMove);
+          if (mv) lastMove = { from: mv.from, to: mv.to };
+        } catch (_) {}
         waiting = false;
         render();
       }, 350);
@@ -507,11 +514,12 @@ function handleEngineMessage(line) {
   const mv = line.split(' ')[1];
   if (mv && mv !== '(none)') {
     try {
-      game.move({
+      const moveObj = game.move({
         from: mv.slice(0, 2),
         to: mv.slice(2, 4),
         promotion: mv.length > 4 ? mv[4] : 'q'
       });
+      if (moveObj) lastMove = { from: moveObj.from, to: moveObj.to };
     } catch (_) {
       console.error('Engine trả về nước đi không hợp lệ:', mv);
     }
@@ -625,6 +633,9 @@ function undoMove() {
 
   game.undo(); // lùi nước của máy
   game.undo(); // lùi nước của người chơi
+
+  const hist = game.history({ verbose: true });
+  lastMove = hist.length ? { from: hist[hist.length - 1].from, to: hist[hist.length - 1].to } : null;
 
   selected = null;
   targets = [];

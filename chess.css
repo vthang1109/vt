@@ -494,6 +494,17 @@
   background: rgba(181, 136, 99, 0.85);
 }
 
+/* Tô sáng ô cũ (đi ra) và ô mới (đi tới) của nước đi gần nhất, để dễ theo dõi nước máy vừa đi */
+.square.last-move {
+  box-shadow: inset 0 0 0 9999px rgba(250, 204, 21, 0.35);
+}
+.square.last-move.light {
+  background: rgba(246, 217, 108, 0.9);
+}
+.square.last-move.dark {
+  background: rgba(191, 149, 63, 0.9);
+}
+
 .square.selected {
   box-shadow: inset 0 0 0 3px #fbbf24, inset 0 0 20px rgba(251, 191, 36, 0.3);
   z-index: 2;
