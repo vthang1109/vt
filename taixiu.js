@@ -1,4 +1,7 @@
 import { addPoints, getPoints } from './points.js';
+import { getActiveBuff, getPetById } from './pet.js';
+import { auth, db } from './points.js';
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 class TaiXiu {
     constructor() {
@@ -197,8 +200,26 @@ class TaiXiu {
         const totalBet = Object.values(this.bets).reduce((a,b)=>a+b,0);
         let winAmt = 0;
         if (this.bets[result] > 0) winAmt = this.bets[result] * 2;
-        const net = winAmt - totalBet;
-        if (winAmt > 0) await addPoints('Tài Xỉu', 'Thắng', winAmt);
+        let buffBonus = 0, buffPct = 0;
+        if (winAmt > 0) {
+            try {
+                buffPct = await getActiveBuff();
+                if (buffPct > 0) buffBonus = Math.round(this.bets[result] * buffPct / 100);
+            } catch {}
+        }
+        const net = winAmt - totalBet + buffBonus;
+        if (winAmt > 0) {
+            await addPoints('Tài Xỉu', 'Thắng', winAmt + buffBonus, false);
+            if (buffBonus > 0) {
+                let petLabel = '🐾 Pet';
+                try {
+                    const ud = await getDoc(doc(db, 'users', auth.currentUser.uid));
+                    const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
+                    if (pet) petLabel = `${pet.emoji} ${pet.name}`;
+                } catch {}
+                window.showToast?.(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
+            }
+        }
 
         if (statusEl) statusEl.classList.remove('rolling');
         this.bets = { tai: 0, xiu: 0 };

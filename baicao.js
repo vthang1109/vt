@@ -1,9 +1,10 @@
 // baicao.js — Bài Cào Online (đặt cược giống Xì Dách)
 import { createDeck, renderCardUI } from './cards.js';
 import { auth, db } from './points.js';
-import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { addPoints, getPoints } from './points.js';
+import { getActiveBuff, getPetById } from './pet.js';
 
 class BaiCao {
     constructor() {
@@ -182,12 +183,26 @@ class BaiCao {
 
     async endRound() {
         const result = this.compareHands();
-        let multiplier = 0, profit = 0;
+        let multiplier = 0, profit = 0, buffBonus = 0, buffPct = 0, petLabel = '🐾 Pet';
         if (result === 'win') {
             multiplier = this.player.special === 'SAP' ? 4 : (this.player.special === 'LIENG' ? 3 : (this.player.special === 'DONG_HOA' ? 3 : 2));
+            const winAmount = this.currentBet * multiplier;
             profit = this.currentBet * (multiplier - 1);
-            try { await addPoints('Casino', 'Thắng Bài Cào', this.currentBet * multiplier); } catch(e){}
-            if (window.VTQuests) { window.VTQuests.trackPlay('baicao'); window.VTQuests.trackWinSmart(); window.VTQuests.trackEarn(this.currentBet * (multiplier - 1)); }
+            try {
+                buffPct = await getActiveBuff();
+                if (buffPct > 0) buffBonus = Math.round(profit * buffPct / 100);
+            } catch {}
+            try {
+                await addPoints('Casino', 'Thắng Bài Cào', winAmount + buffBonus, false);
+                if (buffBonus > 0) {
+                    try {
+                        const ud = await getDoc(doc(db, 'users', auth.currentUser.uid));
+                        const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
+                        if (pet) petLabel = `${pet.emoji} ${pet.name}`;
+                    } catch {}
+                }
+            } catch(e){}
+            if (window.VTQuests) { window.VTQuests.trackPlay('baicao'); window.VTQuests.trackWinSmart(); window.VTQuests.trackEarn(profit + buffBonus); }
         } else if (result === 'lose') {
             multiplier = 0;
             profit = -this.currentBet;
@@ -204,8 +219,9 @@ class BaiCao {
         document.getElementById('bc-status').className = 'bc-status ' + statusCls;
         document.getElementById('bc-status-msg').textContent = msg;
         const profitEl = document.getElementById('bc-profit-stat');
-        profitEl.textContent = (profit > 0 ? '+' : '') + profit.toLocaleString('vi-VN');
-        profitEl.className = 'stat-profit ' + (profit > 0 ? 'positive' : profit < 0 ? 'negative' : 'zero');
+        const totalProfit = profit + buffBonus;
+        profitEl.textContent = (totalProfit > 0 ? '+' : '') + totalProfit.toLocaleString('vi-VN');
+        profitEl.className = 'stat-profit ' + (totalProfit > 0 ? 'positive' : totalProfit < 0 ? 'negative' : 'zero');
         document.getElementById('btn-flip').style.display = 'none';
         this.renderTable(null, null, result);
 

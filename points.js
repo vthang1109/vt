@@ -38,7 +38,7 @@ export async function addPoints(source, reason, amount, applyBuff = true) {
         let current = userSnap.exists() ? (userSnap.data().points || 0) : 0;
 
         let finalAmount = amount;
-        if (amount > 0) {
+        if (amount > 0 && applyBuff) {
             const rsn = String(reason || '').toLowerCase();
             const isBet = rsn.includes('hoàn') || rsn.includes('refund') || rsn.includes('cược') || rsn.includes('đặt');
             if (!isBet) {

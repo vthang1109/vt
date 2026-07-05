@@ -257,7 +257,7 @@ class SlotGame {
       if (buffPercent > 0) {
         finalWinWithBuff = Math.round(finalWin * (1 + buffPercent / 100));
         if (finalWinWithBuff > finalWin) {
-          await addPoints('Casino', 'Buff Pet Nổ Hũ', finalWinWithBuff - finalWin);
+          await addPoints('Casino', 'Buff Pet Nổ Hũ', finalWinWithBuff - finalWin, false);
         }
         window.showToast(`🐾 Pet buff +${buffPercent}%! Nhận ${finalWinWithBuff.toLocaleString('vi-VN')} ⭐`, 'success');
       }
@@ -282,7 +282,7 @@ class SlotGame {
       }
     } catch (e) {}
 
-    await addPoints('Casino', `Trúng 3x ${symbol}`, finalAmount);
+    await addPoints('Casino', `Trúng 3x ${symbol}`, finalAmount, false);
 
     this.balance += finalAmount;
     if (window.TopNav) TopNav.setPoints(this.balance);

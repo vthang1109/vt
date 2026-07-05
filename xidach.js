@@ -1,10 +1,10 @@
 // xidach.js — Xì Dách Offline (Máy cầm cái, luật mới)
 import { createDeck, renderCardUI } from './cards.js';
 import { auth, db } from './points.js';
-import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { addPoints, getPoints } from './points.js';
-
+import { getActiveBuff, getPetById } from './pet.js';
 class XiDach {
     constructor() {
         this.deck = [];
@@ -352,14 +352,33 @@ class XiDach {
             }
         }
 
+        let buffBonus = 0, buffPct = 0;
+        if (delta > this.currentBet) {
+            try {
+                buffPct = await getActiveBuff();
+                if (buffPct > 0) buffBonus = Math.round((delta - this.currentBet) * buffPct / 100);
+            } catch {}
+        }
+
         if (delta > 0) {
-            try { await addPoints('Casino', 'Thắng Xì Dách', delta); } catch(e){}
+            try {
+                await addPoints('Casino', 'Thắng Xì Dách', delta + buffBonus, false);
+                if (buffBonus > 0) {
+                    let petLabel = '🐾 Pet';
+                    try {
+                        const ud = await getDoc(doc(db, 'users', auth.currentUser.uid));
+                        const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
+                        if (pet) petLabel = `${pet.emoji} ${pet.name}`;
+                    } catch {}
+                    window.showToast(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
+                }
+            } catch(e){}
         }
 
         this.render(true);
         this.updateButtons(false);
 
-        const net = delta - this.currentBet;
+        const net = delta - this.currentBet + buffBonus;
         document.getElementById('bc-status')?.classList.remove('rolling');
         this.updateStatusBar(res, net, `Điểm: ${pStat.score}`);
 

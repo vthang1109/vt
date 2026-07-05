@@ -764,12 +764,23 @@ async function finalizeBustDealer(r, dealerHand, deck) {
 async function settleMyResult(r, gs) {
   if (r.hostUid === _user.uid) {
     const dealerDelta = gs.dealerDelta || 0;
+    let dealerBuffBonus = 0, dealerBuffPct = 0;
+    if (dealerDelta > 0) {
+      try {
+        dealerBuffPct = await getActiveBuff();
+        if (dealerBuffPct > 0) dealerBuffBonus = Math.round(dealerDelta * dealerBuffPct / 100);
+      } catch {}
+    }
+    const totalDealerDelta = dealerDelta + dealerBuffBonus;
     if (dealerDelta !== 0) {
       const us = await getDoc(doc(db, 'users', _user.uid));
       const cur = us.exists() ? (us.data().points || 0) : 0;
-      await updateDoc(doc(db, 'users', _user.uid), { points: cur + dealerDelta });
-      showToast(dealerDelta >= 0 ? `🎉 Nhà cái thu ${dealerDelta.toLocaleString('vi-VN')}đ` : `💸 Nhà cái lỗ ${(-dealerDelta).toLocaleString('vi-VN')}đ`, dealerDelta >= 0 ? 'success' : 'warn');
-      if (window.VTQuests && dealerDelta > 0) window.VTQuests.trackEarn(dealerDelta);
+      await updateDoc(doc(db, 'users', _user.uid), { points: cur + totalDealerDelta });
+      if (dealerBuffBonus > 0) {
+        await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.dealerDelta': totalDealerDelta });
+      }
+      showToast(totalDealerDelta >= 0 ? `🎉 Nhà cái thu ${totalDealerDelta.toLocaleString('vi-VN')}đ` : `💸 Nhà cái lỗ ${(-totalDealerDelta).toLocaleString('vi-VN')}đ`, totalDealerDelta >= 0 ? 'success' : 'warn');
+      if (window.VTQuests && totalDealerDelta > 0) window.VTQuests.trackEarn(totalDealerDelta);
     }
     return;
   }
@@ -791,6 +802,9 @@ async function settleMyResult(r, gs) {
     const us = await getDoc(doc(db, 'users', _user.uid));
     const cur = us.exists() ? (us.data().points || 0) : 0;
     await updateDoc(doc(db, 'users', _user.uid), { points: cur + totalRefund });
+    if (buffBonus > 0) {
+      await updateDoc(doc(db, 'rooms', ROOM_ID), { [`gameState.results.${_user.uid}.delta`]: winAmount + buffBonus });
+    }
 
     if (buffBonus > 0) {
       const petData = await (async () => {

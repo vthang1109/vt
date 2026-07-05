@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Cờ Tướng Online</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="quests.css"/>
+  <link rel="stylesheet" href="xiangqi.css"/>
+  <link rel="stylesheet" href="xiangqi-mp.css"/>
+  <script src="top-nav.js"></script>
+  <script src="bottom-nav.js"></script>
+  <script type="module" src="quests.js"></script>
+</head>
+<body data-bottom-nav="games">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+
+  <div class="xq-wrap">
+
+    <!-- STATUS BAR -->
+    <div class="bc-status" id="bc-status">
+      <div class="stat-side stat-side-player" id="side-me">
+        <div class="side-top">
+          <span class="side-avatar" id="side-me-avatar">帥</span>
+          <span class="side-label" id="side-me-label">BẠN</span>
+        </div>
+      </div>
+
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="xq-score">--</span>
+        <span class="stat-score-sub" id="xq-score-sub">Lượt đi</span>
+      </div>
+
+      <div class="stat-side stat-side-machine" id="side-opp">
+        <div class="side-top">
+          <span class="side-label" id="side-opp-label">ĐỐI THỦ</span>
+          <span class="side-avatar" id="side-opp-avatar">將</span>
+        </div>
+        <span class="stat-profit zero" id="xq-profit">+0</span>
+      </div>
+    </div>
+
+    <!-- VÙNG ĐẶT CƯỢC -->
+    <div class="xq-bet-zone" id="xq-bet-zone"></div>
+
+    <!-- BÀN CỜ -->
+    <div class="xq-board-wrap">
+      <div class="xq-bet-badge hidden" id="xq-bet-badge">
+        <small>CƯỢC</small> <span id="xq-bet-badge-value">0</span>
+      </div>
+      <div id="board"></div>
+    </div>
+
+    <!-- STATUS TEXT -->
+    <div id="status">Đang tải...</div>
+
+    <!-- HÀNH ĐỘNG -->
+    <div class="xq-actions" id="xq-actions"></div>
+
+  </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(52,211,153,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast = function(){};
+  </script>
+
+  <script type="module" src="xiangqi-mp.js"></script>
+</body>
+</html>

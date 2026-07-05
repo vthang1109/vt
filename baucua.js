@@ -1,5 +1,6 @@
 import { addPoints, getPoints, db, auth } from './points.js';
-import { doc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getActiveBuff, getPetById } from './pet.js';
+import { doc, getDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 class BauCua {
@@ -401,14 +402,31 @@ class BauCua {
         let profit = 0;
 
         if (winAmt > 0) {
-            const newBalance = await this.updateBalance(winAmt, 'Thắng');
+            const roundProfit = winAmt - totalBet;
+            let buffBonus = 0, buffPct = 0;
+            if (roundProfit > 0) {
+                try {
+                    buffPct = await getActiveBuff();
+                    if (buffPct > 0) buffBonus = Math.round(roundProfit * buffPct / 100);
+                } catch {}
+            }
+            const newBalance = await this.updateBalance(winAmt + buffBonus, 'Thắng');
             if (newBalance === null) {
                 console.error('Không thể cập nhật balance');
                 this.isRolling = false;
                 if (btnRoll) btnRoll.disabled = false;
                 return;
             }
-            profit = winAmt - totalBet;
+            if (buffBonus > 0) {
+                let petLabel = '🐾 Pet';
+                try {
+                    const ud = await getDoc(doc(db, 'users', this._userId));
+                    const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
+                    if (pet) petLabel = `${pet.emoji} ${pet.name}`;
+                } catch {}
+                window.showToast?.(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
+            }
+            profit = winAmt - totalBet + buffBonus;
             this.lastProfit = profit;
             
             if (window.VTQuests) {

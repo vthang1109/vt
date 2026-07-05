@@ -16,6 +16,7 @@ const GAMES = {
   tictactoe: { id: 'tictactoe', name: 'Tic-Tac-Toe',     icon: '⭕', max: 2, min: 2, page: 'tictactoe-mp.html', ready: true },
   pickso:    { id: 'pickso',    name: 'Pick Số',      icon: '🔢', max: 6, min: 2, page: 'pickso-mp.html',    ready: true },
   chess:     { id: 'chess',     name: 'Cờ Vua',      icon: '♞', max: 2, min: 2, page: 'chess-mp.html',     ready: true },
+  xiangqi:   { id: 'xiangqi',   name: 'Cờ Tướng',    icon: '🀄', max: 2, min: 2, page: 'xiangqi-mp.html',   ready: true },
 };
 
 let _user = null;
@@ -165,7 +166,7 @@ window.doCreateRoom = async function(){
       status: 'lobby',
       maxPlayers: Math.min(max, g.max),
       members: [_user.uid],
-      memberInfo: { [_user.uid]: { name: myName, avatarUrl: _myProfile.avatarUrl || '', ready: false } },
+      memberInfo: { [_user.uid]: { name: myName, avatarUrl: _myProfile.avatarUrl || '', ready: true } },
       createdAt: serverTimestamp()
     });
     closeCreateModal();
@@ -220,7 +221,7 @@ async function joinRoomById(id, data){
     if (!(data.members||[]).includes(_user.uid)){
       const myName = _myProfile.nickname || _user.email.split('@')[0];
       const memberInfo = data.memberInfo || {};
-      memberInfo[_user.uid] = { name: myName, avatarUrl: _myProfile.avatarUrl || '', ready: false };
+      memberInfo[_user.uid] = { name: myName, avatarUrl: _myProfile.avatarUrl || '', ready: true };
       await updateDoc(doc(db,'rooms',id), {
         members: arrayUnion(_user.uid),
         memberInfo
@@ -370,6 +371,8 @@ window.startGame = async function(){
     gameState = { phase: 'betting', round: 1, bets: {}, picks: {}, turnOrder: [], turnIdx: 0, winners: [], deltas: {} };
   } else if (data.gameType === 'chess'){
     gameState = { phase: 'betting', round: 1, bets: {}, betAmount: null, betDeclinedBy: null, colors: {}, fen: null, turn: 'w', lastMove: null, moveCount: 0, players: data.members.slice(0, 2), result: null, winnerUid: null, drawOffer: null };
+  } else if (data.gameType === 'xiangqi'){
+    gameState = { phase: 'betting', round: 1, bets: {}, betAmount: null, betDeclinedBy: null, colors: {}, boardStr: null, turn: 'r', lastMove: null, moveCount: 0, players: data.members.slice(0, 2), result: null, winnerUid: null, drawOffer: null };
   }
   await updateDoc(doc(db,'rooms',_currentRoomId), {
     status: 'playing',
