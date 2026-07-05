@@ -1,0 +1,192 @@
+/* ============================================================
+   CỜ VUA MULTIPLAYER — bổ sung style cho phòng đấu (chess-mp)
+   Dùng chung layout/board/status-bar với chess.css, chỉ thêm
+   phần bet-row, action buttons và modal đề nghị hòa.
+   ============================================================ */
+
+/* Hiển thị tiền cược ở status bar (bản đơn không hiện .stat-bet,
+   bản multiplayer thì hiện — dùng class riêng để không đụng chess.css) */
+.chess-mp-bet {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 17px;
+  color: #fbbf24;
+  min-width: 65px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+}
+.chess-mp-bet small {
+  font-size: 9px;
+  font-weight: 600;
+  color: #94a3b8;
+  font-family: 'Nunito', sans-serif;
+}
+.bc-status.in-progress .chess-mp-bet {
+  display: none;
+}
+
+/* ===================== BET ROW ===================== */
+.chess-bet-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  margin-bottom: 12px;
+}
+.chess-bet-row label {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+.chess-bet-row input {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  background: rgba(0, 0, 0, 0.3);
+  color: #fde68a;
+  font-family: 'Orbitron', monospace;
+  font-weight: 800;
+  font-size: 14px;
+  text-align: center;
+}
+.chess-bet-row button {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #0a101e;
+  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
+  transition: transform 0.15s;
+}
+.chess-bet-row button:active { transform: scale(0.95); }
+
+.chess-waiting-text {
+  text-align: center;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #94a3b8;
+  padding: 10px 0;
+  margin-bottom: 12px;
+}
+
+/* ===================== HÀNG NÚT HÀNH ĐỘNG ===================== */
+.chess-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.chess-act-btn {
+  padding: 10px 22px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+}
+.chess-act-btn:active:not(:disabled) { transform: scale(0.95); }
+.chess-act-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.chess-act-red {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+.chess-act-red:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3); }
+
+.chess-act-blue {
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #7dd3fc;
+}
+.chess-act-blue:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(56, 189, 248, 0.3); }
+
+.chess-act-yellow {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #0a101e;
+  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.25);
+}
+.chess-act-yellow:hover:not(:disabled) { box-shadow: 0 6px 24px rgba(251, 191, 36, 0.4); }
+
+.chess-wait-host {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* ===================== MODAL ĐỀ NGHỊ HÒA ===================== */
+.chess-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.55);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.chess-modal-box {
+  width: 100%;
+  max-width: 340px;
+  background: linear-gradient(160deg, rgba(20,26,43,0.98), rgba(10,16,30,0.98));
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 16px;
+  padding: 22px 20px;
+  box-shadow: 0 12px 50px rgba(0,0,0,0.6);
+  text-align: center;
+}
+.chess-modal-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  color: #fff;
+  margin-bottom: 18px;
+}
+.chess-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+.chess-modal-btn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+}
+.chess-modal-btn.decline {
+  background: rgba(255,255,255,0.08);
+  color: #cbd5e1;
+}
+.chess-modal-btn.accept {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #06240f;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 600px) {
+  .chess-bet-row { flex-wrap: wrap; }
+  .chess-act-btn { padding: 9px 16px; font-size: 12px; }
+}

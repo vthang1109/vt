@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Cờ Vua Online</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="quests.css"/>
+  <link rel="stylesheet" href="chess.css"/>
+  <link rel="stylesheet" href="chess-mp.css"/>
+  <script src="top-nav.js"></script>
+  <script src="bottom-nav.js"></script>
+  <script type="module" src="quests.js"></script>
+</head>
+<body data-bottom-nav="games">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <!-- TOP NAV -->
+  <div id="top-nav-root"></div>
+
+  <div class="chess-wrap">
+
+    <!-- STATUS BAR -->
+    <div class="bc-status" id="bc-status">
+      <div class="stat-side stat-side-player" id="side-me">
+        <div class="side-top">
+          <span class="side-avatar" id="side-me-avatar">♔</span>
+          <span class="side-label" id="side-me-label">BẠN</span>
+        </div>
+        <span class="chess-mp-bet">
+          <span id="chess-bet-value">0</span>
+          <small>CƯỢC</small>
+        </span>
+      </div>
+
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="chess-score">--</span>
+        <span class="stat-score-sub" id="chess-score-sub">Lượt đi</span>
+      </div>
+
+      <div class="stat-side stat-side-machine" id="side-opp">
+        <div class="side-top">
+          <span class="side-label" id="side-opp-label">ĐỐI THỦ</span>
+          <span class="side-avatar" id="side-opp-avatar">♚</span>
+        </div>
+        <span class="stat-profit zero" id="chess-profit">+0</span>
+      </div>
+    </div>
+
+    <!-- BET ROW -->
+    <div class="chess-bet-row" id="chess-bet-row" style="display:none">
+      <label>Đặt cược:</label>
+      <input id="chess-bet-input" type="number" min="50" step="50" value="100"/>
+      <button onclick="placeBet()">✅ Đặt cược</button>
+    </div>
+    <div class="chess-waiting-text" id="chess-waiting-text" style="display:none">⏳ Đang chờ đối thủ đặt cược...</div>
+
+    <!-- BÀN CỜ -->
+    <div class="chess-board-wrap">
+      <div id="board"></div>
+    </div>
+
+    <!-- STATUS TEXT -->
+    <div id="status">Đang tải...</div>
+
+    <!-- HÀNH ĐỘNG -->
+    <div class="chess-actions" id="chess-actions"></div>
+
+  </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    // Particle
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(52,211,153,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    // Đã bỏ thông báo nổi (toast) — giữ hàm rỗng để code cũ gọi không lỗi
+    window.showToast = function(){};
+  </script>
+
+  <!-- Load chess.js library với nhiều CDN fallback -->
+  <script>
+    (function loadChessLib(sources, i) {
+      if (i >= sources.length) {
+        var s = document.getElementById('status');
+        if (s) s.textContent = '❌ Không tải được chess.js từ mọi CDN. Kiểm tra mạng.';
+        return;
+      }
+      var tag = document.createElement('script');
+      tag.src = sources[i];
+      tag.onload = function () {
+        var gameScript = document.createElement('script');
+        gameScript.type = 'module';
+        gameScript.src = 'chess-mp.js';
+        document.body.appendChild(gameScript);
+      };
+      tag.onerror = function () {
+        console.warn('Chess.js CDN lỗi:', sources[i]);
+        loadChessLib(sources, i + 1);
+      };
+      document.body.appendChild(tag);
+    })([
+      'https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.12.0/chess.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.min.js',
+      'https://cdn.jsdelivr.net/npm/chess.js@0.12.0/dist/chess.min.js',
+      'https://unpkg.com/chess.js@0.12.0/dist/chess.min.js'
+    ], 0);
+  </script>
+</body>
+</html>

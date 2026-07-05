@@ -6,6 +6,7 @@ import {
   orderBy, limit
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { initProfileCard } from './profile-card.js';
 
 const GAMES = {
   xidach:    { id: 'xidach',    name: 'Xì dách',     icon: '♣️', max: 5, min: 2, page: 'xidach-mp.html',    ready: true },
@@ -14,6 +15,7 @@ const GAMES = {
   caro:      { id: 'caro',      name: 'Caro',     icon: '♟️', max: 2, min: 2, page: 'caro-mp.html',      ready: true },
   tictactoe: { id: 'tictactoe', name: 'Tic-Tac-Toe',     icon: '⭕', max: 2, min: 2, page: 'tictactoe-mp.html', ready: true },
   pickso:    { id: 'pickso',    name: 'Pick Số',      icon: '🔢', max: 6, min: 2, page: 'pickso-mp.html',    ready: true },
+  chess:     { id: 'chess',     name: 'Cờ Vua',      icon: '♞', max: 2, min: 2, page: 'chess-mp.html',     ready: true },
 };
 
 let _user = null;
@@ -47,6 +49,7 @@ try {
     try {
       if (!user) { window.location.href = 'index.html'; return; }
       _user = user;
+      initProfileCard({ db, getMyUid: () => _user.uid });
       const ps = await getDoc(doc(db, 'users', user.uid));
       _myProfile = ps.exists() ? ps.data() : { nickname: user.email.split('@')[0] };
       setText('me-name', _myProfile.nickname || user.email.split('@')[0]);
@@ -162,7 +165,7 @@ window.doCreateRoom = async function(){
       status: 'lobby',
       maxPlayers: Math.min(max, g.max),
       members: [_user.uid],
-      memberInfo: { [_user.uid]: { name: myName, ready: false } },
+      memberInfo: { [_user.uid]: { name: myName, avatarUrl: _myProfile.avatarUrl || '', ready: false } },
       createdAt: serverTimestamp()
     });
     closeCreateModal();
@@ -217,7 +220,7 @@ async function joinRoomById(id, data){
     if (!(data.members||[]).includes(_user.uid)){
       const myName = _myProfile.nickname || _user.email.split('@')[0];
       const memberInfo = data.memberInfo || {};
-      memberInfo[_user.uid] = { name: myName, ready: false };
+      memberInfo[_user.uid] = { name: myName, avatarUrl: _myProfile.avatarUrl || '', ready: false };
       await updateDoc(doc(db,'rooms',id), {
         members: arrayUnion(_user.uid),
         memberInfo
@@ -365,6 +368,8 @@ window.startGame = async function(){
     gameState = { phase: 'betting', round: 1, hands: {}, bets: {}, results: {}, deck: [] };
   } else if (data.gameType === 'pickso'){
     gameState = { phase: 'betting', round: 1, bets: {}, picks: {}, turnOrder: [], turnIdx: 0, winners: [], deltas: {} };
+  } else if (data.gameType === 'chess'){
+    gameState = { phase: 'betting', round: 1, bets: {}, colors: {}, fen: null, turn: 'w', lastMove: null, moveCount: 0, players: data.members.slice(0, 2), result: null, winnerUid: null, drawOffer: null };
   }
   await updateDoc(doc(db,'rooms',_currentRoomId), {
     status: 'playing',
