@@ -369,7 +369,7 @@ window.startGame = async function(){
   } else if (data.gameType === 'pickso'){
     gameState = { phase: 'betting', round: 1, bets: {}, picks: {}, turnOrder: [], turnIdx: 0, winners: [], deltas: {} };
   } else if (data.gameType === 'chess'){
-    gameState = { phase: 'betting', round: 1, bets: {}, colors: {}, fen: null, turn: 'w', lastMove: null, moveCount: 0, players: data.members.slice(0, 2), result: null, winnerUid: null, drawOffer: null };
+    gameState = { phase: 'betting', round: 1, bets: {}, betAmount: null, betDeclinedBy: null, colors: {}, fen: null, turn: 'w', lastMove: null, moveCount: 0, players: data.members.slice(0, 2), result: null, winnerUid: null, drawOffer: null };
   }
   await updateDoc(doc(db,'rooms',_currentRoomId), {
     status: 'playing',

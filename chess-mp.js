@@ -26,6 +26,7 @@ let _autoStartRound = -1;
 let _drawModalShownFor = null;
 let _actionLock = false;
 let _lastRoomData = null, _gs = null;
+let _lastDeclineHandled = null;
 
 if (!ROOM_ID) document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">⚠️ Thiếu mã phòng.</div>';
 
@@ -285,8 +286,6 @@ function render(r) {
   const oppUid = members.find(u => u !== uid);
   const isHost = r.hostUid === uid;
 
-  const betRow = document.getElementById('chess-bet-row');
-  const waitingText = document.getElementById('chess-waiting-text');
   const scoreEl = document.getElementById('chess-score');
   const scoreSubEl = document.getElementById('chess-score-sub');
   const profitEl = document.getElementById('chess-profit');
@@ -309,8 +308,7 @@ function render(r) {
     document.getElementById('board').innerHTML = '';
     statusEl.textContent = 'Đối thủ đã rời phòng.';
     actEl.innerHTML = '';
-    betRow.style.display = 'none';
-    waitingText.style.display = 'none';
+    document.getElementById('chess-bet-zone').innerHTML = '';
     hideDrawModal();
     return;
   }
@@ -321,18 +319,26 @@ function render(r) {
     targets = [];
     renderBoard(gs);
 
-    const myBet = gs.bets?.[uid] || 0;
     betValueEl.textContent = '0';
     profitEl.textContent = '+0'; profitEl.className = 'stat-profit zero';
     scoreEl.textContent = '--'; scoreSubEl.textContent = 'Đặt cược';
-    statusEl.textContent = 'Cả hai người chơi cùng đặt cược để bắt đầu ván đấu.';
-    betRow.style.display = myBet > 0 ? 'none' : 'flex';
-    waitingText.style.display = myBet > 0 ? 'block' : 'none';
+    statusEl.textContent = 'Chủ phòng chọn mức cược, đối thủ xác nhận để bắt đầu ván đấu.';
     actEl.innerHTML = '';
     hideDrawModal();
 
+    renderBetZone(r, gs, isHost, uid, oppUid);
+
+    // Nếu đối thủ vừa từ chối mức cược: chủ phòng hoàn tiền cược và reset (chỉ xử lý 1 lần/round)
+    if (isHost && gs.betDeclinedBy) {
+      const key = `${gs.round}:${gs.betDeclinedBy}`;
+      if (_lastDeclineHandled !== key) {
+        _lastDeclineHandled = key;
+        refundDeclinedBet(gs);
+      }
+    }
+
     const p1 = members[0], p2 = members[1];
-    const allBet = p1 && p2 && (gs.bets?.[p1] || 0) > 0 && (gs.bets?.[p2] || 0) > 0;
+    const allBet = gs.betAmount && p1 && p2 && (gs.bets?.[p1] || 0) > 0 && (gs.bets?.[p2] || 0) > 0;
     if (isHost && allBet && gs.round !== _autoStartRound) {
       _autoStartRound = gs.round;
       setTimeout(() => { hostStartMatch(); }, 400);
@@ -341,8 +347,7 @@ function render(r) {
   }
 
   // playing hoặc result
-  betRow.style.display = 'none';
-  waitingText.style.display = 'none';
+  document.getElementById('chess-bet-zone').innerHTML = '';
   game.load(gs.fen || game.fen());
 
   const myColor = gs.colors?.[uid];
@@ -412,6 +417,111 @@ function render(r) {
   }
 }
 
+/* ========== VÙNG ĐẶT CƯỢC (chủ phòng chọn mức, đối thủ xác nhận) ========== */
+function renderBetZone(r, gs, isHost, uid, oppUid) {
+  const zone = document.getElementById('chess-bet-zone');
+  const betAmount = gs.betAmount || null;
+  const oppConfirmed = oppUid && !!gs.bets?.[oppUid];
+  const meConfirmed = !!gs.bets?.[uid];
+
+  if (isHost) {
+    if (!betAmount) {
+      zone.innerHTML = `
+        <div class="chess-bet-picker">
+          <div class="chess-bet-picker-label">Chọn mức cược cho ván này</div>
+          <div class="chess-bet-picker-row">
+            <input id="chess-bet-input" type="number" min="50" step="50" value="100"/>
+          </div>
+          <div class="chess-bet-quick">
+            <button type="button" onclick="chessQuickBet(100)">100</button>
+            <button type="button" onclick="chessQuickBet(200)">200</button>
+            <button type="button" onclick="chessQuickBet(500)">500</button>
+            <button type="button" onclick="chessQuickBet(1000)">1000</button>
+          </div>
+          <button class="chess-bet-confirm-btn" onclick="hostSetBet()">✅ Đặt mức cược</button>
+        </div>`;
+    } else {
+      zone.innerHTML = `<div class="chess-bet-waiting">⏳ Đã đặt mức cược <b>${betAmount.toLocaleString('vi-VN')}đ</b> — đang chờ đối thủ xác nhận...</div>`;
+    }
+    return;
+  }
+
+  // không phải host
+  if (!betAmount) {
+    zone.innerHTML = `<div class="chess-bet-waiting">⏳ Đang chờ chủ phòng chọn mức cược...</div>`;
+  } else if (!meConfirmed) {
+    zone.innerHTML = `
+      <div class="chess-bet-confirm-card">
+        <div class="chess-bet-confirm-title">Chủ phòng muốn đặt cược</div>
+        <div class="chess-bet-confirm-amt">${betAmount.toLocaleString('vi-VN')}đ</div>
+        <div class="chess-bet-confirm-actions">
+          <button class="decline" onclick="declineBet()">Từ chối</button>
+          <button class="accept" onclick="acceptBet()">Đồng ý</button>
+        </div>
+      </div>`;
+  } else {
+    zone.innerHTML = `<div class="chess-bet-waiting">✅ Đã xác nhận cược ${betAmount.toLocaleString('vi-VN')}đ — đang bắt đầu ván đấu...</div>`;
+  }
+}
+
+window.chessQuickBet = function(amt) {
+  const el = document.getElementById('chess-bet-input');
+  if (el) el.value = amt;
+};
+
+window.hostSetBet = async function() {
+  const el = document.getElementById('chess-bet-input');
+  const amt = parseInt(el?.value);
+  if (!amt || amt < 50) { showToast('Cược tối thiểu 50', 'warn'); return; }
+  if (amt > _myBalance) { showToast('Không đủ điểm', 'error'); return; }
+  try {
+    await updateDoc(doc(db, 'users', _user.uid), { points: _myBalance - amt });
+    await updateDoc(doc(db, 'rooms', ROOM_ID), {
+      'gameState.betAmount': amt,
+      [`gameState.bets.${_user.uid}`]: amt
+    });
+    showToast('✅ Đã đặt mức cược ' + amt.toLocaleString('vi-VN') + 'đ', 'success');
+  } catch (e) { console.error(e); showToast('Lỗi', 'error'); }
+};
+
+window.acceptBet = async function() {
+  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
+  if (!snap.exists()) return;
+  const r = snap.data(); const gs = r.gameState;
+  const amt = gs.betAmount;
+  if (!amt || gs.bets?.[_user.uid]) return;
+  if (amt > _myBalance) { showToast('Không đủ điểm để đồng ý mức cược này', 'error'); return; }
+  try {
+    await updateDoc(doc(db, 'users', _user.uid), { points: _myBalance - amt });
+    await updateDoc(doc(db, 'rooms', ROOM_ID), { [`gameState.bets.${_user.uid}`]: amt });
+    showToast('✅ Đã xác nhận cược', 'success');
+  } catch (e) { console.error(e); showToast('Lỗi', 'error'); }
+};
+
+window.declineBet = async function() {
+  try {
+    await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.betDeclinedBy': _user.uid });
+  } catch (e) { console.error(e); }
+};
+
+// Chỉ chủ phòng gọi: hoàn lại tiền cược của chính mình rồi reset mức cược để chọn lại
+async function refundDeclinedBet(gs) {
+  const amt = gs.betAmount || 0;
+  try {
+    if (amt > 0) {
+      const us = await getDoc(doc(db, 'users', _user.uid));
+      const cur = us.exists() ? (us.data().points || 0) : 0;
+      await updateDoc(doc(db, 'users', _user.uid), { points: cur + amt });
+      showToast(`↩️ Đối thủ từ chối mức cược, đã hoàn lại ${amt.toLocaleString('vi-VN')}đ`, 'info');
+    }
+    await updateDoc(doc(db, 'rooms', ROOM_ID), {
+      'gameState.betAmount': null,
+      'gameState.bets': {},
+      'gameState.betDeclinedBy': null
+    });
+  } catch (e) { console.error(e); }
+}
+
 function showDrawModal(r, offer) {
   if (_drawModalShownFor === offer.uid) return;
   _drawModalShownFor = offer.uid;
@@ -441,18 +551,6 @@ function hideDrawModal() {
 }
 
 /* ========== HÀNH ĐỘNG ========== */
-window.placeBet = async function() {
-  const amt = parseInt(document.getElementById('chess-bet-input').value);
-  if (!amt || amt < 50) { showToast('Cược tối thiểu 50', 'warn'); return; }
-  if (amt > _myBalance) { showToast('Không đủ điểm', 'error'); return; }
-  try {
-    await updateDoc(doc(db, 'users', _user.uid), { points: _myBalance - amt });
-    await updateDoc(doc(db, 'rooms', ROOM_ID), { [`gameState.bets.${_user.uid}`]: amt });
-    if (window.VTQuests) window.VTQuests.trackPlay('chess');
-    showToast('✅ Đã đặt ' + amt.toLocaleString('vi-VN') + 'đ', 'success');
-  } catch (e) { console.error(e); showToast('Lỗi', 'error'); }
-};
-
 async function hostStartMatch() {
   const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
   if (!snap.exists()) return;
@@ -470,6 +568,7 @@ async function hostStartMatch() {
   const blackUid = flip ? p1 : p2;
 
   game.reset();
+  if (window.VTQuests) window.VTQuests.trackPlay('chess');
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
     'gameState.phase': 'playing',
     'gameState.colors': { [whiteUid]: 'w', [blackUid]: 'b' },
@@ -539,6 +638,8 @@ window.hostNextRound = async function() {
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
     'gameState.phase': 'betting',
     'gameState.bets': {},
+    'gameState.betAmount': null,
+    'gameState.betDeclinedBy': null,
     'gameState.colors': {},
     'gameState.fen': null,
     'gameState.turn': 'w',
