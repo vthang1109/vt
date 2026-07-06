@@ -1,10 +1,9 @@
 // xidach.js — Xì Dách Offline (Máy cầm cái, luật mới)
 import { createDeck, renderCardUI } from './cards.js';
 import { auth, db } from './points.js';
-import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { addPoints, getPoints } from './points.js';
-import { getActiveBuff, getPetById } from './pet.js';
+import { addPoints } from './points.js';
 class XiDach {
     constructor() {
         this.deck = [];
@@ -18,6 +17,9 @@ class XiDach {
         this.phase = 'betting';
         this.dealerResult = '';
         this.unsubBalance = null;
+        this.betSettled = true;
+        this.cachedBuffPct = 0;
+        this.cachedPetLabel = '🐾 Pet';
         this.initAfterAuth();
     }
 
@@ -41,6 +43,7 @@ class XiDach {
         document.head.appendChild(style);
 
         this.listenBalance();
+        this.refreshBuffCache();
         window.game = this;
 
         document.getElementById('xd-bet-row').style.display = 'flex';
@@ -54,6 +57,19 @@ class XiDach {
                 this.balance = snap.data().points || 0;
             }
         });
+    }
+
+    async refreshBuffCache() {
+        try {
+            const { getPetData, getPetById, getTierById } = await import('./pet.js');
+            const d = await getPetData();
+            const pet = d.activePet ? getPetById(d.activePet) : null;
+            this.cachedBuffPct = pet ? (getTierById(pet.tier).buff || 0) : 0;
+            this.cachedPetLabel = pet ? `${pet.emoji} ${pet.name}` : '🐾 Pet';
+        } catch {
+            this.cachedBuffPct = 0;
+            this.cachedPetLabel = '🐾 Pet';
+        }
     }
 
     // ========== CẬP NHẬT STATUS BAR: [tổng cược] [thông báo + chi tiết] [lời-lỗ] ==========
@@ -111,27 +127,18 @@ class XiDach {
             return;
         }
 
-        let currentPoints;
-        try {
-            currentPoints = await getPoints();
-        } catch (e) {
-            window.showToast('Lỗi kiểm tra điểm', 'error');
-            return;
-        }
-        if (currentPoints !== null) this.balance = currentPoints;
-
         const amt = parseInt(document.getElementById('xd-bet-input').value);
         if (!amt || amt < 50) { window.showToast('Cược tối thiểu 50 ⭐', 'warn'); return; }
         if (amt > this.balance) { window.showToast('Không đủ điểm!', 'error'); return; }
 
         this.currentBet = amt;
+        this.betSettled = false;
         try {
-            await addPoints('Casino', 'Cược Xì Dách', -this.currentBet);
             // Bắt đầu ván mới
             await this.startDeal();
         } catch (e) {
             console.error(e);
-            window.showToast('Lỗi đặt cược: ' + e.message, 'error');
+            window.showToast('Lỗi chia bài: ' + e.message, 'error');
             // Khôi phục trạng thái
             this.phase = 'betting';
             document.getElementById('xd-bet-row').style.display = 'flex';
@@ -352,25 +359,19 @@ class XiDach {
             }
         }
 
-        let buffBonus = 0, buffPct = 0;
-        if (delta > this.currentBet) {
-            try {
-                buffPct = await getActiveBuff();
-                if (buffPct > 0) buffBonus = Math.round((delta - this.currentBet) * buffPct / 100);
-            } catch {}
+        let buffBonus = 0;
+        const buffPct = this.cachedBuffPct || 0;
+        if (delta > this.currentBet && buffPct > 0) {
+            buffBonus = Math.round((delta - this.currentBet) * buffPct / 100);
         }
 
-        if (delta > 0) {
+        const net = delta - this.currentBet + buffBonus;
+        this.betSettled = true;
+        if (net !== 0) {
             try {
-                await addPoints('Casino', 'Thắng Xì Dách', delta + buffBonus, false);
+                await addPoints('Casino', net > 0 ? 'Thắng Xì Dách' : 'Cược Xì Dách', net, false);
                 if (buffBonus > 0) {
-                    let petLabel = '🐾 Pet';
-                    try {
-                        const ud = await getDoc(doc(db, 'users', auth.currentUser.uid));
-                        const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
-                        if (pet) petLabel = `${pet.emoji} ${pet.name}`;
-                    } catch {}
-                    window.showToast(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
+                    window.showToast(`${this.cachedPetLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
                 }
             } catch(e){}
         }
@@ -378,7 +379,6 @@ class XiDach {
         this.render(true);
         this.updateButtons(false);
 
-        const net = delta - this.currentBet + buffBonus;
         document.getElementById('bc-status')?.classList.remove('rolling');
         this.updateStatusBar(res, net, `Điểm: ${pStat.score}`);
 
@@ -483,6 +483,14 @@ class XiDach {
             location.href = 'games.html';
         }
     }
+
+    forfeitIfAbandoned() {
+        if (this.betSettled || this.phase === 'betting') return;
+        this.betSettled = true;
+        addPoints('Casino', 'Xì Dách out phòng - mất cược', -this.currentBet, false).catch(() => {});
+    }
 }
 
 new XiDach();
+window.addEventListener('pagehide', () => window.game?.forfeitIfAbandoned());
+window.addEventListener('beforeunload', () => window.game?.forfeitIfAbandoned());

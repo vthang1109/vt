@@ -10,8 +10,6 @@ const levelInfoEl = document.getElementById('level-info');
 const colorWhiteBtn = document.getElementById('color-white');
 const colorBlackBtn = document.getElementById('color-black');
 const startBtn = document.getElementById('start-btn');
-const betInputEl = document.getElementById('chess-bet-input');
-const betQuickEl = document.querySelector('.bet-quick');
 
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
@@ -39,14 +37,6 @@ function listenBalance() {
   if (unsubBalance) unsubBalance();
   unsubBalance = onSnapshot(doc(db, 'users', auth.currentUser.uid), (snap) => {
     if (snap.exists()) balance = snap.data().points || 0;
-  });
-}
-
-if (betQuickEl) {
-  betQuickEl.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-bet]');
-    if (!btn) return;
-    betInputEl.value = btn.dataset.bet;
   });
 }
 
@@ -90,16 +80,16 @@ const PIECE_SVG = {
 
 // --- 10 CẤP ĐỘ ---
 const LEVELS = [
-  { elo: 1320, depth: 2,  random: 0.55, tier: 'easy',   note: 'Newbie · máy đi ngẫu nhiên, dễ mắc sai lầm' },
-  { elo: 1400, depth: 3,  random: 0.45, tier: 'easy',   note: 'Newbie · tính toán rất nông' },
-  { elo: 1500, depth: 4,  random: 0.30, tier: 'easy',   note: 'Newbie+ · thỉnh thoảng sai lầm' },
-  { elo: 1650, depth: 6,  random: 0,    tier: 'medium', note: 'Trung bình · phân tích thế cờ cơ bản' },
-  { elo: 1800, depth: 8,  random: 0,    tier: 'medium', note: 'Trung bình · ổn định hơn' },
-  { elo: 1950, depth: 9,  random: 0,    tier: 'medium', note: 'Trung bình khá' },
-  { elo: 2100, depth: 10, random: 0,    tier: 'medium', note: 'Trung bình+ · sắp bước vào khó' },
-  { elo: 2400, depth: 12, random: 0,    tier: 'hard',   note: 'Khó · tính toán sâu, đánh gắt' },
-  { elo: 2700, depth: 14, random: 0,    tier: 'hard',   note: 'Rất khó · rất ít sai sót' },
-  { elo: 3190, depth: 16, random: 0,    tier: 'hard',   note: 'Siêu khó · gần như hoàn hảo' }
+  { elo: 1320, depth: 2,  random: 0.55, tier: 'easy',   note: 'Newbie · máy đi ngẫu nhiên, dễ mắc sai lầm', reward: 500 },
+  { elo: 1400, depth: 3,  random: 0.45, tier: 'easy',   note: 'Newbie · tính toán rất nông', reward: 1000 },
+  { elo: 1500, depth: 4,  random: 0.30, tier: 'easy',   note: 'Newbie+ · thỉnh thoảng sai lầm', reward: 1500 },
+  { elo: 1650, depth: 6,  random: 0,    tier: 'medium', note: 'Trung bình · phân tích thế cờ cơ bản', reward: 2000 },
+  { elo: 1800, depth: 8,  random: 0,    tier: 'medium', note: 'Trung bình · ổn định hơn', reward: 2500 },
+  { elo: 1950, depth: 9,  random: 0,    tier: 'medium', note: 'Trung bình khá', reward: 3000 },
+  { elo: 2100, depth: 10, random: 0,    tier: 'medium', note: 'Trung bình+ · sắp bước vào khó', reward: 3500 },
+  { elo: 2400, depth: 12, random: 0,    tier: 'hard',   note: 'Khó · tính toán sâu, đánh gắt', reward: 4000 },
+  { elo: 2700, depth: 14, random: 0,    tier: 'hard',   note: 'Rất khó · rất ít sai sót', reward: 4500 },
+  { elo: 3190, depth: 16, random: 0,    tier: 'hard',   note: 'Siêu khó · gần như hoàn hảo', reward: 5000 }
 ];
 
 let selectedLevel = 3; // mặc định cấp 3 (1-indexed)
@@ -135,7 +125,7 @@ function buildLevelStrip() {
 
 function updateLevelInfo() {
   const lvl = LEVELS[selectedLevel - 1];
-  levelInfoEl.textContent = `Cấp ${selectedLevel} · ~${lvl.elo} ELO · ${lvl.note}`;
+  levelInfoEl.textContent = `Cấp ${selectedLevel} · ~${lvl.elo} ELO · ${lvl.note} · Thưởng ${lvl.reward.toLocaleString('vi-VN')}⭐`;
 }
 
 colorWhiteBtn.addEventListener('click', () => {
@@ -153,28 +143,10 @@ startBtn.addEventListener('click', placeBetAndStart);
 
 async function placeBetAndStart() {
   if (startBtn.disabled) return;
-
-  let currentPoints;
-  try {
-    currentPoints = await getPoints();
-  } catch (e) {
-    window.showToast('Lỗi kiểm tra điểm', 'error');
-    return;
-  }
-  if (currentPoints !== null) balance = currentPoints;
-
-  const amt = parseInt(betInputEl.value);
-  if (!amt || amt < 50) { window.showToast('Cược tối thiểu 50 ⭐', 'warn'); return; }
-  if (amt > balance) { window.showToast('Không đủ điểm!', 'error'); return; }
-
+  currentBet = LEVELS[selectedLevel - 1].reward;
   startBtn.disabled = true;
   try {
-    await addPoints('Casino', 'Cược Cờ Vua', -amt);
-    currentBet = amt;
     startGame();
-  } catch (e) {
-    console.error(e);
-    window.showToast('Lỗi đặt cược: ' + e.message, 'error');
   } finally {
     startBtn.disabled = false;
   }
@@ -587,27 +559,27 @@ function updateStatus() {
   }
 }
 
-// --- THANH TOÁN CƯỢC: thắng x2, hòa hoàn cược, thua mất cược. Chỉ chạy 1 lần/ván ---
+// --- THANH TOÁN: thắng nhận thưởng, thua bị phạt, hòa không cộng trừ. Chỉ chạy 1 lần/ván ---
 async function settlePayout(result) {
   if (payoutSettled) return;
   payoutSettled = true;
 
   let delta = 0;
-  if (result === 'win') delta = currentBet * 2;
-  else if (result === 'draw') delta = currentBet;
+  if (result === 'win') delta = currentBet;
+  else if (result === 'loss') delta = -currentBet;
   else delta = 0;
 
-  if (delta > 0) {
+  if (delta !== 0) {
     try {
-      const reason = result === 'win' ? 'Thắng Cờ Vua' : 'Hòa Cờ Vua';
-      await addPoints('Casino', reason, delta);
+      const reason = result === 'win' ? 'Thắng Cờ Vua' : 'Thua Cờ Vua';
+      await addPoints('Casino', reason, delta, false);
     } catch (e) {
       console.error(e);
       window.showToast('Lỗi cộng điểm: ' + e.message, 'error');
     }
   }
 
-  const net = delta - currentBet;
+  const net = delta;
   chessProfitEl.classList.remove('positive', 'negative', 'zero');
   if (net > 0) {
     chessProfitEl.textContent = `+${net.toLocaleString('vi-VN')}`;

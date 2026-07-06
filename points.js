@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
-    getFirestore, doc, getDoc, updateDoc, setDoc, serverTimestamp, onSnapshot
+    getFirestore, doc, getDoc, updateDoc, setDoc, serverTimestamp, onSnapshot, increment, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -34,9 +34,6 @@ export async function addPoints(source, reason, amount, applyBuff = true) {
     if (!user) return;
     try {
         const userRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-        let current = userSnap.exists() ? (userSnap.data().points || 0) : 0;
-
         let finalAmount = amount;
         if (amount > 0 && applyBuff) {
             const rsn = String(reason || '').toLowerCase();
@@ -49,13 +46,15 @@ export async function addPoints(source, reason, amount, applyBuff = true) {
                 } catch {}
             }
         }
-        let newTotal = current + finalAmount;
-        if (newTotal < 0) newTotal = 0;
-        await updateDoc(userRef, { points: newTotal, lastUpdate: serverTimestamp() });
 
-        // Cập nhật TopNav (dùng đúng API của top-nav.js)
-        if (window.TopNav) {
-            window.TopNav.setPoints(newTotal);
+        if (finalAmount < 0) {
+            await runTransaction(db, async tx => {
+                const snap = await tx.get(userRef);
+                const cur = snap.data()?.points || 0;
+                tx.update(userRef, { points: Math.max(0, cur + finalAmount), lastUpdate: serverTimestamp() });
+            });
+        } else {
+            await updateDoc(userRef, { points: increment(finalAmount), lastUpdate: serverTimestamp() });
         }
 
         if (window.VTQuests && finalAmount > 0) {
@@ -63,7 +62,7 @@ export async function addPoints(source, reason, amount, applyBuff = true) {
             const rsn = String(reason || '').toLowerCase();
             if (rsn.includes('thắng') || rsn.includes('win')) window.VTQuests.trackWinSmart();
         }
-        return newTotal;
+        return finalAmount;
     } catch (e) { throw e; }
 }
 
@@ -89,12 +88,12 @@ export function initPointsSync() {
         onSnapshot(userRef, snap => {
             if (!snap.exists()) return;
             const pts = snap.data().points || 0;
-            
+
             // Cập nhật TopNav (dùng đúng API)
             if (window.TopNav) {
                 window.TopNav.setPoints(pts);
             }
-            
+
             // Cập nhật các element khác (nếu có)
             const ptsStr = pts.toLocaleString('vi-VN');
             ['user-points-home', 'status-pts', 'pro-points', 'wd-pts', 'shPts'].forEach(id => {

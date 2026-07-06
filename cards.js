@@ -4,17 +4,24 @@
 // Giá trị: A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K
 
 function suitToCode(suit) {
+    // LƯU Ý: bộ ảnh SVG đang đặt tên chất bị xoay vòng (H/D/C lệch nhau),
+    // đã kiểm tra thực tế và map lại cho đúng hình:
+    // ♥ (cơ) thực tế nằm trong file C..svg
+    // ♦ (rô) thực tế nằm trong file H..svg
+    // ♣ (chuồn) thực tế nằm trong file D..svg
+    // ♠ (bích) đúng chuẩn, vẫn là S
     switch (suit) {
         case '♠': return 'S';
-        case '♥': return 'H';
-        case '♦': return 'D';
-        case '♣': return 'C';
+        case '♥': return 'C';
+        case '♦': return 'H';
+        case '♣': return 'D';
         default: return 'S';
     }
 }
 
 export function createDeck() {
-    const suits = ['♠', '♥', '♦', '♣'];
+    // Thứ tự chất khớp với tienlen.js: Bích < Chuồn < Rô < Cơ (Cơ mạnh nhất)
+    const suits = ['♠', '♣', '♦', '♥'];
     const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
     const deck = [];
     for (const s of suits) {

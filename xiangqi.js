@@ -174,8 +174,6 @@ const levelInfoEl = document.getElementById('level-info');
 const colorRedBtn = document.getElementById('color-red');
 const colorBlackBtn = document.getElementById('color-black');
 const startBtn = document.getElementById('start-btn');
-const betInputEl = document.getElementById('xq-bet-input');
-const betQuickEl = document.querySelector('.bet-quick');
 
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
@@ -204,13 +202,6 @@ function listenBalance() {
     if (snap.exists()) balance = snap.data().points || 0;
   });
 }
-if (betQuickEl) {
-  betQuickEl.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-bet]');
-    if (!btn) return;
-    betInputEl.value = btn.dataset.bet;
-  });
-}
 initAuth();
 
 // ==================== TRẠNG THÁI VÁN CỜ ====================
@@ -227,16 +218,16 @@ const sideMachineAvatarEl = document.getElementById('side-machine-avatar');
 
 // --- 10 CẤP ĐỘ ---
 const LEVELS = [
-  { depth: 1, timeMs: 600,  random: 0.55, tier: 'easy',   note: 'Newbie · máy đi ngẫu nhiên, dễ mắc sai lầm' },
-  { depth: 1, timeMs: 800,  random: 0.45, tier: 'easy',   note: 'Newbie · tính toán rất nông' },
-  { depth: 2, timeMs: 1000, random: 0.30, tier: 'easy',   note: 'Newbie+ · thỉnh thoảng sai lầm' },
-  { depth: 2, timeMs: 1500, random: 0,    tier: 'medium', note: 'Trung bình · phân tích thế cờ cơ bản' },
-  { depth: 3, timeMs: 2000, random: 0,    tier: 'medium', note: 'Trung bình · ổn định hơn' },
-  { depth: 3, timeMs: 2500, random: 0,    tier: 'medium', note: 'Trung bình khá' },
-  { depth: 4, timeMs: 3000, random: 0,    tier: 'medium', note: 'Trung bình+ · sắp bước vào khó' },
-  { depth: 4, timeMs: 4000, random: 0,    tier: 'hard',   note: 'Khó · tính toán sâu, đánh gắt' },
-  { depth: 5, timeMs: 5000, random: 0,    tier: 'hard',   note: 'Rất khó · rất ít sai sót' },
-  { depth: 6, timeMs: 6000, random: 0,    tier: 'hard',   note: 'Siêu khó · gần như hoàn hảo' }
+  { depth: 1, timeMs: 600,  random: 0.55, tier: 'easy',   note: 'Newbie · máy đi ngẫu nhiên, dễ mắc sai lầm', reward: 500 },
+  { depth: 1, timeMs: 800,  random: 0.45, tier: 'easy',   note: 'Newbie · tính toán rất nông', reward: 1000 },
+  { depth: 2, timeMs: 1000, random: 0.30, tier: 'easy',   note: 'Newbie+ · thỉnh thoảng sai lầm', reward: 1500 },
+  { depth: 2, timeMs: 1500, random: 0,    tier: 'medium', note: 'Trung bình · phân tích thế cờ cơ bản', reward: 2000 },
+  { depth: 3, timeMs: 2000, random: 0,    tier: 'medium', note: 'Trung bình · ổn định hơn', reward: 2500 },
+  { depth: 3, timeMs: 2500, random: 0,    tier: 'medium', note: 'Trung bình khá', reward: 3000 },
+  { depth: 4, timeMs: 3000, random: 0,    tier: 'medium', note: 'Trung bình+ · sắp bước vào khó', reward: 3500 },
+  { depth: 4, timeMs: 4000, random: 0,    tier: 'hard',   note: 'Khó · tính toán sâu, đánh gắt', reward: 4000 },
+  { depth: 5, timeMs: 5000, random: 0,    tier: 'hard',   note: 'Rất khó · rất ít sai sót', reward: 4500 },
+  { depth: 6, timeMs: 6000, random: 0,    tier: 'hard',   note: 'Siêu khó · gần như hoàn hảo', reward: 5000 }
 ];
 
 let selectedLevel = 3;
@@ -274,7 +265,7 @@ function buildLevelStrip() {
 }
 function updateLevelInfo() {
   const lvl = LEVELS[selectedLevel - 1];
-  levelInfoEl.textContent = `Cấp ${selectedLevel} · ${lvl.note}`;
+  levelInfoEl.textContent = `Cấp ${selectedLevel} · ${lvl.note} · Thưởng ${lvl.reward.toLocaleString('vi-VN')}⭐`;
 }
 
 colorRedBtn.addEventListener('click', () => {
@@ -292,23 +283,10 @@ startBtn.addEventListener('click', placeBetAndStart);
 
 async function placeBetAndStart() {
   if (startBtn.disabled) return;
-  let currentPoints;
-  try { currentPoints = await getPoints(); }
-  catch (e) { window.showToast('Lỗi kiểm tra điểm', 'error'); return; }
-  if (currentPoints !== null) balance = currentPoints;
-
-  const amt = parseInt(betInputEl.value);
-  if (!amt || amt < 50) { window.showToast('Cược tối thiểu 50 ⭐', 'warn'); return; }
-  if (amt > balance) { window.showToast('Không đủ điểm!', 'error'); return; }
-
+  currentBet = LEVELS[selectedLevel - 1].reward;
   startBtn.disabled = true;
   try {
-    await addPoints('Casino', 'Cược Cờ Tướng', -amt);
-    currentBet = amt;
     startGame();
-  } catch (e) {
-    console.error(e);
-    window.showToast('Lỗi đặt cược: ' + e.message, 'error');
   } finally {
     startBtn.disabled = false;
   }
@@ -791,21 +769,21 @@ async function settlePayout(result) {
   if (payoutSettled) return;
   payoutSettled = true;
   let delta = 0;
-  if (result === 'win') delta = currentBet * 2;
-  else if (result === 'draw') delta = currentBet;
+  if (result === 'win') delta = currentBet;
+  else if (result === 'loss') delta = -currentBet;
 
   let buffBonus = 0, buffPct = 0;
   if (result === 'win') {
     try {
       buffPct = await getActiveBuff();
-      if (buffPct > 0) buffBonus = Math.round((delta - currentBet) * buffPct / 100);
+      if (buffPct > 0) buffBonus = Math.round(delta * buffPct / 100);
     } catch {}
   }
 
-  if (delta > 0) {
+  if (delta !== 0) {
     try {
-      const reason = result === 'win' ? 'Thắng Cờ Tướng' : 'Hòa Cờ Tướng';
-      await addPoints('Casino', reason, delta + buffBonus);
+      const reason = result === 'win' ? 'Thắng Cờ Tướng' : 'Thua Cờ Tướng';
+      await addPoints('Casino', reason, delta + buffBonus, false);
       if (buffBonus > 0) {
         let petLabel = '🐾 Pet';
         try {
@@ -820,7 +798,7 @@ async function settlePayout(result) {
       window.showToast('Lỗi cộng điểm: ' + e.message, 'error');
     }
   }
-  const net = delta - currentBet + buffBonus;
+  const net = delta + buffBonus;
   xqProfitEl.classList.remove('positive', 'negative', 'zero');
   if (net > 0) { xqProfitEl.textContent = `+${net.toLocaleString('vi-VN')}`; xqProfitEl.classList.add('positive'); }
   else if (net < 0) { xqProfitEl.textContent = `${net.toLocaleString('vi-VN')}`; xqProfitEl.classList.add('negative'); }
