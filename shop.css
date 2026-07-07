@@ -191,7 +191,7 @@
   font-family: 'Science Gothic', sans-serif;
   font-size: 13px;
   font-weight: 400;
-  color: #38bdf8;
+  color: #fbbf24;
   white-space: nowrap;
 }
 .shop-card.vip .shop-card-price { color: #fbbf24; }
@@ -406,8 +406,8 @@
   font-weight: 500;
   font-size: 12px;
   cursor: pointer;
-  background: rgba(56,189,248,0.15);
-  color: #38bdf8;
+  background: rgba(251,191,36,0.15);
+  color: #fbbf24;
   transition: all 0.2s;
 }
 .title-buy-btn:hover { background: rgba(56,189,248,0.25); transform: scale(1.04); }

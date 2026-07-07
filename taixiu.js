@@ -1,7 +1,8 @@
 import { addPoints, getPoints } from './points.js';
-import { getActiveBuff, getPetById } from './pet.js';
+import { getActivePetInfo } from './pet.js';
 import { auth, db } from './points.js';
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 class TaiXiu {
     constructor() {
@@ -10,19 +11,28 @@ class TaiXiu {
         this.isRolling = false;
         this.cachedBuffPct = 0;
         this.balance = 0;
+        this.ready = false;
         this.init();
     }
 
     async init() {
+        await new Promise(resolve => {
+            const unsub = onAuthStateChanged(auth, (u) => { unsub(); resolve(u); });
+        });
         await this.refreshPts();
         await this.refreshBuffCache();
+        this.ready = true;
         this.bindEvents();
         this.updateStatusBar(null, null, null);
         window.txGame = this;
     }
 
     async refreshBuffCache() {
-        try { this.cachedBuffPct = await getActiveBuff(); } catch { this.cachedBuffPct = 0; }
+        try {
+            const info = await getActivePetInfo();
+            this.cachedBuffPct = info.buff;
+            this.cachedPet = info.pet;
+        } catch { this.cachedBuffPct = 0; this.cachedPet = null; }
     }
 
     // Đọc điểm 1 lần khi vào game / sau khi ván kết thúc — không đọc lại mỗi lần đặt cược.
@@ -106,6 +116,10 @@ class TaiXiu {
     // gộp thành 1 lượt ghi net duy nhất trong finishRoll().
     placeBet(choice) {
         if (this.isRolling) return;
+        if (!this.ready) {
+            if (window.showToast) window.showToast('⏳ Đang tải điểm, vui lòng thử lại sau 1 giây!', 'info');
+            return;
+        }
         if (this.balance < this.currentChip) {
             if (window.showToast) window.showToast('⚠️ Không đủ điểm để đặt cược!', 'warn');
             return;
@@ -213,12 +227,7 @@ class TaiXiu {
         if (window.TopNav) window.TopNav.setPoints(this.balance);
 
         if (buffBonus > 0) {
-            let petLabel = '🐾 Pet';
-            try {
-                const ud = await getDoc(doc(db, 'users', auth.currentUser.uid));
-                const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
-                if (pet) petLabel = `${pet.emoji} ${pet.name}`;
-            } catch {}
+            const petLabel = this.cachedPet ? `${this.cachedPet.emoji} ${this.cachedPet.name}` : '🐾 Pet';
             window.showToast?.(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
         }
 

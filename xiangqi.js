@@ -1,8 +1,8 @@
 import { auth, db } from './points.js';
-import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { addPoints, getPoints } from './points.js';
-import { getActiveBuff, getPetById } from './pet.js';
+import { getActivePetInfo } from './pet.js';
 
 // ==================== ENGINE CỜ TƯỚNG (LUẬT) — gộp trực tiếp, không tách file riêng ====================
 // Bàn cờ: 10 dòng (0..9, 0=trên/Đen, 9=dưới/Đỏ) x 9 cột (0..8).
@@ -209,12 +209,9 @@ const bcStatusEl = document.getElementById('bc-status');
 const xqScoreEl = document.getElementById('xq-score');
 const xqScoreSubEl = document.getElementById('xq-score-sub');
 const xqProfitEl = document.getElementById('xq-profit');
-const xqBetValueEl = document.getElementById('xq-bet-value');
 const xqLevelBadgeEl = document.getElementById('xq-level-badge');
 const sidePlayerEl = document.getElementById('side-player');
 const sideMachineEl = document.getElementById('side-machine');
-const sidePlayerAvatarEl = document.getElementById('side-player-avatar');
-const sideMachineAvatarEl = document.getElementById('side-machine-avatar');
 
 // --- 10 CẤP ĐỘ ---
 const LEVELS = [
@@ -307,12 +304,9 @@ function startGame() {
   gameScreen.style.display = '';
 
   xqLevelBadgeEl.textContent = `Cấp ${selectedLevel}`;
-  xqBetValueEl.textContent = currentBet.toLocaleString('vi-VN');
   xqProfitEl.textContent = '+0';
-  xqProfitEl.className = 'stat-profit zero';
+  xqProfitEl.className = 'xq-profit-value zero';
 
-  sidePlayerAvatarEl.textContent = playerColor === 'r' ? '帥' : '將';
-  sideMachineAvatarEl.textContent = playerColor === 'r' ? '將' : '帥';
   sidePlayerEl.classList.remove('active-turn');
   sideMachineEl.classList.remove('active-turn');
 
@@ -744,24 +738,21 @@ function updateStatus() {
     xqScoreEl.textContent = playerWon ? 'WIN' : 'LOSE';
     xqScoreSubEl.textContent = 'Ván đấu kết thúc';
     bcStatusEl.classList.add(playerWon ? 'result-win' : 'result-lose');
-  } else if (waiting) {
-    statusEl.textContent = 'Máy đang suy nghĩ...';
-    xqScoreEl.textContent = turn === 'r' ? 'ĐEN' : 'ĐỎ';
-    xqScoreSubEl.textContent = 'Máy đang đi';
-    xqProfitEl.textContent = '+0'; xqProfitEl.classList.add('zero');
-    bcStatusEl.classList.add('thinking');
-  } else if (isInCheck(board, turn)) {
-    const label = turn === 'r' ? 'Đỏ' : 'Đen';
-    statusEl.textContent = `Đang bị chiếu: ${label}.`;
-    xqScoreEl.textContent = label.toUpperCase();
-    xqScoreSubEl.textContent = 'Đang bị chiếu!';
-    xqProfitEl.textContent = '+0'; xqProfitEl.classList.add('zero');
   } else {
-    const label = turn === 'r' ? 'Đỏ' : 'Đen';
-    statusEl.textContent = `Lượt đi: ${label}`;
-    xqScoreEl.textContent = label.toUpperCase();
-    xqScoreSubEl.textContent = 'Lượt đi';
+    const inCheck = isInCheck(board, turn);
+    xqScoreEl.textContent = inCheck ? 'CHIẾU TƯỚNG' : '';
     xqProfitEl.textContent = '+0'; xqProfitEl.classList.add('zero');
+    if (waiting) {
+      statusEl.textContent = inCheck ? 'Máy đang bị chiếu, đang suy nghĩ...' : 'Máy đang suy nghĩ...';
+      xqScoreSubEl.textContent = 'Máy đang đi';
+    } else if (inCheck) {
+      statusEl.textContent = 'Đang bị chiếu tướng.';
+      xqScoreSubEl.textContent = 'Đang bị chiếu!';
+    } else {
+      statusEl.textContent = `Lượt đi: ${turn === 'r' ? 'Đỏ' : 'Đen'}`;
+      xqScoreSubEl.textContent = 'Lượt đi';
+    }
+    if (waiting) bcStatusEl.classList.add('thinking');
   }
 }
 
@@ -772,10 +763,12 @@ async function settlePayout(result) {
   if (result === 'win') delta = currentBet;
   else if (result === 'loss') delta = -currentBet;
 
-  let buffBonus = 0, buffPct = 0;
+  let buffBonus = 0, buffPct = 0, activePet = null;
   if (result === 'win') {
     try {
-      buffPct = await getActiveBuff();
+      const info = await getActivePetInfo();
+      buffPct = info.buff;
+      activePet = info.pet;
       if (buffPct > 0) buffBonus = Math.round(delta * buffPct / 100);
     } catch {}
   }
@@ -785,12 +778,7 @@ async function settlePayout(result) {
       const reason = result === 'win' ? 'Thắng Cờ Tướng' : 'Thua Cờ Tướng';
       await addPoints('Casino', reason, delta + buffBonus, false);
       if (buffBonus > 0) {
-        let petLabel = '🐾 Pet';
-        try {
-          const ud = await getDoc(doc(db, 'users', auth.currentUser.uid));
-          const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
-          if (pet) petLabel = `${pet.emoji} ${pet.name}`;
-        } catch {}
+        const petLabel = activePet ? `${activePet.emoji} ${activePet.name}` : '🐾 Pet';
         window.showToast(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
       }
     } catch (e) {

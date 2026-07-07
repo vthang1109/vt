@@ -70,7 +70,7 @@ class SlotGame {
   // ========== HIỂN THỊ SỐ DƯ & HŨ LỚN ==========
   updateJackpotDisplay(value) {
     const el = document.getElementById('slot-jackpot-value');
-    if (el) el.textContent = value.toLocaleString('vi-VN') + ' đ';
+    if (el) el.textContent = value.toLocaleString('vi-VN') + '〄';
   }
 
   updateResultDisplay(message, type = '') {
@@ -96,16 +96,16 @@ class SlotGame {
     if (profitEl) {
       if (net === null) {
         profitEl.textContent = '+0';
-        profitEl.className = 'bc-profit zero';
+        profitEl.className = 'stat-profit zero';
       } else if (net > 0) {
         profitEl.textContent = `+${net.toLocaleString('vi-VN')}`;
-        profitEl.className = 'bc-profit positive';
+        profitEl.className = 'stat-profit positive';
       } else if (net < 0) {
         profitEl.textContent = `${net.toLocaleString('vi-VN')}`;
-        profitEl.className = 'bc-profit negative';
+        profitEl.className = 'stat-profit negative';
       } else {
         profitEl.textContent = 'Huề';
-        profitEl.className = 'bc-profit zero';
+        profitEl.className = 'stat-profit zero';
       }
     }
 

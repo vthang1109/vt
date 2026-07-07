@@ -4,7 +4,7 @@ import { auth, db } from './points.js';
 import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { addPoints, getPoints } from './points.js';
-import { getActiveBuff, getPetById } from './pet.js';
+import { getActivePetInfo } from './pet.js';
 
 class BaiCao {
     constructor() {
@@ -56,7 +56,11 @@ class BaiCao {
     }
 
     async refreshBuffCache() {
-        try { this.cachedBuffPct = await getActiveBuff(); } catch { this.cachedBuffPct = 0; }
+        try {
+            const info = await getActivePetInfo();
+            this.cachedBuffPct = info.buff;
+            this.cachedPet = info.pet;
+        } catch { this.cachedBuffPct = 0; this.cachedPet = null; }
     }
 
     bindEvents() {
@@ -202,12 +206,8 @@ class BaiCao {
         if (net !== 0) {
             try {
                 await addPoints('Casino', net > 0 ? 'Thắng Bài Cào' : 'Cược Bài Cào', net, false);
-                if (buffBonus > 0) {
-                    try {
-                        const ud = await getDoc(doc(db, 'users', auth.currentUser.uid));
-                        const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
-                        if (pet) petLabel = `${pet.emoji} ${pet.name}`;
-                    } catch {}
+                if (buffBonus > 0 && this.cachedPet) {
+                    petLabel = `${this.cachedPet.emoji} ${this.cachedPet.name}`;
                 }
             } catch (e) {
                 console.error(e);

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VTWorld — Caro</title>
   <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="status-bar.css"/>
   <link rel="stylesheet" href="caro.css"/>
   <link rel="stylesheet" href="quests.css"/>
   <script type="module" src="quests.js"></script>
@@ -19,44 +20,13 @@
 
   <div class="caro-wrap">
 
-    <!-- CHỌN CHẾ ĐỘ -->
-    <div id="screen-mode" class="caro-screen">
-      <div class="caro-phase">♟️ Chọn chế độ chơi</div>
-      <div class="mode-grid">
-        <div class="mode-card" onclick="selectMode('tictactoe')">
-          <span class="mode-emoji">⭕</span>
-          <span class="mode-name">TicTacToe</span>
-          <span class="mode-desc">Bàn 3×3 · Thắng 3 ô</span>
-        </div>
-        <div class="mode-card" onclick="selectMode('caro')">
-          <span class="mode-emoji">♟️</span>
-          <span class="mode-name">Caro</span>
-          <span class="mode-desc">Bàn 15×15 · Thắng 5 ô</span>
-        </div>
+    <!-- CHỌN KIỂU CHƠI (mặc định TicTacToe, có tab đổi chế độ) -->
+    <div id="screen-type" class="caro-screen">
+      <div class="mode-tabs">
+        <button class="mtab active" data-mode="tictactoe" onclick="selectGameMode('tictactoe')">⭕ TicTacToe</button>
+        <button class="mtab" data-mode="caro" onclick="selectGameMode('caro')">♟️ Caro</button>
       </div>
-    </div>
-
-    <!-- CHỌN KIỂU CHƠI -->
-    <div id="screen-type" class="caro-screen hidden">
-      <div class="caro-phase" id="type-title">Chọn kiểu chơi</div>
-      <div class="mode-grid">
-        <div class="mode-card" onclick="selectType('bot')">
-          <span class="mode-emoji">🤖</span>
-          <span class="mode-name">vs Máy</span>
-          <span class="mode-desc">Chơi một mình</span>
-        </div>
-        <div class="mode-card" onclick="selectType('local')">
-          <span class="mode-emoji">👥</span>
-          <span class="mode-name">2 Người</span>
-          <span class="mode-desc">Cùng 1 màn hình</span>
-        </div>
-      </div>
-      <button class="caro-back-btn" onclick="goBack('screen-mode')">← Quay lại</button>
-    </div>
-
-    <!-- CHỌN ĐỘ KHÓ (vs Bot) -->
-    <div id="screen-difficulty" class="caro-screen hidden">
-      <div class="caro-phase">Chọn độ khó</div>
+      <div class="caro-phase" id="type-title">⭕ TicTacToe — Chọn chế độ chơi</div>
       <div class="mode-grid">
         <div class="mode-card" onclick="startGame('easy')">
           <span class="mode-emoji">😊</span>
@@ -73,30 +43,36 @@
           <span class="mode-name">Khó</span>
           <span class="mode-desc">AI thông minh</span>
         </div>
+        <div class="mode-card" onclick="startGame('local')">
+          <span class="mode-emoji">👥</span>
+          <span class="mode-name">2 Người</span>
+          <span class="mode-desc">Cùng 1 màn hình</span>
+        </div>
       </div>
-      <button class="caro-back-btn" onclick="goBack('screen-type')">← Quay lại</button>
     </div>
 
     <!-- GAME BOARD -->
     <div id="screen-game" class="caro-screen hidden">
 
-      <!-- PLAYERS ROW (bank-style) -->
-      <div class="caro-players-row">
-        <div class="caro-player-tag" id="player1-tag">
-          <span class="caro-player-symbol x">✕</span>
-          <span id="player1-name">Bạn</span>
-          <span class="caro-player-score" id="score-p1">0</span>
+      <!-- STATUS BAR (dùng chung: xì dách, bài cào, bầu cua, tài xỉu...) -->
+      <div class="bc-status" id="caro-status-bar">
+        <div class="stat-bet">
+          <div class="caro-player-tag" id="player1-tag">
+            <span id="player1-name">Bạn</span>
+            <span class="caro-player-score" id="score-p1">0</span>
+          </div>
         </div>
-        <div class="caro-vs">VS</div>
-        <div class="caro-player-tag right" id="player2-tag">
-          <span class="caro-player-score" id="score-p2">0</span>
-          <span id="player2-name">Máy</span>
-          <span class="caro-player-symbol o">○</span>
+        <div class="stat-score-wrap">
+          <span class="stat-score" id="caro-status"></span>
+        </div>
+        <div class="stat-profit">
+          <span class="caro-profit" id="caro-profit"></span>
+          <div class="caro-player-tag right" id="player2-tag">
+            <span class="caro-player-score" id="score-p2">0</span>
+            <span id="player2-name">Máy</span>
+          </div>
         </div>
       </div>
-
-      <!-- STATUS (phase-style) -->
-      <div class="caro-phase" id="caro-status">⚔️ Lượt của bạn</div>
 
       <!-- BOARD -->
       <div class="caro-board-wrap">
@@ -113,28 +89,11 @@
 
   </div>
 
-  <!-- RESULT MODAL -->
-  <div id="result-modal" class="result-modal hidden">
-    <div class="result-box">
-      <div class="result-emoji" id="result-emoji">🏆</div>
-      <div class="result-title" id="result-title">Bạn thắng!</div>
-      <div class="result-pts"   id="result-pts"></div>
-      <div class="caro-actions" style="justify-content:center">
-        <button class="btn-restart" onclick="restartGame()">🔄 Chơi lại</button>
-        <button class="btn-home"    onclick="goToModeSelect()">🏠 Đổi chế độ</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOAST -->
-  <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
-
   <script>
     const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
     function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
     for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
     (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(52,211,153,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
-    window.showToast=function(msg,type='info'){const c={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};const t=document.createElement('div');t.style.cssText=`pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]};color:#e0f2fe;font-size:13px;font-weight:400;font-family:"Science Gothic", sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;t.innerHTML=msg;toastContainer.appendChild(t);setTimeout(()=>t.remove(),3500)};
   </script>
 
   <script src="bottom-nav.js"></script>

@@ -6,6 +6,7 @@
   <title>VTWorld — Cờ Vua</title>
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="quests.css"/>
+  <link rel="stylesheet" href="status-bar.css"/>
   <link rel="stylesheet" href="chess.css"/>
   <script src="top-nav.js"></script>
   <script src="bottom-nav.js"></script>
@@ -53,17 +54,12 @@
     <!-- MÀN HÌNH BÀN CỜ -->
     <div id="game-screen" style="display:none">
 
-      <!-- STATUS BAR -->
+      <!-- STATUS BAR (style giống caro) -->
       <div class="bc-status" id="bc-status">
-        <div class="stat-side stat-side-player" id="side-player">
-          <div class="side-top">
-            <span class="side-avatar" id="side-player-avatar">♔</span>
-            <span class="side-label">BẠN</span>
+        <div class="stat-bet">
+          <div class="chess-player-tag" id="side-player">
+            <span>Bạn</span>
           </div>
-          <span class="stat-bet" id="chess-bet-label">
-            <span id="chess-bet-value">0</span>
-            <small>THƯỞNG</small>
-          </span>
         </div>
 
         <div class="stat-score-wrap">
@@ -71,12 +67,11 @@
           <span class="stat-score-sub" id="chess-score-sub">Lượt đi</span>
         </div>
 
-        <div class="stat-side stat-side-machine" id="side-machine">
-          <div class="side-top">
-            <span class="side-label">MÁY</span>
-            <span class="side-avatar" id="side-machine-avatar">♚</span>
+        <div class="stat-profit">
+          <span class="chess-profit-value zero" id="chess-profit">+0</span>
+          <div class="chess-player-tag right" id="side-machine">
+            <span>Máy</span>
           </div>
-          <span class="stat-profit zero" id="chess-profit">+0</span>
         </div>
       </div>
 

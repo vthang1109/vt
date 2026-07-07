@@ -231,3 +231,13 @@ export async function getActiveBuff() {
   const t = getTierById(p.tier);
   return t.buff || 0;
 }
+
+// Gộp buff% + thông tin pet trong 1 lần đọc (thay vì gọi getActiveBuff rồi getDoc riêng)
+export async function getActivePetInfo() {
+  const data = await getPetData();
+  if (!data.activePet) return { buff: 0, pet: null };
+  const p = getPetById(data.activePet);
+  if (!p) return { buff: 0, pet: null };
+  const t = getTierById(p.tier);
+  return { buff: t.buff || 0, pet: p };
+}

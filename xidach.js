@@ -269,7 +269,7 @@ class XiDach {
     async stand() {
         this.isPlayerFlipped = true;
         this.phase = 'dealer';
-        this.updateStatusBar('Nhà cái', null, `Bạn: ${this.getScore(this.players[0].hand)}`);
+        this.updateStatusBar('👑', null, `Bạn: ${this.getScore(this.players[0].hand)}`);
         document.getElementById('bc-status')?.classList.add('rolling');
         this.updateButtons(false);
         await new Promise(r => setTimeout(r, 1000));

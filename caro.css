@@ -12,6 +12,32 @@
 .caro-screen { animation: fadeUp 0.4s both; }
 .caro-screen.hidden { display: none; }
 
+/* ===================== MODE TABS (gạch chân) ===================== */
+.mode-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+}
+.mtab {
+  background: none;
+  border: none;
+  padding: 10px 4px;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(224, 242, 254, 0.5);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.mtab.active {
+  color: #7dd3fc;
+  border-bottom-color: #38bdf8;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+}
+
 /* ===================== PHASE BAR (đồng bộ xd-phase) ===================== */
 .caro-phase {
   text-align: center;
@@ -61,19 +87,7 @@
 }
 .caro-back-btn:hover { color: #38bdf8; }
 
-/* ===================== PLAYERS ROW (bank-style) ===================== */
-.caro-players-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 11px 16px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(14, 165, 233, 0.04));
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  margin-bottom: 14px;
-  gap: 8px;
-}
-
+/* ===================== PLAYER TAGS (nằm trong .bc-status dùng chung) ===================== */
 .caro-player-tag {
   display: flex;
   align-items: center;
@@ -116,13 +130,6 @@
 #score-p1 { color: #38bdf8; }
 #score-p2 { color: #f87171; }
 
-.caro-vs {
-  font-family: "Science Gothic", sans-serif;
-  font-weight: 500;
-  font-size: 13px;
-  color: #4a7a9b;
-  flex-shrink: 0;
-}
 
 /* ===================== BOARD ===================== */
 .caro-board-wrap {
@@ -164,37 +171,27 @@
 .btn-restart { background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #fff; }
 .btn-home    { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; }
 
-/* ===================== RESULT MODAL ===================== */
-.result-modal {
-  position: fixed; inset: 0; z-index: 500;
-  background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center;
-}
-.result-modal.hidden { display: none; }
-
-.result-box {
-  background: rgba(4, 20, 40, 0.97);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  border-radius: 24px; padding: 36px 28px;
-  text-align: center; min-width: 260px;
-  display: flex; flex-direction: column; gap: 14px;
-  animation: popResult 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
-}
-@keyframes popResult {
-  0%   { transform: scale(0.4); opacity: 0; }
-  100% { transform: scale(1);   opacity: 1; }
-}
-
-.result-emoji { font-size: 56px; line-height: 1; }
-.result-title {
-  font-family: "Science Gothic", sans-serif;
-  font-size: 22px; font-weight: 500; color: #e0f2fe;
-}
-.result-pts { font-size: 15px; font-weight: 700; color: #38bdf8; }
-
 /* ===================== ANIMATIONS ===================== */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+/* ===================== KẾT QUẢ VÁN (tiền/điểm) ===================== */
+.caro-profit {
+  display: none;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+}
+.bc-status.result-win .caro-profit,
+.bc-status.result-lose .caro-profit,
+.bc-status.result-draw .caro-profit {
+  display: inline-block;
+}
+.bc-status.result-win .caro-profit { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
+ .bc-status.result-lose .caro-profit { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
+ .bc-status.result-draw .caro-profit { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+
+.bc-status.result-win .stat-score { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); font-weight: 700; letter-spacing: 1px; }
+.bc-status.result-lose .stat-score { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); font-weight: 700; letter-spacing: 1px; }
+.bc-status.result-draw .stat-score { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 1px; }

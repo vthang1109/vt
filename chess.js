@@ -54,12 +54,9 @@ const bcStatusEl = document.getElementById('bc-status');
 const chessScoreEl = document.getElementById('chess-score');
 const chessScoreSubEl = document.getElementById('chess-score-sub');
 const chessProfitEl = document.getElementById('chess-profit');
-const chessBetValueEl = document.getElementById('chess-bet-value');
 const chessEloBadgeEl = document.getElementById('chess-elo-badge');
 const sidePlayerEl = document.getElementById('side-player');
 const sideMachineEl = document.getElementById('side-machine');
-const sidePlayerAvatarEl = document.getElementById('side-player-avatar');
-const sideMachineAvatarEl = document.getElementById('side-machine-avatar');
 
 // Bộ quân cờ Cburnett (chuẩn Lichess/Wikipedia) — nạp qua CDN jsdelivr, đẹp và không phụ thuộc font máy
 const PIECE_CDN_BASE = 'https://cdn.jsdelivr.net/gh/lichess-org/lila@master/public/piece/cburnett/';
@@ -164,12 +161,9 @@ function startGame() {
   gameScreen.style.display = '';
 
   chessEloBadgeEl.textContent = `${LEVELS[selectedLevel - 1].elo} ELO`;
-  chessBetValueEl.textContent = currentBet.toLocaleString('vi-VN');
   chessProfitEl.textContent = '+0';
-  chessProfitEl.className = 'stat-profit zero';
+  chessProfitEl.className = 'chess-profit-value zero';
 
-  sidePlayerAvatarEl.textContent = playerColor === 'w' ? '♔' : '♚';
-  sideMachineAvatarEl.textContent = playerColor === 'w' ? '♚' : '♔';
   sidePlayerEl.classList.remove('active-turn');
   sideMachineEl.classList.remove('active-turn');
 
@@ -536,23 +530,23 @@ function updateStatus() {
     bcStatusEl.classList.add('result-draw');
     settlePayout('draw');
   } else if (waiting) {
-    statusEl.textContent = 'Máy đang suy nghĩ...';
-    chessScoreEl.textContent = playerColor === 'w' ? 'ĐEN' : 'TRẮNG';
+    const inCheck = game.in_check();
+    statusEl.textContent = inCheck ? 'Máy đang bị chiếu, đang suy nghĩ...' : 'Máy đang suy nghĩ...';
+    chessScoreEl.textContent = inCheck ? 'CHIẾU TƯỚNG' : '';
     chessScoreSubEl.textContent = 'Máy đang đi';
     chessProfitEl.textContent = '+0';
     chessProfitEl.classList.add('zero');
     bcStatusEl.classList.add('thinking');
   } else if (game.in_check()) {
-    const turnLabel = game.turn() === 'w' ? 'Trắng' : 'Đen';
-    statusEl.textContent = `Đang bị chiếu: ${turnLabel}.`;
-    chessScoreEl.textContent = turnLabel.toUpperCase();
+    statusEl.textContent = 'Đang bị chiếu tướng.';
+    chessScoreEl.textContent = 'CHIẾU TƯỚNG';
     chessScoreSubEl.textContent = 'Đang bị chiếu!';
     chessProfitEl.textContent = '+0';
     chessProfitEl.classList.add('zero');
   } else {
     const turnLabel = game.turn() === 'w' ? 'Trắng' : 'Đen';
     statusEl.textContent = `Lượt đi: ${turnLabel}`;
-    chessScoreEl.textContent = turnLabel.toUpperCase();
+    chessScoreEl.textContent = '';
     chessScoreSubEl.textContent = 'Lượt đi';
     chessProfitEl.textContent = '+0';
     chessProfitEl.classList.add('zero');

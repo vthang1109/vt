@@ -7,7 +7,7 @@
   border-radius: 12px;
   margin-bottom: 12px;
   font-weight: 400;
-  font-size: 13px;
+  font-size: 11px;
   font-family: 'Science Gothic', sans-serif;
   line-height: 1.2;
 --bc-left: rgba(251, 191, 36, 0.1);
@@ -70,7 +70,7 @@
 .stat-bet {
   font-family: 'Science Gothic', sans-serif;
   font-weight: 500;
-  font-size: 19px;
+  font-size: 16px;
   color: #fbbf24;
   min-width: 65px;
 }
@@ -86,7 +86,7 @@
 .stat-score {
   font-family: 'Science Gothic', sans-serif;
   font-weight: 500;
-  font-size: 22px;
+  font-size: 18px;
   color: #fff;
   text-align: center;
   text-shadow: 0 0 12px rgba(251,191,36,0.6);
@@ -95,7 +95,7 @@
   display: none !important;
   font-family: 'Science Gothic', sans-serif;
   font-weight: 400;
-  font-size: 11px;
+  font-size: 10px;
   color: #94a3b8;
   margin-top: 2px;
   letter-spacing: 0.3px;
@@ -109,7 +109,7 @@
 .stat-profit {
   font-family: 'Science Gothic', sans-serif;
   font-weight: 500;
-  font-size: 19px;
+  font-size: 16px;
   text-align: right;
   min-width: 65px;
 }

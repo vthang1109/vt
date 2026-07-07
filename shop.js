@@ -10,14 +10,12 @@ const TIER_NAME  = { 1:'Ga mo', 2:'Tinh anh', 3:'Ba san', 4:'Kiet tac', 5:'Huyen
 
 const GACHA_DATA = {
   normal: [
-    { id:'pg_x1',  name:'Gacha Thuong x1',  icon:'🐣', qty:1,  price:100,  desc:'1 lan trieu hoi' },
-    { id:'pg_x5',  name:'Gacha Thuong x5',  icon:'🐣', qty:5,  price:450,  desc:'5 lan · Tiet kiem 10%', badge:'best' },
-    { id:'pg_x10', name:'Gacha Thuong x10', icon:'🐣', qty:10, price:850,  desc:'10 lan · Tiet kiem 15%', badge:'best' },
+    { id:'pg_x1',  name:'Gacha Thuong x1',  icon:'🐣', qty:1,  price:500,  desc:'1 lan trieu hoi' },
+    { id:'pg_x10', name:'Gacha Thuong x10', icon:'🐣', qty:10, price:4500, desc:'10 lan · Tiet kiem 10%', badge:'best' },
   ],
   vip: [
-    { id:'pg_vip_x1',  name:'Gacha VIP x1',  icon:'🦄', qty:1,  price:500,  desc:'1 lan trieu hoi VIP' },
-    { id:'pg_vip_x5',  name:'Gacha VIP x5',  icon:'🦄', qty:5,  price:2200, desc:'5 lan · Tiet kiem 12%', badge:'best' },
-    { id:'pg_vip_x10', name:'Gacha VIP x10', icon:'🦄', qty:10, price:4000, desc:'10 lan · Tiet kiem 20%', badge:'best' },
+    { id:'pg_vip_x1',  name:'Gacha VIP x1',  icon:'🦄', qty:1,  price:4000,  desc:'1 lan trieu hoi VIP' },
+    { id:'pg_vip_x10', name:'Gacha VIP x10', icon:'🦄', qty:10, price:36000, desc:'10 lan · Tiet kiem 10%', badge:'best' },
   ],
 };
 
@@ -160,7 +158,7 @@ function renderTitleGrid() {
     const isActive = myActiveTitleId === t.id;
     const locked   = lockedItems.includes(t.id);
 
-    let btnLabel = t.price.toLocaleString('vi-VN') + ' ⭐ Mua';
+    let btnLabel = t.price.toLocaleString('vi-VN') + ' 〄 Mua';
     let btnCls   = '';
     let disabled = false;
     if (isActive)        { btnLabel = '✓ Dang dung'; btnCls = 'active-now'; disabled = true; }
@@ -205,7 +203,7 @@ function renderTitleGrid() {
       showPopup({
         type: 'confirm',
         title: 'Xac nhan mua',
-        message: 'Mua danh hieu <b style="color:#f1f5f9">' + (titleObj ? titleObj.label : id) + '</b> voi gia <b style="color:#fbbf24">' + price.toLocaleString('vi-VN') + ' ⭐</b>?',
+        message: 'Mua danh hieu <b style="color:#f1f5f9">' + (titleObj ? titleObj.label : id) + '</b> voi gia <b style="color:#fbbf24">' + price.toLocaleString('vi-VN') + ' 〄</b>?',
         confirmText: 'Mua ngay',
         onConfirm: function() {
           btn.disabled    = true;
@@ -223,7 +221,7 @@ function renderTitleGrid() {
               onConfirm: function() {},
             });
             btn.disabled    = false;
-            btn.textContent = price.toLocaleString('vi-VN') + ' ⭐ Mua';
+            btn.textContent = price.toLocaleString('vi-VN') + ' 〄 Mua';
           });
         },
       });
@@ -277,7 +275,7 @@ function render() {
         '<div class="shop-card-desc">' + item.desc + '</div>' +
       '</div>' +
       '<div class="shop-card-right">' +
-        '<div class="shop-card-price">' + item.price.toLocaleString('vi-VN') + ' ⭐</div>' +
+        '<div class="shop-card-price">' + item.price.toLocaleString('vi-VN') + ' 〄</div>' +
         (item.badge === 'best' ? '<span class="shop-card-badge badge-best">GIA TOT</span>' : '') +
         (activeTab === 'vip' ? '<span class="shop-card-badge badge-vip">VIP</span>' : '') +
         (isAdmin ? '<button class="admin-lock-btn" data-id="' + item.id + '" style="margin-top:4px;padding:3px 8px;border-radius:6px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:' + (locked ? 'rgba(34,197,94,0.2);color:#4ade80' : 'rgba(239,68,68,0.2);color:#f87171') + ';">' + (locked ? '🔓 Mở' : '🔒 Khoá') + '</button>' : '') +

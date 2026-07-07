@@ -7,8 +7,9 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { addPoints, getPoints } from './points.js';
+import { getActiveBuff } from './pet.js';
 
-const POINTS = { WIN_CARO: 100 }; // fallback vì points.js chưa export POINTS
+const POINTS = { WIN_CARO: { easy: 50, medium: 100, hard: 150 } }; // fallback vì points.js chưa export POINTS
 const updateMission = async () => {}; // stub vì points.js chưa export updateMission
 
 const firebaseConfig = {
@@ -42,16 +43,17 @@ drawBg();
 // ============================================================
 //  GAME STATE
 // ============================================================
-let gameMode   = '';      // 'tictactoe' | 'caro'
+let gameMode   = 'tictactoe'; // 'tictactoe' | 'caro'
 let gameType   = '';      // 'bot' | 'local'
 let difficulty = 'medium';
 let board      = [];
-let BOARD_SIZE = 15;
-let WIN_COUNT  = 5;
-let CELL_SIZE  = 36;
+let BOARD_SIZE = 3;
+let WIN_COUNT  = 3;
+let CELL_SIZE  = 100;
 let currentPlayer = 1;   // 1 = X (người), 2 = O (bot/p2)
 let gameOver   = false;
 let scores     = { p1: 0, p2: 0 };
+let petBuff    = 0; // % cộng điểm từ pet active — fetch 1 lần, dùng lại
 
 const canvas  = document.getElementById('caro-canvas');
 const ctx     = canvas.getContext('2d');
@@ -64,35 +66,30 @@ function showScreen(id) {
   document.getElementById(id).classList.remove('hidden');
 }
 
-window.selectMode = function(mode) {
+window.selectGameMode = function(mode) {
   gameMode = mode;
   BOARD_SIZE = mode === 'tictactoe' ? 3 : 15;
   WIN_COUNT  = mode === 'tictactoe' ? 3 : 5;
   CELL_SIZE  = mode === 'tictactoe' ? 100 : 36;
-  document.getElementById('type-title').textContent = mode === 'tictactoe' ? '⭕ TicTacToe — Kiểu chơi' : '♟️ Caro — Kiểu chơi';
+  document.getElementById('type-title').textContent = mode === 'tictactoe' ? '⭕ TicTacToe — Chọn chế độ chơi' : '♟️ Caro — Chọn chế độ chơi';
+  document.querySelectorAll('.mtab').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
   showScreen('screen-type');
 }
 
-window.selectType = function(type) {
-  gameType = type;
-  if (type === 'bot')    showScreen('screen-difficulty');
-  if (type === 'local')  { difficulty = 'local'; startGame('local'); }
-}
-
-window.goBack = function(screenId) {
-  showScreen(screenId);
-}
-
 window.goToModeSelect = function() {
-  showScreen('screen-mode');
-  document.getElementById('result-modal').classList.add('hidden');
+  showScreen('screen-type');
 }
 
 // ============================================================
-//  START GAME (bot / local)
+//  START GAME (chọn thẳng độ khó hoặc 2 người)
 // ============================================================
 window.startGame = function(diff) {
-  if (diff !== 'local') difficulty = diff;
+  if (diff === 'local') {
+    gameType = 'local';
+  } else {
+    gameType = 'bot';
+    difficulty = diff;
+  }
   scores = { p1: 0, p2: 0 };
   document.getElementById('score-p1').textContent = 0;
   document.getElementById('score-p2').textContent = 0;
@@ -110,7 +107,10 @@ window.restartGame = function() {
   board = Array(BOARD_SIZE * BOARD_SIZE).fill(0);
   currentPlayer = 1;
   gameOver = false;
-  document.getElementById('result-modal').classList.add('hidden');
+  document.getElementById('caro-status-bar').classList.remove('result-win', 'result-lose', 'result-draw');
+  document.getElementById('player2-tag').style.display = '';
+  document.getElementById('caro-profit').textContent = '';
+  document.getElementById('caro-status').textContent = '';
   initCanvas();
   drawBoard();
   updateStatus();
@@ -227,8 +227,6 @@ function handleClick(e) {
 
 async function handleMove(px, py) {
   if (gameOver) return;
-
-  // Bot: chỉ đánh khi lượt người (player 1)
   if (gameType === 'bot' && currentPlayer !== 1) return;
 
   const c = Math.floor(px / CELL_SIZE);
@@ -388,57 +386,50 @@ async function handleWin(player) {
   setPlayerActive(0);
 
   if (isMe && gameType !== 'local') {
-    const pts = gameMode === 'caro' ? POINTS.WIN_CARO : POINTS.WIN_CARO;
-    await addPoints(gameMode === 'caro' ? 'Caro' : 'TicTacToe', 'Thắng game', pts);
+    const base = POINTS.WIN_CARO[difficulty] ?? 100;
+    const pts  = petBuff > 0 ? Math.round(base * (1 + petBuff / 100)) : base;
+    await addPoints(gameMode === 'caro' ? 'Caro' : 'TicTacToe', 'Thắng game', pts, false);
     await updateMission('win1');
     await updateMission('win3');
     await updateMission('win5');
     await updateMission('play3');
-    showResult('🏆', 'Bạn thắng!', `+${pts} điểm`);
     refreshPoints();
+    if (gameType === 'bot') updateStatusResult('win', `+${pts}`);
   } else if (!isMe && gameType !== 'local') {
     await updateMission('play3');
-    showResult('😔', gameType === 'bot' ? 'Máy thắng!' : 'Đối thủ thắng!', '');
-  } else {
-    // Local 2 người
-    showResult(player === 1 ? '🏆' : '🎉', `Người chơi ${player} thắng!`, '');
+    if (gameType === 'bot') updateStatusResult('lose', '0');
   }
 }
 
 function handleDraw() {
-  showResult('🤝', 'Hòa!', '');
+  if (gameType === 'bot') updateStatusResult('draw', '0');
 }
 
-function showResult(emoji, title, pts) {
-  document.getElementById('result-emoji').textContent = emoji;
-  document.getElementById('result-title').textContent = title;
-  document.getElementById('result-pts').textContent   = pts;
-  document.getElementById('result-modal').classList.remove('hidden');
-}
+function updateStatusResult(kind, text) {
+   const bar = document.getElementById('caro-status-bar');
+   const profitEl = document.getElementById('caro-profit');
+  const statusEl = document.getElementById('caro-status');
+   const p2Tag = document.getElementById('player2-tag');
+   bar.classList.remove('result-win', 'result-lose', 'result-draw');
+   if (kind === 'win') bar.classList.add('result-win');
+   else if (kind === 'lose') bar.classList.add('result-lose');
+   else if (kind === 'draw') bar.classList.add('result-draw');
+   if (p2Tag) p2Tag.style.display = 'none';
+   if (profitEl) profitEl.textContent = text;
+  if (statusEl) statusEl.textContent = kind === 'win' ? 'WIN' : kind === 'lose' ? 'LOSE' : 'DRAW';
+ }
 
 // ============================================================
 //  UI HELPERS
 // ============================================================
 function updateStatus() {
-  const el = document.getElementById('caro-status');
   if (gameOver) return;
-
-  const names = ['', document.getElementById('player1-name').textContent, document.getElementById('player2-name').textContent];
-  el.textContent = `⚔️ Lượt: ${names[currentPlayer]}`;
-  el.style.color = currentPlayer === 1 ? '#38bdf8' : '#f87171';
   setPlayerActive(currentPlayer);
 }
 
 function setPlayerActive(p) {
   document.getElementById('player1-tag').classList.toggle('active', p === 1);
   document.getElementById('player2-tag').classList.toggle('active', p === 2);
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
 }
 
 async function refreshPoints() {
@@ -448,11 +439,14 @@ async function refreshPoints() {
   } catch(e) {}
 }
 
+
 // ============================================================
 //  AUTH CHECK
 // ============================================================
 onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = 'index.html'; return; }
-  const pts = await getPoints();
+  // Gộp lượt đọc: lấy điểm + buff pet song song, chỉ 1 lần/phiên (không đọc lại mỗi ván)
+  const [pts, buff] = await Promise.all([getPoints(), getActiveBuff()]);
+  petBuff = buff;
   if (window.TopNav) window.TopNav.setPoints(pts);
 });

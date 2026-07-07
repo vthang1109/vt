@@ -1,5 +1,5 @@
 import { addPoints, getPoints, db, auth } from './points.js';
-import { getActiveBuff, getPetById } from './pet.js';
+import { getActivePetInfo } from './pet.js';
 import { doc, getDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -66,7 +66,11 @@ class BauCua {
     }
 
     async refreshBuffCache() {
-        try { this.cachedBuffPct = await getActiveBuff(); } catch { this.cachedBuffPct = 0; }
+        try {
+            const info = await getActivePetInfo();
+            this.cachedBuffPct = info.buff;
+            this.cachedPet = info.pet;
+        } catch { this.cachedBuffPct = 0; this.cachedPet = null; }
     }
 
     syncNavPoints() {
@@ -412,13 +416,8 @@ class BauCua {
         this.syncNavPoints();
 
         if (buffBonus > 0) {
-            let petLabel = '🐾 Pet';
-            try {
-                const ud = await getDoc(doc(db, 'users', this._userId));
-                const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
-                if (pet) petLabel = `${pet.emoji} ${pet.name}`;
-            } catch {}
-            window.showToast?.(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
+            const petLabel = this.cachedPet ? `${this.cachedPet.emoji} ${this.cachedPet.name}` : '🐾 Pet';
+            window.showToast?.(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}〄 (${buffPct}%)!`, 'success');
         }
 
         const profit = winAmt - totalBet + buffBonus;

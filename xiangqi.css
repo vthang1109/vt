@@ -134,78 +134,55 @@
 .btn-start:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(251, 191, 36, 0.5); }
 .btn-start:active { transform: scale(0.97); }
 
-/* ===================== STATUS BAR (đồng bộ Xì Dách) ===================== */
-.bc-status {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 16px 16px; border-radius: 12px; margin-bottom: 12px;
-  font-weight: 700; font-size: 13px;
-  --bc-right: rgba(148, 163, 184, 0.08);
-  --bc-left-border: rgba(251, 191, 36, 0.9);
-  --bc-right-border: rgba(56, 189, 248, 0.4);
-  background-image:
-    linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 191, 36, 0.1) 20%, transparent 38%, transparent 62%, var(--bc-right) 80%, var(--bc-right) 100%),
-    linear-gradient(#0a101e, #0a101e),
-    linear-gradient(135deg, var(--bc-left-border) 0%, var(--bc-left-border) 35%, var(--bc-right-border) 65%, var(--bc-right-border) 100%);
-  background-origin: padding-box, padding-box, border-box;
-  background-clip: padding-box, padding-box, border-box;
-  border: 1px solid transparent;
-  min-height: 64px; width: 100%; box-sizing: border-box;
-  transition: all 0.3s; gap: 8px;
-  box-shadow: 0 0 16px rgba(251, 191, 36, 0.18);
-}
-.bc-status.thinking { --bc-right: rgba(120, 90, 10, 0.55); --bc-right-border: rgba(251, 191, 36, 0.9); box-shadow: 0 0 20px rgba(251, 191, 36, 0.45); }
+/* ===================== STATUS BAR (dùng file chung status-bar.css, style giống caro) ===================== */
 .bc-status.in-check { --bc-left-border: #fbbf24; --bc-right-border: #ef4444; animation: statusCheckBlink 0.9s ease-in-out infinite; }
 @keyframes statusCheckBlink {
   0%, 100% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.3), 0 0 10px rgba(251, 191, 36, 0.15); }
   50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.85), 0 0 34px rgba(239, 68, 68, 0.75), inset 0 0 18px rgba(239, 68, 68, 0.25); }
 }
-.bc-status *, .bc-status *::before, .bc-status *::after { box-sizing: content-box; margin: 0; padding: 0; font-family: inherit; }
-.bc-status { font-family: 'Science Gothic', sans-serif; line-height: 1.2; }
 
-.stat-side {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
-  padding: 6px 10px; border-radius: 10px; border: 1px solid transparent;
-  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+/* Player tag — style giống caro (.caro-player-tag) */
+.xq-player-tag {
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 800; font-size: 13px; color: #e0f2fe;
+  padding: 6px 12px; border-radius: 10px; border: 1px solid transparent;
+  transition: all 0.3s;
 }
-.stat-side-machine { align-items: flex-end; }
-.side-top { display: flex; align-items: center; gap: 5px; }
-.stat-side-machine .side-top { flex-direction: row-reverse; }
-.side-avatar {
-  font-size: 15px; line-height: 1;
-  color: inherit;
+.xq-player-tag.right { flex-direction: row-reverse; }
+.xq-player-tag.active-turn {
+  border-color: rgba(56, 189, 248, 0.55);
+  background: rgba(56, 189, 248, 0.1);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+  animation: playerPulse 1s ease-in-out infinite alternate;
 }
-.side-label { font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 9.5px; letter-spacing: 0.6px; color: #94a3b8; }
+@keyframes playerPulse {
+  from { box-shadow: 0 0 10px rgba(56, 189, 248, 0.15); }
+  to   { box-shadow: 0 0 24px rgba(56, 189, 248, 0.45); }
+}
+.bc-status.in-check .xq-player-tag.active-turn {
+  animation: sideCheckBlink 0.9s ease-in-out infinite;
+}
+@keyframes sideCheckBlink {
+  0%, 100% { background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 0 10px rgba(239, 68, 68, 0.25); }
+  50% { background: rgba(251, 191, 36, 0.14); border-color: rgba(251, 191, 36, 0.9); box-shadow: 0 0 20px rgba(251, 191, 36, 0.65), 0 0 14px rgba(239, 68, 68, 0.5); }
+}
 
-.stat-side.active-turn { background: rgba(251, 191, 36, 0.08); border-color: rgba(251, 191, 36, 0.7); box-shadow: 0 0 14px rgba(251, 191, 36, 0.35), inset 0 0 10px rgba(251, 191, 36, 0.12); }
-.stat-side.active-turn .side-label { color: #fbbf24; }
-.stat-side-machine.active-turn { background: rgba(56, 189, 248, 0.08); border-color: rgba(56, 189, 248, 0.7); box-shadow: 0 0 14px rgba(56, 189, 248, 0.35), inset 0 0 10px rgba(56, 189, 248, 0.12); }
-.stat-side-machine.active-turn .side-label { color: #7dd3fc; }
-.stat-side-player .side-label, .stat-side-player.active-turn .side-label { color: #ffffff !important; }
-.bc-status.in-check .stat-side.active-turn { background: rgba(239,68,68,0.1); border-color: #ef4444; box-shadow: 0 0 14px rgba(239,68,68,0.4); }
-.bc-status.in-check .stat-side.active-turn .side-label { color: #fca5a5; }
-
-.stat-score-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
-.stat-score { font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 22px; color: #fff; text-align: center; text-shadow: 0 0 12px rgba(251,191,36,0.6); transition: color 0.3s; }
-.stat-score-sub { font-family: 'Science Gothic', sans-serif; font-weight: 400; font-size: 11px; color: #94a3b8; margin-top: 2px; letter-spacing: 0.3px; }
-
-.stat-profit { font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 19px; text-align: right; min-width: 65px; }
-.stat-profit.positive { color: #4ade80; }
-.stat-profit.negative { color: #f87171; }
-.stat-profit.zero { color: #ffffff; }
-
-.bc-status.result-win { --bc-right: rgba(8, 60, 28, 0.7); --bc-right-border: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
-.bc-status.result-lose { --bc-right: rgba(70, 12, 12, 0.7); --bc-right-border: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
-.bc-status.result-draw { --bc-right: rgba(40, 45, 55, 0.7); --bc-right-border: rgba(255, 255, 255, 0.85); box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); }
-.bc-status.result-win .stat-score { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
-.bc-status.result-lose .stat-score { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
-.bc-status.result-draw .stat-score { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+.stat-score { font-size: 22px; transition: color 0.3s; }
 .bc-status.thinking .stat-score { color: #fbbf24; animation: pulseText 0.8s ease-in-out infinite alternate; }
 
-.stat-bet { display: none; }
-.bc-status.in-progress .stat-profit { display: none; }
+.xq-profit-value {
+  display: none;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500; font-size: 18px;
+}
+.bc-status.result-win .xq-profit-value,
+.bc-status.result-lose .xq-profit-value,
+.bc-status.result-draw .xq-profit-value { display: inline-block; }
+.bc-status.result-win .xq-profit-value { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
+.bc-status.result-lose .xq-profit-value { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
+.bc-status.result-draw .xq-profit-value { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+
 .bc-status.result-win .stat-score-sub, .bc-status.result-lose .stat-score-sub, .bc-status.result-draw .stat-score-sub { display: none; }
-.bc-status.result-win .stat-side-machine .side-label, .bc-status.result-lose .stat-side-machine .side-label, .bc-status.result-draw .stat-side-machine .side-label { display: none; }
-.bc-status.result-win .stat-side-machine .side-avatar, .bc-status.result-lose .stat-side-machine .side-avatar, .bc-status.result-draw .stat-side-machine .side-avatar { display: none; }
 
 @keyframes pulseText { from { opacity: 0.6; } to { opacity: 1; } }
 
