@@ -4,7 +4,7 @@ body {
     min-height: 100vh;
     margin: 0;
     overflow-y: auto;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Science Gothic', sans-serif;
     color: white;
 }
 #bg-canvas {
@@ -96,8 +96,8 @@ body {
 }
 /* Trái: tổng cược */
 .stat-bet {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
+    font-family: 'Science Gothic', sans-serif;
+    font-weight: 500;
     font-size: 19px;
     color: #fbbf24;
     min-width: 65px;
@@ -111,16 +111,16 @@ body {
     line-height: 1.1;
 }
 .stat-score {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
+    font-family: 'Science Gothic', sans-serif;
+    font-weight: 500;
     font-size: 22px;
     color: #fff;
     text-align: center;
     text-shadow: 0 0 12px rgba(251,191,36,0.6);
 }
 .stat-score-sub {
-    font-family: 'Orbitron', monospace;
-    font-weight: 700;
+    font-family: 'Science Gothic', sans-serif;
+    font-weight: 400;
     font-size: 11px;
     color: #94a3b8;
     margin-top: 2px;
@@ -128,8 +128,8 @@ body {
 }
 /* Phải: lời/lỗ */
 .stat-profit {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
+    font-family: 'Science Gothic', sans-serif;
+    font-weight: 500;
     font-size: 19px;
     text-align: right;
     min-width: 65px;
@@ -239,9 +239,9 @@ body {
     position: absolute;
     top: 10px;
     left: 14px;
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Science Gothic', sans-serif;
     font-size: 20px;
-    font-weight: 900;
+    font-weight: 500;
     color: #fff;
     letter-spacing: 0.5px;
     text-shadow: 0 0 10px rgba(251,191,36,0.3);
@@ -250,9 +250,9 @@ body {
 .bet-card.xiu .bet-label { color: #38bdf8; }
 .bet-info {
     font-size: 16px;
-    font-weight: 800;
+    font-weight: 500;
     color: #e2e8f0;
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Science Gothic', sans-serif;
     margin-top: 2px;
 }
 .my-bet {
@@ -262,8 +262,8 @@ body {
     padding: 3px 10px;
     border-radius: 10px;
     font-size: 14px;
-    font-weight: 800;
-    font-family: 'Orbitron', sans-serif;
+    font-weight: 500;
+    font-family: 'Science Gothic', sans-serif;
     display: inline-block;
 }
 
@@ -282,8 +282,8 @@ body {
     background: #1e293b;
     color: #fff;
     cursor: pointer;
-    font-weight: 700;
-    font-family: 'Orbitron', sans-serif;
+    font-weight: 400;
+    font-family: 'Science Gothic', sans-serif;
     transition: 0.2s;
 }
 .chip.active {
@@ -299,8 +299,8 @@ body {
     background: rgba(255,255,255,0.08);
     color: #cbd5e1;
     cursor: pointer;
-    font-weight: 700;
-    font-family: 'Orbitron', sans-serif;
+    font-weight: 400;
+    font-family: 'Science Gothic', sans-serif;
     font-size: 15px;
     transition: 0.2s;
 }

@@ -27,12 +27,12 @@
   font-weight: 800;
   font-size: 13px;
   cursor: pointer;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Science Gothic', sans-serif;
 }
 .xd-room {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Science Gothic', sans-serif;
   color: #34d399;
-  font-weight: 900;
+  font-weight: 500;
   font-size: 14px;
   padding: 6px 14px;
   border-radius: 999px;
@@ -93,7 +93,7 @@
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Science Gothic', sans-serif;
 }
 .nav-dropdown-item:hover {
   background: rgba(56,189,248,0.1);
@@ -141,7 +141,7 @@
   transition: all 0.3s;
   gap: 8px;
   box-shadow: 0 0 16px rgba(251, 191, 36, 0.18);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Science Gothic', sans-serif;
   line-height: 1.2;
 }
 .bc-status.rolling {
@@ -169,8 +169,8 @@
   --bc-right-border: rgba(255, 255, 255, 0.9);
 }
 .stat-bet {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 19px;
   color: #fbbf24;
   min-width: 65px;
@@ -183,8 +183,8 @@
   line-height: 1.1;
 }
 .stat-score {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 22px;
   color: #fff;
   text-align: center;
@@ -192,8 +192,8 @@
 }
 .stat-score-sub {
   display: none !important;
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 400;
   font-size: 11px;
   color: #94a3b8;
   margin-top: 2px;
@@ -204,8 +204,8 @@
 .bc-status.result-draw .stat-score { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
 .bc-status.rolling .stat-score { color: #fbbf24; }
 .stat-profit {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 19px;
   text-align: right;
   min-width: 65px;
@@ -258,8 +258,8 @@
 
 /* Điểm inline */
 .xd-score-inline {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 16px;
   color: #fbbf24;
   background: rgba(0,0,0,0.5);
@@ -316,8 +316,8 @@
   border: 1px solid rgba(251,191,36,0.5);
   background: rgba(251,191,36,0.12);
   color: #fbbf24;
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 12px;
   pointer-events: none;
 }
@@ -332,8 +332,8 @@
   border: none;
   background: #ef4444;
   color: #fff;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 12px;
   cursor: pointer;
   box-shadow: 0 0 15px #ef4444, 0 0 30px rgba(239,68,68,0.6);
@@ -354,8 +354,8 @@
   border: none;
   background: #22c55e;
   color: #fff;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 12px;
   cursor: pointer;
   z-index: 30;
@@ -379,8 +379,8 @@
 }
 .xd-offer-text {
   color: #e0f2fe;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 14px;
 }
 .xd-offer-actions { display: flex; gap: 10px; }
@@ -389,8 +389,8 @@
   padding: 7px 16px;
   border-radius: 10px;
   border: none;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 13px;
   cursor: pointer;
 }
@@ -404,8 +404,8 @@
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 20;
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 20px;
   white-space: nowrap;
   padding: 10px 20px;
@@ -466,8 +466,8 @@
   border: 1px solid rgba(56,189,248,.3);
   background: rgba(0,0,0,.3);
   color: #e0f2fe;
-  font-family: 'Orbitron', monospace;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   text-align: center;
 }
 .xd-bet-row button {
@@ -475,8 +475,8 @@
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-weight: 800;
-  font-family: 'Nunito', sans-serif;
+  font-weight: 500;
+  font-family: 'Science Gothic', sans-serif;
   font-size: 13px;
   background: linear-gradient(135deg,#34d399,#059669);
   color: #fff;
@@ -492,8 +492,8 @@
   padding: 14px 0;
   border-radius: 14px;
   border: none;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 14px;
   color: #fff;
   cursor: pointer;
@@ -530,8 +530,8 @@
 }
 .xd-modal-title {
   color: #e0f2fe;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 15px;
   margin-bottom: 18px;
 }
@@ -541,8 +541,8 @@
   padding: 10px 0;
   border-radius: 10px;
   border: none;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 14px;
   cursor: pointer;
 }
@@ -552,9 +552,9 @@
 
 /* ===== ROOM ID TRÊN NAV ===== */
 .vt-top-nav .vt-nav-logo .vt-room-id {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Science Gothic', sans-serif;
   color: #fbbf24 !important;
-  font-weight: 900;
+  font-weight: 500;
   font-size: 13px;
   padding: 4px 12px;
   border-radius: 999px;

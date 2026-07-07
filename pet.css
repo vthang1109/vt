@@ -46,7 +46,7 @@
   border-bottom: 2px solid transparent;
   text-align: center;
   transition: all 0.2s;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Science Gothic', sans-serif;
 }
 .pet-tab.active {
   color: #38bdf8;
@@ -62,8 +62,8 @@
   padding: 16px 18px 12px; flex-shrink: 0;
 }
 .pet-modal-title {
-  font-family: 'Orbitron', monospace;
-  font-size: 16px; font-weight: 900; color: #e0f2fe;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 16px; font-weight: 500; color: #e0f2fe;
 }
 .pet-modal-close {
   background: none; border: none; color: #4a7a9b;
@@ -113,8 +113,8 @@
 }
 .pet-gacha-banner-icon { font-size: 48px; margin-bottom: 8px; }
 .pet-gacha-banner-title {
-  font-family: 'Orbitron', monospace; font-size: 14px;
-  font-weight: 900; color: #e0f2fe; margin-bottom: 4px;
+  font-family: 'Science Gothic', sans-serif; font-size: 14px;
+  font-weight: 500; color: #e0f2fe; margin-bottom: 4px;
 }
 .pet-gacha-banner-sub { font-size: 12px; color: #7dd3fc; }
 
@@ -126,8 +126,8 @@
 }
 .pet-tickets-icon { font-size: 20px; }
 .pet-tickets-count {
-  font-family: 'Orbitron', monospace; font-size: 20px;
-  font-weight: 900; color: #fbbf24;
+  font-family: 'Science Gothic', sans-serif; font-size: 20px;
+  font-weight: 500; color: #fbbf24;
 }
 .pet-tickets-label { font-size: 12px; color: #92400e; font-weight: 700; }
 
@@ -136,9 +136,9 @@
   flex: 1; padding: 12px 6px; border-radius: 12px;
   border: 1.5px solid rgba(167,139,250,0.3);
   background: rgba(167,139,250,0.08);
-  color: #a78bfa; font-size: 12px; font-weight: 800;
+  color: #a78bfa; font-size: 12px; font-weight: 500;
   cursor: pointer; transition: all 0.2s;
-  font-family: 'Nunito', sans-serif; text-align: center;
+  font-family: 'Science Gothic', sans-serif; text-align: center;
 }
 .pet-roll-btn:hover:not(:disabled) {
   background: rgba(167,139,250,0.18); border-color: #a78bfa;
@@ -158,7 +158,7 @@
   border: 1px solid rgba(56,189,248,0.2);
   background: rgba(56,189,248,0.05);
   cursor: pointer; transition: all 0.2s;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Science Gothic', sans-serif;
 }
 .pet-buy-btn:hover { background: rgba(56,189,248,0.12); border-color: #38bdf8; }
 .pet-buy-label { font-size: 13px; font-weight: 700; color: #e0f2fe; }
@@ -193,14 +193,14 @@
 .pet-result-card-tier  { font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 999px; }
 
 .pet-result-title {
-  font-family: 'Orbitron', monospace; font-size: 18px;
-  font-weight: 900; color: #e0f2fe; text-align: center;
+  font-family: 'Science Gothic', sans-serif; font-size: 18px;
+  font-weight: 500; color: #e0f2fe; text-align: center;
 }
 .pet-result-close {
   padding: 12px 32px; border-radius: 12px;
   background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3);
-  color: #38bdf8; font-size: 14px; font-weight: 700;
-  cursor: pointer; font-family: 'Nunito', sans-serif;
+  color: #38bdf8; font-size: 14px; font-weight: 400;
+  cursor: pointer; font-family: 'Science Gothic', sans-serif;
   margin-top: 8px;
 }
 
@@ -216,7 +216,7 @@
 .pet-rate-name  { font-size: 13px; font-weight: 800; }
 .pet-rate-desc  { font-size: 11px; color: #4a7a9b; margin-top: 2px; }
 .pet-rate-pct   {
-  font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 900;
+  font-family: 'Science Gothic', sans-serif; font-size: 14px; font-weight: 500;
 }
 
 /* ===== ACTIVE PET DISPLAY trong profile ===== */

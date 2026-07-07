@@ -799,7 +799,7 @@ window.addEventListener('resize', () => {
 window.showToast = function(msg, type = 'info') {
   const c = { info: '#38bdf8', success: '#34d399', warn: '#fbbf24', error: '#f87171' };
   const t = document.createElement('div');
-  t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]||c.info};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;
+  t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]||c.info};color:#e0f2fe;font-size:13px;font-weight:400;font-family:'Science Gothic', sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;
   t.textContent = msg;
   document.getElementById('toastContainer').appendChild(t);
   setTimeout(() => t.remove(), 3500);

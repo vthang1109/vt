@@ -18,16 +18,16 @@
   background: linear-gradient(160deg, rgba(20,26,43,0.98), rgba(10,16,30,0.98));
   border: 1px solid rgba(251, 191, 36, 0.6);
   box-shadow: 0 2px 12px rgba(0,0,0,0.4), 0 0 14px rgba(251, 191, 36, 0.25);
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 13px;
   color: #fbbf24;
   z-index: 4;
   white-space: nowrap;
 }
 .xq-bet-badge small {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 400;
   font-size: 9.5px;
   color: #94a3b8;
   letter-spacing: 0.5px;
@@ -44,8 +44,8 @@
   border: 1px solid rgba(251, 191, 36, 0.25);
 }
 .xq-bet-picker-label {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 400;
   font-size: 12px;
   color: #94a3b8;
   text-transform: uppercase;
@@ -60,8 +60,8 @@
   border: 1px solid rgba(251, 191, 36, 0.3);
   background: rgba(0, 0, 0, 0.3);
   color: #fde68a;
-  font-family: 'Orbitron', monospace;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 14px;
   text-align: center;
 }
@@ -71,13 +71,13 @@
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(255,255,255,0.04);
   color: #cbd5e1;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700; font-size: 11.5px; cursor: pointer;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 400; font-size: 11.5px; cursor: pointer;
 }
 .xq-bet-quick button:active { transform: scale(0.95); }
 .xq-bet-confirm-btn {
   width: 100%; margin-top: 10px; padding: 11px 0; border-radius: 10px; border: none; cursor: pointer;
-  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px;
+  font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 13px;
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
   color: #0a101e;
   box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
@@ -87,8 +87,8 @@
 
 .xq-bet-waiting {
   text-align: center;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 400;
   font-size: 13px;
   color: #94a3b8;
   padding: 14px 0;
@@ -103,15 +103,15 @@
   text-align: center;
 }
 .xq-bet-confirm-title {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 14px;
   color: #fff;
   margin-bottom: 4px;
 }
 .xq-bet-confirm-amt {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 20px;
   color: #fbbf24;
   margin-bottom: 12px;
@@ -119,7 +119,7 @@
 .xq-bet-confirm-actions { display: flex; gap: 10px; }
 .xq-bet-confirm-actions button {
   flex: 1; padding: 10px 0; border-radius: 10px; border: none; cursor: pointer;
-  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px;
+  font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 13px;
 }
 .xq-bet-confirm-actions .decline { background: rgba(255,255,255,0.08); color: #cbd5e1; }
 .xq-bet-confirm-actions .accept { background: linear-gradient(135deg, #4ade80, #22c55e); color: #06240f; }
@@ -128,7 +128,7 @@
 .xq-actions { display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
 .xq-act-btn {
   padding: 10px 22px; border-radius: 12px; border: none; cursor: pointer;
-  font-weight: 800; font-family: 'Nunito', sans-serif; font-size: 13px;
+  font-weight: 500; font-family: 'Science Gothic', sans-serif; font-size: 13px;
   transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
 }
 .xq-act-btn:active:not(:disabled) { transform: scale(0.95); }
@@ -147,7 +147,7 @@
 }
 .xq-act-yellow:hover:not(:disabled) { box-shadow: 0 6px 24px rgba(251, 191, 36, 0.4); }
 
-.xq-wait-host { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; color: #94a3b8; }
+.xq-wait-host { font-family: 'Science Gothic', sans-serif; font-weight: 400; font-size: 13px; color: #94a3b8; }
 
 /* ===================== MODAL ĐỀ NGHỊ HÒA ===================== */
 .xq-modal-overlay {
@@ -164,9 +164,9 @@
   box-shadow: 0 12px 50px rgba(0,0,0,0.6);
   text-align: center;
 }
-.xq-modal-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: #fff; margin-bottom: 18px; }
+.xq-modal-title { font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 15px; color: #fff; margin-bottom: 18px; }
 .xq-modal-actions { display: flex; gap: 10px; }
-.xq-modal-btn { flex: 1; padding: 10px 0; border-radius: 10px; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; }
+.xq-modal-btn { flex: 1; padding: 10px 0; border-radius: 10px; border: none; cursor: pointer; font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 13px; }
 .xq-modal-btn.decline { background: rgba(255,255,255,0.08); color: #cbd5e1; }
 .xq-modal-btn.accept { background: linear-gradient(135deg, #4ade80, #22c55e); color: #06240f; }
 
@@ -180,8 +180,8 @@
   border: 1px solid rgba(251, 191, 36, 0.5);
   background: rgba(251, 191, 36, 0.12);
   color: #fbbf24;
-  font-family: 'Orbitron', monospace;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 12px;
   letter-spacing: 0.3px;
   white-space: nowrap;

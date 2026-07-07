@@ -4,7 +4,6 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VTWorld — Phòng chơi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="rooms.css"/>
   <link rel="stylesheet" href="quests.css"/>
@@ -101,7 +100,7 @@
     <div class="modal-box" style="max-width:380px">
       <div class="modal-header"><span>🔑 Vào bằng mã</span><button class="modal-close" onclick="closeJoinModal()">✕</button></div>
       <label class="rm-label">Mã phòng (6 ký tự)</label>
-      <input id="jc-code" class="input" maxlength="6" placeholder="VD: AB23CD" style="text-transform:uppercase;font-family:'Orbitron',monospace;letter-spacing:3px;font-size:18px;text-align:center"/>
+      <input id="jc-code" class="input" maxlength="6" placeholder="VD: AB23CD" style="text-transform:uppercase;font-family:'Science Gothic', sans-serif;letter-spacing:3px;font-size:18px;text-align:center"/>
       <label class="rm-label">Mật khẩu (nếu có)</label>
       <input id="jc-pw" class="input" maxlength="20" placeholder="Để trống nếu phòng không khoá"/>
       <button class="btn-primary" style="width:100%;margin-top:14px" onclick="doJoinByCode()">Vào phòng</button>
@@ -130,7 +129,7 @@
     function showToast(msg, type='info'){
       const colors = { info:'#38bdf8', success:'#34d399', warn:'#fbbf24', error:'#f87171' };
       const t = document.createElement('div');
-      t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${colors[type]||'#38bdf8'};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;
+      t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${colors[type]||'#38bdf8'};color:#e0f2fe;font-size:13px;font-weight:400;font-family:'Science Gothic', sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;
       t.innerHTML = msg;
       document.getElementById('toastContainer').appendChild(t);
       setTimeout(() => t.remove(), 3500);

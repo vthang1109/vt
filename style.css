@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Science+Gothic:wght@100..900&display=swap');
+
 /* ===== CHAT PAGE ===== */
 #page-chat { background: transparent; }
 
@@ -22,8 +24,8 @@
 }
 .chat-back-btn {
   background: none; border: none; color: #38bdf8; font-size: 12px;
-  font-weight: 700; cursor: pointer; padding: 0; margin-bottom: 4px;
-  font-family: 'Be Vietnam Pro', sans-serif; opacity: 0.75; transition: opacity 0.2s; display: block;
+  font-weight: 400; cursor: pointer; padding: 0; margin-bottom: 4px;
+  font-family: "Science Gothic", sans-serif; opacity: 0.75; transition: opacity 0.2s; display: block;
 }
 .chat-back-btn:hover { opacity: 1; }
 
@@ -31,7 +33,7 @@
 .chat-search-input {
   width: 100%; padding: 8px 12px; border-radius: 50px;
   border: 1px solid rgba(56,189,248,0.18); background: rgba(56,189,248,0.05);
-  color: #e0f2fe; font-size: 13px; outline: none; font-family: 'Be Vietnam Pro', sans-serif;
+  color: #e0f2fe; font-size: 13px; outline: none; font-family: "Science Gothic", sans-serif;
 }
 .chat-search-input:focus { border-color: rgba(56,189,248,0.4); }
 .chat-search-input::placeholder { color: #4a7a9b; }
@@ -145,7 +147,7 @@
 .chat-window-input {
   flex: 1; padding: 10px 14px; border-radius: 50px;
   border: 1px solid rgba(52,211,153,0.22); background: rgba(52,211,153,0.05);
-  color: #e0f2fe; font-size: 14px; outline: none; font-family: 'Be Vietnam Pro', sans-serif;
+  color: #e0f2fe; font-size: 14px; outline: none; font-family: "Science Gothic", sans-serif;
 }
 .chat-window-input:focus { border-color: rgba(52,211,153,0.45); }
 .chat-window-input::placeholder { color: #4a7a9b; }
@@ -169,7 +171,8 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Be Vietnam Pro', sans-serif;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 300;
   background: linear-gradient(135deg, #020b18 0%, #041428 50%, #030d1a 100%);
   color: #e0f2fe;
   min-height: 100vh;
@@ -222,21 +225,21 @@ nav {
   background: rgba(2,11,24,0.7); backdrop-filter: blur(12px);
 }
 .logo { display: flex; align-items: baseline; gap: 2px; }
-.logo-vt { font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900; color: #38bdf8; }
-.logo-world { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700; color: #7dd3fc; }
+.logo-vt { font-family: "Science Gothic", sans-serif; font-size: 22px; font-weight: 500; color: #38bdf8; }
+.logo-world { font-family: "Science Gothic", sans-serif; font-size: 18px; font-weight: 400; color: #7dd3fc; }
 
 /* BUTTONS */
 .btn-primary {
   padding: 13px 32px; border-radius: 12px; border: none; cursor: pointer;
   background: linear-gradient(135deg, #0ea5e9, #38bdf8);
-  color: #fff; font-size: 15px; font-weight: 700; font-family: 'Be Vietnam Pro', sans-serif;
+  color: #fff; font-size: 15px; font-weight: 400; font-family: "Science Gothic", sans-serif;
   box-shadow: 0 6px 24px rgba(56,189,248,0.4); transition: all 0.2s;
 }
 .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(56,189,248,0.6); }
 .btn-secondary {
   padding: 13px 32px; border-radius: 12px; cursor: pointer;
   background: rgba(56,189,248,0.05); border: 1px solid rgba(56,189,248,0.3);
-  color: #7dd3fc; font-size: 15px; font-weight: 700; font-family: 'Be Vietnam Pro', sans-serif;
+  color: #7dd3fc; font-size: 15px; font-weight: 400; font-family: "Science Gothic", sans-serif;
   transition: all 0.2s;
 }
 .btn-secondary:hover { background: rgba(56,189,248,0.15); transform: translateY(-3px); }
@@ -254,9 +257,9 @@ nav {
   animation: fadeUp 0.8s 0.2s both;
 }
 .hero-title {
-  font-family: 'Orbitron', monospace;
+  font-family: "Science Gothic", sans-serif;
   font-size: clamp(32px, 8vw, 64px);
-  font-weight: 900; line-height: 1.2; margin-bottom: 16px;
+  font-weight: 500; line-height: 1.2; margin-bottom: 16px;
   animation: fadeUp 0.8s 0.35s both;
 }
 .hero-title span { color: #38bdf8; text-shadow: 0 0 40px rgba(56,189,248,0.8); }
@@ -291,7 +294,7 @@ nav {
 .qbtn {
   display: flex; align-items: center; gap: 8px;
   padding: 11px 22px; border-radius: 50px; border: none; cursor: pointer;
-  font-size: 14px; font-weight: 700; font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 14px; font-weight: 400; font-family: "Science Gothic", sans-serif;
   transition: all 0.25s; white-space: nowrap;
 }
 .qbtn-icon { font-size: 16px; }
@@ -442,7 +445,7 @@ nav {
 .chat-input {
   flex: 1; padding: 9px 12px; border-radius: 10px;
   border: 1px solid rgba(52,211,153,0.25); background: rgba(52,211,153,0.05);
-  color: #e0f2fe; font-size: 13px; outline: none; font-family: 'Be Vietnam Pro', sans-serif;
+  color: #e0f2fe; font-size: 13px; outline: none; font-family: "Science Gothic", sans-serif;
   transition: border-color 0.2s;
 }
 .chat-input:focus { border-color: rgba(52,211,153,0.5); }
@@ -487,7 +490,7 @@ nav {
   width: 100%; padding: 12px 16px; border-radius: 10px;
   border: 1px solid rgba(56,189,248,0.25); background: rgba(56,189,248,0.05);
   color: #e0f2fe; font-size: 14px; margin-bottom: 12px; outline: none;
-  font-family: 'Be Vietnam Pro', sans-serif; transition: border-color 0.2s;
+  font-family: "Science Gothic", sans-serif; transition: border-color 0.2s;
 }
 .input:focus { border-color: rgba(56,189,248,0.6); }
 .input::placeholder { color: #4a7a9b; }
@@ -588,7 +591,7 @@ nav {
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s;
-    font-family: 'Be Vietnam Pro', sans-serif;
+    font-family: "Science Gothic", sans-serif;
 }
 .nav-dropdown-item:hover {
     background: rgba(56,189,248,0.1);
@@ -640,7 +643,7 @@ body.has-bottom-nav { padding-bottom: 58px !important; }
 
 .vt-profile-panel *,
 .vt-apps-panel * {
-  font-family: 'Be Vietnam Pro', sans-serif;
+  font-family: "Science Gothic", sans-serif;
   box-sizing: border-box;
 }
 

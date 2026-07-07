@@ -4,7 +4,7 @@ body {
     min-height: 100vh;
     margin: 0;
     overflow-y: auto;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Science Gothic', sans-serif;
     color: white;
 }
 
@@ -23,16 +23,16 @@ body {
 }
 .logo {
     cursor: pointer;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
+    font-family: 'Science Gothic', sans-serif;
+    font-weight: 500;
     font-size: 1.4rem;
     color: white;
 }
 .logo span:first-child { color: #38bdf8; }
 .nav-center { flex: 1; display: flex; justify-content: center; }
 .nav-title {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
+    font-family: 'Science Gothic', sans-serif;
+    font-weight: 500;
     font-size: 16px;
     color: #facc15;
     text-shadow: 0 0 20px rgba(250,204,21,0.6);
@@ -42,7 +42,7 @@ body {
 .nav-btn {
     padding: 6px 14px;
     border-radius: 8px;
-    font-family: 'Orbitron';
+    font-family: 'Science Gothic', sans-serif;
     font-size: 11px;
     cursor: pointer;
     border: 1px solid transparent;
@@ -187,8 +187,8 @@ body {
     display: inline-block;
     padding: 8px 20px;
     border-radius: 20px;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
+    font-family: 'Science Gothic', sans-serif;
+    font-weight: 500;
     font-size: 14px;
     letter-spacing: 2px;
     margin-bottom: 20px;
@@ -250,8 +250,8 @@ body {
 }
 
 .stat-value {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
+    font-family: 'Science Gothic', sans-serif;
+    font-weight: 500;
     font-size: 28px;
     color: #facc15;
     text-shadow: 0 0 15px rgba(250,204,21,0.5);
@@ -269,8 +269,8 @@ body {
     padding: 16px 32px;
     border-radius: 14px;
     border: 2px solid;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
+    font-family: 'Science Gothic', sans-serif;
+    font-weight: 500;
     cursor: pointer;
     color: #fff;
     transition: all 0.25s;
@@ -295,8 +295,8 @@ body {
     padding: 16px 32px !important;
     border-radius: 14px !important;
     min-width: 160px !important;
-    font-family: 'Orbitron', sans-serif !important;
-    font-weight: 900 !important;
+    font-family: 'Science Gothic', sans-serif !important;
+    font-weight: 500 !important;
     font-size: 15px !important;
     letter-spacing: 1px !important;
 }
@@ -327,8 +327,8 @@ body {
 }
 
 .section-title {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
+    font-family: 'Science Gothic', sans-serif;
+    font-weight: 500;
     font-size: 13px;
     color: #7dd3fc;
     margin-bottom: 12px;
@@ -414,8 +414,8 @@ body {
 }
 
 .confirm-title {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
+    font-family: 'Science Gothic', sans-serif;
+    font-weight: 500;
     font-size: 16px;
     color: #fbbf24;
     letter-spacing: 2px;
@@ -443,8 +443,8 @@ body {
     padding: 12px 24px;
     border-radius: 12px;
     border: 2px solid;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
+    font-family: 'Science Gothic', sans-serif;
+    font-weight: 500;
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;

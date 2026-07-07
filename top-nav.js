@@ -34,8 +34,8 @@ window.TopNav = (() => {
       box-shadow: 0 2px 20px rgba(0,0,0,0.4);
     }
     .vt-top-nav .vt-nav-logo {
-      font-family: 'Orbitron', 'Segoe UI', sans-serif;
-      font-weight: 900;
+      font-family: "Science Gothic", sans-serif;
+      font-weight: 500;
       font-size: 20px;
       cursor: pointer;
       user-select: none;
@@ -44,19 +44,32 @@ window.TopNav = (() => {
     }
     .vt-top-nav .vt-nav-logo .logo-vt   { color: #0288D1; }
     .vt-top-nav .vt-nav-logo .logo-world { color: #ffffff; }
+    .vt-top-nav .vt-nav-logo { display: flex; align-items: center; gap: 6px; }
+    .vt-top-nav .vt-nav-logo img { height: 28px; width: auto; }
     .vt-top-nav .vt-nav-right {
       display: flex;
       align-items: center;
       gap: 10px;
     }
     .vt-top-nav .vt-nav-pts {
-      font-family: 'Orbitron', monospace;
+      font-family: "Science Gothic", sans-serif;
       font-size: 12px;
-      color: #38bdf8;
-      font-weight: 700;
+      color: #facc15;
+      font-weight: 400;
       display: none;
     }
     .vt-top-nav .vt-nav-pts.visible { display: block; }
+    .vt-top-nav .vt-coin {
+      background: linear-gradient(90deg, #ffee00, #ffffff, #ffee00);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: vt-coin-shine 3s linear infinite;
+    }
+    @keyframes vt-coin-shine {
+      to { background-position: 200% center; }
+    }
     .vt-top-nav .vt-hamburger {
       background: none;
       border: 1px solid rgba(2, 136, 209, 0.25);
@@ -105,9 +118,9 @@ window.TopNav = (() => {
       padding: 10px 16px;
       color: #94a3b8;
       text-decoration: none;
-      font-family: 'Nunito', sans-serif;
+      font-family: "Science Gothic", sans-serif;
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 400;
       transition: background 0.15s, color 0.15s;
     }
     .vt-nav-dropdown a:hover { background: rgba(2,136,209,0.08); color: #38bdf8; }
@@ -122,9 +135,9 @@ window.TopNav = (() => {
       gap: 10px;
       padding: 10px 16px;
       color: #94a3b8;
-      font-family: 'Nunito', sans-serif;
+      font-family: "Science Gothic", sans-serif;
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 400;
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
       border: none;
@@ -161,10 +174,10 @@ window.TopNav = (() => {
     return `
       <div class="vt-top-nav" id="vtTopNav">
         <a class="vt-nav-logo" href="index.html">
-          <span class="logo-vt">VT</span><span class="logo-world">World</span>
+          <img src="logo.png" alt="logo"><span class="logo-vt">VT</span><span class="logo-world">World</span>
         </a>
         <div class="vt-nav-right">
-          <span class="vt-nav-pts" id="vtNavPts">⭐ 0</span>
+          <span class="vt-nav-pts" id="vtNavPts">0 <span class="vt-coin">〄</span></span>
           <button class="vt-hamburger" id="vtHamburger" aria-label="Menu">☰</button>
         </div>
       </div>
@@ -232,7 +245,7 @@ window.TopNav = (() => {
   function setPoints(pts) {
     const el = document.getElementById('vtNavPts');
     if (!el) return;
-    el.textContent = '⭐ ' + Number(pts).toLocaleString();
+    el.innerHTML = Number(pts).toLocaleString() + ' <span class="vt-coin">〄</span>';
     el.classList.add('visible');
   }
 

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VTWorld — Bầu Cua</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="status-bar.css">
     <link rel="stylesheet" href="baucua.css">
     <link rel="stylesheet" href="quests.css">
     <script src="top-nav.js"></script>
@@ -21,8 +21,11 @@
     <div class="game-container">
         <!-- STATUS BAR -->
         <div class="bc-status" id="bc-status">
-            <span class="bc-round" id="bc-round">0</span>
-            <span class="bc-profit zero" id="bc-profit">+0</span>
+            <span class="stat-bet" id="bc-round">0</span>
+            <div class="stat-score-wrap">
+                <span class="stat-score" id="bc-status-msg"></span>
+            </div>
+            <span class="stat-profit zero" id="bc-profit">+0</span>
         </div>
 
         <!-- XÚC XẮC -->

@@ -59,9 +59,9 @@ window.BottomNav = (() => {
       position: absolute; top: -4px; right: -6px;
       min-width: 15px; height: 15px;
       background: #ef4444; border-radius: 8px;
-      font-size: 9px; font-weight: 800; color: #fff;
+      font-size: 9px; font-weight: 500; color: #fff;
       display: none; align-items: center; justify-content: center;
-      padding: 0 3px; font-family: 'Nunito', sans-serif;
+      padding: 0 3px; font-family: "Science Gothic", sans-serif;
       border: 1.5px solid rgba(8,13,28,0.97);
     }
     .vt-bn-badge.visible { display: flex; }
@@ -113,12 +113,12 @@ window.BottomNav = (() => {
 
     /* Profile panel internals */
     .vt-pp-quests-head { display:flex;align-items:center;justify-content:space-between;padding:10px 18px 10px; }
-    .vt-pp-quests-title { font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:#fbbf24;letter-spacing:0.4px; }
-    .vt-pp-quest-count { font-size:11px;font-weight:800;color:#94a3b8;font-family:'Nunito',sans-serif; }
+    .vt-pp-quests-title { font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#fbbf24;letter-spacing:0.4px; }
+    .vt-pp-quest-count { font-size:11px;font-weight:500;color:#94a3b8;font-family:'Science Gothic', sans-serif; }
     .vt-pp-streak { margin:0 14px 10px;background:linear-gradient(135deg,rgba(251,146,60,0.12),rgba(239,68,68,0.06));border:1px solid rgba(251,146,60,0.28);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px; }
-    .vt-pp-streak-num { font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#fb923c;line-height:1; }
-    .vt-pp-streak-label { font-size:11px;color:#fdba74;font-weight:700;margin-top:2px; }
-    .vt-pp-streak-btn { padding:7px 14px;border-radius:10px;border:none;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;font-weight:800;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.2s;flex-shrink:0; }
+    .vt-pp-streak-num { font-family:'Science Gothic', sans-serif;font-size:18px;font-weight:500;color:#fb923c;line-height:1; }
+    .vt-pp-streak-label { font-size:11px;color:#fdba74;font-weight:400;margin-top:2px; }
+    .vt-pp-streak-btn { padding:7px 14px;border-radius:10px;border:none;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;font-weight:500;font-size:12px;cursor:pointer;font-family:'Science Gothic', sans-serif;transition:all 0.2s;flex-shrink:0; }
     .vt-pp-streak-btn:hover:not(:disabled) { transform:translateY(-1px); }
     .vt-pp-streak-btn:disabled { opacity:0.5;cursor:not-allowed;background:#374151; }
     .vt-pp-quest-list { padding:0 14px 16px;display:flex;flex-direction:column;gap:7px; }
@@ -133,8 +133,8 @@ window.BottomNav = (() => {
     .vt-pp-quest-bar { flex:1;height:4px;border-radius:999px;background:rgba(255,255,255,0.06);overflow:hidden; }
     .vt-pp-quest-bar-fill { height:100%;border-radius:999px;background:linear-gradient(90deg,#38bdf8,#0ea5e9);transition:width 0.4s; }
     .vt-pp-quest-row.q-done .vt-pp-quest-bar-fill { background:linear-gradient(90deg,#34d399,#059669); }
-    .vt-pp-quest-prog { font-size:10px;color:#94a3b8;font-weight:700;white-space:nowrap; }
-    .vt-pp-quest-claim { padding:6px 11px;border-radius:8px;border:none;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:800;font-size:11px;cursor:pointer;font-family:'Nunito',sans-serif;flex-shrink:0;transition:all 0.2s; }
+    .vt-pp-quest-prog { font-size:10px;color:#94a3b8;font-weight:400;white-space:nowrap; }
+    .vt-pp-quest-claim { padding:6px 11px;border-radius:8px;border:none;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:500;font-size:11px;cursor:pointer;font-family:'Science Gothic', sans-serif;flex-shrink:0;transition:all 0.2s; }
     .vt-pp-quest-claim:hover:not(:disabled) { transform:translateY(-1px); }
     .vt-pp-quest-claim:disabled { background:rgba(255,255,255,0.06);color:#64748b;cursor:not-allowed; }
     .vt-pp-quest-row.q-claimed .vt-pp-quest-claim { background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.2); }
@@ -149,8 +149,8 @@ window.BottomNav = (() => {
       flex: 1; text-align: center;
       padding: 12px 0;
       color: #7dd3fc;
-      font-family: 'Nunito', sans-serif;
-      font-weight: 700; font-size: 14px;
+      font-family: "Science Gothic", sans-serif;
+      font-weight: 400; font-size: 14px;
       text-decoration: none;
       position: relative;
       transition: color 0.2s;
@@ -239,17 +239,17 @@ window.BottomNav = (() => {
       <!-- SHOP PANEL -->
       <div class="vt-slide-panel" id="vtShopPanel">
         <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 4px"></div>
-        <div style="font-family:'Orbitron',monospace;font-size:12px;font-weight:900;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">🛒 Shop & Túi đồ</div>
+        <div style="font-family:'Science Gothic', sans-serif;font-size:12px;font-weight:500;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">🛒 Shop & Túi đồ</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 18px">
           <a href="shop.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
             <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))">🛒</div>
-            <span style="font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#e0f2fe">Shop</span>
-            <span style="font-family:'Nunito',sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Gacha · Mua vật phẩm</span>
+            <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Shop</span>
+            <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Gacha · Mua vật phẩm</span>
           </a>
           <a href="bag.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
             <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2))">🎒</div>
-            <span style="font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#e0f2fe">Túi đồ</span>
-            <span style="font-family:'Nunito',sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Thú cưng · Vật phẩm</span>
+            <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Túi đồ</span>
+            <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Thú cưng · Vật phẩm</span>
           </a>
         </div>
       </div>
@@ -257,17 +257,17 @@ window.BottomNav = (() => {
       <!-- APPS PANEL -->
       <div class="vt-slide-panel" id="vtAppsPanel">
         <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 4px"></div>
-        <div style="font-family:'Orbitron',monospace;font-size:12px;font-weight:900;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">📱 Ứng dụng & Trò chơi</div>
+        <div style="font-family:'Science Gothic', sans-serif;font-size:12px;font-weight:500;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">📱 Ứng dụng & Trò chơi</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 18px">
           <a href="applications.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
             <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))">📱</div>
-            <span style="font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#e0f2fe">Ứng dụng</span>
-            <span style="font-family:'Nunito',sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Offline · Không cần login</span>
+            <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Ứng dụng</span>
+            <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Offline · Không cần login</span>
           </a>
           <a href="games.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
             <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2))">🎮</div>
-            <span style="font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#e0f2fe">Game</span>
-            <span style="font-family:'Nunito',sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Mini games · Xếp hạng</span>
+            <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Game</span>
+            <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Mini games · Xếp hạng</span>
           </a>
         </div>
       </div>
@@ -277,14 +277,14 @@ window.BottomNav = (() => {
         <div style="padding:0 0 env(safe-area-inset-bottom,0px)">
           <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 0"></div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px">
-            <span style="font-family:'Orbitron',monospace;font-size:13px;font-weight:900;letter-spacing:.5px;color:#7dd3fc">👤 Hồ sơ</span>
-            <a href="profile.html" style="font-size:12px;font-weight:700;color:#0288D1;text-decoration:none;font-family:'Nunito',sans-serif">Xem đầy đủ →</a>
+            <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;letter-spacing:.5px;color:#7dd3fc">👤 Hồ sơ</span>
+            <a href="profile.html" style="font-size:12px;font-weight:400;color:#0288D1;text-decoration:none;font-family:'Science Gothic', sans-serif">Xem đầy đủ →</a>
           </div>
           <a href="profile.html" id="vtPpProfileCard" style="display:flex;align-items:center;gap:14px;margin:0 14px 14px;padding:14px 16px;background:rgba(2,136,209,0.07);border:1px solid rgba(2,136,209,0.18);border-radius:16px;text-decoration:none;cursor:pointer">
-            <div id="vtPpAvatar" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0288d1,#38bdf8);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;color:#fff;flex-shrink:0;border:2px solid rgba(2,136,209,0.4)">?</div>
+            <div id="vtPpAvatar" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0288d1,#38bdf8);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:22px;color:#fff;flex-shrink:0;border:2px solid rgba(2,136,209,0.4)">?</div>
             <div style="flex:1;min-width:0">
-              <div id="vtPpUsername" style="font-weight:900;font-size:16px;color:#e0f2fe;font-family:'Nunito',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Đang tải...</div>
-              <div id="vtPpPoints" style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#fbbf24;margin-top:3px">⭐ —</div>
+              <div id="vtPpUsername" style="font-weight:500;font-size:16px;color:#e0f2fe;font-family:'Science Gothic', sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Đang tải...</div>
+              <div id="vtPpPoints" style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:400;color:#fbbf24;margin-top:3px">⭐ —</div>
             </div>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.5)" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
           </a>
@@ -302,7 +302,7 @@ window.BottomNav = (() => {
             <button id="vtPpStreakBtn" class="vt-pp-streak-btn">Nhận</button>
           </div>
           <div id="vtPpQuestList" class="vt-pp-quest-list">
-            <div style="padding:10px 0;text-align:center;color:#4a7a9b;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif">Đang tải...</div>
+            <div style="padding:10px 0;text-align:center;color:#4a7a9b;font-size:12px;font-weight:400;font-family:'Science Gothic', sans-serif">Đang tải...</div>
           </div>
         </div>
       </div>

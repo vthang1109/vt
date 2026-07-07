@@ -65,8 +65,8 @@
 }
 
 .pro-name {
-  font-family: 'Orbitron', monospace;
-  font-size: 17px; font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 17px; font-weight: 500;
   color: #ffffff;
   text-shadow: 0 1px 10px rgba(0,0,0,0.85), 0 0 24px rgba(0,0,0,0.6);
   margin: 0;
@@ -105,8 +105,8 @@
   border: 1px solid rgba(56,189,248,0.4);
   border-radius: 10px;
   padding: 4px 10px;
-  font-family: 'Orbitron', monospace;
-  font-size: 12px; font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 12px; font-weight: 500;
   color: #38bdf8;
   box-shadow: 0 0 10px rgba(56,189,248,0.25);
 }
@@ -234,8 +234,8 @@
   border: none;
   font-size: 28px;
   display: flex; align-items: center; justify-content: center;
-  color: #e0f2fe; font-weight: 900;
-  font-family: 'Nunito', sans-serif;
+  color: #e0f2fe; font-weight: 500;
+  font-family: 'Science Gothic', sans-serif;
 }
 
 .pro-avatar-upload {
@@ -263,8 +263,8 @@
   padding: 5px 12px;
 }
 .pro-points-icon { font-size: 13px; }
-.pro-points-val  { font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 900; color: #fbbf24; }
-.pro-points-label { font-size: 11px; color: #fde68a; font-weight: 700; }
+.pro-points-val  { font-family: 'Science Gothic', sans-serif; font-size: 13px; font-weight: 500; color: #fbbf24; }
+.pro-points-label { font-size: 11px; color: #fde68a; font-weight: 400; }
 
 /* ===== GRID MỚI (3 HÀNG) ===== */
 .pro-grid {
@@ -506,8 +506,8 @@
   padding: 14px 8px; gap: 4px; border-right: 1px solid rgba(56,189,248,0.08);
 }
 .pro-stat:last-child { border-right: none; }
-.pro-stat-val   { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 900; color: #38bdf8; }
-.pro-stat-label { font-size: 11px; color: #4a7a9b; font-weight: 700; }
+.pro-stat-val   { font-family: 'Science Gothic', sans-serif; font-size: 18px; font-weight: 500; color: #38bdf8; }
+.pro-stat-label { font-size: 11px; color: #4a7a9b; font-weight: 400; }
 
 /* ===== RANK STYLES ===== */
 .pro-stat-rank {
@@ -527,9 +527,9 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  font-family: 'Orbitron', monospace;
+  font-family: 'Science Gothic', sans-serif;
   font-size: 16px;
-  font-weight: 900;
+  font-weight: 500;
   border: 2px solid;
   color: #0f172a;
   transition: all 0.3s;

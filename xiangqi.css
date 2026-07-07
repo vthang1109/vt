@@ -27,8 +27,8 @@
 }
 
 .setup-title {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 20px;
   color: #fff;
   text-align: center;
@@ -40,8 +40,8 @@
 
 .setup-label {
   display: block;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 400;
   font-size: 12px;
   color: #94a3b8;
   letter-spacing: 0.6px;
@@ -51,8 +51,8 @@
 
 .level-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
 .level-btn {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 15px;
   padding: 10px 0;
   border-radius: 10px;
@@ -69,7 +69,7 @@
 
 .level-info {
   margin-top: 10px;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Science Gothic', sans-serif;
   font-weight: 600;
   font-size: 12.5px;
   color: #94a3b8;
@@ -92,8 +92,8 @@
 }
 .color-btn:active { transform: scale(0.96); }
 .color-piece { font-size: 34px; line-height: 1; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,0.4); }
-.color-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; color: #e2e8f0; }
-.color-note { font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 10.5px; color: #94a3b8; }
+.color-name { font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 13px; color: #e2e8f0; }
+.color-note { font-family: 'Science Gothic', sans-serif; font-weight: 600; font-size: 10.5px; color: #94a3b8; }
 .color-btn.active { border-color: #fbbf24; background: rgba(251,191,36,0.12); box-shadow: 0 0 16px rgba(251,191,36,0.3); }
 .color-btn.active .color-piece { text-shadow: 0 0 12px rgba(251,191,36,0.7); }
 #color-red .color-piece { color: #f87171; }
@@ -107,8 +107,8 @@
   border: 1px solid rgba(251, 191, 36, 0.3);
   background: rgba(0, 0, 0, 0.3);
   color: #fde68a;
-  font-family: 'Orbitron', monospace;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 14px;
   text-align: center;
 }
@@ -118,14 +118,14 @@
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(255,255,255,0.04);
   color: #cbd5e1;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700; font-size: 11.5px; cursor: pointer;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 400; font-size: 11.5px; cursor: pointer;
 }
 .bet-quick button:active { transform: scale(0.95); }
 
 .btn-start {
   width: 100%; padding: 14px 0; border-radius: 14px; border: none; cursor: pointer;
-  font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 15px; letter-spacing: 0.8px;
+  font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 15px; letter-spacing: 0.8px;
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
   color: #0a101e;
   box-shadow: 0 4px 20px rgba(251, 191, 36, 0.35);
@@ -160,7 +160,7 @@
   50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.85), 0 0 34px rgba(239, 68, 68, 0.75), inset 0 0 18px rgba(239, 68, 68, 0.25); }
 }
 .bc-status *, .bc-status *::before, .bc-status *::after { box-sizing: content-box; margin: 0; padding: 0; font-family: inherit; }
-.bc-status { font-family: 'Inter', sans-serif; line-height: 1.2; }
+.bc-status { font-family: 'Science Gothic', sans-serif; line-height: 1.2; }
 
 .stat-side {
   display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
@@ -174,7 +174,7 @@
   font-size: 15px; line-height: 1;
   color: inherit;
 }
-.side-label { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 9.5px; letter-spacing: 0.6px; color: #94a3b8; }
+.side-label { font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 9.5px; letter-spacing: 0.6px; color: #94a3b8; }
 
 .stat-side.active-turn { background: rgba(251, 191, 36, 0.08); border-color: rgba(251, 191, 36, 0.7); box-shadow: 0 0 14px rgba(251, 191, 36, 0.35), inset 0 0 10px rgba(251, 191, 36, 0.12); }
 .stat-side.active-turn .side-label { color: #fbbf24; }
@@ -185,10 +185,10 @@
 .bc-status.in-check .stat-side.active-turn .side-label { color: #fca5a5; }
 
 .stat-score-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
-.stat-score { font-family: 'Orbitron', monospace; font-weight: 900; font-size: 22px; color: #fff; text-align: center; text-shadow: 0 0 12px rgba(251,191,36,0.6); transition: color 0.3s; }
-.stat-score-sub { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 11px; color: #94a3b8; margin-top: 2px; letter-spacing: 0.3px; }
+.stat-score { font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 22px; color: #fff; text-align: center; text-shadow: 0 0 12px rgba(251,191,36,0.6); transition: color 0.3s; }
+.stat-score-sub { font-family: 'Science Gothic', sans-serif; font-weight: 400; font-size: 11px; color: #94a3b8; margin-top: 2px; letter-spacing: 0.3px; }
 
-.stat-profit { font-family: 'Orbitron', monospace; font-weight: 900; font-size: 19px; text-align: right; min-width: 65px; }
+.stat-profit { font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 19px; text-align: right; min-width: 65px; }
 .stat-profit.positive { color: #4ade80; }
 .stat-profit.negative { color: #f87171; }
 .stat-profit.zero { color: #ffffff; }
@@ -226,7 +226,7 @@
   background: linear-gradient(135deg, #1e293b, #0f172a);
   border: 1px solid rgba(251, 191, 36, 0.4);
   color: #fbbf24;
-  font-family: 'Orbitron', monospace; font-weight: 800; font-size: 10.5px; letter-spacing: 0.3px;
+  font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: 10.5px; letter-spacing: 0.3px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.4);
   z-index: 3;
 }
@@ -283,7 +283,7 @@
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 6%;
   box-sizing: border-box;
-  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: clamp(12px, 3vw, 16px);
+  font-family: 'Science Gothic', sans-serif; font-weight: 500; font-size: clamp(12px, 3vw, 16px);
   letter-spacing: 3px;
   color: rgba(70,38,10,0.6);
   pointer-events: none;
@@ -359,8 +359,8 @@
   max-width: 44px; max-height: 44px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Nunito', 'Noto Sans SC', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: clamp(16px, 4.2vw, 24px);
   z-index: 2;
   pointer-events: none;
@@ -375,7 +375,7 @@
 .xq-controls { display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
 .btn-undo {
   padding: 10px 24px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.4); cursor: pointer;
-  font-weight: 800; font-family: 'Nunito', sans-serif; font-size: 13px;
+  font-weight: 500; font-family: 'Science Gothic', sans-serif; font-size: 13px;
   background: rgba(56, 189, 248, 0.1); color: #7dd3fc;
   transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
 }
@@ -385,7 +385,7 @@
 
 .btn-reset {
   padding: 10px 24px; border-radius: 12px; border: none; cursor: pointer;
-  font-weight: 800; font-family: 'Nunito', sans-serif; font-size: 13px;
+  font-weight: 500; font-family: 'Science Gothic', sans-serif; font-size: 13px;
   background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0a101e;
   transition: transform 0.15s, box-shadow 0.2s;
   box-shadow: 0 4px 16px rgba(251, 191, 36, 0.25);
@@ -395,7 +395,7 @@
 
 /* ===================== STATUS TEXT ===================== */
 #status {
-  font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; color: #e2e8f0;
+  font-family: 'Science Gothic', sans-serif; font-weight: 400; font-size: 14px; color: #e2e8f0;
   text-align: center; padding: 6px 0 2px; min-height: 28px;
 }
 

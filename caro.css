@@ -23,7 +23,7 @@
   background: rgba(56, 189, 248, 0.08);
   color: #7dd3fc;
   border: 1px solid rgba(56, 189, 248, 0.25);
-  font-family: 'Nunito', sans-serif;
+  font-family: "Science Gothic", sans-serif;
 }
 
 /* ===================== MODE GRID ===================== */
@@ -55,8 +55,8 @@
 .caro-back-btn {
   display: block; margin: 16px auto 0;
   background: none; border: none;
-  color: #7dd3fc; font-size: 13px; font-weight: 700;
-  cursor: pointer; font-family: 'Nunito', sans-serif;
+  color: #7dd3fc; font-size: 13px; font-weight: 400;
+  cursor: pointer; font-family: "Science Gothic", sans-serif;
   transition: color 0.2s;
 }
 .caro-back-btn:hover { color: #38bdf8; }
@@ -99,15 +99,15 @@
 .caro-player-tag.right { flex-direction: row-reverse; }
 
 .caro-player-symbol {
-  font-size: 16px; font-weight: 900;
-  font-family: 'Orbitron', monospace;
+  font-size: 16px; font-weight: 500;
+  font-family: "Science Gothic", sans-serif;
 }
 .caro-player-symbol.x { color: #38bdf8; }
 .caro-player-symbol.o { color: #f87171; }
 
 .caro-player-score {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
   font-size: 18px;
   background: rgba(0, 0, 0, 0.4);
   padding: 1px 8px;
@@ -117,8 +117,8 @@
 #score-p2 { color: #f87171; }
 
 .caro-vs {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
   font-size: 13px;
   color: #4a7a9b;
   flex-shrink: 0;
@@ -153,8 +153,8 @@
   border-radius: 12px;
   border: none;
   cursor: pointer;
-  font-weight: 800;
-  font-family: 'Nunito', sans-serif;
+  font-weight: 500;
+  font-family: "Science Gothic", sans-serif;
   font-size: 13px;
   transition: opacity 0.2s, transform 0.15s;
 }
@@ -188,8 +188,8 @@
 
 .result-emoji { font-size: 56px; line-height: 1; }
 .result-title {
-  font-family: 'Orbitron', monospace;
-  font-size: 22px; font-weight: 900; color: #e0f2fe;
+  font-family: "Science Gothic", sans-serif;
+  font-size: 22px; font-weight: 500; color: #e0f2fe;
 }
 .result-pts { font-size: 15px; font-weight: 700; color: #38bdf8; }
 

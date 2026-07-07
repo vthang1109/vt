@@ -7,8 +7,8 @@
 /* Hiển thị tiền cược ở status bar (bản đơn không hiện .stat-bet,
    bản multiplayer thì hiện — dùng class riêng để không đụng chess.css) */
 .chess-mp-bet {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 17px;
   color: #fbbf24;
   min-width: 65px;
@@ -21,7 +21,7 @@
   font-size: 9px;
   font-weight: 600;
   color: #94a3b8;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Science Gothic', sans-serif;
 }
 .bc-status.in-progress .chess-mp-bet {
   display: none;
@@ -40,8 +40,8 @@
   border: 1px solid rgba(251, 191, 36, 0.25);
 }
 .chess-bet-picker-label {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 400;
   font-size: 12px;
   color: #94a3b8;
   text-transform: uppercase;
@@ -60,8 +60,8 @@
   border: 1px solid rgba(251, 191, 36, 0.3);
   background: rgba(0, 0, 0, 0.3);
   color: #fde68a;
-  font-family: 'Orbitron', monospace;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 14px;
   text-align: center;
 }
@@ -77,8 +77,8 @@
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(255,255,255,0.04);
   color: #cbd5e1;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 400;
   font-size: 11.5px;
   cursor: pointer;
 }
@@ -90,8 +90,8 @@
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 13px;
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
   color: #0a101e;
@@ -103,8 +103,8 @@
 /* Trạng thái chờ (chủ phòng chờ xác nhận / đối thủ chờ chủ phòng chọn mức) */
 .chess-bet-waiting {
   text-align: center;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 400;
   font-size: 13px;
   color: #94a3b8;
   padding: 14px 0;
@@ -120,15 +120,15 @@
   text-align: center;
 }
 .chess-bet-confirm-title {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 14px;
   color: #fff;
   margin-bottom: 4px;
 }
 .chess-bet-confirm-amt {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 20px;
   color: #fbbf24;
   margin-bottom: 12px;
@@ -143,8 +143,8 @@
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 13px;
 }
 .chess-bet-confirm-actions .decline {
@@ -171,8 +171,8 @@
   border-radius: 12px;
   border: none;
   cursor: pointer;
-  font-weight: 800;
-  font-family: 'Nunito', sans-serif;
+  font-weight: 500;
+  font-family: 'Science Gothic', sans-serif;
   font-size: 13px;
   transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
 }
@@ -201,8 +201,8 @@
 .chess-act-yellow:hover:not(:disabled) { box-shadow: 0 6px 24px rgba(251, 191, 36, 0.4); }
 
 .chess-wait-host {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 400;
   font-size: 13px;
   color: #94a3b8;
 }
@@ -229,8 +229,8 @@
   text-align: center;
 }
 .chess-modal-title {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 15px;
   color: #fff;
   margin-bottom: 18px;
@@ -245,8 +245,8 @@
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
   font-size: 13px;
 }
 .chess-modal-btn.decline {

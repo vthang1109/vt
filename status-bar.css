@@ -1,0 +1,118 @@
+/* ===================== STATUS BAR (dùng chung: xì dách, bài cào, bầu cua, tài xỉu...) ===================== */
+.bc-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-weight: 400;
+  font-size: 13px;
+  font-family: 'Science Gothic', sans-serif;
+  line-height: 1.2;
+--bc-left: rgba(251, 191, 36, 0.1);
+  --bc-right: rgba(56, 189, 248, 0.18);
+  --bc-left-border: rgba(251, 191, 36, 0.9);
+  --bc-right-border: rgba(56, 189, 248, 0.9);
+  background-image:
+    linear-gradient(135deg,
+      var(--bc-left) 0%,
+      var(--bc-left) 20%,
+      transparent 38%,
+      transparent 62%,
+      var(--bc-right) 80%,
+      var(--bc-right) 100%),
+    linear-gradient(#0a101e, #0a101e),
+    linear-gradient(135deg,
+      var(--bc-left-border) 0%,
+      var(--bc-left-border) 35%,
+      var(--bc-right-border) 65%,
+      var(--bc-right-border) 100%);
+  background-origin: padding-box, padding-box, border-box;
+  background-clip: padding-box, padding-box, border-box;
+  border: 1px solid transparent;
+  min-height: 64px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.3s;
+  gap: 8px;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.18);
+}
+.bc-status.rolling {
+  --bc-right: rgba(56, 189, 248, 0.18);
+  --bc-right-border: rgba(56, 189, 248, 0.9);
+}
+.bc-status.result-win {
+  --bc-right: rgba(8, 60, 28, 0.7);
+  --bc-right-border: #22c55e;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+.bc-status.result-lose {
+  --bc-right: rgba(70, 12, 12, 0.7);
+  --bc-right-border: #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+.bc-status.result-draw {
+  --bc-right: rgba(40, 45, 55, 0.7);
+  --bc-right-border: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+}
+.bc-status *,
+.bc-status *::before,
+.bc-status *::after {
+  box-sizing: content-box;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+}
+
+/* Trái: số tiền cược */
+.stat-bet {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 19px;
+  color: #fbbf24;
+  min-width: 65px;
+}
+
+/* Giữa: thông báo / lượt chơi + chi tiết */
+.stat-score-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+.stat-score {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 22px;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 0 12px rgba(251,191,36,0.6);
+}
+.stat-score-sub {
+  display: none !important;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+}
+.bc-status.result-win .stat-score { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
+.bc-status.result-lose .stat-score { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
+.bc-status.result-draw .stat-score { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+.bc-status.rolling .stat-score { color: #ffffff; }
+
+/* Phải: lời/lỗ */
+.stat-profit {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 19px;
+  text-align: right;
+  min-width: 65px;
+}
+.stat-profit.positive { color: #4ade80; }
+.stat-profit.negative { color: #f87171; }
+.stat-profit.zero { color: #ffffff; }
