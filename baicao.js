@@ -12,8 +12,10 @@ class BaiCao {
         this.player = { hand: [], score: 0, special: null, specialValue: 0, description: '', revealed: [false, false, false] };
         this.balance = 0;
         this.currentBet = 0;
+        this.cachedBuffPct = 0;
         this.phase = 'betting'; // betting | playing | result
         this.canFlip = false;
+        this.betSettled = true;
         this.unsubBalance = null;
         this.initAfterAuth();
     }
@@ -36,6 +38,7 @@ class BaiCao {
         document.head.appendChild(style);
 
         this.listenBalance();
+        this.refreshBuffCache();
         this.renderEmpty();
         this.bindEvents();
         document.getElementById('bc-bet-row').style.display = 'flex';
@@ -52,38 +55,30 @@ class BaiCao {
         });
     }
 
+    async refreshBuffCache() {
+        try { this.cachedBuffPct = await getActiveBuff(); } catch { this.cachedBuffPct = 0; }
+    }
+
     bindEvents() {
         document.getElementById('btn-place-bet').addEventListener('click', () => this.placeBet());
         document.getElementById('btn-flip').addEventListener('click', () => this.revealNextPlayerCard());
     }
 
+    // Không ghi Firestore ở đây nữa — chỉ kiểm tra điểm bằng dữ liệu cache từ onSnapshot,
+    // tiền cược sẽ được tính gộp thành 1 lượt ghi net khi kết thúc ván (endRound).
     async placeBet() {
         if (this.phase !== 'betting' && this.phase !== 'result') {
             window.showToast('⏳ Không thể đặt cược lúc này', 'warn');
             return;
         }
 
-        let currentPoints;
-        try {
-            currentPoints = await getPoints();
-        } catch (e) {
-            window.showToast('Lỗi kiểm tra điểm', 'error');
-            return;
-        }
-        if (currentPoints !== null) this.balance = currentPoints;
-
         const amt = parseInt(document.getElementById('bc-bet-input').value);
         if (!amt || amt < 50) { window.showToast('Cược tối thiểu 50 ⭐', 'warn'); return; }
         if (amt > this.balance) { window.showToast('Không đủ điểm!', 'error'); return; }
 
         this.currentBet = amt;
-        try {
-            await addPoints('Casino', 'Cược Bài Cào', -this.currentBet);
-            this.startDeal();
-        } catch (e) {
-            console.error(e);
-            window.showToast('Lỗi đặt cược: ' + e.message, 'error');
-        }
+        this.betSettled = false;
+        this.startDeal();
     }
 
     startDeal() {
@@ -181,19 +176,32 @@ class BaiCao {
         this.endRound();
     }
 
+    // Ghi Firestore NGAY 1 LẦN DUY NHẤT cho cả ván: net = lời/lỗ thực tế
+    // (không còn trừ cược lúc đặt + cộng thắng lúc kết thúc như trước — gộp lại thành 1 lượt ghi).
     async endRound() {
         const result = this.compareHands();
-        let multiplier = 0, profit = 0, buffBonus = 0, buffPct = 0, petLabel = '🐾 Pet';
+        let multiplier = 0, net = 0, buffBonus = 0, buffPct = 0, petLabel = '🐾 Pet';
         if (result === 'win') {
             multiplier = this.player.special === 'SAP' ? 4 : (this.player.special === 'LIENG' ? 3 : (this.player.special === 'DONG_HOA' ? 3 : 2));
-            const winAmount = this.currentBet * multiplier;
-            profit = this.currentBet * (multiplier - 1);
+            const profit = this.currentBet * (multiplier - 1);
+            buffPct = this.cachedBuffPct;
+            if (buffPct > 0) buffBonus = Math.round(profit * buffPct / 100);
+            net = profit + buffBonus;
+            if (window.VTQuests) { window.VTQuests.trackPlay('baicao'); window.VTQuests.trackWinSmart(); window.VTQuests.trackEarn(net); }
+        } else if (result === 'lose') {
+            multiplier = 0;
+            net = -this.currentBet;
+            if (window.VTQuests) window.VTQuests.trackPlay('baicao');
+        } else {
+            multiplier = 1;
+            net = 0;
+            if (window.VTQuests) window.VTQuests.trackPlay('baicao');
+        }
+
+        this.betSettled = true;
+        if (net !== 0) {
             try {
-                buffPct = await getActiveBuff();
-                if (buffPct > 0) buffBonus = Math.round(profit * buffPct / 100);
-            } catch {}
-            try {
-                await addPoints('Casino', 'Thắng Bài Cào', winAmount + buffBonus, false);
+                await addPoints('Casino', net > 0 ? 'Thắng Bài Cào' : 'Cược Bài Cào', net, false);
                 if (buffBonus > 0) {
                     try {
                         const ud = await getDoc(doc(db, 'users', auth.currentUser.uid));
@@ -201,17 +209,10 @@ class BaiCao {
                         if (pet) petLabel = `${pet.emoji} ${pet.name}`;
                     } catch {}
                 }
-            } catch(e){}
-            if (window.VTQuests) { window.VTQuests.trackPlay('baicao'); window.VTQuests.trackWinSmart(); window.VTQuests.trackEarn(profit + buffBonus); }
-        } else if (result === 'lose') {
-            multiplier = 0;
-            profit = -this.currentBet;
-            if (window.VTQuests) window.VTQuests.trackPlay('baicao');
-        } else {
-            multiplier = 1;
-            profit = 0;
-            try { await addPoints('Casino', 'Hòa Bài Cào', this.currentBet); } catch(e){}
-            if (window.VTQuests) window.VTQuests.trackPlay('baicao');
+            } catch (e) {
+                console.error(e);
+                window.showToast('Lỗi cộng điểm: ' + e.message, 'error');
+            }
         }
 
         const statusCls = result === 'win' ? 'result-win' : result === 'lose' ? 'result-lose' : 'result-draw';
@@ -219,9 +220,8 @@ class BaiCao {
         document.getElementById('bc-status').className = 'bc-status ' + statusCls;
         document.getElementById('bc-status-msg').textContent = msg;
         const profitEl = document.getElementById('bc-profit-stat');
-        const totalProfit = profit + buffBonus;
-        profitEl.textContent = (totalProfit > 0 ? '+' : '') + totalProfit.toLocaleString('vi-VN');
-        profitEl.className = 'stat-profit ' + (totalProfit > 0 ? 'positive' : totalProfit < 0 ? 'negative' : 'zero');
+        profitEl.textContent = (net > 0 ? '+' : '') + net.toLocaleString('vi-VN');
+        profitEl.className = 'stat-profit ' + (net > 0 ? 'positive' : net < 0 ? 'negative' : 'zero');
         document.getElementById('btn-flip').style.display = 'none';
         this.renderTable(null, null, result);
 
@@ -258,7 +258,6 @@ class BaiCao {
         const allPlayerRevealed = p.revealed.every(r => r);
         const allDealerRevealed = d.revealed.every(r => r);
 
-        // score display
         const pScoreText = allPlayerRevealed
             ? (p.special ? `<span class="hand-type ${this.getSpecialClass(p.special)}">${p.description}</span>` : p.description)
             : '?';
@@ -268,14 +267,12 @@ class BaiCao {
         const pInlineCls = (allPlayerRevealed && p.special) ? 'xd-score-inline plain' : 'xd-score-inline';
         const dInlineCls = (allDealerRevealed && d.special) ? 'xd-score-inline plain' : 'xd-score-inline';
 
-        // result overlays
         let playerResultHtml = '', dealerResultHtml = '';
         if (result) {
             const pCls = result === 'win' ? 'xd-result-win' : result === 'lose' ? 'xd-result-lose' : 'xd-result-draw';
             const dCls = result === 'lose' ? 'xd-result-win' : result === 'win' ? 'xd-result-lose' : 'xd-result-draw';
             const pText = result === 'win' ? 'THẮNG' : result === 'lose' ? 'THUA' : 'HÒA';
             const dText = result === 'lose' ? 'THẮNG' : result === 'win' ? 'THUA' : 'HÒA';
-            // Nếu bên thắng có bài đặc biệt (Sáp/Liêng/Tiên) thì hiện tên bài đó với màu riêng, thay vì "THẮNG"
             const specialBannerClass = (special) => special === 'SAP' ? 'xd-result-special' : special === 'LIENG' ? 'xd-result-lieng' : special === 'DONG_HOA' ? 'xd-result-tien' : null;
             const pSpecialCls = result === 'win' ? specialBannerClass(p.special) : null;
             const dSpecialCls = result === 'lose' ? specialBannerClass(d.special) : null;
@@ -287,7 +284,6 @@ class BaiCao {
                 : `<div class="xd-result-overlay ${dCls}">${dText}</div>`;
         }
 
-        // render dealer cards
         const dealerCardsHtml = d.hand.length
             ? d.hand.map((c, i) => {
                 const hidden = !d.revealed[i];
@@ -296,7 +292,6 @@ class BaiCao {
               }).join('')
             : '<div style="color:#64748b;font-size:12px;padding:8px 0">Chưa có bài</div>';
 
-        // render player cards
         const playerCardsHtml = p.hand.length
             ? p.hand.map((c, i) => {
                 const hidden = !p.revealed[i];
@@ -324,6 +319,15 @@ class BaiCao {
     }
 
     delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+    // Nếu người chơi thoát/đóng tab giữa ván (đã đặt cược nhưng chưa endRound), tính thua cược.
+    forfeitIfAbandoned() {
+        if (this.betSettled || this.phase === 'betting') return;
+        this.betSettled = true;
+        addPoints('Casino', 'Bài Cào out phòng - mất cược', -this.currentBet, false).catch(() => {});
+    }
 }
 
 new BaiCao();
+window.addEventListener('pagehide', () => window.game?.forfeitIfAbandoned());
+window.addEventListener('beforeunload', () => window.game?.forfeitIfAbandoned());

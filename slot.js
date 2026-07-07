@@ -5,6 +5,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getPoints, addPoints } from './points.js';
+import { getActiveBuff } from './pet.js';
 
 // ========== CẤU HÌNH ==========
 const SYMBOLS = ['🍊', '🍇', '🍋', '🔔', '7️⃣'];
@@ -16,6 +17,7 @@ class SlotGame {
     this.balance = 0;
     this.isSpinning = false;
     this.unsubJackpot = null;
+    this.cachedBuffPct = 0;
     this.initAfterAuth();
   }
 
@@ -57,7 +59,12 @@ class SlotGame {
       }
     });
 
+    this.refreshBuffCache();
     window.game = this;
+  }
+
+  async refreshBuffCache() {
+    try { this.cachedBuffPct = await getActiveBuff(); } catch { this.cachedBuffPct = 0; }
   }
 
   // ========== HIỂN THỊ SỐ DƯ & HŨ LỚN ==========
@@ -252,8 +259,7 @@ class SlotGame {
 
     let finalWinWithBuff = finalWin;
     try {
-      const { getActiveBuff } = await import('./pet.js');
-      const buffPercent = await getActiveBuff();
+      const buffPercent = this.cachedBuffPct;
       if (buffPercent > 0) {
         finalWinWithBuff = Math.round(finalWin * (1 + buffPercent / 100));
         if (finalWinWithBuff > finalWin) {
@@ -274,13 +280,10 @@ class SlotGame {
   async grantNormalWin(baseAmount, symbol, betAmount) {
     let finalAmount = baseAmount;
 
-    try {
-      const { getActiveBuff } = await import('./pet.js');
-      const buffPercent = await getActiveBuff();
-      if (buffPercent > 0) {
-        finalAmount = Math.round(baseAmount * (1 + buffPercent / 100));
-      }
-    } catch (e) {}
+    const buffPercent = this.cachedBuffPct;
+    if (buffPercent > 0) {
+      finalAmount = Math.round(baseAmount * (1 + buffPercent / 100));
+    }
 
     await addPoints('Casino', `Trúng 3x ${symbol}`, finalAmount, false);
 

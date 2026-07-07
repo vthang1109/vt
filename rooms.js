@@ -75,7 +75,7 @@ setTimeout(() => {
 
 function startListeningPublicRooms(){
   if (_unsubRooms) _unsubRooms();
-  const q = query(collection(db, 'rooms'));
+  const q = query(collection(db, 'rooms'), where('status', '==', 'lobby'), limit(30));
   _unsubRooms = onSnapshot(q, (snap) => {
     const list = $('rooms-list');
     if (!snap.size) {

@@ -9,6 +9,7 @@ import {
   addDoc, serverTimestamp, deleteDoc, arrayUnion, arrayRemove, setDoc,
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { initProfileCard } from './profile-card.js';
 
 // ===== FIREBASE CONFIG =====
 const firebaseConfig = {
@@ -23,6 +24,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
+
+initProfileCard({ db, getMyUid: () => _currentUser?.uid });
 
 // ===== PARTICLE CANVAS =====
 const canvas = document.getElementById('bg-canvas');
@@ -505,12 +508,15 @@ window.openConvo = function(uid, name, avatarChar, type) {
 
   const clearBtn = document.getElementById('clearMessagesBtn');
   const ptsBtn = document.getElementById('sendPointsBtn');
+  const profBtn = document.getElementById('viewProfileBtn');
   if (type === 'server') {
     clearBtn.style.display = 'none';
     ptsBtn.style.display = 'none';
+    if (profBtn) profBtn.style.display = 'none';
   } else {
     clearBtn.style.display = 'inline-block';
     ptsBtn.style.display = 'inline-flex';
+    if (profBtn) profBtn.style.display = 'inline-flex';
     const roomId = getDmId(_currentUser.uid, uid);
     _readUnsubscribe = listenReadReceipt(roomId, uid, (time) => {
       _otherReadTime = time;
@@ -629,7 +635,7 @@ function renderAllUsersInChat() {
       const name = u.nickname || u.email?.split('@')[0] || '?';
       const div  = document.createElement('div');
       div.className = 'chat-contact';
-      div.onclick   = () => viewUserProfile(u.uid);
+      div.onclick   = () => window.showProfileCard(u.uid);
       div.innerHTML = `
         <div class="contact-av">${name[0].toUpperCase()}</div>
         <div class="contact-info">
@@ -681,88 +687,30 @@ window._renderMyFriendsList = function renderMyFriendsList() {
       const name = f.nickname || '?';
       const div  = document.createElement('div');
       div.style.cssText = 'display:flex;align-items:center;gap:8px;padding:9px 8px;border-radius:10px;background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.1);margin-bottom:6px;cursor:pointer';
-      div.onclick = () => viewUserProfile(f.uid);
+      div.onclick = () => window.showProfileCard(f.uid);
+      const avStyle = f.avatarUrl
+        ? `background:url(${f.avatarUrl}) center/cover;color:transparent`
+        : 'background:linear-gradient(135deg,#34d399,#059669)';
       div.innerHTML = `
-        <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#34d399,#059669);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:13px;flex-shrink:0">${name[0].toUpperCase()}</div>
+        <div style="width:34px;height:34px;border-radius:50%;${avStyle};display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:13px;flex-shrink:0">${f.avatarUrl ? '' : name[0].toUpperCase()}</div>
         <div style="flex:1;min-width:0;font-weight:700;font-size:13px;color:#e0f2fe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(name)} <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#34d399;vertical-align:middle;margin-left:4px"></span></div>
-        <button onclick="event.stopPropagation();openConvoWithUid('${f.uid}','${escHtml(name)}')" style="padding:5px 9px;border-radius:8px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);color:#34d399;cursor:pointer;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif">💬</button>`;
+        <button onclick="event.stopPropagation();window.showProfileCard('${f.uid}')" title="Xem hồ sơ" style="padding:5px 9px;border-radius:8px;background:rgba(94,201,240,0.1);border:1px solid rgba(94,201,240,0.25);color:#5ec9f0;cursor:pointer;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif">👁</button>
+        <button onclick="event.stopPropagation();openConvoWithUid('${f.uid}','${escHtml(name)}')" title="Nhắn tin" style="padding:5px 9px;border-radius:8px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);color:#34d399;cursor:pointer;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif">💬</button>`;
       el.appendChild(div);
     });
   });
 }
 // ===== chat.js – Phần 3 =====
 
-// ===== VIEW PROFILE =====
+// ===== VIEW PROFILE (dùng chung profile-card.js) =====
 window.viewCurrentProfile = function() {
   if (!currentConvoUid) return;
-  viewUserProfile(currentConvoUid);
+  window.showProfileCard(currentConvoUid);
 };
 
-function viewUserProfile(uid) {
-  if (!_currentUser) { window.showToast('⚠️ Hãy đăng nhập!', 'warn'); return; }
-  getUserData(uid, (data) => {
-    if (!data) { window.showToast('Không tìm thấy người dùng.', 'error'); return; }
-    const nickname = data.nickname || data.email?.split('@')[0] || '?';
-    const colors = ['#a78bfa,#7c3aed','#38bdf8,#0ea5e9','#34d399,#059669','#fbbf24,#f59e0b','#f87171,#ef4444'];
-    const colorIdx = uid.charCodeAt(0) % colors.length;
-    const avEl = document.getElementById('vp-avatar');
-    if (data.avatarUrl) {
-      avEl.style.background = `url(${data.avatarUrl}) center/cover`;
-      avEl.textContent = '';
-    } else {
-      avEl.style.background = `linear-gradient(135deg,${colors[colorIdx]})`;
-      avEl.textContent = nickname[0].toUpperCase();
-    }
-    document.getElementById('vp-character-frame').style.background = `linear-gradient(135deg,${colors[colorIdx]})`;
-    document.getElementById('vp-name').textContent  = nickname;
-    document.getElementById('vp-email').textContent = data.email || '';
-    document.getElementById('vp-points').textContent = (data.points ?? 0).toLocaleString('vi');
-    document.getElementById('vp-friends-count').textContent = (data.friends || []).length;
-    renderViewProfileActions(uid, { ...data, nickname });
-    document.getElementById('viewProfileModal').classList.add('open');
-  });
-}
-
-function renderViewProfileActions(uid, data) {
-  const area = document.getElementById('vp-action-area');
-  if (uid === _currentUser.uid) {
-    area.innerHTML = '<p style="color:#7dd3fc;font-size:13px;text-align:center;padding:8px 0">✨ Đây là bạn!</p>';
-    return;
-  }
-  getFriendStatus(_currentUser.uid, uid, (status) => {
-    if (status === 'friends') {
-      area.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;gap:8px">
-          <button onclick="openConvoWithUid('${uid}','${escHtml(data.nickname)}')" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#34d399,#059669);border:none;color:#fff;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">💬 Nhắn tin</button>
-          <button onclick="unfriend('${uid}')" style="flex:1;padding:10px;border-radius:10px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#f87171;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">Hủy kết bạn</button>
-        </div>
-        <button onclick="window.openSendPointsModal('${uid}','${escHtml(data.nickname)}')" style="width:100%;padding:10px;border-radius:10px;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">💸 Gửi điểm</button>
-      </div>`;
-    } else if (status === 'pending_sent') {
-      area.innerHTML = `<div style="text-align:center;padding:10px;border-radius:10px;background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);color:#7dd3fc;font-weight:700;font-size:13px">⏳ Đã gửi lời mời kết bạn</div>`;
-    } else if (status === 'pending_received') {
-      area.innerHTML = `<div style="display:flex;gap:8px">
-        <button onclick="acceptFriend('${uid}')" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#34d399,#059669);border:none;color:#fff;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">✅ Chấp nhận</button>
-        <button onclick="declineFriend('${uid}')" style="flex:1;padding:10px;border-radius:10px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#f87171;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">❌ Từ chối</button>
-      </div>`;
-    } else {
-      area.innerHTML = `<div style="display:flex;gap:8px">
-        <button onclick="sendFriendRequest('${uid}')" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#0ea5e9,#38bdf8);border:none;color:#fff;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">➕ Kết bạn</button>
-        <button onclick="location.href='profile.html?uid=${uid}'" style="flex:1;padding:10px;border-radius:10px;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">👤 Hồ sơ</button>
-      </div>`;
-    }
-  });
-}
-
-window.closeViewProfile = function(e) {
-  if (!e || e.target === document.getElementById('viewProfileModal')) {
-    document.getElementById('viewProfileModal').classList.remove('open');
-  }
-};
-
-// ===== FRIEND ACTIONS =====
+// ===== FRIEND ACTIONS (dùng cho panel Bạn bè) =====
 window.openConvoWithUid = function(uid, name) {
-  window.closeViewProfile();
+  window.closeProfileCard && window.closeProfileCard();
   window.switchChatTab && window.switchChatTab('world');
   setTimeout(() => {
     window.openConvo(uid, name, name[0].toUpperCase(), 'dm');
@@ -776,7 +724,7 @@ window.sendFriendRequest = async function(toUid) {
       fromUid: myUid, toUid, createdAt: serverTimestamp()
     });
     window.showToast('📨 Đã gửi lời mời kết bạn!', 'success');
-    window.closeViewProfile();
+    window.closeProfileCard && window.closeProfileCard();
   } catch(e) { window.showToast('❌ Gửi thất bại!', 'error'); }
 };
 
@@ -787,7 +735,7 @@ window.acceptFriend = async function(fromUid) {
     await updateDoc(doc(db, 'users', fromUid), { friends: arrayUnion(myUid) });
     await deleteDoc(doc(db, 'friendRequests', myUid, 'requests', fromUid));
     window.showToast('🎉 Đã kết bạn thành công!', 'success');
-    window.closeViewProfile();
+    window.closeProfileCard && window.closeProfileCard();
     window._renderMyFriendsList && window._renderMyFriendsList();
     _listenIncomingDMs();
   } catch(e) { window.showToast('❌ Lỗi!', 'error'); }
@@ -798,18 +746,7 @@ window.declineFriend = async function(fromUid) {
   try {
     await deleteDoc(doc(db, 'friendRequests', myUid, 'requests', fromUid));
     window.showToast('Đã từ chối.', 'info');
-    window.closeViewProfile();
-  } catch(e) {}
-};
-
-window.unfriend = async function(uid) {
-  const myUid = _currentUser.uid;
-  try {
-    await updateDoc(doc(db, 'users', myUid), { friends: arrayRemove(uid) });
-    await updateDoc(doc(db, 'users', uid),   { friends: arrayRemove(myUid) });
-    window.showToast('Đã hủy kết bạn.', 'info');
-    window.closeViewProfile();
-    window._renderMyFriendsList && window._renderMyFriendsList();
+    window.closeProfileCard && window.closeProfileCard();
   } catch(e) {}
 };
 

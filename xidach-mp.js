@@ -2,7 +2,7 @@
 // ===== XÌ DÁCH MULTIPLAYER - PHẦN 1/2 =====
 // ============================================================
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { createDeck, renderCardUI } from './cards.js';
 import { getActiveBuff, getPetById, getTierById } from './pet.js';
@@ -22,6 +22,7 @@ const auth = getAuth(app);
 
 const ROOM_ID = new URLSearchParams(location.search).get('room');
 let _user = null, _unsub = null, _unsubMe = null, _myBalance = 0;
+let _room = null, _myActivePet = null;
 let _settledRound = -1;
 let _autoDealRound = -1;
 let _dealerModalShownFor = null;
@@ -163,6 +164,7 @@ onAuthStateChanged(auth, async (u) => {
   _unsubMe = onSnapshot(doc(db, 'users', _user.uid), (s) => {
     if (s.exists()) {
       _myBalance = s.data().points || 0;
+      _myActivePet = s.data().activePet || null;
       if (window.TopNav) window.TopNav.setPoints(_myBalance);
     }
   });
@@ -187,6 +189,7 @@ function start() {
       return;
     }
     const r = snap.data();
+    _room = r;
     updateNavRoom(r.code || '------');
     if (r.gameType !== 'xidach' || !r.gameState) return;
     render(r);
@@ -508,7 +511,6 @@ window.placeBet = async function() {
   if (!amt || amt < 50) { showToast('Cược tối thiểu 50', 'warn'); return; }
   if (amt > _myBalance) { showToast('Không đủ điểm', 'error'); return; }
   try {
-    await updateDoc(doc(db, 'users', _user.uid), { points: _myBalance - amt });
     await updateDoc(doc(db, 'rooms', ROOM_ID), { [`gameState.bets.${_user.uid}`]: amt });
     if (window.VTQuests) window.VTQuests.trackPlay('xidach');
     showToast('✅ Đã đặt ' + amt.toLocaleString('vi-VN') + 'đ', 'success');
@@ -516,9 +518,8 @@ window.placeBet = async function() {
 };
 
 window.hostDeal = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  const r = _room;
+  if (!r) return;
   if (r.hostUid !== _user.uid) return;
   const gs = r.gameState || {};
   const players = (r.members || []).filter(u => u !== r.hostUid && (gs.bets?.[u] || 0) > 0);
@@ -600,9 +601,9 @@ window.hit = async function() {
   if (_actionLock) return;
   _actionLock = true;
   try {
-    const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-    if (!snap.exists()) return;
-    const r = snap.data(); const gs = r.gameState;
+    const r = _room;
+    if (!r) return;
+    const gs = r.gameState;
     if (gs.turnOrder?.[gs.turnIdx] !== _user.uid) return;
     if ((gs.hands?.[_user.uid] || []).length >= 5) return;
     const deck = [...(gs.deck || [])];
@@ -611,72 +612,80 @@ window.hit = async function() {
     hand.push(deck.pop());
     const stat = handStatus(hand);
     const updates = { 'gameState.deck': deck, [`gameState.hands.${_user.uid}`]: hand };
-    let advance = false;
     if (stat.tag === 'bust' || hand.length >= 5 || stat.score >= 21) {
       updates[`gameState.stands.${_user.uid}`] = true;
-      advance = true;
+      const stands = { ...(gs.stands || {}), [_user.uid]: true };
+      let idx = gs.turnIdx;
+      while (idx < gs.turnOrder.length && stands[gs.turnOrder[idx]]) idx++;
+      updates['gameState.turnIdx'] = idx;
+      if (idx >= gs.turnOrder.length) updates['gameState.phase'] = 'dealer';
     }
     await updateDoc(doc(db, 'rooms', ROOM_ID), updates);
-    if (advance) await advanceTurn();
   } finally {
     _actionLock = false;
   }
 };
 
 window.stand = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data(); const gs = r.gameState;
+  const r = _room;
+  if (!r) return;
+  const gs = r.gameState;
   if (gs.turnOrder?.[gs.turnIdx] !== _user.uid) return;
   const hand = gs.hands?.[_user.uid] || [];
   const score = bestScore(hand);
   if (score < 16 && hand.length < 5) { showToast('Phải đủ 16 điểm hoặc Ngũ Linh', 'warn'); return; }
-  await updateDoc(doc(db, 'rooms', ROOM_ID), { [`gameState.stands.${_user.uid}`]: true });
-  await advanceTurn();
-};
-
-async function advanceTurn() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data(); const gs = r.gameState;
-  if (gs.phase !== 'playing') return;
+  const updates = { [`gameState.stands.${_user.uid}`]: true };
+  const stands = { ...(gs.stands || {}), [_user.uid]: true };
   let idx = gs.turnIdx;
-  while (idx < gs.turnOrder.length && gs.stands?.[gs.turnOrder[idx]]) idx++;
-  if (idx >= gs.turnOrder.length) {
-    await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.turnIdx': idx, 'gameState.phase': 'dealer' });
-  } else {
-    await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.turnIdx': idx });
-  }
-}
+  while (idx < gs.turnOrder.length && stands[gs.turnOrder[idx]]) idx++;
+  updates['gameState.turnIdx'] = idx;
+  if (idx >= gs.turnOrder.length) updates['gameState.phase'] = 'dealer';
+  await updateDoc(doc(db, 'rooms', ROOM_ID), updates);
+};
 
 window.hostDealerDraw = async function() {
   if (_actionLock) return;
   _actionLock = true;
   try {
-    const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-    if (!snap.exists()) return;
-    const r = snap.data(); const gs = r.gameState;
+    const r = _room;
+    if (!r) return;
+    const gs = r.gameState;
     if (r.hostUid !== _user.uid || gs.phase !== 'dealer') return;
     if ((gs.hands?.[r.hostUid] || []).length >= 5) return;
     let deck = [...(gs.deck || [])];
     let hand = [...(gs.hands?.[r.hostUid] || [])];
     if (deck.length === 0) { showToast('Hết bài', 'warn'); return; }
     hand.push(deck.pop());
-    await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.deck': deck, [`gameState.hands.${r.hostUid}`]: hand });
+    const updates = { 'gameState.deck': deck, [`gameState.hands.${r.hostUid}`]: hand };
 
     const newStat = handStatus(hand);
     if (newStat.tag === 'bust') {
-      await finalizeBustDealer(r, hand, deck);
+      const players = (r.members || []).filter(u => u !== r.hostUid);
+      const results = { ...(gs.results || {}) };
+      for (const uid of players) {
+        if (gs.dealerChecked?.[uid]) continue;
+        const bet = gs.bets?.[uid] || 0;
+        if (bet === 0) continue;
+        const playerHand = gs.hands?.[uid] || [];
+        const pStat = handStatus(playerHand);
+        results[uid] = pStat.tag === 'bust' ? { outcome: 'draw', delta: 0 } : { outcome: 'win', delta: bet };
+      }
+      let dealerDelta = 0;
+      for (const res of Object.values(results)) dealerDelta -= res.delta;
+      updates['gameState.phase'] = 'result';
+      updates['gameState.results'] = results;
+      updates['gameState.dealerDelta'] = dealerDelta;
     }
+    await updateDoc(doc(db, 'rooms', ROOM_ID), updates);
   } finally {
     _actionLock = false;
   }
 };
 
 window.hostCheckPlayer = async function(targetUid) {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data(); const gs = r.gameState;
+  const r = _room;
+  if (!r) return;
+  const gs = r.gameState;
   if (r.hostUid !== _user.uid || gs.phase !== 'dealer') return;
   const dealerHand = gs.hands?.[r.hostUid] || [];
   const dealerScore = bestScore(dealerHand);
@@ -698,9 +707,9 @@ window.hostCheckPlayer = async function(targetUid) {
 };
 
 window.hostEndDealerTurn = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data(); const gs = r.gameState;
+  const r = _room;
+  if (!r) return;
+  const gs = r.gameState;
   if (r.hostUid !== _user.uid || gs.phase !== 'dealer') return;
   
   const dealerHand = gs.hands?.[r.hostUid] || [];
@@ -732,34 +741,7 @@ window.hostEndDealerTurn = async function() {
   });
 };
 
-async function finalizeBustDealer(r, dealerHand, deck) {
-  const gs = r.gameState;
-  const players = (r.members || []).filter(u => u !== r.hostUid);
-  const results = { ...(gs.results || {}) };
-  for (const uid of players) {
-    if (gs.dealerChecked?.[uid]) continue;
-    const bet = gs.bets?.[uid] || 0;
-    if (bet === 0) continue;
-    const playerHand = gs.hands?.[uid] || [];
-    const pStat = handStatus(playerHand);
-    let outcome, delta;
-    if (pStat.tag === 'bust') { outcome = 'draw'; delta = 0; }
-    else { outcome = 'win'; delta = bet; }
-    results[uid] = { outcome, delta };
-  }
 
-  let dealerDelta = 0;
-  for (const res of Object.values(results)) dealerDelta -= res.delta;
-
-  await updateDoc(doc(db, 'rooms', ROOM_ID), {
-    'gameState.phase': 'result',
-    'gameState.deck': deck,
-    [`gameState.hands.${r.hostUid}`]: dealerHand,
-    'gameState.results': results,
-    'gameState.dealerChecked': Object.fromEntries(players.map(u => [u, true])),
-    'gameState.dealerDelta': dealerDelta
-  });
-}
 
 async function settleMyResult(r, gs) {
   if (r.hostUid === _user.uid) {
@@ -773,9 +755,7 @@ async function settleMyResult(r, gs) {
     }
     const totalDealerDelta = dealerDelta + dealerBuffBonus;
     if (dealerDelta !== 0) {
-      const us = await getDoc(doc(db, 'users', _user.uid));
-      const cur = us.exists() ? (us.data().points || 0) : 0;
-      await updateDoc(doc(db, 'users', _user.uid), { points: cur + totalDealerDelta });
+      await updateDoc(doc(db, 'users', _user.uid), { points: increment(totalDealerDelta) });
       if (dealerBuffBonus > 0) {
         await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.dealerDelta': totalDealerDelta });
       }
@@ -798,19 +778,16 @@ async function settleMyResult(r, gs) {
         buffBonus = Math.round(winAmount * buffPct / 100);
       }
     } catch {}
-    const totalRefund = bet + winAmount + buffBonus;
-    const us = await getDoc(doc(db, 'users', _user.uid));
-    const cur = us.exists() ? (us.data().points || 0) : 0;
-    await updateDoc(doc(db, 'users', _user.uid), { points: cur + totalRefund });
+    const netGain = winAmount + buffBonus;
+    await updateDoc(doc(db, 'users', _user.uid), { points: increment(netGain) });
     if (buffBonus > 0) {
       await updateDoc(doc(db, 'rooms', ROOM_ID), { [`gameState.results.${_user.uid}.delta`]: winAmount + buffBonus });
     }
 
     if (buffBonus > 0) {
-      const petData = await (async () => {
+      const petData = (() => {
         try {
-          const ud = await getDoc(doc(db, 'users', _user.uid));
-          const activePetId = ud.data()?.activePet;
+          const activePetId = _myActivePet;
           if (!activePetId) return null;
           const pet = getPetById(activePetId);
           const tier = pet ? getTierById(pet.tier) : null;
@@ -825,20 +802,17 @@ async function settleMyResult(r, gs) {
     if (window.VTQuests) { window.VTQuests.trackEarn(winAmount + buffBonus); window.VTQuests.trackWinSmart(); }
 
   } else if (res.outcome === 'lose') {
+    await updateDoc(doc(db, 'users', _user.uid), { points: increment(-bet) });
     showToast(`💸 Thua ${bet.toLocaleString('vi-VN')}đ`, 'warn');
 
   } else {
-    const us = await getDoc(doc(db, 'users', _user.uid));
-    const cur = us.exists() ? (us.data().points || 0) : 0;
-    await updateDoc(doc(db, 'users', _user.uid), { points: cur + bet });
     showToast(`🤝 Hoà`, 'info');
   }
 }
 
 window.hostNextRound = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  const r = _room;
+  if (!r) return;
   if (r.hostUid !== _user.uid) return;
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
     'gameState.phase': 'betting',
@@ -856,9 +830,8 @@ window.hostNextRound = async function() {
 };
 
 window.hostTransferDealer = async function(targetUid) {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  const r = _room;
+  if (!r) return;
   if (r.hostUid !== _user.uid) return;
   const phase = r.gameState?.phase;
   if (phase !== 'result' && phase !== 'betting') return;
@@ -881,9 +854,8 @@ window.hostTransferDealer = async function(targetUid) {
 };
 
 window.requestDealer = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  const r = _room;
+  if (!r) return;
   if (r.hostUid === _user.uid) return;
   const phase = r.gameState?.phase;
   if (phase !== 'betting' && phase !== 'result') { showToast('Chờ ván kết thúc', 'warn'); return; }
@@ -894,9 +866,8 @@ window.requestDealer = async function() {
 };
 
 window.acceptDealerRequest = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  const r = _room;
+  if (!r) return;
   if (r.hostUid !== _user.uid) return;
   const req = r.gameState?.dealerRequest;
   if (!req) return;
@@ -904,17 +875,15 @@ window.acceptDealerRequest = async function() {
 };
 
 window.declineDealerRequest = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  const r = _room;
+  if (!r) return;
   if (r.hostUid !== _user.uid) return;
   await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.dealerRequest': null });
 };
 
 window.hostOfferDealer = async function(targetUid) {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  const r = _room;
+  if (!r) return;
   if (r.hostUid !== _user.uid) return;
   if (r.gameState?.phase !== 'result') return;
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
@@ -923,9 +892,8 @@ window.hostOfferDealer = async function(targetUid) {
 };
 
 window.acceptDealerOffer = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  const r = _room;
+  if (!r) return;
   const offer = r.gameState?.dealerOffer;
   if (!offer || offer.uid !== _user.uid) return;
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
@@ -947,9 +915,8 @@ window.acceptDealerOffer = async function() {
 };
 
 window.declineDealerOffer = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  const r = _room;
+  if (!r) return;
   const offer = r.gameState?.dealerOffer;
   if (!offer || offer.uid !== _user.uid) return;
   await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.dealerOffer': null });
@@ -957,16 +924,11 @@ window.declineDealerOffer = async function() {
 
 window.quitGame = async function() {
   try {
-    const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-    if (snap.exists()) {
-      const r = snap.data();
-      if (r.gameState?.phase === 'betting') {
-        const myBet = r.gameState.bets?.[_user.uid] || 0;
-        if (myBet > 0) {
-          const us = await getDoc(doc(db, 'users', _user.uid));
-          const cur = us.exists() ? (us.data().points || 0) : 0;
-          await updateDoc(doc(db, 'users', _user.uid), { points: cur + myBet });
-        }
+    const r = _room;
+    if (r) {
+      const myBet = r.gameState?.phase === 'betting' ? (r.gameState.bets?.[_user.uid] || 0) : 0;
+      if (myBet > 0) {
+        await updateDoc(doc(db, 'users', _user.uid), { points: increment(-myBet) });
       }
       if (r.hostUid === _user.uid) {
         await deleteDoc(doc(db, 'rooms', ROOM_ID));

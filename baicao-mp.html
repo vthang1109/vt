@@ -4,7 +4,6 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>VTWorld — Bài Cào Online</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="quests.css"/>
   <link rel="stylesheet" href="cards.css"/>
@@ -65,7 +64,7 @@
       if (!container) return;
       const colors = { info: '#38bdf8', success: '#34d399', warn: '#fbbf24', error: '#f87171' };
       const t = document.createElement('div');
-      t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${colors[type] || '#38bdf8'};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;
+      t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${colors[type] || '#38bdf8'};color:#e0f2fe;font-size:13px;font-weight:400;font-family:"Science Gothic",sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;
       t.textContent = msg;
       container.appendChild(t);
       setTimeout(() => t.remove(), 3500);

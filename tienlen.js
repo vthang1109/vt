@@ -284,6 +284,7 @@ function newGame(mode = 'an_tat', bet = 100, buffPct = 0) {
     firstMove: true,
     requireThreeSpades,
     lastPlaySeq: 0,
+    justPlayed: null,
     selected: new Set(),
     finished: [],
     over: false,
@@ -342,6 +343,7 @@ function playCombo(playerIdx, cards) {
   state.passCount = 0;
   state.firstMove = false;
   state.lastPlaySeq = (state.lastPlaySeq || 0) + 1;
+  state.justPlayed = playerIdx;
   pushLog(`${PLAYER_NAMES[playerIdx]} đánh ${combo.cards.map(cardLabel).join(' ')}`);
 
   if (state.hands[playerIdx].length === 0) {
@@ -675,7 +677,6 @@ function loadPetBuff() {
 }
 const playBtn = document.getElementById('play-btn');
 const passBtn = document.getElementById('pass-btn');
-const sortBtn = document.getElementById('sort-btn');
 const roundBetRow = document.getElementById('tl-round-bet-row');
 const roundBetInput = document.getElementById('tl-round-bet-input');
 const myHandEl = document.getElementById('my-hand');
@@ -685,7 +686,6 @@ const resultBox = document.getElementById('result-box');
 // ==================== TIMER 30S/LƯỢT ====================
 const turnTimer = { remaining: TURN_SECONDS, playerIdx: null, interval: null };
 let lastTimerTurn = null;
-let renderedPlaySeq = 0;
 
 function setRingProgress(playerIdx, fraction, warn) {
   const seat = seatEls[playerIdx];
@@ -784,7 +784,7 @@ function render() {
   tableEl.innerHTML = '';
   if (state.tableStack.length) {
     const offsets = [{ x: 0, y: 0 }, { x: 18, y: -18 }, { x: -18, y: -34 }];
-    const isNewPlay = state.lastPlaySeq !== renderedPlaySeq;
+    const justPlayedBy = state.justPlayed;
     state.tableStack.forEach((combo, idx) => {
       const group = document.createElement('div');
       const back = state.tableStack.length - 1 - idx;
@@ -795,11 +795,11 @@ function render() {
       const inner = document.createElement('div');
       inner.className = 'table-play-inner';
       combo.cards.forEach(c => inner.appendChild(renderCard(c, false)));
-      if (back === 0 && isNewPlay) inner.classList.add('play-in', `from-${state.lastPlayer}`);
+      if (back === 0 && justPlayedBy !== null && justPlayedBy !== undefined) inner.classList.add('play-in', `from-${justPlayedBy}`);
       group.appendChild(inner);
       tableEl.appendChild(group);
     });
-    renderedPlaySeq = state.lastPlaySeq;
+    state.justPlayed = null;
   } else {
     tableEl.innerHTML = '<span class="table-empty">— Đi tự do —</span>';
   }
@@ -884,7 +884,6 @@ startBtn.addEventListener('click', async () => {
   newGame(currentMode, currentBet, currentBuffPct);
   payoutSettled = false;
   lastTimerTurn = null;
-  renderedPlaySeq = 0;
   setupScreen.style.display = 'none';
   gameScreen.style.display = '';
   statusBarEl.style.display = '';
@@ -901,13 +900,11 @@ window.tlGame = {
     newGame(currentMode, currentBet, currentBuffPct);
     payoutSettled = false;
     lastTimerTurn = null;
-    renderedPlaySeq = 0;
     render();
     maybeRunAi();
   }
 };
 
-sortBtn.addEventListener('click', () => { state.hands[0] = sortHand(state.hands[0]); render(); });
 
 playBtn.addEventListener('click', () => {
   const cards = getSelectedCards();

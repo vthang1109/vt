@@ -37,7 +37,7 @@
   transition: all 0.3s;
   gap: 8px;
   box-shadow: 0 0 16px rgba(251, 191, 36, 0.18);
-  font-family: 'Inter', sans-serif;
+  font-family: "Science Gothic", sans-serif;
   line-height: 1.2;
 }
 .bc-status.result-win {
@@ -56,8 +56,8 @@
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
 }
 .stat-bet {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
   font-size: 19px;
   color: #fbbf24;
   min-width: 65px;
@@ -70,8 +70,8 @@
   line-height: 1.1;
 }
 .stat-score {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
   font-size: 22px;
   color: #fff;
   text-align: center;
@@ -81,8 +81,8 @@
 .bc-status.result-lose .stat-score { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
 .bc-status.result-draw .stat-score { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
 .stat-profit {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
   font-size: 19px;
   text-align: right;
   min-width: 65px;
@@ -106,9 +106,9 @@
 }
 .bc-bet-row label {
   color: #e0f2fe;
-  font-weight: 700;
+  font-weight: 400;
   font-size: 14px;
-  font-family: 'Nunito', sans-serif;
+  font-family: "Science Gothic", sans-serif;
 }
 .bc-bet-row select {
   padding: 8px 14px;
@@ -116,8 +116,8 @@
   border: 1px solid rgba(251,191,36,0.3);
   background: rgba(0,0,0,0.4);
   color: #fbbf24;
-  font-family: 'Orbitron', monospace;
-  font-weight: 800;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
   font-size: 14px;
   cursor: pointer;
 }
@@ -130,8 +130,8 @@
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-weight: 800;
-  font-family: 'Nunito', sans-serif;
+  font-weight: 500;
+  font-family: "Science Gothic", sans-serif;
   font-size: 14px;
   background: linear-gradient(135deg, #34d399, #059669);
   color: #fff;
@@ -172,11 +172,11 @@
 .bc-seat.draw { background: rgba(148,163,184,.07); border-color: rgba(148,163,184,.3); }
 
 .bc-seat-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
-.bc-seat-name { font-weight: 800; color: #e0f2fe; font-size: 14px; }
+.bc-seat-name { font-weight: 500; color: #e0f2fe; font-size: 14px; }
 
 .bc-score-inline {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
   font-size: 16px;
   color: #fbbf24;
   background: rgba(0,0,0,0.5);
@@ -229,8 +229,8 @@
   border: 1px solid rgba(251,191,36,0.5);
   background: rgba(251,191,36,0.12);
   color: #fbbf24;
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
   font-size: 12px;
   pointer-events: none;
 }
@@ -251,8 +251,8 @@
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 20;
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
   font-size: 20px;
   white-space: nowrap;
   padding: 10px 20px;
@@ -316,8 +316,8 @@
   padding: 14px 8px;
   border-radius: 14px;
   border: none;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
   font-size: 13px;
   color: #fff;
   cursor: pointer;
@@ -336,9 +336,9 @@
 
 /* ===================== ROOM ID ===================== */
 .vt-top-nav .vt-nav-logo .bc-room-id {
-  font-family: 'Orbitron', monospace;
+  font-family: "Science Gothic", sans-serif;
   color: #fbbf24 !important;
-  font-weight: 900;
+  font-weight: 500;
   font-size: 13px;
   padding: 4px 12px;
   border-radius: 999px;

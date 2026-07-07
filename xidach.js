@@ -179,7 +179,7 @@ class XiDach {
                 this.render();
                 this.updateButtons(true);
                 this.updateStatusBar('Bạn', null, 'Bài úp');
-                document.getElementById('bc-status')?.classList.remove('rolling');
+                document.getElementById('bc-status')?.classList.add('rolling');
             }
         } catch (e) {
             console.error('Lỗi khi chia bài:', e);

@@ -24,6 +24,7 @@ class BauCua {
         this._userId = null;
         this._isResultShowing = false;
         this._lastResults = null;
+        this.cachedBuffPct = 0;
 
         this.items.forEach(item => {
             this.bets[item.id] = 0;
@@ -42,6 +43,8 @@ class BauCua {
 
         if (user) {
             this._userId = user.uid;
+            // Chỉ dùng để đồng bộ balance khi có thay đổi thực sự từ DB (ví dụ chuyển điểm nơi khác),
+            // không còn bị "spam" mỗi lần đặt cược vì placeBet/resetBoard không ghi Firestore nữa.
             this._unsubBalance = onSnapshot(doc(db, 'users', user.uid), (snap) => {
                 if (snap.exists()) {
                     this._myBalance = snap.data().points || 0;
@@ -52,12 +55,18 @@ class BauCua {
 
         const pts = await getPoints();
         this._myBalance = pts || 0;
-        
+        this.refreshBuffCache();
+
         this.buildBoard();
         this.bindEvents();
         this.updateStatusBar('betting', 0);
         this.syncNavPoints();
         this.updateRollButton('roll');
+        window.bcGame = this;
+    }
+
+    async refreshBuffCache() {
+        try { this.cachedBuffPct = await getActiveBuff(); } catch { this.cachedBuffPct = 0; }
     }
 
     syncNavPoints() {
@@ -116,6 +125,7 @@ class BauCua {
         
         const roundEl = document.getElementById('bc-round');
         const profitEl = document.getElementById('bc-profit');
+        const msgEl = document.getElementById('bc-status-msg');
         
         statusEl.classList.remove('rolling', 'result-win', 'result-lose', 'result-draw');
         statusEl.style.background = '';
@@ -124,10 +134,10 @@ class BauCua {
         const totalBet = this.getTotalBet();
         
         roundEl.textContent = totalBet > 0 ? totalBet.toLocaleString('vi-VN') : '0';
-        roundEl.style.color = '#fbbf24';
-        roundEl.style.fontFamily = "'Orbitron', monospace";
-        roundEl.style.fontWeight = '900';
-        roundEl.style.fontSize = '18px';
+
+        if (msgEl) {
+            msgEl.textContent = phase === 'rolling' ? 'Đang lắc...' : (phase === 'result' ? 'Kết quả' : '');
+        }
         
         if (phase === 'rolling') {
             statusEl.classList.add('rolling');
@@ -139,13 +149,13 @@ class BauCua {
         
         if (profit > 0) {
             profitEl.textContent = `+${profit.toLocaleString('vi-VN')}`;
-            profitEl.className = 'bc-profit positive';
+            profitEl.className = 'stat-profit positive';
         } else if (profit < 0) {
             profitEl.textContent = `${profit.toLocaleString('vi-VN')}`;
-            profitEl.className = 'bc-profit negative';
+            profitEl.className = 'stat-profit negative';
         } else {
             profitEl.textContent = '+0';
-            profitEl.className = 'bc-profit zero';
+            profitEl.className = 'stat-profit zero';
         }
     }
 
@@ -175,8 +185,9 @@ class BauCua {
         }
     }
 
-    // ========== CẬP NHẬT BALANCE GỘP ==========
-    async updateBalance(amount, reason) {
+    // Ghi Firestore 1 lượt (transaction) — chỉ dùng khi kết thúc ván (finishRoll) hoặc
+    // khi thoát ngang (forfeitIfAbandoned). Không còn gọi ở placeBet/resetBoard.
+    async commitBalance(amount, reason) {
         if (!this._userId) return this._myBalance;
         
         try {
@@ -209,14 +220,11 @@ class BauCua {
         }
     }
 
-    // ========== ĐẶT CƯỢC ==========
-    async placeBet(id) {
+    // Không ghi Firestore ở đây nữa — chỉ trừ điểm local để hiện UI, tiền cược sẽ được
+    // gộp thành 1 lượt ghi net duy nhất trong finishRoll().
+    placeBet(id) {
         if (this.isRolling || this._isResultShowing) {
             console.log('Không thể đặt cược lúc này');
-            return;
-        }
-        if (this._isProcessingBet) {
-            console.log('Đang xử lý cược');
             return;
         }
         if (this.currentChip > this._myBalance) {
@@ -224,25 +232,11 @@ class BauCua {
             return;
         }
 
-        this._isProcessingBet = true;
-
-        try {
-            const newBalance = await this.updateBalance(-this.currentChip, `Đặt ${id}`);
-            
-            if (newBalance === null) {
-                this._isProcessingBet = false;
-                return;
-            }
-            
-            this.bets[id] += this.currentChip;
-            this.updateTileUI(id, this.bets[id]);
-            this.updateStatusBar('betting', this.lastProfit);
-            
-        } catch (e) {
-            console.error('Lỗi đặt cược:', e);
-        }
-
-        this._isProcessingBet = false;
+        this._myBalance -= this.currentChip;
+        this.bets[id] += this.currentChip;
+        this.updateTileUI(id, this.bets[id]);
+        this.updateStatusBar('betting', this.lastProfit);
+        this.syncNavPoints();
     }
 
     updateTileUI(id, amount) {
@@ -261,7 +255,7 @@ class BauCua {
         });
     }
 
-    // Reset tất cả cược về 0 (chỉ local, không ghi Firestore vì tiền đã được xử lý)
+    // Reset tất cả cược về 0 (chỉ local, không ghi Firestore vì tiền chưa từng bị trừ ở DB)
     resetAllBets() {
         this.items.forEach(item => {
             this.bets[item.id] = 0;
@@ -274,24 +268,18 @@ class BauCua {
         });
     }
 
-    resetBoard = async function() {
+    // Huỷ cược chỉ hoàn lại local, không cần ghi Firestore.
+    resetBoard() {
         if (this.isRolling || this._isResultShowing) return;
         
         const total = Object.values(this.bets).reduce((a, b) => a + b, 0);
         if (total === 0) return;
 
-        try {
-            const newBalance = await this.updateBalance(total, 'Huỷ cược');
-            
-            if (newBalance === null) return;
-            
-            this.resetAllBets();
-
-            this.lastProfit = 0;
-            this.updateStatusBar('betting', 0);
-        } catch (e) {
-            console.error(e);
-        }
+        this._myBalance += total;
+        this.resetAllBets();
+        this.lastProfit = 0;
+        this.updateStatusBar('betting', 0);
+        this.syncNavPoints();
     }
 
     resetDice() {
@@ -361,6 +349,7 @@ class BauCua {
         }, 80);
     }
 
+    // Ghi Firestore NGAY 1 LẦN DUY NHẤT cho cả ván: net = (tiền thắng + buff) - tổng cược.
     finishRoll = async function() {
         const results = Array.from({ length: 3 }, () => this.items[Math.floor(Math.random() * 6)]);
         this._lastResults = results;
@@ -399,46 +388,45 @@ class BauCua {
             }
         });
 
-        let profit = 0;
-
+        let buffBonus = 0, buffPct = 0;
         if (winAmt > 0) {
             const roundProfit = winAmt - totalBet;
-            let buffBonus = 0, buffPct = 0;
             if (roundProfit > 0) {
-                try {
-                    buffPct = await getActiveBuff();
-                    if (buffPct > 0) buffBonus = Math.round(roundProfit * buffPct / 100);
-                } catch {}
+                buffPct = this.cachedBuffPct;
+                if (buffPct > 0) buffBonus = Math.round(roundProfit * buffPct / 100);
             }
-            const newBalance = await this.updateBalance(winAmt + buffBonus, 'Thắng');
+        }
+        const net = winAmt - totalBet + buffBonus;
+
+        if (net !== 0) {
+            const newBalance = await this.commitBalance(net, winAmt > 0 ? 'Thắng' : 'Thua');
             if (newBalance === null) {
                 console.error('Không thể cập nhật balance');
                 this.isRolling = false;
                 if (btnRoll) btnRoll.disabled = false;
                 return;
             }
-            if (buffBonus > 0) {
-                let petLabel = '🐾 Pet';
-                try {
-                    const ud = await getDoc(doc(db, 'users', this._userId));
-                    const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
-                    if (pet) petLabel = `${pet.emoji} ${pet.name}`;
-                } catch {}
-                window.showToast?.(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
-            }
-            profit = winAmt - totalBet + buffBonus;
-            this.lastProfit = profit;
-            
-            if (window.VTQuests) {
-                window.VTQuests.trackPlay('baucua');
-                if (profit > 0) window.VTQuests.trackEarn(profit);
-            }
-        } else {
-            profit = -totalBet;
-            this.lastProfit = profit;
-            if (window.VTQuests) {
-                window.VTQuests.trackPlay('baucua');
-            }
+        }
+        // Local đã trừ totalBet lúc đặt cược rồi, giờ chỉ cộng lại phần thắng + buff.
+        this._myBalance += (winAmt + buffBonus);
+        this.syncNavPoints();
+
+        if (buffBonus > 0) {
+            let petLabel = '🐾 Pet';
+            try {
+                const ud = await getDoc(doc(db, 'users', this._userId));
+                const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
+                if (pet) petLabel = `${pet.emoji} ${pet.name}`;
+            } catch {}
+            window.showToast?.(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
+        }
+
+        const profit = winAmt - totalBet + buffBonus;
+        this.lastProfit = profit;
+
+        if (window.VTQuests) {
+            window.VTQuests.trackPlay('baucua');
+            if (profit > 0) window.VTQuests.trackEarn(profit);
         }
 
         this.updateStatusBar('result', profit);
@@ -458,7 +446,18 @@ class BauCua {
         // Đổi nút thành "Ván mới"
         this.updateRollButton('newgame');
     }
+
+    // Nếu người chơi thoát/đóng tab khi đã đặt cược nhưng chưa lắc xong, tính thua toàn bộ cược
+    // (vì cược mới chỉ trừ ở local, chưa từng ghi Firestore).
+    forfeitIfAbandoned() {
+        const total = Object.values(this.bets).reduce((a, b) => a + b, 0);
+        if (total > 0) {
+            addPoints('Casino', 'Bầu Cua out phòng - mất cược', -total, false).catch(() => {});
+        }
+    }
 }
 
 // Khởi chạy
 new BauCua();
+window.addEventListener('pagehide', () => window.bcGame?.forfeitIfAbandoned());
+window.addEventListener('beforeunload', () => window.bcGame?.forfeitIfAbandoned());

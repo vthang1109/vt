@@ -8,38 +8,28 @@ class TaiXiu {
         this.bets = { tai: 0, xiu: 0 };
         this.currentChip = 1000;
         this.isRolling = false;
+        this.cachedBuffPct = 0;
+        this.balance = 0;
         this.init();
     }
 
     async init() {
         await this.refreshPts();
+        await this.refreshBuffCache();
         this.bindEvents();
-        this.watchNavPts();
         this.updateStatusBar(null, null, null);
+        window.txGame = this;
     }
 
-    watchNavPts() {
-        const navEl = document.getElementById('nav-pts');
-        if (!navEl) return;
-        const sync = () => {
-            const num = parseInt(navEl.textContent.replace(/[^\d]/g, '')) || 0;
-            if (window.TopNav) window.TopNav.setPoints(num);
-        };
-        sync();
-        new MutationObserver(sync).observe(navEl, { childList: true, characterData: true, subtree: true });
+    async refreshBuffCache() {
+        try { this.cachedBuffPct = await getActiveBuff(); } catch { this.cachedBuffPct = 0; }
     }
 
+    // Đọc điểm 1 lần khi vào game / sau khi ván kết thúc — không đọc lại mỗi lần đặt cược.
     async refreshPts() {
         const pts = await getPoints();
-        let el = document.getElementById('nav-pts');
-        if (!el) {
-            el = document.createElement('div');
-            el.id = 'nav-pts';
-            el.style.display = 'none';
-            document.body.appendChild(el);
-        }
-        el.textContent = '⭐ ' + (pts || 0).toLocaleString('vi-VN');
-        if (window.TopNav) window.TopNav.setPoints(pts || 0);
+        this.balance = pts || 0;
+        if (window.TopNav) window.TopNav.setPoints(this.balance);
     }
 
     // Cập nhật status bar: [tổng cược] [Tài/Xỉu + điểm + chi tiết cược] [lời/lỗ]
@@ -112,18 +102,19 @@ class TaiXiu {
         document.getElementById('btn-clear').addEventListener('click', () => this.resetBoard());
     }
 
-    async placeBet(choice) {
+    // Không ghi Firestore ở đây nữa — chỉ trừ điểm local để hiện UI, tiền cược sẽ được
+    // gộp thành 1 lượt ghi net duy nhất trong finishRoll().
+    placeBet(choice) {
         if (this.isRolling) return;
-        const bal = await getPoints();
-        if (bal < this.currentChip) {
+        if (this.balance < this.currentChip) {
             if (window.showToast) window.showToast('⚠️ Không đủ điểm để đặt cược!', 'warn');
             return;
         }
-        await addPoints('Tài Xỉu', `Đặt ${choice}`, -this.currentChip);
+        this.balance -= this.currentChip;
         this.bets[choice] += this.currentChip;
         this.renderBets();
         this.updateStatusBar(null, null, null);
-        await this.refreshPts();
+        if (window.TopNav) window.TopNav.setPoints(this.balance);
     }
 
     renderBets() {
@@ -135,15 +126,16 @@ class TaiXiu {
         }
     }
 
-    async resetBoard() {
+    // Huỷ cược chỉ hoàn lại local, không cần ghi Firestore vì chưa từng trừ ở DB.
+    resetBoard() {
         if (this.isRolling) return;
         const total = Object.values(this.bets).reduce((a,b) => a+b, 0);
         if (total > 0) {
-            await addPoints('Tài Xỉu', 'Huỷ cược', total);
+            this.balance += total;
             this.bets = { tai: 0, xiu: 0 };
             this.renderBets();
             this.updateStatusBar(null, null, null);
-            await this.refreshPts();
+            if (window.TopNav) window.TopNav.setPoints(this.balance);
         }
     }
 
@@ -180,6 +172,7 @@ class TaiXiu {
         }, 80);
     }
 
+    // Ghi Firestore NGAY 1 LẦN DUY NHẤT cho cả ván: net = (tiền thắng + buff) - tổng cược.
     async finishRoll() {
         const diceValues = [Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1];
         const total = diceValues.reduce((a,b)=>a+b);
@@ -202,23 +195,31 @@ class TaiXiu {
         if (this.bets[result] > 0) winAmt = this.bets[result] * 2;
         let buffBonus = 0, buffPct = 0;
         if (winAmt > 0) {
-            try {
-                buffPct = await getActiveBuff();
-                if (buffPct > 0) buffBonus = Math.round(this.bets[result] * buffPct / 100);
-            } catch {}
+            buffPct = this.cachedBuffPct;
+            if (buffPct > 0) buffBonus = Math.round(this.bets[result] * buffPct / 100);
         }
         const net = winAmt - totalBet + buffBonus;
-        if (winAmt > 0) {
-            await addPoints('Tài Xỉu', 'Thắng', winAmt + buffBonus, false);
-            if (buffBonus > 0) {
-                let petLabel = '🐾 Pet';
-                try {
-                    const ud = await getDoc(doc(db, 'users', auth.currentUser.uid));
-                    const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
-                    if (pet) petLabel = `${pet.emoji} ${pet.name}`;
-                } catch {}
-                window.showToast?.(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
+
+        if (net !== 0) {
+            try {
+                await addPoints('Tài Xỉu', net > 0 ? 'Thắng' : 'Thua', net, false);
+            } catch (e) {
+                console.error(e);
+                window.showToast?.('Lỗi cộng điểm: ' + e.message, 'error');
             }
+        }
+        // Local đã trừ totalBet lúc đặt cược rồi, giờ chỉ cộng lại phần thắng + buff.
+        this.balance += (winAmt + buffBonus);
+        if (window.TopNav) window.TopNav.setPoints(this.balance);
+
+        if (buffBonus > 0) {
+            let petLabel = '🐾 Pet';
+            try {
+                const ud = await getDoc(doc(db, 'users', auth.currentUser.uid));
+                const pet = ud.data()?.activePet ? getPetById(ud.data().activePet) : null;
+                if (pet) petLabel = `${pet.emoji} ${pet.name}`;
+            } catch {}
+            window.showToast?.(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
         }
 
         if (statusEl) statusEl.classList.remove('rolling');
@@ -233,8 +234,18 @@ class TaiXiu {
 
         this.isRolling = false;
         bowl.classList.remove('disabled');
-        await this.refreshPts();
+    }
+
+    // Nếu người chơi thoát/đóng tab khi đã đặt cược nhưng chưa lắc xong, tính thua toàn bộ cược
+    // (vì cược mới chỉ trừ ở local, chưa từng ghi Firestore).
+    forfeitIfAbandoned() {
+        const total = Object.values(this.bets).reduce((a,b) => a+b, 0);
+        if (total > 0) {
+            addPoints('Tài Xỉu', 'Bỏ ván - mất cược', -total, false).catch(() => {});
+        }
     }
 }
 
 new TaiXiu();
+window.addEventListener('pagehide', () => window.txGame?.forfeitIfAbandoned());
+window.addEventListener('beforeunload', () => window.txGame?.forfeitIfAbandoned());

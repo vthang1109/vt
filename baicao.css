@@ -18,14 +18,6 @@
 /* TIÊN — xanh dương tươi */
 .hand-type.tien { color: #3b82f6; }
 
-.bc-status.zero-state {
-  --bc-right: rgba(255, 255, 255, 0.18);
-  --bc-right-border: rgba(255, 255, 255, 0.9);
-}
-.stat-profit.zero {
-  color: #ffffff;
-}
-
 /* ===================== BANNER KẾT QUẢ THẮNG ĐẶC BIỆT ===================== */
 /* Sáp dùng chung xd-result-special (vàng-đen) đã có sẵn trong xidach.css */
 .xd-result-lieng {
