@@ -182,7 +182,7 @@ export const SHOP_TITLES = SHOP_TITLE_DEFS.map(t => {
     cls,
     color,
     price: meta.price,
-    desc: t.desc || `Danh hiệu ${meta.name} — mua thẳng bằng điểm`,
+    desc: t.desc || `Danh hiệu ${meta.name}`,
   };
 });
 

@@ -4,27 +4,73 @@
    phần bet-row, action buttons và modal đề nghị hòa.
    ============================================================ */
 
-/* Hiển thị tiền cược ở status bar (bản đơn không hiện .stat-bet,
-   bản multiplayer thì hiện — dùng class riêng để không đụng chess.css) */
-.chess-mp-bet {
-  font-family: 'Science Gothic', sans-serif;
-  font-weight: 500;
-  font-size: 17px;
-  color: #fbbf24;
-  min-width: 65px;
-  display: flex;
+/* Khung tên người chơi: xếp dọc tên + mức cược, canh giữa giống bản 1 người */
+.chess-player-tag,
+.chess-player-tag.right {
   flex-direction: column;
-  align-items: flex-start;
-  line-height: 1.2;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  min-width: 64px;
 }
-.chess-mp-bet small {
+.chess-player-bet {
+  display: block;
   font-size: 9px;
-  font-weight: 600;
+  font-weight: 700;
   color: #94a3b8;
   font-family: 'Science Gothic', sans-serif;
 }
-.bc-status.in-progress .chess-mp-bet {
+.bc-status.in-progress .chess-player-bet,
+.bc-status.result-win .chess-player-bet,
+.bc-status.result-lose .chess-player-bet,
+.bc-status.result-draw .chess-player-bet {
   display: none;
+}
+
+/* Luôn ẩn số tiền nổi phía trên — thay bằng chữ tên đối thủ khi thắng/thua */
+.chess-profit-value {
+  display: none !important;
+}
+/* Khi kết thúc ván: bên đối thủ hiện +/- tiền dạng phẳng (bỏ khung/viền), giống stat-profit của xidach */
+.chess-player-tag.as-profit {
+  border-color: transparent;
+  background: none;
+  box-shadow: none;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.chess-player-tag.as-profit span:first-child {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+}
+.chess-player-tag.as-profit.positive span:first-child { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
+.chess-player-tag.as-profit.negative span:first-child { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
+.chess-player-tag.as-profit.zero span:first-child { color: #f1f5f9; }
+
+/* Mã phòng trên top-nav: đồng bộ style với xidach-mp */
+.vt-top-nav .vt-nav-logo .vt-room-id {
+  font-family: 'Science Gothic', sans-serif;
+  color: #fbbf24 !important;
+  font-weight: 500;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(251,191,36,.1);
+  border: 1px solid rgba(251,191,36,.4);
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+.vt-top-nav .vt-nav-logo .vt-room-id .room-icon {
+  margin-right: 4px;
+  font-size: 14px;
+}
+
+/* Chữ "CHIẾU TƯỚNG" đỏ tươi khi bị chiếu */
+.bc-status.in-check .stat-score {
+  color: #ff3b3b;
 }
 
 /* ===================== VÙNG ĐẶT CƯỢC ===================== */

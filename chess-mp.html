@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="quests.css"/>
   <link rel="stylesheet" href="chess.css"/>
+  <link rel="stylesheet" href="status-bar.css"/>
   <link rel="stylesheet" href="chess-mp.css"/>
   <script src="top-nav.js"></script>
   <script src="bottom-nav.js"></script>
@@ -20,32 +21,26 @@
   <!-- TOP NAV -->
   <div id="top-nav-root"></div>
 
-  <div class="chess-wrap">
+  <div class="chess-wrap chess-wrap-mp">
 
-    <!-- STATUS BAR -->
+    <!-- STATUS BAR (đồng bộ style với bản 1 người - chess.html) -->
     <div class="bc-status" id="bc-status">
-      <div class="stat-side stat-side-player" id="side-me">
-        <div class="side-top">
-          <span class="side-avatar" id="side-me-avatar">♔</span>
-          <span class="side-label" id="side-me-label">BẠN</span>
-        </div>
-        <span class="chess-mp-bet">
-          <span id="chess-bet-value">0</span>
-          <small>CƯỢC</small>
-        </span>
+      <div class="chess-player-tag" id="side-player">
+        <span>Bạn</span>
+        <small class="chess-player-bet" id="chess-my-bet">0</small>
       </div>
 
       <div class="stat-score-wrap">
         <span class="stat-score" id="chess-score">--</span>
-        <span class="stat-score-sub" id="chess-score-sub">Lượt đi</span>
+        <span class="stat-score-sub" id="chess-score-sub"></span>
       </div>
 
-      <div class="stat-side stat-side-machine" id="side-opp">
-        <div class="side-top">
-          <span class="side-label" id="side-opp-label">ĐỐI THỦ</span>
-          <span class="side-avatar" id="side-opp-avatar">♚</span>
+      <div class="stat-profit">
+        <span class="chess-profit-value zero" id="chess-profit">+0</span>
+        <div class="chess-player-tag right" id="side-machine">
+          <span id="chess-opp-name">Đối thủ</span>
+          <small class="chess-player-bet" id="chess-opp-bet">0</small>
         </div>
-        <span class="stat-profit zero" id="chess-profit">+0</span>
       </div>
     </div>
 

@@ -389,23 +389,19 @@ function render(r) {
   const scoreEl = document.getElementById('xq-score');
   const scoreSubEl = document.getElementById('xq-score-sub');
   const profitEl = document.getElementById('xq-profit');
-  const betBadgeEl = document.getElementById('xq-bet-badge');
-  const betBadgeValueEl = document.getElementById('xq-bet-badge-value');
-  const meLabel = document.getElementById('side-me-label');
-  const oppLabel = document.getElementById('side-opp-label');
-  const meAvatar = document.getElementById('side-me-avatar');
-  const oppAvatar = document.getElementById('side-opp-avatar');
+  const myBetEl = document.getElementById('xq-my-bet');
+  const oppBetEl = document.getElementById('xq-opp-bet');
+  const oppNameEl = document.getElementById('xq-opp-name');
   const sideMe = document.getElementById('side-me');
   const sideOpp = document.getElementById('side-opp');
   const statusEl = document.getElementById('status');
   const actEl = document.getElementById('xq-actions');
   const bcStatusEl = document.getElementById('bc-status');
 
-  meLabel.textContent = 'BẠN';
-  oppLabel.textContent = esc(r.memberInfo?.[oppUid]?.name || 'Đối thủ');
+  oppNameEl.textContent = esc(r.memberInfo?.[oppUid]?.name || 'Đối thủ');
   bcStatusEl.className = 'bc-status';
   sideMe.classList.remove('active-turn');
-  sideOpp.classList.remove('active-turn');
+  sideOpp.classList.remove('active-turn', 'as-profit', 'positive', 'negative', 'zero');
 
   if (members.length < 2) {
     document.getElementById('board').innerHTML = '';
@@ -418,8 +414,6 @@ function render(r) {
   }
 
   const myColor = gs.colors?.[uid] || 'r';
-  meAvatar.textContent = PIECE_LABEL[myColor].k;
-  oppAvatar.textContent = PIECE_LABEL[opposite(myColor)].k;
 
   if (gs.phase === 'betting' || !gs.phase) {
     board = createInitialBoard();
@@ -427,8 +421,8 @@ function render(r) {
     selected = null; targets = [];
     renderBoard(gs, myColor);
 
-    betBadgeEl?.classList.add('hidden');
-    profitEl.textContent = '+0'; profitEl.className = 'stat-profit zero';
+    myBetEl.textContent = '0'; oppBetEl.textContent = '0';
+    profitEl.textContent = '+0'; profitEl.className = 'chess-profit-value zero';
     scoreEl.textContent = '--'; scoreSubEl.textContent = 'Đặt cược';
     statusEl.textContent = 'Chủ phòng chọn mức cược, đối thủ xác nhận để bắt đầu ván đấu.';
     actEl.innerHTML = '';
@@ -461,22 +455,22 @@ function render(r) {
 
   const myBet = gs.bets?.[uid] || 0;
   const oppBet = gs.bets?.[oppUid] || 0;
-  betBadgeEl?.classList.remove('hidden');
-  if (betBadgeValueEl) betBadgeValueEl.textContent = myBet.toLocaleString('vi-VN');
+  myBetEl.textContent = myBet.toLocaleString('vi-VN');
+  oppBetEl.textContent = oppBet.toLocaleString('vi-VN');
 
   renderBoard(gs, myColor);
 
   if (gs.phase === 'playing') {
     const turnLabel = turn === 'r' ? 'Đỏ' : 'Đen';
     const myTurn = turn === myColor;
-    scoreEl.textContent = turnLabel.toUpperCase();
-    scoreSubEl.textContent = myTurn ? 'Lượt của bạn' : 'Lượt đối thủ';
-    profitEl.textContent = '+0'; profitEl.className = 'stat-profit zero';
     const inCheckNow = isInCheck(board, turn);
+    scoreEl.textContent = inCheckNow ? 'CHIẾU TƯỚNG' : '';
+    scoreSubEl.textContent = inCheckNow ? '' : 'Lượt đi';
+    profitEl.textContent = '+0'; profitEl.className = 'chess-profit-value zero';
     statusEl.textContent = inCheckNow ? `Đang bị chiếu: ${turnLabel}.` : `Lượt đi: ${turnLabel}`;
     bcStatusEl.classList.toggle('in-check', inCheckNow);
     bcStatusEl.classList.add('in-progress');
-    if (myTurn) sideMe.classList.add('active-turn'); else sideOpp.classList.add('active-turn');
+    (myTurn ? sideMe : sideOpp).classList.add('active-turn');
 
     const drawPendingMine = gs.drawOffer?.uid === uid;
     const canOfferDraw = !gs.drawOffer;
@@ -504,10 +498,10 @@ function render(r) {
     let net = 0;
     if (outcome === 'win') net = oppBet;
     else if (outcome === 'lose') net = -myBet;
-    profitEl.classList.remove('positive', 'negative', 'zero');
-    if (net > 0) { profitEl.textContent = `+${net.toLocaleString('vi-VN')}`; profitEl.classList.add('positive'); }
-    else if (net < 0) { profitEl.textContent = `${net.toLocaleString('vi-VN')}`; profitEl.classList.add('negative'); }
-    else { profitEl.textContent = 'Huề'; profitEl.classList.add('zero'); }
+    sideOpp.classList.add('as-profit');
+    if (net > 0) { oppNameEl.textContent = `+${net.toLocaleString('vi-VN')}`; sideOpp.classList.add('positive'); }
+    else if (net < 0) { oppNameEl.textContent = `${net.toLocaleString('vi-VN')}`; sideOpp.classList.add('negative'); }
+    else { oppNameEl.textContent = 'Huề'; sideOpp.classList.add('zero'); }
 
     let reasonText = '';
     if (gs.result === 'checkmate') reasonText = 'Hết nước đi (chiếu bí).';

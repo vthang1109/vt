@@ -4,36 +4,6 @@
    phần bet-zone, action buttons và modal đề nghị hòa.
    ============================================================ */
 
-/* ===================== Ô CƯỢC (badge riêng, tách khỏi lượt đi) ===================== */
-.xq-bet-badge {
-  position: absolute;
-  top: -13px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 16px;
-  border-radius: 20px;
-  background: linear-gradient(160deg, rgba(20,26,43,0.98), rgba(10,16,30,0.98));
-  border: 1px solid rgba(251, 191, 36, 0.6);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.4), 0 0 14px rgba(251, 191, 36, 0.25);
-  font-family: 'Science Gothic', sans-serif;
-  font-weight: 500;
-  font-size: 13px;
-  color: #fbbf24;
-  z-index: 4;
-  white-space: nowrap;
-}
-.xq-bet-badge small {
-  font-family: 'Science Gothic', sans-serif;
-  font-weight: 400;
-  font-size: 9.5px;
-  color: #94a3b8;
-  letter-spacing: 0.5px;
-}
-.xq-bet-badge.hidden { display: none; }
-
 /* ===================== VÙNG ĐẶT CƯỢC ===================== */
 .xq-bet-zone { margin-bottom: 12px; }
 
@@ -170,28 +140,122 @@
 .xq-modal-btn.decline { background: rgba(255,255,255,0.08); color: #cbd5e1; }
 .xq-modal-btn.accept { background: linear-gradient(135deg, #4ade80, #22c55e); color: #06240f; }
 
-/* ===================== ID PHÒNG (top-nav) ===================== */
-.vt-room-id {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(251, 191, 36, 0.5);
-  background: rgba(251, 191, 36, 0.12);
-  color: #fbbf24;
+/* ===================== ID PHÒNG (top-nav, đồng bộ xidach-mp) ===================== */
+.vt-top-nav .vt-nav-logo .vt-room-id {
   font-family: 'Science Gothic', sans-serif;
+  color: #fbbf24 !important;
   font-weight: 500;
-  font-size: 12px;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(251,191,36,.1);
+  border: 1px solid rgba(251,191,36,.4);
+  display: inline-block;
+  letter-spacing: 0.5px;
 }
-.vt-room-id .room-icon { font-size: 12px; line-height: 1; }
+.vt-top-nav .vt-nav-logo .vt-room-id .room-icon {
+  margin-right: 4px;
+  font-size: 14px;
+}
 
 /* ===================== NÚT NGUY HIỂM TRONG MODAL (đầu hàng) ===================== */
 .xq-modal-btn.danger {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #fff;
+}
+
+/* ===================== STATUS BAR (y hệt chess-mp) ===================== */
+.bc-status.in-check {
+  --bc-left-border: #fbbf24;
+  --bc-right-border: #ef4444;
+  animation: statusCheckBlink 0.9s ease-in-out infinite;
+}
+@keyframes statusCheckBlink {
+  0%, 100% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.3), 0 0 10px rgba(251, 191, 36, 0.15); }
+  50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.85), 0 0 34px rgba(239, 68, 68, 0.75), inset 0 0 18px rgba(239, 68, 68, 0.25); }
+}
+
+.chess-player-tag,
+.chess-player-tag.right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-weight: 800;
+  font-size: 13px;
+  color: #e0f2fe;
+  padding: 6px 14px;
+  border-radius: 8px;
+  min-width: 64px;
+  border: 1px solid transparent;
+  transition: all 0.3s;
+}
+.chess-player-tag.active-turn {
+  border-color: rgba(56, 189, 248, 0.55);
+  background: rgba(56, 189, 248, 0.1);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+  animation: playerPulse 1s ease-in-out infinite alternate;
+}
+@keyframes playerPulse {
+  from { box-shadow: 0 0 10px rgba(56, 189, 248, 0.15); }
+  to   { box-shadow: 0 0 24px rgba(56, 189, 248, 0.45); }
+}
+.bc-status.in-check .chess-player-tag.active-turn {
+  animation: sideCheckBlink 0.9s ease-in-out infinite;
+}
+@keyframes sideCheckBlink {
+  0%, 100% {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.6);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+  }
+  50% {
+    background: rgba(251, 191, 36, 0.14);
+    border-color: rgba(251, 191, 36, 0.9);
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.65), 0 0 14px rgba(239, 68, 68, 0.5);
+  }
+}
+
+.chess-player-bet {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  color: #94a3b8;
+  font-family: 'Science Gothic', sans-serif;
+}
+.bc-status.in-progress .chess-player-bet,
+.bc-status.result-win .chess-player-bet,
+.bc-status.result-lose .chess-player-bet,
+.bc-status.result-draw .chess-player-bet {
+  display: none;
+}
+
+/* Luôn ẩn số tiền nổi phía trên — thay bằng chữ tên đối thủ khi thắng/thua */
+.chess-profit-value {
+  display: none !important;
+}
+
+/* Khi kết thúc ván: bên đối thủ hiện +/- tiền dạng phẳng (bỏ khung/viền), giống stat-profit của xidach */
+.chess-player-tag.as-profit {
+  border-color: transparent;
+  background: none;
+  box-shadow: none;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.chess-player-tag.as-profit span:first-child {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+}
+.chess-player-tag.as-profit.positive span:first-child { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
+.chess-player-tag.as-profit.negative span:first-child { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
+.chess-player-tag.as-profit.zero span:first-child { color: #f1f5f9; }
+
+/* Chữ "CHIẾU TƯỚNG" đỏ tươi khi bị chiếu */
+.bc-status.in-check .stat-score {
+  color: #ff3b3b;
 }
 
 /* ===================== RESPONSIVE ===================== */

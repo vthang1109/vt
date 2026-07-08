@@ -69,8 +69,8 @@
 /* Trái: số tiền cược */
 .stat-bet {
   font-family: 'Science Gothic', sans-serif;
-  font-weight: 500;
-  font-size: 16px;
+  font-weight: 700;
+  font-size: 14px;
   color: #fbbf24;
   min-width: 65px;
 }
@@ -85,8 +85,8 @@
 }
 .stat-score {
   font-family: 'Science Gothic', sans-serif;
-  font-weight: 500;
-  font-size: 18px;
+  font-weight: 700;
+  font-size: 16px;
   color: #fff;
   text-align: center;
   text-shadow: 0 0 12px rgba(251,191,36,0.6);
@@ -94,8 +94,8 @@
 .stat-score-sub {
   display: none !important;
   font-family: 'Science Gothic', sans-serif;
-  font-weight: 400;
-  font-size: 10px;
+  font-weight: 600;
+  font-size: 9px;
   color: #94a3b8;
   margin-top: 2px;
   letter-spacing: 0.3px;
@@ -108,8 +108,8 @@
 /* Phải: lời/lỗ */
 .stat-profit {
   font-family: 'Science Gothic', sans-serif;
-  font-weight: 500;
-  font-size: 16px;
+  font-weight: 700;
+  font-size: 14px;
   text-align: right;
   min-width: 65px;
 }

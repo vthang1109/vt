@@ -326,10 +326,14 @@
   display: flex;
   gap: 6px;
   margin-bottom: 14px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.title-tier-tabs::-webkit-scrollbar { display: none; }
 .title-tier-tab {
-  flex: 1;
+  flex: 0 0 auto;
   min-width: 70px;
   padding: 9px 6px;
   border-radius: 10px;
@@ -342,6 +346,7 @@
   cursor: pointer;
   transition: all 0.2s;
   text-align: center;
+  white-space: nowrap;
 }
 .title-tier-tab:hover { border-color: rgba(255,255,255,0.3); }
 .title-tier-tab.active.tier-1 { background: rgba(52,211,153,0.15); border-color: #34d399; color: #34d399; }
@@ -410,7 +415,7 @@
   color: #fbbf24;
   transition: all 0.2s;
 }
-.title-buy-btn:hover { background: rgba(56,189,248,0.25); transform: scale(1.04); }
+.title-buy-btn:hover { background: rgba(251,191,36,0.25); transform: scale(1.04); }
 .title-buy-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
