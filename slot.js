@@ -4,7 +4,7 @@ import {
   doc, onSnapshot, runTransaction, getDoc, setDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getPoints, addPoints } from './points.js';
+import { subscribeBalance } from './points.js';
 import { getActiveBuff } from './pet.js';
 
 // ========== CẤU HÌNH ==========
@@ -17,6 +17,7 @@ class SlotGame {
     this.balance = 0;
     this.isSpinning = false;
     this.unsubJackpot = null;
+    this.unsubBalance = null;
     this.cachedBuffPct = 0;
     this.initAfterAuth();
   }
@@ -33,11 +34,12 @@ class SlotGame {
 
     // TopNav đã tự init() lúc DOMContentLoaded, không gọi lại để tránh tạo nav trùng
 
-    const points = await getPoints();
-    this.balance = points || 0;
+    // ===== ĐỒNG BỘ ĐIỂM REALTIME (thay getPoints 1 lần) =====
+    this.unsubBalance = subscribeBalance((points) => {
+      this.balance = points || 0;
+      if (window.TopNav) TopNav.setPoints(this.balance);
+    });
 
-    // Hiển thị điểm trên top-nav (tiền đã lên nav, không hiện bank riêng)
-    if (window.TopNav) TopNav.setPoints(this.balance);
     this.updateStatusBar(0, '--', null);
 
     // ===== TẠO DOCUMENT JACKPOT NẾU CHƯA CÓ =====
@@ -126,13 +128,11 @@ class SlotGame {
     const betInput = document.getElementById('slot-bet-input');
     const bet = parseInt(betInput.value);
     if (!bet || bet < MIN_BET) {
-      window.showToast(`Cược tối thiểu ${MIN_BET}⭐`, 'warn');
+      window.showToast(`Cược tối thiểu ${MIN_BET}〄`, 'warn');
       return;
     }
 
-    const currentPoints = await getPoints();
-    if (currentPoints !== null) this.balance = currentPoints;
-
+    // this.balance đã được đồng bộ realtime qua subscribeBalance, không cần getPoints()
     if (bet > this.balance) {
       window.showToast('Không đủ điểm!', 'error');
       return;
@@ -147,9 +147,8 @@ class SlotGame {
     document.getElementById('bc-status')?.classList.add('rolling');
 
     try {
-      await this.deductAndAddJackpot(bet);
       const result = await this.spinReels();
-      await this.checkWin(result, bet);
+      await this.resolveRound(result, bet);
     } catch (e) {
       console.error('Lỗi trong spin():', e);
       window.showToast('Lỗi quay: ' + e.message, 'error');
@@ -157,31 +156,7 @@ class SlotGame {
       this.isSpinning = false;
       if (btnSpin) btnSpin.disabled = false;
       document.getElementById('bc-status')?.classList.remove('rolling');
-      if (window.TopNav) TopNav.setPoints(this.balance);
     }
-  }
-
-  // ========== GỘP TRỪ ĐIỂM & CỘNG HŨ (1 TRANSACTION) ==========
-  async deductAndAddJackpot(betAmount) {
-    const userRef = doc(db, 'users', auth.currentUser.uid);
-    const jackpotRef = JACKPOT_DOC_REF;
-
-    await runTransaction(db, async (transaction) => {
-      const userSnap = await transaction.get(userRef);
-      if (!userSnap.exists()) throw new Error('Tài khoản không tồn tại');
-      const currentPoints = userSnap.data().points || 0;
-      if (currentPoints < betAmount) throw new Error('Không đủ điểm');
-      const newPoints = currentPoints - betAmount;
-
-      const jpSnap = await transaction.get(jackpotRef);
-      const currentJackpot = jpSnap.exists() ? (jpSnap.data().value || 1000) : 1000;
-      const newJackpot = currentJackpot + betAmount;
-
-      transaction.update(userRef, { points: newPoints, lastUpdate: serverTimestamp() });
-      transaction.set(jackpotRef, { value: newJackpot }, { merge: true });
-
-      this.balance = newPoints;
-    });
   }
 
   // ========== HIỆU ỨNG QUAY 3 Ô ==========
@@ -207,99 +182,84 @@ class SlotGame {
     return result;
   }
 
-  // ========== KIỂM TRA KẾT QUẢ & PHÁT THƯỞNG ==========
-  async checkWin(result, betAmount) {
+  // ========== GỘP TRỪ CƯỢC + CỘNG HŨ + PHÁT THƯỞNG THÀNH 1 TRANSACTION/VÁN ==========
+  async resolveRound(result, betAmount) {
     const [a, b, c] = result;
+    const isJackpot = a === '7️⃣' && b === '7️⃣' && c === '7️⃣';
+    const isTriple = !isJackpot && a === b && b === c;
+    const buffPercent = this.cachedBuffPct;
 
-    if (a === '7️⃣' && b === '7️⃣' && c === '7️⃣') {
-      this.updateResultDisplay('🔥 NỔ HŨ! 🔥', 'jackpot');
-      await this.triggerJackpotWin(betAmount);
-      return;
-    }
-
-    if (a === b && b === c) {
-      this.updateResultDisplay(`🎉 Trúng 3x ${result[0]}!`, 'win');
-      const winAmount = betAmount * 3;
-      await this.grantNormalWin(winAmount, result[0], betAmount);
-      return;
-    }
-
-    this.updateResultDisplay('❌ Không trúng', 'lose');
-    this.updateStatusBar(betAmount, 'Lose', -betAmount);
-    window.showToast('Chúc bạn may mắn lần sau!', 'info');
-  }
-
-  // ========== NỔ HŨ: NHẬN TOÀN BỘ JACKPOT & RESET ==========
-  async triggerJackpotWin(betAmount) {
     const userRef = doc(db, 'users', auth.currentUser.uid);
     let finalWin = 0;
+    let newUserPoints = 0;
 
     try {
-      finalWin = await runTransaction(db, async (transaction) => {
+      await runTransaction(db, async (transaction) => {
         const userSnap = await transaction.get(userRef);
-        const currentPoints = userSnap.exists() ? (userSnap.data().points || 0) : 0;
+        if (!userSnap.exists()) throw new Error('Tài khoản không tồn tại');
+        const currentPoints = userSnap.data().points || 0;
+        if (currentPoints < betAmount) throw new Error('Không đủ điểm');
 
         const jpSnap = await transaction.get(JACKPOT_DOC_REF);
-        const jackpotValue = jpSnap.exists() ? (jpSnap.data().value || 1000) : 1000;
+        const currentJackpot = jpSnap.exists() ? (jpSnap.data().value || 1000) : 1000;
 
-        transaction.update(JACKPOT_DOC_REF, { value: 1000 });
-        transaction.update(userRef, { points: currentPoints + jackpotValue, lastUpdate: serverTimestamp() });
+        const pointsAfterBet = currentPoints - betAmount;
+        let newJackpotValue;
 
-        return jackpotValue;
+        if (isJackpot) {
+          finalWin = buffPercent > 0
+            ? Math.round(currentJackpot * (1 + buffPercent / 100))
+            : currentJackpot;
+          newJackpotValue = 1000;
+        } else if (isTriple) {
+          const baseWin = betAmount * 3;
+          finalWin = buffPercent > 0
+            ? Math.round(baseWin * (1 + buffPercent / 100))
+            : baseWin;
+          newJackpotValue = currentJackpot + betAmount;
+        } else {
+          finalWin = 0;
+          newJackpotValue = currentJackpot + betAmount;
+        }
+
+        newUserPoints = pointsAfterBet + finalWin;
+
+        transaction.update(userRef, { points: newUserPoints, lastUpdate: serverTimestamp() });
+        transaction.set(JACKPOT_DOC_REF, { value: newJackpotValue }, { merge: true });
       });
     } catch (e) {
-      console.error('Transaction nổ hũ lỗi:', e);
-      const snap = await getDoc(JACKPOT_DOC_REF);
-      finalWin = snap.exists() ? (snap.data().value || 1000) : 1000;
-      await setDoc(JACKPOT_DOC_REF, { value: 1000 }, { merge: true });
-      const userSnap = await getDoc(userRef);
-      const currentPoints = userSnap.exists() ? (userSnap.data().points || 0) : 0;
-      await setDoc(userRef, { points: currentPoints + finalWin, lastUpdate: serverTimestamp() }, { merge: true });
+      console.error('Lỗi transaction ván chơi:', e);
+      window.showToast('Lỗi: ' + e.message, 'error');
+      this.updateStatusBar(betAmount, '--', null);
+      return;
     }
 
-    let finalWinWithBuff = finalWin;
-    try {
-      const buffPercent = this.cachedBuffPct;
+    // this.balance sẽ được listener subscribeBalance cập nhật; set tạm để UI mượt
+    this.balance = newUserPoints;
+    if (window.TopNav) TopNav.setPoints(this.balance);
+
+    if (isJackpot) {
+      this.updateResultDisplay('🔥 NỔ HŨ! 🔥', 'jackpot');
+      this.updateStatusBar(betAmount, '777', finalWin - betAmount);
       if (buffPercent > 0) {
-        finalWinWithBuff = Math.round(finalWin * (1 + buffPercent / 100));
-        if (finalWinWithBuff > finalWin) {
-          await addPoints('Casino', 'Buff Pet Nổ Hũ', finalWinWithBuff - finalWin, false);
-        }
-        window.showToast(`🐾 Pet buff +${buffPercent}%! Nhận ${finalWinWithBuff.toLocaleString('vi-VN')} ⭐`, 'success');
+        window.showToast(`🐾 Pet buff +${buffPercent}%! Nhận ${finalWin.toLocaleString('vi-VN')} 〄`, 'success');
       }
-    } catch (e) {}
-
-    this.balance += finalWinWithBuff;
-    if (window.TopNav) TopNav.setPoints(this.balance);
-    this.updateStatusBar(betAmount, '777', finalWinWithBuff - betAmount);
-
-    window.showToast(`🎉🎉 NỔ HŨ! Bạn nhận ${finalWinWithBuff.toLocaleString('vi-VN')} ⭐ 🎉🎉`, 'success');
-  }
-
-  // ========== THẮNG THƯỜNG ==========
-  async grantNormalWin(baseAmount, symbol, betAmount) {
-    let finalAmount = baseAmount;
-
-    const buffPercent = this.cachedBuffPct;
-    if (buffPercent > 0) {
-      finalAmount = Math.round(baseAmount * (1 + buffPercent / 100));
+      window.showToast(`🎉🎉 NỔ HŨ! Bạn nhận ${finalWin.toLocaleString('vi-VN')} 〄 🎉🎉`, 'success');
+    } else if (isTriple) {
+      this.updateResultDisplay(`🎉 Trúng 3x ${a}!`, 'win');
+      this.updateStatusBar(betAmount, 'Triple', finalWin - betAmount);
+      window.showToast(`🎉 Trúng 3x ${a}! +${finalWin.toLocaleString('vi-VN')} 〄`, 'success');
+    } else {
+      this.updateResultDisplay('❌ Không trúng', 'lose');
+      this.updateStatusBar(betAmount, 'Lose', -betAmount);
+      window.showToast('Chúc bạn may mắn lần sau!', 'info');
     }
-
-    await addPoints('Casino', `Trúng 3x ${symbol}`, finalAmount, false);
-
-    this.balance += finalAmount;
-    if (window.TopNav) TopNav.setPoints(this.balance);
-    this.updateStatusBar(betAmount, 'Triple', finalAmount - betAmount);
-
-    window.showToast(
-      `🎉 Trúng 3x ${symbol}! +${finalAmount.toLocaleString('vi-VN')} ⭐`,
-      'success'
-    );
   }
 
   // ========== RỜI GAME ==========
   quit() {
     if (this.unsubJackpot) this.unsubJackpot();
+    if (this.unsubBalance) this.unsubBalance();
     location.href = 'games.html';
   }
 }

@@ -1,7 +1,6 @@
 import { auth, db } from './points.js';
-import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { addPoints, getPoints } from './points.js';
+import { addPoints } from './points.js';
 import { getActivePetInfo } from './pet.js';
 
 // ==================== ENGINE CỜ TƯỚNG (LUẬT) — gộp trực tiếp, không tách file riêng ====================
@@ -180,10 +179,10 @@ const statusEl = document.getElementById('status');
 const undoBtn = document.getElementById('undo-btn');
 const resetBtn = document.getElementById('reset');
 
-// ==================== HỆ THỐNG TIỀN CƯỢC (đồng bộ Xì Dách) ====================
-let balance = 0;
+// ==================== HỆ THỐNG TIỀN CƯỢC ====================
+// Không cache balance cục bộ: TopNav đã tự subscribeBalance() từ points.js
+// và cập nhật realtime, không cần xiangqi.js tự quản lý/đồng bộ tay.
 let currentBet = 0;
-let unsubBalance = null;
 let payoutSettled = false;
 
 async function initAuth() {
@@ -193,13 +192,6 @@ async function initAuth() {
       if (user) resolve();
       else location.href = 'index.html';
     });
-  });
-  listenBalance();
-}
-function listenBalance() {
-  if (unsubBalance) unsubBalance();
-  unsubBalance = onSnapshot(doc(db, 'users', auth.currentUser.uid), (snap) => {
-    if (snap.exists()) balance = snap.data().points || 0;
   });
 }
 initAuth();
@@ -740,7 +732,7 @@ function updateStatus() {
     bcStatusEl.classList.add(playerWon ? 'result-win' : 'result-lose');
   } else {
     const inCheck = isInCheck(board, turn);
-    xqScoreEl.textContent = inCheck ? 'CHIẾU TƯỚNG' : '';
+    xqScoreEl.textContent = inCheck ? 'CHIẾU' : '';
     xqProfitEl.textContent = '+0'; xqProfitEl.classList.add('zero');
     if (waiting) {
       statusEl.textContent = inCheck ? 'Máy đang bị chiếu, đang suy nghĩ...' : 'Máy đang suy nghĩ...';
@@ -759,9 +751,9 @@ function updateStatus() {
 async function settlePayout(result) {
   if (payoutSettled) return;
   payoutSettled = true;
+  // Thua không bị trừ tiền (đồng bộ với chess): chỉ cộng thưởng khi thắng.
   let delta = 0;
   if (result === 'win') delta = currentBet;
-  else if (result === 'loss') delta = -currentBet;
 
   let buffBonus = 0, buffPct = 0, activePet = null;
   if (result === 'win') {
@@ -775,8 +767,8 @@ async function settlePayout(result) {
 
   if (delta !== 0) {
     try {
-      const reason = result === 'win' ? 'Thắng Cờ Tướng' : 'Thua Cờ Tướng';
-      await addPoints('Casino', reason, delta + buffBonus, false);
+      await addPoints('Casino', 'Thắng Cờ Tướng', delta + buffBonus, false);
+      // TopNav tự cập nhật realtime qua subscribeBalance, không cần setPoints tay.
       if (buffBonus > 0) {
         const petLabel = activePet ? `${activePet.emoji} ${activePet.name}` : '🐾 Pet';
         window.showToast(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
@@ -786,11 +778,13 @@ async function settlePayout(result) {
       window.showToast('Lỗi cộng điểm: ' + e.message, 'error');
     }
   }
+  sideMachineEl.style.display = 'none';
   const net = delta + buffBonus;
   xqProfitEl.classList.remove('positive', 'negative', 'zero');
-  if (net > 0) { xqProfitEl.textContent = `+${net.toLocaleString('vi-VN')}`; xqProfitEl.classList.add('positive'); }
+  if (result === 'lose') { xqProfitEl.textContent = '0'; xqProfitEl.classList.add('zero'); }
+  else if (net > 0) { xqProfitEl.textContent = `+${net.toLocaleString('vi-VN')}`; xqProfitEl.classList.add('positive'); }
   else if (net < 0) { xqProfitEl.textContent = `${net.toLocaleString('vi-VN')}`; xqProfitEl.classList.add('negative'); }
-  else { xqProfitEl.textContent = 'Huề'; xqProfitEl.classList.add('zero'); }
+  else { xqProfitEl.textContent = '0'; xqProfitEl.classList.add('zero'); }
 }
 
 // --- UNDO: lùi 2 nước (máy + người) để trả lại đúng lượt cho người chơi ---

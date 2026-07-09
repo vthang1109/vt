@@ -13,6 +13,25 @@
 
 window.TopNav = (() => {
   const NAV_H = 56;
+  let _currentBalance = 0;
+  let _unsubBalance = null;
+
+  async function listenBalance() {
+    try {
+      const { auth, subscribeBalance } = await import('./points.js');
+      const { onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+      onAuthStateChanged(auth, (user) => {
+        if (_unsubBalance) { _unsubBalance(); _unsubBalance = null; }
+        if (!user) return;
+        _unsubBalance = subscribeBalance(pts => {
+          _currentBalance = pts || 0;
+          setPoints(_currentBalance);
+        });
+      });
+    } catch (e) { console.error('TopNav balance listen failed', e); }
+  }
+
+  function getBalance() { return _currentBalance; }
 
   const STYLES = `
     body.has-top-nav { padding-top: ${NAV_H}px; }
@@ -45,7 +64,22 @@ window.TopNav = (() => {
     .vt-top-nav .vt-nav-logo .logo-vt   { color: #0288D1; }
     .vt-top-nav .vt-nav-logo .logo-world { color: #ffffff; }
     .vt-top-nav .vt-nav-logo { display: flex; align-items: center; gap: 6px; }
+    .vt-top-nav .vt-logo-content { display: flex; align-items: center; gap: 6px; }
     .vt-top-nav .vt-nav-logo img { height: 28px; width: auto; }
+    .vt-top-nav .vt-room-id {
+      display: none;
+      font-family: "Science Gothic", sans-serif;
+      color: #fbbf24;
+      font-weight: 500;
+      font-size: 13px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(251,191,36,.1);
+      border: 1px solid rgba(251,191,36,.4);
+      letter-spacing: 0.5px;
+    }
+    .vt-top-nav .vt-room-id.visible { display: inline-block; }
+    .vt-top-nav .vt-room-id .room-icon { margin-right: 4px; font-size: 14px; }
     .vt-top-nav .vt-nav-right {
       display: flex;
       align-items: center;
@@ -174,7 +208,8 @@ window.TopNav = (() => {
     return `
       <div class="vt-top-nav" id="vtTopNav">
         <a class="vt-nav-logo" href="index.html">
-          <img src="logo.png" alt="logo"><span class="logo-vt">VT</span><span class="logo-world">World</span>
+          <span class="vt-logo-content" id="vtLogoContent"><img src="logo.png" alt="logo"><span class="logo-vt">VT</span><span class="logo-world">World</span></span>
+          <span class="vt-room-id" id="vtRoomId"></span>
         </a>
         <div class="vt-nav-right">
           <span class="vt-nav-pts" id="vtNavPts">0 <span class="vt-coin">〄</span></span>
@@ -240,12 +275,14 @@ window.TopNav = (() => {
       document.body.insertAdjacentHTML('afterbegin', buildHTML());
     }
     bindEvents();
+    listenBalance();
   }
-
-  function setPoints(pts) {
+  
+function setPoints(pts) {
+    _currentBalance = Number(pts) || 0;
     const el = document.getElementById('vtNavPts');
     if (!el) return;
-    el.innerHTML = Number(pts).toLocaleString() + ' <span class="vt-coin">〄</span>';
+    el.innerHTML = _currentBalance.toLocaleString() + ' <span class="vt-coin">〄</span>';
     el.classList.add('visible');
   }
 
@@ -260,7 +297,22 @@ window.TopNav = (() => {
     };
   }
 
-  return { init, setPoints, setLeaveAction };
+  function setRoomId(code, icon) {
+    const el = document.getElementById('vtRoomId');
+    const logoContent = document.getElementById('vtLogoContent');
+    if (!el) return;
+    if (!code) {
+      el.classList.remove('visible');
+      el.innerHTML = '';
+      if (logoContent) logoContent.style.display = '';
+      return;
+    }
+    el.innerHTML = (icon ? `<span class="room-icon">${icon}</span>` : '') + '#' + code;
+    el.classList.add('visible');
+    if (logoContent) logoContent.style.display = 'none';
+  }
+
+  return { init, setPoints, setLeaveAction, setRoomId, getBalance };
 })();
 
 document.addEventListener('DOMContentLoaded', () => {

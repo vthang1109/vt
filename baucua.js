@@ -1,6 +1,6 @@
-import { addPoints, getPoints, db, auth } from './points.js';
+import { addPoints, db, auth, subscribeBalance } from './points.js';
 import { getActivePetInfo } from './pet.js';
-import { doc, getDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 class BauCua {
@@ -43,26 +43,30 @@ class BauCua {
 
         if (user) {
             this._userId = user.uid;
-            // Chỉ dùng để đồng bộ balance khi có thay đổi thực sự từ DB (ví dụ chuyển điểm nơi khác),
-            // không còn bị "spam" mỗi lần đặt cược vì placeBet/resetBoard không ghi Firestore nữa.
-            this._unsubBalance = onSnapshot(doc(db, 'users', user.uid), (snap) => {
-                if (snap.exists()) {
-                    this._myBalance = snap.data().points || 0;
-                    this.syncNavPoints();
-                }
-            });
         }
 
-        const pts = await getPoints();
-        this._myBalance = pts || 0;
+        await this.listenBalance();
         this.refreshBuffCache();
 
         this.buildBoard();
         this.bindEvents();
         this.updateStatusBar('betting', 0);
-        this.syncNavPoints();
         this.updateRollButton('roll');
         window.bcGame = this;
+    }
+
+    // Sync realtime từ points.js, chỉ ghi đè _myBalance khi không có cược đang treo.
+    listenBalance() {
+        return new Promise(resolve => {
+            let first = true;
+            this._unsubBalance = subscribeBalance(pts => {
+                if (this.getTotalBet() === 0) {
+                    this._myBalance = pts || 0;
+                    this.syncNavPoints();
+                }
+                if (first) { first = false; resolve(); }
+            });
+        });
     }
 
     async refreshBuffCache() {
@@ -458,5 +462,5 @@ class BauCua {
 
 // Khởi chạy
 new BauCua();
-window.addEventListener('pagehide', () => window.bcGame?.forfeitIfAbandoned());
+window.addEventListener('pagehide', () => { window.bcGame?.forfeitIfAbandoned(); window.bcGame?._unsubBalance?.(); });
 window.addEventListener('beforeunload', () => window.bcGame?.forfeitIfAbandoned());

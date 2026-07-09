@@ -6,7 +6,7 @@
 
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { addPoints, getPoints } from './points.js';
+import { addPoints } from './points.js';
 import { getActiveBuff } from './pet.js';
 
 const POINTS = { WIN_CARO: { easy: 50, medium: 100, hard: 150 } }; // fallback vì points.js chưa export POINTS
@@ -110,6 +110,7 @@ window.restartGame = function() {
   document.getElementById('caro-status-bar').classList.remove('result-win', 'result-lose', 'result-draw');
   document.getElementById('player2-tag').style.display = '';
   document.getElementById('caro-profit').textContent = '';
+  document.getElementById('caro-profit').className = 'stat-profit zero';
   document.getElementById('caro-status').textContent = '';
   initCanvas();
   drawBoard();
@@ -393,7 +394,7 @@ async function handleWin(player) {
     await updateMission('win3');
     await updateMission('win5');
     await updateMission('play3');
-    refreshPoints();
+    // TopNav tự cập nhật realtime qua subscribeBalance, không cần setPoints tay.
     if (gameType === 'bot') updateStatusResult('win', `+${pts}`);
   } else if (!isMe && gameType !== 'local') {
     await updateMission('play3');
@@ -415,7 +416,10 @@ function updateStatusResult(kind, text) {
    else if (kind === 'lose') bar.classList.add('result-lose');
    else if (kind === 'draw') bar.classList.add('result-draw');
    if (p2Tag) p2Tag.style.display = 'none';
-   if (profitEl) profitEl.textContent = text;
+   if (profitEl) {
+     profitEl.textContent = text;
+     profitEl.className = 'stat-profit ' + (kind === 'win' ? 'positive' : kind === 'lose' ? 'negative' : 'zero');
+   }
   if (statusEl) statusEl.textContent = kind === 'win' ? 'WIN' : kind === 'lose' ? 'LOSE' : 'DRAW';
  }
 
@@ -432,21 +436,12 @@ function setPlayerActive(p) {
   document.getElementById('player2-tag').classList.toggle('active', p === 2);
 }
 
-async function refreshPoints() {
-  try {
-    const pts = await getPoints();
-    if (window.TopNav) window.TopNav.setPoints(pts);
-  } catch(e) {}
-}
-
-
 // ============================================================
 //  AUTH CHECK
 // ============================================================
 onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = 'index.html'; return; }
-  // Gộp lượt đọc: lấy điểm + buff pet song song, chỉ 1 lần/phiên (không đọc lại mỗi ván)
-  const [pts, buff] = await Promise.all([getPoints(), getActiveBuff()]);
-  petBuff = buff;
-  if (window.TopNav) window.TopNav.setPoints(pts);
+  // Không cần getPoints(): TopNav đã tự subscribeBalance() từ points.js.
+  // Chỉ cần lấy buff pet cho tính thưởng.
+  petBuff = await getActiveBuff();
 });

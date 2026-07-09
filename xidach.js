@@ -1,9 +1,8 @@
 // xidach.js — Xì Dách Offline (Máy cầm cái, luật mới)
 import { createDeck, renderCardUI } from './cards.js';
 import { auth, db } from './points.js';
-import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { addPoints } from './points.js';
+import { addPoints, subscribeBalance } from './points.js';
 class XiDach {
     constructor() {
         this.deck = [];
@@ -52,11 +51,7 @@ class XiDach {
 
     listenBalance() {
         if (this.unsubBalance) this.unsubBalance();
-        this.unsubBalance = onSnapshot(doc(db, 'users', auth.currentUser.uid), (snap) => {
-            if (snap.exists()) {
-                this.balance = snap.data().points || 0;
-            }
-        });
+        this.unsubBalance = subscribeBalance(pts => { this.balance = pts; });
     }
 
     async refreshBuffCache() {
@@ -303,7 +298,12 @@ class XiDach {
 
         let res = '', delta = 0;
 
-        if (pStat.tag === 'bust') {
+        if (pStat.tag === 'bust' && dStat.tag === 'bust') {
+            res = 'QUẮC';
+            delta = 0;
+            this.dealerResult = 'QUẮC';
+        }
+        else if (pStat.tag === 'bust') {
             res = 'QUẮC';
             delta = 0;
             this.dealerResult = 'THẮNG';
@@ -371,7 +371,7 @@ class XiDach {
             try {
                 await addPoints('Casino', net > 0 ? 'Thắng Xì Dách' : 'Cược Xì Dách', net, false);
                 if (buffBonus > 0) {
-                    window.showToast(`${this.cachedPetLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
+                    window.showToast(`${this.cachedPetLabel} +${buffBonus.toLocaleString('vi-VN')}〄 (${buffPct}%)!`, 'success');
                 }
             } catch(e){}
         }
@@ -457,7 +457,7 @@ class XiDach {
                         return finalHtml;
                     }).join('') : '<div style="color:#64748b;font-size:12px;padding:8px 0">Chưa có bài</div>'}
                 </div>
-                <div class="xd-bet-badge">${this.currentBet ? this.currentBet.toLocaleString('vi-VN') + 'đ' : ''}</div>
+                <div class="xd-bet-badge">${this.currentBet ? this.currentBet.toLocaleString('vi-VN') + ' 〄' : ''}</div>
             </div>
         `;
     }

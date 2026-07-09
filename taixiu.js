@@ -1,7 +1,6 @@
-import { addPoints, getPoints } from './points.js';
+import { addPoints, subscribeBalance } from './points.js';
 import { getActivePetInfo } from './pet.js';
 import { auth, db } from './points.js';
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 class TaiXiu {
@@ -12,6 +11,7 @@ class TaiXiu {
         this.cachedBuffPct = 0;
         this.balance = 0;
         this.ready = false;
+        this.unsubBalance = null;
         this.init();
     }
 
@@ -19,7 +19,7 @@ class TaiXiu {
         await new Promise(resolve => {
             const unsub = onAuthStateChanged(auth, (u) => { unsub(); resolve(u); });
         });
-        await this.refreshPts();
+        await this.listenBalance();
         await this.refreshBuffCache();
         this.ready = true;
         this.bindEvents();
@@ -35,11 +35,20 @@ class TaiXiu {
         } catch { this.cachedBuffPct = 0; this.cachedPet = null; }
     }
 
-    // Đọc điểm 1 lần khi vào game / sau khi ván kết thúc — không đọc lại mỗi lần đặt cược.
-    async refreshPts() {
-        const pts = await getPoints();
-        this.balance = pts || 0;
-        if (window.TopNav) window.TopNav.setPoints(this.balance);
+    // Sync realtime từ points.js, nhưng chỉ ghi đè this.balance khi KHÔNG có cược đang treo
+    // (tránh đè optimistic update lúc đặt cược trước khi finishRoll ghi Firestore).
+    listenBalance() {
+        return new Promise(resolve => {
+            let first = true;
+            this.unsubBalance = subscribeBalance(pts => {
+                const totalBet = Object.values(this.bets).reduce((a,b)=>a+b,0);
+                if (totalBet === 0) {
+                    this.balance = pts || 0;
+                    if (window.TopNav) window.TopNav.setPoints(this.balance);
+                }
+                if (first) { first = false; resolve(); }
+            });
+        });
     }
 
     // Cập nhật status bar: [tổng cược] [Tài/Xỉu + điểm + chi tiết cược] [lời/lỗ]
@@ -256,5 +265,5 @@ class TaiXiu {
 }
 
 new TaiXiu();
-window.addEventListener('pagehide', () => window.txGame?.forfeitIfAbandoned());
+window.addEventListener('pagehide', () => { window.txGame?.forfeitIfAbandoned(); window.txGame?.unsubBalance?.(); });
 window.addEventListener('beforeunload', () => window.txGame?.forfeitIfAbandoned());

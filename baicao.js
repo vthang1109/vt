@@ -1,9 +1,8 @@
 // baicao.js — Bài Cào Online (đặt cược giống Xì Dách)
 import { createDeck, renderCardUI } from './cards.js';
 import { auth, db } from './points.js';
-import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { addPoints, getPoints } from './points.js';
+import { addPoints, getPoints, subscribeBalance } from './points.js';
 import { getActivePetInfo } from './pet.js';
 
 class BaiCao {
@@ -47,11 +46,9 @@ class BaiCao {
 
     listenBalance() {
         if (this.unsubBalance) this.unsubBalance();
-        this.unsubBalance = onSnapshot(doc(db, 'users', auth.currentUser.uid), (snap) => {
-            if (snap.exists()) {
-                this.balance = snap.data().points || 0;
-                if (window.TopNav) TopNav.setPoints(this.balance);
-            }
+        this.unsubBalance = subscribeBalance(pts => {
+            this.balance = pts;
+            if (window.TopNav) window.TopNav.setPoints(this.balance);
         });
     }
 
@@ -77,7 +74,7 @@ class BaiCao {
         }
 
         const amt = parseInt(document.getElementById('bc-bet-input').value);
-        if (!amt || amt < 50) { window.showToast('Cược tối thiểu 50 ⭐', 'warn'); return; }
+        if (!amt || amt < 50) { window.showToast('Cược tối thiểu 50 〄', 'warn'); return; }
         if (amt > this.balance) { window.showToast('Không đủ điểm!', 'error'); return; }
 
         this.currentBet = amt;
@@ -314,7 +311,7 @@ class BaiCao {
                     <span class="xd-seat-name">Bạn <span class="${pInlineCls}">${pScoreText}</span></span>
                 </div>
                 <div class="xd-cards">${playerCardsHtml}</div>
-                <div class="xd-bet-badge">${this.currentBet ? '⭐ ' + this.currentBet.toLocaleString('vi-VN') : ''}</div>
+                <div class="xd-bet-badge">${this.currentBet ? this.currentBet.toLocaleString('vi-VN') + ' 〄' : ''}</div>
             </div>`;
     }
 
@@ -329,5 +326,5 @@ class BaiCao {
 }
 
 new BaiCao();
-window.addEventListener('pagehide', () => window.game?.forfeitIfAbandoned());
+window.addEventListener('pagehide', () => { window.game?.forfeitIfAbandoned(); window.game?.unsubBalance?.(); });
 window.addEventListener('beforeunload', () => window.game?.forfeitIfAbandoned());

@@ -144,7 +144,6 @@
 /* Player tag — style giống caro (.caro-player-tag) */
 .xq-player-tag {
   display: flex; align-items: center; gap: 8px;
-  font-weight: 800; font-size: 13px; color: #e0f2fe;
   padding: 6px 12px; border-radius: 10px; border: 1px solid transparent;
   transition: all 0.3s;
 }
@@ -167,13 +166,12 @@
   50% { background: rgba(251, 191, 36, 0.14); border-color: rgba(251, 191, 36, 0.9); box-shadow: 0 0 20px rgba(251, 191, 36, 0.65), 0 0 14px rgba(239, 68, 68, 0.5); }
 }
 
-.stat-score { font-size: 22px; transition: color 0.3s; }
+.stat-score { transition: color 0.3s; }
+.bc-status.in-check .stat-score { color: #ff3b3b; }
 .bc-status.thinking .stat-score { color: #fbbf24; animation: pulseText 0.8s ease-in-out infinite alternate; }
 
 .xq-profit-value {
   display: none;
-  font-family: 'Science Gothic', sans-serif;
-  font-weight: 500; font-size: 18px;
 }
 .bc-status.result-win .xq-profit-value,
 .bc-status.result-lose .xq-profit-value,
