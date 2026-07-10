@@ -281,6 +281,11 @@ class UongDi {
     document.getElementById('ud-remaining').textContent = `${remaining} lá`;
     document.getElementById('ud-progress-text').textContent =
       `Đã rút ${this.drawnIds.size} / ${this.totalPool} lá`;
+
+    const statusEl = document.getElementById('ud-status');
+    if (statusEl) {
+      statusEl.className = 'bc-status' + (this.currentCard ? ' cat-' + this.currentCard.category : '');
+    }
   }
 
   resetProgress() {

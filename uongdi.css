@@ -21,8 +21,10 @@
 }
 
 .ud-card {
-  width: min(94vw, 460px);
-  height: min(48vw, 230px);
+  width: 88vw;
+  max-width: 420px;
+  height: 48vw;
+  max-height: 230px;
   cursor: pointer;
   transition: transform 0.2s;
   flex-shrink: 0;
@@ -43,7 +45,10 @@
 }
 .ud-card-face {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   backface-visibility: hidden;
   border-radius: 14px;
   display: flex;
@@ -75,10 +80,8 @@
 .ud-card-front {
   background: linear-gradient(160deg, rgba(20,20,30,0.97), rgba(35,25,10,0.97));
   transform: rotateY(180deg);
-  gap: 4px;
   border-width: 3px;
   border-style: solid;
-  position: relative;
 }
 .ud-card-front.border-su_that   { border-color: #38bdf8; }
 .ud-card-front.border-thu_thach { border-color: #fb7185; }
@@ -92,11 +95,11 @@
   font-weight: 800;
   font-size: 10px;
   letter-spacing: 1.5px;
-  padding: 3px 12px;
-  border-radius: 999px;
+  padding: 4px 14px;
+  border-radius: 0 0 10px 10px;
   color: #1a1200;
   position: absolute;
-  top: 10px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
@@ -238,7 +241,10 @@
 .ud-modal-overlay {
   display: none;
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 2000;
   background: rgba(0,0,0,0.6);
   backdrop-filter: blur(4px);

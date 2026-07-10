@@ -162,7 +162,7 @@
 @media (max-width: 640px) {
   .chat-sidebar { width: 100%; position: absolute; top: 0; left: 0; bottom: 0; z-index: 10; }
   .chat-sidebar.mobile-hidden { transform: translateX(-100%); }
-  .chat-window { position: absolute; inset: 0; z-index: 5; display: none; }
+  .chat-window { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 5; display: none; }
   .chat-window.active { display: flex; }
   .chat-win-back { display: block; }
   .chat-page-wrap { position: relative; }
@@ -180,7 +180,7 @@ body {
 }
 
 #bg-canvas {
-  position: fixed; inset: 0;
+  position: fixed; top: 0; right: 0; bottom: 0; left: 0;
   width: 100%; height: 100%;
   pointer-events: none; z-index: 0;
 }
@@ -258,10 +258,12 @@ nav {
 }
 .hero-title {
   font-family: "Science Gothic", sans-serif;
-  font-size: clamp(32px, 8vw, 64px);
+  font-size: 8vw;
   font-weight: 500; line-height: 1.2; margin-bottom: 16px;
   animation: fadeUp 0.8s 0.35s both;
 }
+@media (min-width: 800px) { .hero-title { font-size: 64px; } }
+@media (max-width: 400px) { .hero-title { font-size: 32px; } }
 .hero-title span { color: #38bdf8; text-shadow: 0 0 40px rgba(56,189,248,0.8); }
 .hero-sub {
   font-size: 15px; color: #7dd3fc; margin-bottom: 28px; font-weight: 600;
@@ -351,7 +353,7 @@ nav {
 
 /* ===== GAME MODAL ===== */
 .modal-overlay {
-  position: fixed; inset: 0; z-index: 300;
+  position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 300;
   background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
   display: flex; align-items: center; justify-content: center;
   opacity: 0; pointer-events: none; transition: opacity 0.25s;

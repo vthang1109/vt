@@ -61,6 +61,38 @@
   --bc-right: rgba(255, 255, 255, 0.18);
   --bc-right-border: rgba(255, 255, 255, 0.9);
 }
+
+/* ===== Uống Đi riêng: trái mặc định trắng thay vì vàng ===== */
+#ud-status {
+  --bc-left: rgba(255, 255, 255, 0.1);
+  --bc-left-border: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.15);
+}
+#ud-status .stat-bet { color: #ffffff; }
+
+
+/* ===== Uống Đi: màu theo loại lá bốc được ===== */
+.bc-status.cat-su_that   { --bc-right: rgba(56, 189, 248, 0.18);  --bc-right-border: rgba(56, 189, 248, 0.9); }
+.bc-status.cat-thu_thach { --bc-right: rgba(251, 113, 133, 0.18); --bc-right-border: rgba(251, 113, 133, 0.9); }
+.bc-status.cat-may_man   { --bc-right: rgba(52, 211, 153, 0.18);  --bc-right-border: rgba(52, 211, 153, 0.9); }
+.bc-status.cat-luat_le   { --bc-right: rgba(251, 191, 36, 0.18);  --bc-right-border: rgba(251, 191, 36, 0.9); }
+.bc-status.cat-thi_dau   { --bc-right: rgba(167, 139, 250, 0.18); --bc-right-border: rgba(167, 139, 250, 0.9); }
+.bc-status.cat-do_vui    { --bc-right: rgba(244, 114, 182, 0.18); --bc-right-border: rgba(244, 114, 182, 0.9); }
+
+.bc-status.cat-su_that   .stat-score { color: #38bdf8; text-shadow: 0 0 12px rgba(56, 189, 248, 0.6); }
+.bc-status.cat-thu_thach .stat-score { color: #fb7185; text-shadow: 0 0 12px rgba(251, 113, 133, 0.6); }
+.bc-status.cat-may_man   .stat-score { color: #34d399; text-shadow: 0 0 12px rgba(52, 211, 153, 0.6); }
+.bc-status.cat-luat_le   .stat-score { color: #fbbf24; text-shadow: 0 0 12px rgba(251, 191, 36, 0.6); }
+.bc-status.cat-thi_dau   .stat-score { color: #a78bfa; text-shadow: 0 0 12px rgba(167, 139, 250, 0.6); }
+.bc-status.cat-do_vui    .stat-score { color: #f472b6; text-shadow: 0 0 12px rgba(244, 114, 182, 0.6); }
+
+.bc-status.cat-su_that   .stat-profit { color: #38bdf8; }
+.bc-status.cat-thu_thach .stat-profit { color: #fb7185; }
+.bc-status.cat-may_man   .stat-profit { color: #34d399; }
+.bc-status.cat-luat_le   .stat-profit { color: #fbbf24; }
+.bc-status.cat-thi_dau   .stat-profit { color: #a78bfa; }
+.bc-status.cat-do_vui    .stat-profit { color: #f472b6; }
+
 .bc-status *,
 .bc-status *::before,
 .bc-status *::after {

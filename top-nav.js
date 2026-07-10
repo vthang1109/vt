@@ -63,9 +63,11 @@ window.TopNav = (() => {
     }
     .vt-top-nav .vt-nav-logo .logo-vt   { color: #0288D1; }
     .vt-top-nav .vt-nav-logo .logo-world { color: #ffffff; }
-    .vt-top-nav .vt-nav-logo { display: flex; align-items: center; gap: 6px; }
-    .vt-top-nav .vt-logo-content { display: flex; align-items: center; gap: 6px; }
-    .vt-top-nav .vt-nav-logo img { height: 28px; width: auto; }
+    .vt-top-nav .vt-nav-logo { display: flex; align-items: center; }
+    .vt-top-nav .vt-logo-content { display: flex; align-items: center; }
+    .vt-top-nav .vt-nav-logo img { height: 28px; width: auto; margin-right: 6px; }
+    .vt-top-nav .vt-nav-logo .logo-vt { margin-right: 6px; }
+    .vt-top-nav .vt-room-id { margin-left: 6px; }
     .vt-top-nav .vt-room-id {
       display: none;
       font-family: "Science Gothic", sans-serif;
@@ -275,7 +277,9 @@ window.TopNav = (() => {
       document.body.insertAdjacentHTML('afterbegin', buildHTML());
     }
     bindEvents();
-    listenBalance();
+    if (document.body.dataset.hidePoints !== 'true') {
+      listenBalance();
+    }
   }
   
 function setPoints(pts) {
