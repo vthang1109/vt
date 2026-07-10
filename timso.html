@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Tìm Số</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="status-bar.css"/>
+  <link rel="stylesheet" href="timso.css"/>
+  <script src="top-nav.js"></script>
+  <script src="bottom-nav.js"></script>
+</head>
+<body data-bottom-nav="games" data-hide-points="true">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+  <div class="ts-wrap">
+
+    <!-- MÀN CHỌN CHẾ ĐỘ -->
+    <div class="ts-mode-select" id="ts-mode-select">
+      <h2 class="ts-title">🔢 Tìm Số 1-100</h2>
+      <p class="ts-desc">Chọn chế độ chơi</p>
+      <div class="ts-mode-cards">
+        <button class="ts-mode-card" onclick="window.game.selectMode('solo')">
+          <div class="ts-mode-icon">⏱️</div>
+          <div class="ts-mode-name">1 Người — Tính giờ</div>
+          <div class="ts-mode-sub">Tìm lần lượt từ 1 → 100 nhanh nhất có thể</div>
+        </button>
+        <button class="ts-mode-card" onclick="window.game.selectMode('duo')">
+          <div class="ts-mode-icon">⚔️</div>
+          <div class="ts-mode-name">2 Người — 1 máy</div>
+          <div class="ts-mode-sub">Mỗi lượt có 10 giây để tìm đúng số. Ai tìm nhiều số nhất thắng!</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- STATUS BAR đồng bộ (dùng chung .bc-status) -->
+    <div class="bc-status" id="ts-status" style="display:none">
+      <span class="stat-bet" id="ts-left">--</span>
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="ts-target">1</span>
+        <span class="stat-score-sub" id="ts-sub"></span>
+      </div>
+      <span class="stat-profit zero" id="ts-timer">0.0s</span>
+    </div>
+
+    <!-- BẢNG SỐ -->
+    <div class="ts-board" id="ts-board" style="display:none"></div>
+
+    <!-- ACTIONS -->
+    <div class="ts-actions" id="ts-actions" style="display:none">
+      <button class="btn-restart" onclick="window.game.restart()">🔄 Chơi lại</button>
+      <button class="btn-change-mode" onclick="window.game.backToModeSelect()">↩️ Đổi chế độ</button>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    // Particle nền (đồng bộ xidach)
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(52,211,153,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast = window.showToast || function(){};
+  </script>
+
+  <script type="module" src="timso.js"></script>
+</body>
+</html>

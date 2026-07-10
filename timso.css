@@ -1,0 +1,185 @@
+/* ===================== LAYOUT ===================== */
+.ts-wrap {
+  min-height: 100vh;
+  padding: 14px 12px 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===================== MÀN CHỌN CHẾ ĐỘ ===================== */
+.ts-mode-select {
+  padding-top: 20px;
+  animation: tsFadeIn 0.3s ease-out;
+}
+@keyframes tsFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ts-title {
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 22px;
+  color: #e0f2fe;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.ts-desc {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+  margin-bottom: 22px;
+}
+
+.ts-mode-cards {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.ts-mode-card {
+  flex: 1 1 220px;
+  max-width: 260px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 16px;
+  padding: 22px 16px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.25s;
+  color: #e0f2fe;
+}
+.ts-mode-card:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 0 22px rgba(56, 189, 248, 0.25);
+  transform: translateY(-3px);
+}
+.ts-mode-icon { font-size: 32px; margin-bottom: 8px; }
+.ts-mode-name {
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: #fbbf24;
+  margin-bottom: 6px;
+}
+.ts-mode-sub { font-size: 12px; color: #94a3b8; line-height: 1.4; }
+
+/* ===================== BẢNG SỐ ===================== */
+.ts-board {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  margin: 16px 0;
+}
+.ts-cell {
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  color: #e0f2fe;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.ts-cell:hover:not(:disabled) {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+}
+.ts-cell.correct {
+  background: linear-gradient(135deg, #34d399, #059669);
+  border-color: #34d399;
+  color: #fff;
+  opacity: 0.85;
+  cursor: default;
+  animation: tsPop 0.25s ease-out;
+}
+.ts-cell.correct-p1 {
+  background: linear-gradient(135deg, #34d399, #059669);
+  border-color: #34d399;
+  color: #fff;
+  opacity: 0.9;
+  cursor: default;
+  animation: tsPop 0.25s ease-out;
+}
+.ts-cell.correct-p2 {
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  border-color: #60a5fa;
+  color: #fff;
+  opacity: 0.9;
+  cursor: default;
+  animation: tsPop 0.25s ease-out;
+}
+@keyframes tsPop {
+  0%   { transform: scale(0.7); }
+  100% { transform: scale(1); }
+}
+.ts-cell.wrong {
+  background: rgba(239, 68, 68, 0.5);
+  border-color: #ef4444;
+  animation: tsShake 0.3s;
+}
+@keyframes tsShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+.ts-cell:disabled { cursor: default; }
+
+/* ===================== TRẠNG THÁI LƯỢT (DUO) ===================== */
+.stat-bet.turn-p1 {
+  color: #34d399;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+}
+.stat-profit.turn-p2 {
+  color: #60a5fa;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+}
+.stat-score-sub.turn-warn {
+  color: #ef4444;
+  font-weight: 600;
+}
+.ts-num {
+  font-weight: 700;
+}
+.ts-countdown {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+  vertical-align: middle;
+}
+.ts-countdown.warn {
+  color: #ef4444;
+}
+
+@media (max-width: 480px) {
+  .ts-board { gap: 4px; }
+  .ts-cell { font-size: 11px; border-radius: 6px; }
+}
+
+/* ===================== ACTIONS ===================== */
+.ts-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.ts-actions button {
+  padding: 11px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-family: "Science Gothic", sans-serif;
+  font-size: 13px;
+}
+.btn-restart { background: linear-gradient(135deg, #34d399, #059669); color: #fff; }
+.btn-change-mode { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; }
