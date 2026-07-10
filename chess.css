@@ -195,20 +195,10 @@
   transform: scale(0.97);
 }
 
-/* ===================== STATUS BAR (đồng bộ Xì Dách, dùng file chung status-bar.css) ===================== */
-/* Nhấp nháy vàng-đỏ toàn thanh status khi đang bị chiếu */
-.bc-status.in-check {
-  --bc-left-border: #fbbf24;
-  --bc-right-border: #ef4444;
-  animation: statusCheckBlink 0.9s ease-in-out infinite;
-}
-@keyframes statusCheckBlink {
-  0%, 100% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.3), 0 0 10px rgba(251, 191, 36, 0.15); }
-  50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.85), 0 0 34px rgba(239, 68, 68, 0.75), inset 0 0 18px rgba(239, 68, 68, 0.25); }
-}
-
-/* Player tag — style giống caro (.caro-player-tag) */
-.chess-player-tag {
+/* ===================== STATUS BAR (dùng chung status-bar.css, y hệt chess-mp) ===================== */
+/* Khung tên người chơi (dùng chung .bc-status): y hệt .chess-player-tag của chess-mp */
+.chess-player-tag,
+.chess-player-tag.right {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -225,51 +215,45 @@
   border-color: rgba(56, 189, 248, 0.55);
   background: rgba(56, 189, 248, 0.1);
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
-  animation: playerPulse 1s ease-in-out infinite alternate;
+  animation: chessPlayerPulse 1s ease-in-out infinite alternate;
 }
-@keyframes playerPulse {
+@keyframes chessPlayerPulse {
   from { box-shadow: 0 0 10px rgba(56, 189, 248, 0.15); }
   to   { box-shadow: 0 0 24px rgba(56, 189, 248, 0.45); }
 }
-/* Khi bên đang tới lượt lại đang bị chiếu -> khoanh đỏ nhấp nháy thay vì xanh */
-.bc-status.in-check .chess-player-tag.active-turn {
-  animation: sideCheckBlink 0.9s ease-in-out infinite;
-}
-@keyframes sideCheckBlink {
-  0%, 100% {
-    background: rgba(239, 68, 68, 0.08);
-    border-color: rgba(239, 68, 68, 0.6);
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
-  }
-  50% {
-    background: rgba(251, 191, 36, 0.14);
-    border-color: rgba(251, 191, 36, 0.9);
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.65), 0 0 14px rgba(239, 68, 68, 0.5);
-  }
+
+/* Giãn chữ khi có kết quả (font-weight 700 đã là mặc định của .stat-score ở status-bar.css) */
+.bc-status.result-win .stat-score,
+.bc-status.result-lose .stat-score,
+.bc-status.result-draw .stat-score {
+  letter-spacing: 1px;
 }
 
 .stat-score {
-  font-size: 22px;
   transition: color 0.3s;
 }
 
 .bc-status.thinking .stat-score { color: #fbbf24; animation: pulseText 0.8s ease-in-out infinite alternate; }
 
-/* Kết quả ván — style giống caro .caro-profit */
-.chess-profit-value {
-  display: none;
-  font-family: 'Science Gothic', sans-serif;
-  font-weight: 500;
-  font-size: 18px;
+/* Chữ "CHIẾU" đỏ tươi khi bị chiếu */
+.bc-status.in-check .stat-score {
+  color: #ff3b3b;
 }
-.bc-status.result-win .chess-profit-value,
-.bc-status.result-lose .chess-profit-value,
-.bc-status.result-draw .chess-profit-value {
-  display: inline-block;
+
+/* Hiệu ứng chiếu tướng (lấy từ xiangqi.css): khung viền status bar và khung lượt nhấp nháy vàng-đỏ */
+.bc-status.in-check { --bc-left-border: #fbbf24; --bc-right-border: #ef4444; animation: statusCheckBlink 0.9s ease-in-out infinite; }
+@keyframes statusCheckBlink {
+  0%, 100% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.3), 0 0 10px rgba(251, 191, 36, 0.15); }
+  50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.85), 0 0 34px rgba(239, 68, 68, 0.75), inset 0 0 18px rgba(239, 68, 68, 0.25); }
 }
-.bc-status.result-win .chess-profit-value { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
-.bc-status.result-lose .chess-profit-value { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
-.bc-status.result-draw .chess-profit-value { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+
+.bc-status.in-check .chess-player-tag.active-turn {
+  animation: sideCheckBlink 0.9s ease-in-out infinite;
+}
+@keyframes sideCheckBlink {
+  0%, 100% { background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 0 10px rgba(239, 68, 68, 0.25); }
+  50% { background: rgba(251, 191, 36, 0.14); border-color: rgba(251, 191, 36, 0.9); box-shadow: 0 0 20px rgba(251, 191, 36, 0.65), 0 0 14px rgba(239, 68, 68, 0.5); }
+}
 
 /* Khi ván đấu kết thúc: bỏ dòng phụ "Ván đấu kết thúc" */
 .bc-status.result-win .stat-score-sub,

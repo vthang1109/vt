@@ -121,8 +121,8 @@
 
 .caro-player-score {
   font-family: "Science Gothic", sans-serif;
-  font-weight: 500;
-  font-size: 18px;
+  font-weight: 700;
+  font-size: 14px;
   background: rgba(0, 0, 0, 0.4);
   padding: 1px 8px;
   border-radius: 8px;
@@ -176,22 +176,64 @@
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-/* ===================== KẾT QUẢ VÁN (tiền/điểm) ===================== */
-.caro-profit {
+
+
+/* Phần màu/text-shadow đã có sẵn ở status-bar.css (.bc-status.result-* .stat-score dùng chung),
+   ở đây chỉ thêm phần khác biệt riêng của caro (đậm + giãn chữ) để tránh định nghĩa trùng. */
+.bc-status.result-win .stat-score,
+.bc-status.result-lose .stat-score,
+.bc-status.result-draw .stat-score {
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* ===================== MODAL XÁC NHẬN ĐẦU HÀNG (theo mẫu chess-mp .chess-modal-*) ===================== */
+.caro-modal-overlay {
   display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.55);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.caro-modal-box {
+  width: 100%;
+  max-width: 340px;
+  background: linear-gradient(160deg, rgba(20,26,43,0.98), rgba(10,16,30,0.98));
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 16px;
+  padding: 22px 20px;
+  box-shadow: 0 12px 50px rgba(0,0,0,0.6);
+  text-align: center;
+}
+.caro-modal-title {
   font-family: 'Science Gothic', sans-serif;
   font-weight: 500;
-  font-size: 18px;
+  font-size: 15px;
+  color: #fff;
+  margin-bottom: 18px;
 }
-.bc-status.result-win .caro-profit,
-.bc-status.result-lose .caro-profit,
-.bc-status.result-draw .caro-profit {
-  display: inline-block;
+.caro-modal-actions {
+  display: flex;
+  gap: 10px;
 }
-.bc-status.result-win .caro-profit { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
- .bc-status.result-lose .caro-profit { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
- .bc-status.result-draw .caro-profit { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
-
-.bc-status.result-win .stat-score { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); font-weight: 700; letter-spacing: 1px; }
-.bc-status.result-lose .stat-score { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); font-weight: 700; letter-spacing: 1px; }
-.bc-status.result-draw .stat-score { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 1px; }
+.caro-modal-btn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+}
+.caro-modal-btn.decline {
+  background: rgba(255,255,255,0.08);
+  color: #cbd5e1;
+}
+.caro-modal-btn.danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+}

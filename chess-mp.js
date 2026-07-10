@@ -2,10 +2,11 @@
 // ===== CỜ VUA MULTIPLAYER (PvP qua phòng, dựa theo xidach-mp) =====
 // ============================================================
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, updateDoc, onSnapshot, deleteDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getActiveBuff, getPetById, getTierById } from './pet.js';
+import { getPetById } from './pet.js';
 import { initRoomChat, getMyNickname } from './room-chat.js';
+import { subscribeUserData, addPoints } from './points.js';
 
 const fbConfig = {
   apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -20,12 +21,12 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 const ROOM_ID = new URLSearchParams(location.search).get('room');
-let _user = null, _unsub = null, _unsubMe = null, _myBalance = 0;
+let _user = null, _unsub = null, _unsubMe = null, _myBalance = 0, _myActivePet = null;
 let _settledRound = -1;
 let _autoStartRound = -1;
 let _drawModalShownFor = null;
 let _actionLock = false;
-let _lastRoomData = null, _gs = null;
+let _room = null, _gs = null;
 let _lastDeclineHandled = null;
 
 if (!ROOM_ID) document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">⚠️ Thiếu mã phòng.</div>';
@@ -69,16 +70,7 @@ function esc(s) {
 
 function updateNavRoom(roomCode) {
   if (!roomCode) return;
-  const logo = document.querySelector('.vt-top-nav .vt-nav-logo');
-  if (!logo) return;
-  let roomEl = logo.querySelector('.vt-room-id');
-  if (!roomEl) {
-    roomEl = document.createElement('span');
-    roomEl.className = 'vt-room-id';
-    logo.innerHTML = '';
-    logo.appendChild(roomEl);
-  }
-  roomEl.innerHTML = `<span class="room-icon">♟️</span> #${roomCode}`;
+  if (window.TopNav && window.TopNav.setRoomId) window.TopNav.setRoomId(roomCode, '♟️');
 }
 
 // Chuyển tọa độ ô hiển thị (r,c) -> ô cờ thực, có tính đến việc bàn cờ xoay
@@ -124,9 +116,10 @@ onAuthStateChanged(auth, async (u) => {
   if (!u) { location.href = 'index.html'; return; }
   _user = u;
   if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
-  _unsubMe = onSnapshot(doc(db, 'users', _user.uid), (s) => {
-    if (s.exists()) {
-      _myBalance = s.data().points || 0;
+  _unsubMe = subscribeUserData((data) => {
+    if (data) {
+      _myBalance = data.points || 0;
+      _myActivePet = data.activePet || null;
       if (window.TopNav) window.TopNav.setPoints(_myBalance);
     }
   });
@@ -151,6 +144,7 @@ function start() {
       return;
     }
     const r = snap.data();
+    _room = r;
     updateNavRoom(r.code || '------');
     if (r.gameType !== 'chess' || !r.gameState) return;
     render(r);
@@ -277,7 +271,6 @@ async function pushMove(move) {
 
 /* ========== RENDER TOÀN TRANG ========== */
 function render(r) {
-  _lastRoomData = r;
   const gs = r.gameState || {};
   _gs = gs;
 
@@ -289,8 +282,6 @@ function render(r) {
   const scoreEl = document.getElementById('chess-score');
   const scoreSubEl = document.getElementById('chess-score-sub');
   const profitEl = document.getElementById('chess-profit');
-  const myBetEl = document.getElementById('chess-my-bet');
-  const oppBetEl = document.getElementById('chess-opp-bet');
   const oppNameEl = document.getElementById('chess-opp-name');
   const sidePlayerEl = document.getElementById('side-player');
   const sideMachineEl = document.getElementById('side-machine');
@@ -298,10 +289,13 @@ function render(r) {
   const actEl = document.getElementById('chess-actions');
   const bcStatusEl = document.getElementById('bc-status');
 
+  sideMachineEl.style.display = '';
   oppNameEl.textContent = esc(r.memberInfo?.[oppUid]?.name || 'Đối thủ');
   bcStatusEl.className = 'bc-status';
   sidePlayerEl.classList.remove('active-turn');
-  sideMachineEl.classList.remove('active-turn', 'as-profit', 'positive', 'negative', 'zero');
+  sideMachineEl.classList.remove('active-turn');
+  profitEl.textContent = '';
+  profitEl.className = 'stat-profit zero';
 
   if (members.length < 2) {
     document.getElementById('board').innerHTML = '';
@@ -318,8 +312,6 @@ function render(r) {
     targets = [];
     renderBoard(gs);
 
-    myBetEl.textContent = '0'; oppBetEl.textContent = '0';
-    profitEl.textContent = '+0'; profitEl.className = 'chess-profit-value zero';
     scoreEl.textContent = '--'; scoreSubEl.textContent = 'Đặt cược';
     statusEl.textContent = 'Chủ phòng chọn mức cược, đối thủ xác nhận để bắt đầu ván đấu.';
     actEl.innerHTML = '';
@@ -352,17 +344,14 @@ function render(r) {
   const myColor = gs.colors?.[uid];
   const myBet = gs.bets?.[uid] || 0;
   const oppBet = gs.bets?.[oppUid] || 0;
-  myBetEl.textContent = myBet.toLocaleString('vi-VN');
-  oppBetEl.textContent = oppBet.toLocaleString('vi-VN');
 
   renderBoard(gs);
 
   if (gs.phase === 'playing') {
     const turnLabel = gs.turn === 'w' ? 'Trắng' : 'Đen';
     const inCheck = game.in_check();
-    scoreEl.textContent = inCheck ? 'CHIẾU TƯỚNG' : '';
+    scoreEl.textContent = inCheck ? 'CHIẾU' : '';
     scoreSubEl.textContent = inCheck ? '' : 'Lượt đi';
-    profitEl.textContent = '+0'; profitEl.className = 'chess-profit-value zero';
     statusEl.textContent = inCheck ? `Đang bị chiếu: ${turnLabel}.` : `Lượt đi: ${turnLabel}`;
     bcStatusEl.classList.toggle('in-check', inCheck);
     bcStatusEl.classList.add('in-progress');
@@ -391,14 +380,13 @@ function render(r) {
     scoreEl.textContent = outcome === 'win' ? 'WIN' : outcome === 'lose' ? 'LOSE' : 'HÒA';
     scoreSubEl.textContent = '';
     bcStatusEl.classList.add(outcome === 'win' ? 'result-win' : outcome === 'lose' ? 'result-lose' : 'result-draw');
+    sideMachineEl.style.display = 'none';
 
     let net = 0;
     if (outcome === 'win') net = oppBet;
     else if (outcome === 'lose') net = -myBet;
-    sideMachineEl.classList.add('as-profit');
-    if (net > 0) { oppNameEl.textContent = `+${net.toLocaleString('vi-VN')}`; sideMachineEl.classList.add('positive'); }
-    else if (net < 0) { oppNameEl.textContent = `${net.toLocaleString('vi-VN')}`; sideMachineEl.classList.add('negative'); }
-    else { oppNameEl.textContent = 'Huề'; sideMachineEl.classList.add('zero'); }
+    profitEl.textContent = net === 0 ? '' : (net > 0 ? '+' : '') + net.toLocaleString('vi-VN');
+    profitEl.className = 'stat-profit ' + (net > 0 ? 'positive' : net < 0 ? 'negative' : 'zero');
 
     let reasonText = '';
     if (gs.result === 'checkmate') reasonText = 'Chiếu hết.';
@@ -475,7 +463,7 @@ window.hostSetBet = async function() {
   if (!amt || amt < 50) { showToast('Cược tối thiểu 50', 'warn'); return; }
   if (amt > _myBalance) { showToast('Không đủ điểm', 'error'); return; }
   try {
-    await updateDoc(doc(db, 'users', _user.uid), { points: _myBalance - amt });
+    await addPoints('Cờ vua', 'Đặt cược', -amt);
     await updateDoc(doc(db, 'rooms', ROOM_ID), {
       'gameState.betAmount': amt,
       [`gameState.bets.${_user.uid}`]: amt
@@ -485,14 +473,14 @@ window.hostSetBet = async function() {
 };
 
 window.acceptBet = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data(); const gs = r.gameState;
+  const r = _room;
+  if (!r) return;
+  const gs = r.gameState;
   const amt = gs.betAmount;
   if (!amt || gs.bets?.[_user.uid]) return;
   if (amt > _myBalance) { showToast('Không đủ điểm để đồng ý mức cược này', 'error'); return; }
   try {
-    await updateDoc(doc(db, 'users', _user.uid), { points: _myBalance - amt });
+    await addPoints('Cờ vua', 'Đặt cược', -amt);
     await updateDoc(doc(db, 'rooms', ROOM_ID), { [`gameState.bets.${_user.uid}`]: amt });
     showToast('✅ Đã xác nhận cược', 'success');
   } catch (e) { console.error(e); showToast('Lỗi', 'error'); }
@@ -509,9 +497,7 @@ async function refundDeclinedBet(gs) {
   const amt = gs.betAmount || 0;
   try {
     if (amt > 0) {
-      const us = await getDoc(doc(db, 'users', _user.uid));
-      const cur = us.exists() ? (us.data().points || 0) : 0;
-      await updateDoc(doc(db, 'users', _user.uid), { points: cur + amt });
+      await addPoints('Cờ vua', 'Hoàn cược', amt);
       showToast(`↩️ Đối thủ từ chối mức cược, đã hoàn lại ${amt.toLocaleString('vi-VN')}đ`, 'info');
     }
     await updateDoc(doc(db, 'rooms', ROOM_ID), {
@@ -552,9 +538,8 @@ function hideDrawModal() {
 
 /* ========== HÀNH ĐỘNG ========== */
 async function hostStartMatch() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  const r = _room;
+  if (!r) return;
   if (r.hostUid !== _user.uid) return;
   const gs = r.gameState || {};
   if (gs.phase !== 'betting') return;
@@ -583,10 +568,44 @@ async function hostStartMatch() {
   });
 }
 
-window.resignGame = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data(); const gs = r.gameState;
+function showResignConfirm() {
+  let modal = document.getElementById('chess-resign-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'chess-resign-modal';
+    modal.className = 'chess-modal-overlay';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div class="chess-modal-box">
+      <div class="chess-modal-title">Bạn chắc chắn muốn đầu hàng ván này?</div>
+      <div class="chess-modal-actions">
+        <button class="chess-modal-btn decline" onclick="hideResignConfirm()">Hủy</button>
+        <button class="chess-modal-btn danger" onclick="confirmResign()">🏳️ Đầu hàng</button>
+      </div>
+    </div>`;
+  modal.style.display = 'flex';
+}
+window.hideResignConfirm = function() {
+  const modal = document.getElementById('chess-resign-modal');
+  if (modal) modal.style.display = 'none';
+};
+window.confirmResign = async function() {
+  window.hideResignConfirm();
+  try {
+    await _executeResign();
+  } catch (e) {
+    console.error(e);
+    showToast('Lỗi khi đầu hàng, thử lại', 'error');
+  }
+};
+window.resignGame = function() {
+  showResignConfirm();
+};
+async function _executeResign() {
+  const r = _room;
+  if (!r) return;
+  const gs = r.gameState;
   if (gs.phase !== 'playing') return;
   const oppUid = (r.members || []).find(u => u !== _user.uid);
   if (!oppUid) return;
@@ -595,12 +614,12 @@ window.resignGame = async function() {
     'gameState.result': 'resign',
     'gameState.winnerUid': oppUid
   });
-};
+}
 
 window.offerDraw = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data(); const gs = r.gameState;
+  const r = _room;
+  if (!r) return;
+  const gs = r.gameState;
   if (gs.phase !== 'playing' || gs.drawOffer) return;
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
     'gameState.drawOffer': { uid: _user.uid, name: r.memberInfo?.[_user.uid]?.name || 'Người chơi' }
@@ -609,9 +628,9 @@ window.offerDraw = async function() {
 };
 
 window.acceptDraw = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data(); const gs = r.gameState;
+  const r = _room;
+  if (!r) return;
+  const gs = r.gameState;
   const offer = gs.drawOffer;
   if (!offer || offer.uid === _user.uid) return;
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
@@ -622,18 +641,17 @@ window.acceptDraw = async function() {
 };
 
 window.declineDraw = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data(); const gs = r.gameState;
+  const r = _room;
+  if (!r) return;
+  const gs = r.gameState;
   const offer = gs.drawOffer;
   if (!offer || offer.uid === _user.uid) return;
   await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.drawOffer': null });
 };
 
 window.hostNextRound = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  const r = _room;
+  if (!r) return;
   if (r.hostUid !== _user.uid) return;
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
     'gameState.phase': 'betting',
@@ -661,62 +679,63 @@ async function settleMyResult(r, gs) {
   const oppBet = gs.bets?.[oppUid] || 0;
   const outcome = gs.result === 'draw' ? 'draw' : (gs.winnerUid === uid ? 'win' : 'lose');
 
-  if (outcome === 'win') {
-    const winAmount = oppBet;
-    let buffBonus = 0, buffPct = 0;
-    try {
-      buffPct = await getActiveBuff();
-      if (buffPct > 0) buffBonus = Math.round(winAmount * buffPct / 100);
-    } catch {}
-    const totalRefund = myBet + winAmount + buffBonus;
-    const us = await getDoc(doc(db, 'users', uid));
-    const cur = us.exists() ? (us.data().points || 0) : 0;
-    await updateDoc(doc(db, 'users', uid), { points: cur + totalRefund });
+  try {
+    if (outcome === 'win') {
+      const winAmount = oppBet;
+      if (myBet > 0) await addPoints('Cờ vua', 'Hoàn cược', myBet);
+      const finalWin = await addPoints('Cờ vua', 'Thắng cờ vua', winAmount);
+      const buffBonus = finalWin - winAmount;
 
-    if (buffBonus > 0) {
-      const petData = await (async () => {
-        try {
-          const ud = await getDoc(doc(db, 'users', uid));
-          const activePetId = ud.data()?.activePet;
-          if (!activePetId) return null;
-          const pet = getPetById(activePetId);
-          const tier = pet ? getTierById(pet.tier) : null;
-          return pet ? { emoji: pet.emoji, name: pet.name, tierName: tier?.name } : null;
-        } catch { return null; }
-      })();
-      const petLabel = petData ? `${petData.emoji} ${petData.name}` : '🐾 Pet';
-      showToast(`🎉 Thắng +${winAmount.toLocaleString('vi-VN')}đ  ${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
+      if (buffBonus > 0) {
+        const pet = _myActivePet ? getPetById(_myActivePet) : null;
+        const petLabel = pet ? `${pet.emoji} ${pet.name}` : '🐾 Pet';
+        showToast(`🎉 Thắng +${winAmount.toLocaleString('vi-VN')}đ  ${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ!`, 'success');
+      } else {
+        showToast(`🎉 Thắng +${winAmount.toLocaleString('vi-VN')}đ!`, 'success');
+      }
+
+    } else if (outcome === 'draw') {
+      if (myBet > 0) await addPoints('Cờ vua', 'Hoàn cược (hòa)', myBet);
+      showToast('🤝 Hoà, hoàn lại cược', 'info');
+
     } else {
-      showToast(`🎉 Thắng +${winAmount.toLocaleString('vi-VN')}đ!`, 'success');
+      showToast(`💸 Thua ${myBet.toLocaleString('vi-VN')}đ`, 'warn');
     }
-    if (window.VTQuests) { window.VTQuests.trackEarn(winAmount + buffBonus); window.VTQuests.trackWinSmart(); }
-
-  } else if (outcome === 'draw') {
-    const us = await getDoc(doc(db, 'users', uid));
-    const cur = us.exists() ? (us.data().points || 0) : 0;
-    await updateDoc(doc(db, 'users', uid), { points: cur + myBet });
-    showToast('🤝 Hoà, hoàn lại cược', 'info');
-
-  } else {
-    showToast(`💸 Thua ${myBet.toLocaleString('vi-VN')}đ`, 'warn');
+  } catch (e) {
+    console.error(e);
+    showToast('Lỗi khi cộng điểm, thử lại', 'error');
   }
 }
 
 /* ========== THOÁT PHÒNG ========== */
 window.quitGame = async function() {
   try {
-    const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-    if (snap.exists()) {
-      const r = snap.data();
-      if (r.gameState?.phase === 'betting') {
-        const myBet = r.gameState.bets?.[_user.uid] || 0;
+    const r = _room;
+    if (r) {
+      const gs = r.gameState || {};
+      if (gs.phase === 'betting') {
+        const myBet = gs.bets?.[_user.uid] || 0;
         if (myBet > 0) {
-          const us = await getDoc(doc(db, 'users', _user.uid));
-          const cur = us.exists() ? (us.data().points || 0) : 0;
-          await updateDoc(doc(db, 'users', _user.uid), { points: cur + myBet });
+          await addPoints('Cờ vua', 'Hoàn cược (rời phòng)', myBet);
         }
       }
-      if (r.hostUid === _user.uid) {
+
+      // Thoát ngang giữa ván đang chơi (chưa có kết quả) → xử thua, đối thủ được xử thắng
+      // (dùng đúng field như resignGame() có sẵn)
+      let forfeited = false;
+      if (gs.phase === 'playing' && !gs.result && !gs.winnerUid) {
+        const oppUid = (r.members || []).find(u => u !== _user.uid);
+        if (oppUid) {
+          await updateDoc(doc(db, 'rooms', ROOM_ID), {
+            'gameState.phase': 'result',
+            'gameState.result': 'resign',
+            'gameState.winnerUid': oppUid
+          });
+          forfeited = true;
+        }
+      }
+
+      if (r.hostUid === _user.uid && !forfeited) {
         await deleteDoc(doc(db, 'rooms', ROOM_ID));
       } else {
         const remaining = (r.members || []).filter(u => u !== _user.uid);

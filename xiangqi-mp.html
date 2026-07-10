@@ -20,25 +20,23 @@
 
   <div id="top-nav-root"></div>
 
-  <div class="xq-wrap">
+  <div class="xq-wrap xq-wrap-mp">
 
-    <!-- STATUS BAR (dùng chung status-bar.css, y hệt chess-mp) -->
+    <!-- STATUS BAR (dùng chung: y hệt chess-mp.html) -->
     <div class="bc-status" id="bc-status">
-      <div class="chess-player-tag" id="side-me">
-        <span>Bạn</span>
-        <small class="chess-player-bet" id="xq-my-bet">0</small>
+      <div class="stat-bet">
+        <div class="chess-player-tag" id="side-player">
+          <span>Bạn</span>
+        </div>
       </div>
-
       <div class="stat-score-wrap">
         <span class="stat-score" id="xq-score">--</span>
         <span class="stat-score-sub" id="xq-score-sub"></span>
       </div>
-
       <div class="stat-profit">
-        <span class="chess-profit-value zero" id="xq-profit">+0</span>
-        <div class="chess-player-tag right" id="side-opp">
+        <span class="stat-profit zero" id="xq-profit"></span>
+        <div class="chess-player-tag right" id="side-machine">
           <span id="xq-opp-name">Đối thủ</span>
-          <small class="chess-player-bet" id="xq-opp-bet">0</small>
         </div>
       </div>
     </div>

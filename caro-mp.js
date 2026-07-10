@@ -1,9 +1,11 @@
+
 // caro-mp.js — Caro Multiplayer qua phòng (rooms.js)
 import { db, auth } from './points.js';
 import {
   doc, getDoc, updateDoc, onSnapshot, serverTimestamp, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { initRoomChat, getMyNickname } from './room-chat.js';
 
 // ============================================================
 //  STATE
@@ -27,6 +29,8 @@ let gameOver = false;
 let lastMove = null;
 let moveCount = 0;
 let isProcessingMove = false;
+let scores = { p1: 0, p2: 0 };
+let scoredThisRound = false;
 
 // ===== TIỀN CƯỢC =====
 let BET_AMOUNT = 100;
@@ -34,24 +38,25 @@ let currentBet = 100;
 
 let canvas, ctx;
 let _unsubRoom = null;
+let _autoStarting = false;
+let _lastDeclineHandled = null;
 
 // ============================================================
 //  DOM REFS
 // ============================================================
 const $ = id => document.getElementById(id);
-const statusEl = $('mp-status');
-const p1El = $('mp-p1');
-const p2El = $('mp-p2');
-const p1Name = p1El.querySelector('.name');
-const p2Name = p2El.querySelector('.name');
-const p1Ready = $('mp-p1-ready');
-const p2Ready = $('mp-p2-ready');
-const btnReady = $('btn-ready-mp');
-const btnStart = $('btn-start-mp');
-const roomNameEl = $('mp-room-name');
-const roomCodeEl = $('mp-room-code');
+const statusBarEl = $('caro-status-bar');
+const statusMidEl = $('caro-status');
+const profitEl = $('caro-profit');
+const p1El = $('player1-tag');
+const p2El = $('player2-tag');
+const p1Name = $('player1-name');
+const p2Name = $('player2-name');
+const p1Score = $('score-p1');
+const p2Score = $('score-p2');
 const resultModal = $('result-modal');
 const waitingOverlay = $('mp-waiting-overlay');
+const betZoneEl = $('caro-bet-zone');
 
 canvas = $('caro-canvas');
 ctx = canvas.getContext('2d');
@@ -69,14 +74,30 @@ onAuthStateChanged(auth, async (user) => {
   const params = new URLSearchParams(window.location.search);
   roomId = params.get('room');
   if (!roomId) {
-    statusEl.innerHTML = '⚠️ Không tìm thấy phòng. Quay lại danh sách.';
+    statusMidEl.textContent = '⚠️ Không tìm thấy phòng. Quay lại danh sách.';
     return;
   }
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.leaveMpRoom());
   initRoom();
-  
+
+  const chatName = await getMyNickname(db, myUid, user.email);
+  initRoomChat({
+    db,
+    roomId,
+    uid: myUid,
+    getName: () => chatName
+  });
+
   // Cập nhật điểm lên nav
   updateNavPoints();
 });
+
+// ============================================================
+//  UPDATE ROOM ID TRÊN TOP NAV
+// ============================================================
+function updateNavRoom(roomCode) {
+  if (window.TopNav && window.TopNav.setRoomId) window.TopNav.setRoomId(roomCode, '♟️');
+}
 
 // ============================================================
 //  UPDATE NAV POINTS
@@ -123,7 +144,7 @@ function initRoom() {
   if (_unsubRoom) _unsubRoom();
   _unsubRoom = onSnapshot(doc(db, 'rooms', roomId), (snap) => {
     if (!snap.exists()) {
-      statusEl.innerHTML = '❌ Phòng đã bị xoá hoặc không tồn tại.';
+      statusMidEl.textContent = '❌ Phòng đã bị xoá hoặc không tồn tại.';
       return;
     }
     roomData = snap.data();
@@ -131,7 +152,7 @@ function initRoom() {
     handleGameState(roomData);
   }, (err) => {
     console.error('room snapshot error', err);
-    statusEl.innerHTML = '⚠️ Lỗi kết nối phòng.';
+    statusMidEl.textContent = '⚠️ Lỗi kết nối phòng.';
   });
 }
 
@@ -140,125 +161,93 @@ function initRoom() {
 // ============================================================
 function renderRoomInfo() {
   if (!roomData) return;
-  roomNameEl.textContent = roomData.name || 'Phòng Caro';
-  roomCodeEl.textContent = '#' + (roomData.code || '------');
+  updateNavRoom(roomData.code || '------');
 
   const members = roomData.members || [];
   const memberInfo = roomData.memberInfo || {};
+  const isHost = roomData.hostUid === myUid;
+  // Tự quản lý pha chơi qua gameState.phase, KHÔNG phụ thuộc roomData.status
+  // (nếu file tạo phòng set sẵn status:'playing' thì vẫn luôn ép qua bước chọn cược trước)
+  const gsPhase = (roomData.gameState && roomData.gameState.phase) || 'betting';
+  const inLobby = gsPhase !== 'playing';
 
   const p1Uid = members[0] || null;
   const p2Uid = members[1] || null;
 
-  if (p1Uid) {
-    const info = memberInfo[p1Uid] || { name: '?', ready: false };
-    p1Name.textContent = p1Uid === myUid ? myName + ' (bạn)' : info.name;
-    p1Ready.textContent = info.ready ? '✅' : '⏳';
-    p1Ready.className = info.ready ? 'ready-badge' : 'wait-badge';
-  } else {
-    p1Name.textContent = 'Đang chờ...';
-    p1Ready.textContent = '⏳';
-    p1Ready.className = 'wait-badge';
-  }
+  const info1 = memberInfo[p1Uid] || { name: 'Người chơi' };
+  const info2 = memberInfo[p2Uid] || { name: 'Người chơi' };
+  p1Name.textContent = p1Uid ? (p1Uid === myUid ? 'Bạn' : info1.name) : 'Đang chờ...';
+  p2Name.textContent = p2Uid ? (p2Uid === myUid ? 'Bạn' : info2.name) : 'Đang chờ...';
 
-  if (p2Uid) {
-    const info = memberInfo[p2Uid] || { name: '?', ready: false };
-    p2Name.textContent = p2Uid === myUid ? myName + ' (bạn)' : info.name;
-    p2Ready.textContent = info.ready ? '✅' : '⏳';
-    p2Ready.className = info.ready ? 'ready-badge' : 'wait-badge';
-  } else {
-    p2Name.textContent = 'Đang chờ...';
-    p2Ready.textContent = '⏳';
-    p2Ready.className = 'wait-badge';
-  }
+  p1Score.textContent = scores.p1;
+  p2Score.textContent = scores.p2;
 
   p1El.classList.toggle('active', currentTurn === p1Uid && gameActive && !gameOver);
   p2El.classList.toggle('active', currentTurn === p2Uid && gameActive && !gameOver);
 
-  const isHost = roomData.hostUid === myUid;
-  if (isHost && roomData.status === 'lobby') {
-    btnReady.style.display = 'none';
-    btnStart.style.display = 'inline-block';
-    const allReady = members.filter(u => u !== roomData.hostUid).every(u => memberInfo[u]?.ready);
-    const enough = members.length >= 2;
-    btnStart.disabled = !(allReady && enough);
-    btnStart.textContent = enough ? (allReady ? '🚀 Bắt đầu' : '⏳ Chờ sẵn sàng') : '⏳ Cần 2 người';
-  } else if (roomData.status === 'lobby') {
-    btnStart.style.display = 'none';
-    btnReady.style.display = 'inline-block';
-    const myInfo = memberInfo[myUid] || { ready: false };
-    btnReady.textContent = myInfo.ready ? '↩ Huỷ sẵn sàng' : '✅ Sẵn sàng';
-    btnReady.classList.toggle('on', !!myInfo.ready);
+  // ===== BET: chủ phòng chọn mức, đối thủ xác nhận (giống chess-mp) =====
+  const gs = roomData.gameState || {};
+  if (inLobby) {
+    currentBet = gs.betAmount || currentBet;
+    if (members.length >= 2) {
+      renderBetZone(gs, isHost, p1Uid === myUid ? p2Uid : p1Uid);
+    } else {
+      betZoneEl.innerHTML = '';
+    }
   } else {
-    btnReady.style.display = 'none';
-    btnStart.style.display = 'none';
+    betZoneEl.innerHTML = '';
   }
 
-  if (roomData.status === 'lobby' && members.length < 2) {
+  // Overlay chờ người chơi 2 che toàn màn hình
+  if (inLobby && members.length < 2) {
     waitingOverlay.classList.remove('hidden');
     waitingOverlay.querySelector('.wait-text').textContent = '⏳ Đang chờ người chơi thứ 2...';
-  } else if (roomData.status === 'lobby') {
-    waitingOverlay.classList.add('hidden');
   } else {
     waitingOverlay.classList.add('hidden');
   }
 
-  // Cập nhật status với layout 2 cột
   updateStatusBar();
+
+  const ingameActionsEl = document.getElementById('caro-ingame-actions');
+  if (ingameActionsEl) {
+    ingameActionsEl.classList.toggle('hidden', !(gameActive && !gameOver));
+  }
 }
 
 // ============================================================
-//  UPDATE STATUS BAR
+//  UPDATE STATUS BAR (y hệt caro.js: giữa = lượt/kết quả, phải = điểm cược)
 // ============================================================
 function updateStatusBar() {
-  const members = roomData?.members || [];
-  const memberInfo = roomData?.memberInfo || {};
-  
-  if (roomData?.status === 'lobby') {
-    statusEl.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-        <span>🔄 Đang trong phòng chờ · ${members.length}/${roomData.maxPlayers || 2} người</span>
-        <span style="color:#fbbf24;font-weight:700;">🪙 ${currentBet.toLocaleString('vi-VN')}</span>
-      </div>
-    `;
-    statusEl.style.color = '#94a3b8';
-  } else if (roomData?.status === 'playing') {
-    if (gameActive && !gameOver) {
-      const turnName = currentTurn === myUid ? 'bạn' : (memberInfo[currentTurn]?.name || 'đối thủ');
-      const symbolText = mySymbol ? ` (${mySymbol})` : '';
-      const turnColor = currentTurn === myUid ? '#38bdf8' : '#f87171';
-      
-      statusEl.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-          <span style="color:${turnColor};font-weight:800;">⚔️ Lượt của ${turnName}${symbolText}</span>
-          <span style="color:#fbbf24;font-weight:700;">🪙 ${currentBet.toLocaleString('vi-VN')}</span>
-        </div>
-      `;
-      statusEl.style.color = turnColor;
-    } else if (gameOver) {
-      // Không cần cập nhật
-    } else {
-      statusEl.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-          <span>⏳ Đang tải trận đấu...</span>
-          <span style="color:#fbbf24;font-weight:700;">🪙 ${currentBet.toLocaleString('vi-VN')}</span>
-        </div>
-      `;
-      statusEl.style.color = '#94a3b8';
-    }
-  }
+  if (gameOver) return; // Kết quả được đặt bởi updateStatusResult()
+  statusMidEl.textContent = '';
+}
+
+// ============================================================
+//  KẾT QUẢ VÁN — y hệt caro.js updateStatusResult(): WIN/LOSE/DRAW
+//  nằm giữa, điểm +/- nằm bên .stat-profit (class gốc dùng chung) cạnh player2-tag
+// ============================================================
+function updateStatusResult(kind, profitText) {
+  statusBarEl.classList.remove('result-win', 'result-lose', 'result-draw');
+  if (kind === 'win') statusBarEl.classList.add('result-win');
+  else if (kind === 'lose') statusBarEl.classList.add('result-lose');
+  else statusBarEl.classList.add('result-draw');
+  if (p2El) p2El.style.display = 'none';
+  statusMidEl.textContent = kind === 'win' ? 'WIN' : kind === 'lose' ? 'LOSE' : 'DRAW';
+  profitEl.textContent = profitText || '';
+  profitEl.className = 'stat-profit ' + (kind === 'win' ? 'positive' : kind === 'lose' ? 'negative' : 'zero');
 }
 
 // ============================================================
 //  HANDLE GAME STATE
 // ============================================================
 function handleGameState(data) {
-  if (data.status !== 'playing') {
+  const gs = data.gameState || {};
+  if (gs.phase !== 'playing') {
     gameActive = false;
     gameOver = false;
     return;
   }
 
-  const gs = data.gameState || {};
   if (!gs.board) return;
 
   // Lấy tiền cược từ gameState
@@ -287,6 +276,20 @@ function handleGameState(data) {
   currentTurn = gs.currentTurn || null;
   gameActive = true;
   gameOver = gs.winner !== null && gs.winner !== undefined && gs.winner !== 'draw';
+
+  // Ván mới đã bắt đầu (do 1 trong 2 bên bấm "Ván mới") — dọn sạch UI kết quả cũ ở CẢ 2 client,
+  // không chỉ phía người vừa bấm (resetGameState() chỉ tự dọn cho chính client gọi nó).
+  // Thiếu bước này thì: bên còn lại vẫn thấy result-modal cũ (nút "Đầu hàng" cũ chồng lên nút
+  // đầu hàng thật của ván mới) + màu result-win/lose cũ còn dính trên bc-status, và scoredThisRound
+  // bị kẹt true mãi -> ván sau bên đó không bao giờ được cộng/trừ điểm.
+  if (!gameOver && gs.winner !== 'draw') {
+    scoredThisRound = false;
+    resultModal.classList.add('hidden');
+    statusBarEl.classList.remove('result-win', 'result-lose', 'result-draw');
+    if (p2El) p2El.style.display = '';
+    profitEl.textContent = '';
+    profitEl.className = 'stat-profit zero';
+  }
   
   const symbols = gs.symbols || {};
   mySymbol = symbols[myUid] || null;
@@ -319,13 +322,56 @@ function handleGameState(data) {
 
   renderRoomInfo();
 
+  if ((gameOver || gs.winner === 'draw') && !scoredThisRound) {
+    const members = data.members || [];
+    if (gs.winner && gs.winner !== 'draw') {
+      if (gs.winner === members[0]) scores.p1++;
+      else if (gs.winner === members[1]) scores.p2++;
+    }
+    scoredThisRound = true;
+    renderRoomInfo();
+    settlePoints(gs); // gộp trừ/cộng điểm 1 LẦN DUY NHẤT tại đây (không trừ lúc chọn cược)
+  }
+
   if (gameOver || gs.winner === 'draw') {
     if (gs.winner && gs.winner !== 'draw') {
-      const resultGs = { ...gs, winLine: winLine };
-      showResultFromState(resultGs);
+      const isMe = gs.winner === myUid;
+      const profitText = isMe ? `+${currentBet.toLocaleString('vi-VN')}` : `-${currentBet.toLocaleString('vi-VN')}`;
+      updateStatusResult(isMe ? 'win' : 'lose', profitText);
+      showResultFromState();
     } else if (gs.winner === 'draw') {
-      showResult('🤝', 'Hòa!', '', 'Không còn nước đi');
+      updateStatusResult('draw', '');
+      showResult();
     }
+  }
+}
+
+// ============================================================
+//  SETTLE ĐIỂM CƯỢC — trừ/cộng gộp 1 LẦN DUY NHẤT khi có kết quả.
+//  Cược lúc chọn/xác nhận chỉ ghi nhận số, KHÔNG đụng vào điểm thật.
+//  (đây cũng là điểm duy nhất gọi addPoints() cho ván thắng -> buff pet áp dụng ở đây)
+// ============================================================
+async function settlePoints(gs) {
+  if (!gs.winner || gs.winner === 'draw') return; // hòa: chưa ai bị trừ nên khỏi cần settle
+  try {
+    const { addPoints } = await import('./points.js');
+    const isMe = gs.winner === myUid;
+    const rawDelta = isMe ? currentBet : -currentBet;
+    const reason = isMe
+      ? `Thắng ván Caro MP (mức ${currentBet.toLocaleString('vi-VN')})`
+      : `Thua ván Caro MP (mức ${currentBet.toLocaleString('vi-VN')})`;
+    // addPoints() tự áp buff pet cho số dương (nếu reason không phải hoàn/cược) và
+    // TRẢ VỀ số đã áp buff — phải dùng giá trị này, không dùng rawDelta, nếu không
+    // buff vẫn cộng đúng vào điểm thật nhưng UI sẽ hiện sai (như buff "không hoạt động").
+    const applied = await addPoints('Caro', reason, rawDelta);
+    const finalDelta = (typeof applied === 'number') ? applied : rawDelta;
+    myPoints += finalDelta;
+    updateNavPoints();
+    if (isMe) {
+      profitEl.textContent = `+${finalDelta.toLocaleString('vi-VN')}`;
+    }
+  } catch (e) {
+    console.log('Lỗi settle điểm:', e);
   }
 }
 
@@ -489,6 +535,7 @@ async function sendMove(r, c) {
     }
 
     const newGs = {
+      phase: 'playing',
       board: boardStr,
       currentTurn: getOpponentUid(),
       lastMove: [r, c],
@@ -505,32 +552,17 @@ async function sendMove(r, c) {
       newGs.winLineStr = JSON.stringify(winCells);
       gameOver = true;
       gameActive = false;
-      
+
       drawBoard();
       highlightWin(winCells);
-      
-      try {
-        const { addPoints } = await import('./points.js');
-        const winAmount = currentBet * 2;
-        await addPoints('Caro', `Thắng game MP (cược ${currentBet.toLocaleString('vi-VN')})`, winAmount);
-        myPoints += winAmount;
-        updateNavPoints();
-      } catch (e) {
-        console.log('Không thể cộng điểm:', e);
-      }
-    } 
+      // Điểm được trừ/cộng gộp 1 LẦN DUY NHẤT trong settlePoints() (gọi từ handleGameState)
+      // — không xử lý ở đây để tránh cộng/trừ trùng khi onSnapshot bắn lại cho chính mình.
+    }
     else if ((gs.moveCount || 0) + 1 >= boardArr.length) {
       newGs.winner = 'draw';
       gameOver = true;
       gameActive = false;
-      try {
-        const { addPoints } = await import('./points.js');
-        await addPoints('Caro', `Hoàn cược (hòa)`, currentBet);
-        myPoints += currentBet;
-        updateNavPoints();
-      } catch (e) {
-        console.log('Không thể hoàn tiền:', e);
-      }
+      // Hòa: không ai từng bị trừ điểm nên không cần hoàn — khỏi cần settle.
     }
 
     await updateDoc(doc(db, 'rooms', roomId), {
@@ -538,9 +570,7 @@ async function sendMove(r, c) {
     });
 
     if (winCells) {
-      setTimeout(() => {
-        showResult('🏆', '🎉 Bạn thắng!', `+${(currentBet * 2).toLocaleString('vi-VN')} điểm`, `Thắng cược ${currentBet.toLocaleString('vi-VN')}`);
-      }, 500);
+      setTimeout(() => { showResult(); }, 500);
     }
 
     isMyTurn = false;
@@ -634,28 +664,11 @@ function checkWin(r, c, player) {
 // ============================================================
 //  RESULT
 // ============================================================
-function showResultFromState(gs) {
-  const winner = gs.winner;
-  if (winner === 'draw') {
-    showResult('🤝', 'Hòa!', `+${currentBet.toLocaleString('vi-VN')} (hoàn cược)`, 'Không ai thắng');
-    return;
-  }
-  const isMe = winner === myUid;
-  const memberInfo = roomData.memberInfo || {};
-  const winnerName = isMe ? 'Bạn' : (memberInfo[winner]?.name || 'Người chơi');
-
-  if (isMe) {
-    showResult('🏆', '🎉 Bạn thắng!', `+${(currentBet * 2).toLocaleString('vi-VN')} điểm`, `Thắng cược ${currentBet.toLocaleString('vi-VN')}`);
-  } else {
-    showResult('😔', `${winnerName} thắng!`, `-${currentBet.toLocaleString('vi-VN')} điểm`, 'Lần sau cố gắng nhé!');
-  }
+function showResultFromState() {
+  showResult();
 }
 
-function showResult(emoji, title, pts, sub) {
-  document.getElementById('result-emoji').textContent = emoji;
-  document.getElementById('result-title').textContent = title;
-  document.getElementById('result-pts').textContent = pts || '';
-  document.getElementById('result-sub').textContent = sub || '';
+function showResult() {
   resultModal.classList.remove('hidden');
 }
 
@@ -678,6 +691,11 @@ async function resetGameState() {
     board = Array(BOARD_SIZE * BOARD_SIZE).fill(0);
     gameOver = false;
     gameActive = true;
+    scoredThisRound = false;
+    statusBarEl.classList.remove('result-win', 'result-lose', 'result-draw');
+    if (p2El) p2El.style.display = '';
+    profitEl.textContent = '';
+    profitEl.className = 'stat-profit zero';
     currentTurn = p1;
     isMyTurn = p1 === myUid;
     
@@ -688,6 +706,7 @@ async function resetGameState() {
     mySymbol = symbols[myUid] || null;
     
     const newGs = {
+      phase: 'playing',
       board: boardStr,
       currentTurn: p1,
       winner: null,
@@ -716,72 +735,170 @@ async function resetGameState() {
 }
 
 // ============================================================
-//  READY / START
+//  VÙNG ĐẶT CƯỢC (chủ phòng chọn mức, đối thủ xác nhận — y hệt chess-mp)
 // ============================================================
-window.toggleMpReady = async function() {
-  if (!roomId || !roomData) return;
-  const memberInfo = roomData.memberInfo || {};
-  const me = memberInfo[myUid] || { name: myName, ready: false };
-  me.ready = !me.ready;
-  memberInfo[myUid] = me;
-  await updateDoc(doc(db, 'rooms', roomId), { memberInfo });
-};
+function renderBetZone(gs, isHost, oppUid) {
+  const betAmount = gs.betAmount || null;
+  const meConfirmed = !!(gs.bets && gs.bets[myUid]);
 
-window.startMpGame = async function() {
-  if (!roomId || !roomData) return;
-  if (roomData.hostUid !== myUid) {
-    window.showToast('Chỉ chủ phòng mới bắt đầu được', 'warn');
-    return;
+  if (isHost) {
+    if (!betAmount) {
+      betZoneEl.innerHTML = `
+        <div class="caro-bet-picker">
+          <div class="caro-bet-picker-label">Chọn mức cược cho ván này</div>
+          <div class="caro-bet-picker-row">
+            <input id="caro-bet-input" type="number" min="50" step="50" value="100"/>
+          </div>
+          <div class="caro-bet-quick">
+            <button type="button" onclick="caroQuickBet(100)">100</button>
+            <button type="button" onclick="caroQuickBet(200)">200</button>
+            <button type="button" onclick="caroQuickBet(500)">500</button>
+            <button type="button" onclick="caroQuickBet(1000)">1000</button>
+          </div>
+          <button class="caro-bet-confirm-btn" onclick="hostSetBet()">✅ Đặt mức cược</button>
+        </div>`;
+    } else {
+      betZoneEl.innerHTML = `<div class="caro-bet-waiting">⏳ Đã đặt mức cược <b>${betAmount.toLocaleString('vi-VN')}đ</b> — đang chờ đối thủ xác nhận...</div>`;
+    }
+  } else {
+    if (!betAmount) {
+      betZoneEl.innerHTML = `<div class="caro-bet-waiting">⏳ Đang chờ chủ phòng chọn mức cược...</div>`;
+    } else if (!meConfirmed) {
+      betZoneEl.innerHTML = `
+        <div class="caro-bet-confirm-card">
+          <div class="caro-bet-confirm-title">Chủ phòng muốn đặt cược</div>
+          <div class="caro-bet-confirm-amt">${betAmount.toLocaleString('vi-VN')}đ</div>
+          <div class="caro-bet-confirm-actions">
+            <button class="decline" onclick="declineBet()">Từ chối</button>
+            <button class="accept" onclick="acceptBet()">Đồng ý</button>
+          </div>
+        </div>`;
+    } else {
+      betZoneEl.innerHTML = `<div class="caro-bet-waiting">✅ Đã xác nhận cược ${betAmount.toLocaleString('vi-VN')}đ — đang bắt đầu ván đấu...</div>`;
+    }
   }
+
+  // Đối thủ vừa từ chối cược: chủ phòng hoàn tiền và reset để chọn lại (chỉ xử lý 1 lần)
+  if (isHost && gs.betDeclinedBy && _lastDeclineHandled !== gs.betDeclinedBy) {
+    _lastDeclineHandled = gs.betDeclinedBy;
+    refundDeclinedBet(gs);
+  }
+
+  // Cả 2 đã cược xong -> chủ phòng tự động bắt đầu trận
   const members = roomData.members || [];
-  if (members.length < 2) { 
-    window.showToast('Cần ít nhất 2 người', 'warn'); 
-    return;
+  const p1 = members[0], p2 = members[1];
+  const allBet = betAmount && p1 && p2 && (gs.bets?.[p1] || 0) > 0 && (gs.bets?.[p2] || 0) > 0;
+  if (isHost && allBet && !_autoStarting) {
+    _autoStarting = true;
+    setTimeout(() => { hostStartMatch(); }, 400);
   }
+}
 
-  if (myPoints < currentBet) {
-    window.showToast(`❌ Bạn không đủ tiền! Cần ${currentBet.toLocaleString('vi-VN')}, bạn có ${myPoints.toLocaleString('vi-VN')}`, 'error');
-    return;
-  }
-
-  try {
-    const { addPoints } = await import('./points.js');
-    await addPoints('Caro', `Đặt cược ${currentBet.toLocaleString('vi-VN')}`, -currentBet);
-    myPoints -= currentBet;
-    updateNavPoints();
-  } catch (e) {
-    window.showToast('❌ Không thể trừ tiền cược!', 'error');
-    return;
-  }
-
-  const p1 = members[0];
-  const p2 = members[1];
-  const boardStr = '.'.repeat(BOARD_SIZE * BOARD_SIZE);
-  
-  const symbols = {};
-  symbols[p1] = 'X';
-  symbols[p2] = 'O';
-
-  const gameState = {
-    board: boardStr,
-    currentTurn: p1,
-    symbols: symbols,
-    players: members,
-    winner: null,
-    winLineStr: null,
-    lastMove: null,
-    moveCount: 0,
-    bet: currentBet
-  };
-
-  await updateDoc(doc(db, 'rooms', roomId), {
-    status: 'playing',
-    gameState,
-    startedAt: serverTimestamp()
-  });
-  
-  window.showToast(`🚀 Trận đấu bắt đầu! Cược ${currentBet.toLocaleString('vi-VN')}`, 'success');
+window.caroQuickBet = function(amt) {
+  const el = document.getElementById('caro-bet-input');
+  if (el) el.value = amt;
 };
+
+window.hostSetBet = async function() {
+  const el = document.getElementById('caro-bet-input');
+  const amt = parseInt(el?.value);
+  if (!amt || amt < 50) { window.showToast('Cược tối thiểu 50', 'warn'); return; }
+  if (amt > myPoints) { window.showToast('Không đủ điểm', 'error'); return; }
+  try {
+    // Chỉ ghi nhận mức cược đã chọn, KHÔNG trừ điểm ngay — trừ/cộng gộp 1 lần lúc có kết quả
+    await updateDoc(doc(db, 'rooms', roomId), {
+      'gameState.phase': 'betting',
+      'gameState.betAmount': amt,
+      [`gameState.bets.${myUid}`]: amt
+    });
+    window.showToast('✅ Đã chọn mức cược ' + amt.toLocaleString('vi-VN') + 'đ', 'success');
+  } catch (e) {
+    console.error(e);
+    window.showToast('Lỗi khi đặt cược', 'error');
+  }
+};
+
+window.acceptBet = async function() {
+  const gs = roomData?.gameState || {};
+  const amt = gs.betAmount;
+  if (!amt || gs.bets?.[myUid]) return;
+  if (amt > myPoints) { window.showToast('Không đủ điểm để đồng ý mức cược này', 'error'); return; }
+  try {
+    // Chỉ ghi nhận xác nhận, KHÔNG trừ điểm ngay — trừ/cộng gộp 1 lần lúc có kết quả
+    await updateDoc(doc(db, 'rooms', roomId), { [`gameState.bets.${myUid}`]: amt });
+    window.showToast('✅ Đã xác nhận cược', 'success');
+  } catch (e) {
+    console.error(e);
+    window.showToast('Lỗi', 'error');
+  }
+};
+
+window.declineBet = async function() {
+  try {
+    await updateDoc(doc(db, 'rooms', roomId), { 'gameState.betDeclinedBy': myUid });
+  } catch (e) { console.error(e); }
+};
+
+// Chỉ chủ phòng gọi: reset mức cược để chọn lại (không cần hoàn tiền vì chưa từng bị trừ)
+async function refundDeclinedBet(gs) {
+  try {
+    window.showToast('↩️ Đối thủ từ chối mức cược, hãy chọn mức khác', 'info');
+    await updateDoc(doc(db, 'rooms', roomId), {
+      'gameState.betAmount': null,
+      'gameState.bets': {},
+      'gameState.betDeclinedBy': null
+    });
+  } catch (e) { console.error(e); }
+}
+
+async function hostStartMatch() {
+  try {
+    // Dùng thẳng roomData từ listener (đã fresh, vừa trigger renderBetZone) — khỏi getDoc thêm
+    if (!roomData || roomData.hostUid !== myUid) { _autoStarting = false; return; }
+    const gs = roomData.gameState || {};
+    const members = roomData.members || [];
+    if (members.length < 2) { _autoStarting = false; return; }
+    const p1 = members[0], p2 = members[1];
+    if (!((gs.bets?.[p1] || 0) > 0 && (gs.bets?.[p2] || 0) > 0)) { _autoStarting = false; return; }
+
+    currentBet = gs.betAmount;
+    const boardStr = '.'.repeat(BOARD_SIZE * BOARD_SIZE);
+    scores = { p1: 0, p2: 0 };
+    scoredThisRound = false;
+    statusBarEl.classList.remove('result-win', 'result-lose', 'result-draw');
+    if (p2El) p2El.style.display = '';
+    profitEl.textContent = '';
+    profitEl.className = 'stat-profit zero';
+
+    const symbols = {};
+    symbols[p1] = 'X';
+    symbols[p2] = 'O';
+
+    const gameState = {
+      phase: 'playing',
+      board: boardStr,
+      currentTurn: p1,
+      symbols: symbols,
+      players: members,
+      winner: null,
+      winLineStr: null,
+      lastMove: null,
+      moveCount: 0,
+      bet: currentBet,
+      bets: gs.bets
+    };
+
+    await updateDoc(doc(db, 'rooms', roomId), {
+      status: 'playing',
+      gameState,
+      startedAt: serverTimestamp()
+    });
+
+    window.showToast(`🚀 Trận đấu bắt đầu! Cược ${currentBet.toLocaleString('vi-VN')}`, 'success');
+  } finally {
+    _autoStarting = false;
+  }
+}
 
 // ============================================================
 //  LEAVE ROOM
@@ -792,16 +909,33 @@ window.leaveMpRoom = async function() {
     return;
   }
   try {
-    const snap = await getDoc(doc(db, 'rooms', roomId));
-    if (snap.exists()) {
-      const data = snap.data();
-      if (data.hostUid === myUid && data.status === 'lobby') {
+    // Dùng thẳng roomData từ listener đang có sẵn — khỏi getDoc lại (đủ mới vì listener realtime)
+    const data = roomData;
+    if (data) {
+      const gs = data.gameState || {};
+      const gsPhase = gs.phase || 'betting';
+      // Không cần hoàn cược khi rời phòng lúc đang chọn cược — vì chưa từng bị trừ điểm.
+
+      // Thoát ngang giữa ván đang chơi (chưa có kết quả) → xử thua, đối thủ được xử thắng
+      if (gsPhase === 'playing' && !gs.winner) {
+        const members = data.members || [];
+        const oppUid = members.find(u => u !== myUid);
+        if (oppUid) {
+          try {
+            const { addPoints } = await import('./points.js');
+            await addPoints('Caro', `Bỏ ván Caro MP (mức ${currentBet.toLocaleString('vi-VN')})`, -currentBet, false);
+          } catch (e) { console.error('forfeit deduct error:', e); }
+          await updateDoc(doc(db, 'rooms', roomId), { 'gameState.winner': oppUid });
+        }
+      }
+
+      if (data.hostUid === myUid && gsPhase !== 'playing') {
         await deleteDoc(doc(db, 'rooms', roomId));
       } else {
         const memberInfo = data.memberInfo || {};
         delete memberInfo[myUid];
         await updateDoc(doc(db, 'rooms', roomId), {
-          members: data.members.filter(u => u !== myUid),
+          members: (data.members || []).filter(u => u !== myUid),
           memberInfo
         });
       }
@@ -826,14 +960,55 @@ window.addEventListener('resize', () => {
 // ============================================================
 //  TOAST HELPER
 // ============================================================
-window.showToast = function(msg, type = 'info') {
-  const c = { info: '#38bdf8', success: '#34d399', warn: '#fbbf24', error: '#f87171' };
-  const t = document.createElement('div');
-  t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]||c.info};color:#e0f2fe;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;
-  t.textContent = msg;
-  document.getElementById('toastContainer').appendChild(t);
-  setTimeout(() => t.remove(), 3500);
+window.showToast = function() {
+  // Đã bỏ thông báo nổi — giữ hàm rỗng để code cũ gọi window.showToast(...) không lỗi
 };
+
+// ============================================================
+//  ĐẦU HÀNG (modal xác nhận — mẫu xiangqi-mp)
+// ============================================================
+function showResignConfirm() {
+  let modal = document.getElementById('caro-resign-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'caro-resign-modal';
+    modal.className = 'caro-modal-overlay';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div class="caro-modal-box">
+      <div class="caro-modal-title">Bạn chắc chắn muốn đầu hàng ván này?</div>
+      <div class="caro-modal-actions">
+        <button class="caro-modal-btn decline" onclick="hideResignConfirm()">Hủy</button>
+        <button class="caro-modal-btn danger" onclick="confirmResign()">🏳️ Đầu hàng</button>
+      </div>
+    </div>`;
+  modal.style.display = 'flex';
+}
+window.hideResignConfirm = function() {
+  const modal = document.getElementById('caro-resign-modal');
+  if (modal) modal.style.display = 'none';
+};
+window.confirmResign = async function() {
+  window.hideResignConfirm();
+  try {
+    await _executeResign();
+  } catch (e) {
+    console.error(e);
+    window.showToast('Lỗi khi đầu hàng, thử lại', 'error');
+  }
+};
+window.surrenderMatch = function() {
+  showResignConfirm();
+};
+async function _executeResign() {
+  if (!roomData) return;
+  const gs = roomData.gameState || {};
+  if (gs.phase !== 'playing' || gs.winner) return;
+  const oppUid = getOpponentUid();
+  if (!oppUid) return;
+  await updateDoc(doc(db, 'rooms', roomId), { 'gameState.winner': oppUid });
+}
 
 console.log('🎮 Caro Multiplayer loaded');
 console.log(`🪙 Mức cược mặc định: ${currentBet.toLocaleString('vi-VN')}`);

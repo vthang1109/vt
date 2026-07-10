@@ -57,6 +57,10 @@
   --bc-right-border: rgba(255, 255, 255, 0.85);
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
 }
+.bc-status.zero-state {
+  --bc-right: rgba(255, 255, 255, 0.18);
+  --bc-right-border: rgba(255, 255, 255, 0.9);
+}
 .bc-status *,
 .bc-status *::before,
 .bc-status *::after {
@@ -116,3 +120,7 @@
 .stat-profit.positive { color: #4ade80; }
 .stat-profit.negative { color: #f87171; }
 .stat-profit.zero { color: #ffffff; }
+
+@media (max-width: 480px) {
+  .bc-status { flex-direction: row; flex-wrap: wrap; gap: 4px; font-size: 12px; }
+}

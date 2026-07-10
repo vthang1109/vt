@@ -165,93 +165,31 @@
 }
 
 /* ===================== STATUS BAR (y hệt chess-mp) ===================== */
-.bc-status.in-check {
-  --bc-left-border: #fbbf24;
-  --bc-right-border: #ef4444;
-  animation: statusCheckBlink 0.9s ease-in-out infinite;
-}
-@keyframes statusCheckBlink {
-  0%, 100% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.3), 0 0 10px rgba(251, 191, 36, 0.15); }
-  50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.85), 0 0 34px rgba(239, 68, 68, 0.75), inset 0 0 18px rgba(239, 68, 68, 0.25); }
-}
-
+/* Khung tên người chơi (dùng chung .bc-status): y hệt .chess-player-tag của chess-mp */
 .chess-player-tag,
 .chess-player-tag.right {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
+  gap: 8px;
   font-weight: 800;
   font-size: 13px;
   color: #e0f2fe;
-  padding: 6px 14px;
-  border-radius: 8px;
-  min-width: 64px;
+  padding: 6px 12px;
+  border-radius: 10px;
   border: 1px solid transparent;
   transition: all 0.3s;
 }
+.chess-player-tag.right { flex-direction: row-reverse; }
 .chess-player-tag.active-turn {
   border-color: rgba(56, 189, 248, 0.55);
   background: rgba(56, 189, 248, 0.1);
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
-  animation: playerPulse 1s ease-in-out infinite alternate;
+  animation: chessPlayerPulse 1s ease-in-out infinite alternate;
 }
-@keyframes playerPulse {
+@keyframes chessPlayerPulse {
   from { box-shadow: 0 0 10px rgba(56, 189, 248, 0.15); }
   to   { box-shadow: 0 0 24px rgba(56, 189, 248, 0.45); }
 }
-.bc-status.in-check .chess-player-tag.active-turn {
-  animation: sideCheckBlink 0.9s ease-in-out infinite;
-}
-@keyframes sideCheckBlink {
-  0%, 100% {
-    background: rgba(239, 68, 68, 0.08);
-    border-color: rgba(239, 68, 68, 0.6);
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
-  }
-  50% {
-    background: rgba(251, 191, 36, 0.14);
-    border-color: rgba(251, 191, 36, 0.9);
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.65), 0 0 14px rgba(239, 68, 68, 0.5);
-  }
-}
-
-.chess-player-bet {
-  display: block;
-  font-size: 9px;
-  font-weight: 700;
-  color: #94a3b8;
-  font-family: 'Science Gothic', sans-serif;
-}
-.bc-status.in-progress .chess-player-bet,
-.bc-status.result-win .chess-player-bet,
-.bc-status.result-lose .chess-player-bet,
-.bc-status.result-draw .chess-player-bet {
-  display: none;
-}
-
-/* Luôn ẩn số tiền nổi phía trên — thay bằng chữ tên đối thủ khi thắng/thua */
-.chess-profit-value {
-  display: none !important;
-}
-
-/* Khi kết thúc ván: bên đối thủ hiện +/- tiền dạng phẳng (bỏ khung/viền), giống stat-profit của xidach */
-.chess-player-tag.as-profit {
-  border-color: transparent;
-  background: none;
-  box-shadow: none;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-.chess-player-tag.as-profit span:first-child {
-  font-family: 'Science Gothic', sans-serif;
-  font-weight: 800;
-  font-size: 15px;
-}
-.chess-player-tag.as-profit.positive span:first-child { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
-.chess-player-tag.as-profit.negative span:first-child { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
-.chess-player-tag.as-profit.zero span:first-child { color: #f1f5f9; }
 
 /* Chữ "CHIẾU TƯỚNG" đỏ tươi khi bị chiếu */
 .bc-status.in-check .stat-score {
