@@ -1,0 +1,1502 @@
+[
+  {
+    "id": "s1",
+    "category": "su_that",
+    "text": "Món ăn nào bạn ghét nhất mà mọi người xung quanh lại mê?"
+  },
+  {
+    "id": "s2",
+    "category": "su_that",
+    "text": "Lần gần nhất bạn nói dối là khi nào?"
+  },
+  {
+    "id": "s3",
+    "category": "su_that",
+    "text": "Bạn sợ nhất con vật gì?"
+  },
+  {
+    "id": "s4",
+    "category": "su_that",
+    "text": "Nếu được đổi tên, bạn sẽ chọn tên gì?"
+  },
+  {
+    "id": "s5",
+    "category": "su_that",
+    "text": "Bạn từng trốn học/trốn làm chưa? Vì lý do gì?"
+  },
+  {
+    "id": "s6",
+    "category": "su_that",
+    "text": "Câu nói cửa miệng của bạn là gì?"
+  },
+  {
+    "id": "s7",
+    "category": "su_that",
+    "text": "Bạn có sợ ma không? Kể 1 kỷ niệm liên quan"
+  },
+  {
+    "id": "s8",
+    "category": "su_that",
+    "text": "Nếu ngày mai là ngày cuối cùng, bạn sẽ làm gì đầu tiên?"
+  },
+  {
+    "id": "s9",
+    "category": "su_that",
+    "text": "Bạn từng bị đúp lớp hay thi lại môn nào chưa?"
+  },
+  {
+    "id": "s10",
+    "category": "su_that",
+    "text": "Ai là người bạn ngưỡng mộ nhất và vì sao?"
+  },
+  {
+    "id": "s11",
+    "category": "su_that",
+    "text": "Bạn có tin vào định mệnh không?"
+  },
+  {
+    "id": "s12",
+    "category": "su_that",
+    "text": "Kỷ niệm xấu hổ nhất thời học sinh của bạn?"
+  },
+  {
+    "id": "s13",
+    "category": "su_that",
+    "text": "Nếu trúng số 10 tỷ, việc đầu tiên bạn làm là gì?"
+  },
+  {
+    "id": "s14",
+    "category": "su_that",
+    "text": "Bạn ghét thói quen nào của bản thân nhất?"
+  },
+  {
+    "id": "s15",
+    "category": "su_that",
+    "text": "Ai trong bàn này bạn nghĩ sẽ thành công nhất sau 10 năm?"
+  },
+  {
+    "id": "s16",
+    "category": "su_that",
+    "text": "Bạn từng thất hứa với ai chưa? Chuyện gì đã xảy ra?"
+  },
+  {
+    "id": "s17",
+    "category": "su_that",
+    "text": "Nếu được sống lại 1 ngày trong quá khứ, bạn chọn ngày nào?"
+  },
+  {
+    "id": "s18",
+    "category": "su_that",
+    "text": "Bạn sợ điều gì nhất trong cuộc sống?"
+  },
+  {
+    "id": "s19",
+    "category": "su_that",
+    "text": "Mối tình đầu của bạn kết thúc như thế nào?"
+  },
+  {
+    "id": "s20",
+    "category": "su_that",
+    "text": "Bạn có đang thầm thích ai trong bàn này không?"
+  },
+  {
+    "id": "s21",
+    "category": "su_that",
+    "text": "Kiểu người bạn thích nhất ở điểm gì?"
+  },
+  {
+    "id": "s22",
+    "category": "su_that",
+    "text": "Bạn từng bị 'cắm sừng' hay từng phản bội ai chưa?"
+  },
+  {
+    "id": "s23",
+    "category": "su_that",
+    "text": "Tiêu chuẩn chọn người yêu của bạn là gì?"
+  },
+  {
+    "id": "s24",
+    "category": "su_that",
+    "text": "Bạn có còn nghĩ về người yêu cũ không?"
+  },
+  {
+    "id": "s25",
+    "category": "su_that",
+    "text": "Nụ hôn đầu của bạn diễn ra ở đâu, với ai?"
+  },
+  {
+    "id": "s26",
+    "category": "su_that",
+    "text": "Bạn nghĩ tình yêu sét đánh có thật không?"
+  },
+  {
+    "id": "s27",
+    "category": "su_that",
+    "text": "Điều gì khiến bạn 'đổ' một người nhanh nhất?"
+  },
+  {
+    "id": "s28",
+    "category": "su_that",
+    "text": "Bạn đã từng chủ động tỏ tình chưa? Kết quả ra sao?"
+  },
+  {
+    "id": "s29",
+    "category": "su_that",
+    "text": "Người yêu lý tưởng của bạn trông như thế nào?"
+  },
+  {
+    "id": "s30",
+    "category": "su_that",
+    "text": "Bạn có tin vào việc yêu xa không?"
+  },
+  {
+    "id": "s31",
+    "category": "su_that",
+    "text": "Điều gì khiến bạn dễ chia tay một mối quan hệ nhất?"
+  },
+  {
+    "id": "s32",
+    "category": "su_that",
+    "text": "Bạn từng bị từ chối tình cảm chưa? Cảm giác lúc đó thế nào?"
+  },
+  {
+    "id": "s33",
+    "category": "su_that",
+    "text": "Nếu người yêu cũ nhắn tin lại, bạn sẽ trả lời gì?"
+  },
+  {
+    "id": "s34",
+    "category": "su_that",
+    "text": "Bạn thích được tỏ tình theo cách nào nhất?"
+  },
+  {
+    "id": "s35",
+    "category": "su_that",
+    "text": "Bạn có bao giờ yêu 2 người cùng lúc không?"
+  },
+  {
+    "id": "s36",
+    "category": "su_that",
+    "text": "Điều bạn hối tiếc nhất trong chuyện tình cảm là gì?"
+  },
+  {
+    "id": "s37",
+    "category": "su_that",
+    "text": "Bạn nghĩ 'bạn thân khác giới' có tồn tại thật sự không?"
+  },
+  {
+    "id": "s38",
+    "category": "su_that",
+    "text": "Bí mật nào bạn chưa từng kể cho ai trong bàn này?"
+  },
+  {
+    "id": "s39",
+    "category": "su_that",
+    "text": "Bạn từng lấy trộm đồ của ai chưa, dù chỉ 1 lần?"
+  },
+  {
+    "id": "s40",
+    "category": "su_that",
+    "text": "Có ai trong bàn này bạn từng nói xấu sau lưng không?"
+  },
+  {
+    "id": "s41",
+    "category": "su_that",
+    "text": "Bạn từng giả vờ ốm để trốn việc/học chưa?"
+  },
+  {
+    "id": "s42",
+    "category": "su_that",
+    "text": "Số dư tài khoản ngân hàng hiện tại của bạn là bao nhiêu?"
+  },
+  {
+    "id": "s43",
+    "category": "su_that",
+    "text": "Bạn có đang giấu gia đình điều gì không?"
+  },
+  {
+    "id": "s44",
+    "category": "su_that",
+    "text": "Điều tệ nhất bạn từng làm với 1 người bạn thân là gì?"
+  },
+  {
+    "id": "s45",
+    "category": "su_that",
+    "text": "Bạn từng đọc trộm tin nhắn của người khác chưa?"
+  },
+  {
+    "id": "s46",
+    "category": "su_that",
+    "text": "Nếu phải thú nhận 1 điều xấu hổ ngay bây giờ, đó là gì?"
+  },
+  {
+    "id": "s47",
+    "category": "su_that",
+    "text": "Bạn từng nói dối bố mẹ chuyện gì nghiêm trọng nhất?"
+  },
+  {
+    "id": "s48",
+    "category": "su_that",
+    "text": "Ai là người bạn ghét nhất mà vẫn phải cười nói với họ?"
+  },
+  {
+    "id": "s49",
+    "category": "su_that",
+    "text": "Bạn từng 'ghost' (im lặng biến mất) với ai chưa?"
+  },
+  {
+    "id": "s50",
+    "category": "su_that",
+    "text": "Cuộc gọi nhỡ/tin nhắn nào bạn hối hận vì đã bỏ lỡ?"
+  },
+  {
+    "id": "s51",
+    "category": "su_that",
+    "text": "Bạn từng gian lận thi cử chưa?"
+  },
+  {
+    "id": "s52",
+    "category": "su_that",
+    "text": "Bạn có đang che giấu cảm xúc thật với ai trong bàn không?"
+  },
+  {
+    "id": "s53",
+    "category": "su_that",
+    "text": "Điều xấu hổ nhất từng xảy ra trên mạng xã hội của bạn?"
+  },
+  {
+    "id": "s54",
+    "category": "su_that",
+    "text": "Bạn từng bị bắt quả tang làm việc gì đáng xấu hổ?"
+  },
+  {
+    "id": "s55",
+    "category": "su_that",
+    "text": "Nếu điện thoại bạn bị mở công khai ngay bây giờ, điều gì sẽ lộ ra?"
+  },
+  {
+    "id": "s56",
+    "category": "su_that",
+    "text": "Bạn từng vu oan cho ai đó chưa?"
+  },
+  {
+    "id": "s57",
+    "category": "su_that",
+    "text": "Điều bạn giấu kỹ nhất về bản thân là gì?"
+  },
+  {
+    "id": "s58",
+    "category": "su_that",
+    "text": "Ai trong nhóm bạn nghĩ hay đi trễ nhất?"
+  },
+  {
+    "id": "s59",
+    "category": "su_that",
+    "text": "Đồng nghiệp/bạn nào khiến bạn khó chịu nhất mà vẫn phải cười với họ?"
+  },
+  {
+    "id": "s60",
+    "category": "su_that",
+    "text": "Bạn từng đổ lỗi cho đồng nghiệp/bạn bè để thoát tội chưa?"
+  },
+  {
+    "id": "s61",
+    "category": "su_that",
+    "text": "Ai trong nhóm này bạn nghĩ sẽ 'thay lòng đổi dạ' nhanh nhất?"
+  },
+  {
+    "id": "s62",
+    "category": "su_that",
+    "text": "Sếp/thầy cô nào bạn ghét nhất từng gặp?"
+  },
+  {
+    "id": "s63",
+    "category": "su_that",
+    "text": "Bạn từng nói xấu nhóm/tổ chức mình đang tham gia chưa?"
+  },
+  {
+    "id": "s64",
+    "category": "su_that",
+    "text": "Nếu được sa thải 1 người trong nhóm này (chỉ là trò chơi), bạn chọn ai?"
+  },
+  {
+    "id": "s65",
+    "category": "su_that",
+    "text": "Ai trong bàn này bạn nghĩ giỏi 'nịnh sếp' nhất?"
+  },
+  {
+    "id": "s66",
+    "category": "su_that",
+    "text": "Bạn từng giả vờ bận để tránh né 1 cuộc họp/hẹn nhóm chưa?"
+  },
+  {
+    "id": "s67",
+    "category": "su_that",
+    "text": "Người bạn thân nhất trong nhóm hiện tại là ai và vì sao?"
+  },
+  {
+    "id": "s68",
+    "category": "su_that",
+    "text": "Bạn nghĩ ai trong bàn sống '2 mặt' nhất?"
+  },
+  {
+    "id": "s69",
+    "category": "su_that",
+    "text": "Chuyện vui nhất bạn từng trải qua cùng nhóm này là gì?"
+  },
+  {
+    "id": "s70",
+    "category": "su_that",
+    "text": "Ai là người bạn tin tưởng nhất để giữ bí mật?"
+  },
+  {
+    "id": "s71",
+    "category": "su_that",
+    "text": "Bạn từng có cảm giác rung động với ai đó đã có đôi chưa?"
+  },
+  {
+    "id": "s72",
+    "category": "su_that",
+    "text": "Điều 'táo bạo' nhất bạn từng làm vì yêu là gì?"
+  },
+  {
+    "id": "s73",
+    "category": "su_that",
+    "text": "Bạn từng thức trắng đêm nói chuyện với ai vì quá thích họ?"
+  },
+  {
+    "id": "s74",
+    "category": "su_that",
+    "text": "Bạn nghĩ mình 'cháy' (say đắm) nhanh nhất với kiểu người nào?"
+  },
+  {
+    "id": "s75",
+    "category": "su_that",
+    "text": "Chuyện hẹn hò 'dở khóc dở cười' nhất bạn từng trải qua?"
+  },
+  {
+    "id": "s76",
+    "category": "su_that",
+    "text": "Bạn từng ghen với ai đến mức mất kiểm soát chưa?"
+  },
+  {
+    "id": "s77",
+    "category": "su_that",
+    "text": "Bạn nghĩ giữa tình và tiền, cái nào quan trọng hơn với bạn lúc này?"
+  },
+  {
+    "id": "s78",
+    "category": "su_that",
+    "text": "Nếu phải chọn 1 người trong bàn để hẹn hò thử, bạn chọn ai?"
+  },
+  {
+    "id": "s79",
+    "category": "su_that",
+    "text": "Bạn từng nhắn tin nhầm cho crush 1 tin nhắn xấu hổ chưa?"
+  },
+  {
+    "id": "s80",
+    "category": "su_that",
+    "text": "Bạn nghĩ bản thân là người chung thủy hay dễ 'xao lòng'?"
+  },
+  {
+    "id": "s81",
+    "category": "su_that",
+    "text": "Kỷ niệm hẹn hò 'quê' nhất bạn từng có?"
+  },
+  {
+    "id": "s82",
+    "category": "su_that",
+    "text": "Bạn từng yêu 1 người mà cả nhóm bạn phản đối chưa?"
+  },
+  {
+    "id": "s83",
+    "category": "su_that",
+    "text": "Bạn có từng mơ thấy người yêu cũ không? Mơ gì?"
+  },
+  {
+    "id": "s84",
+    "category": "su_that",
+    "text": "Bạn nghĩ ai trong bàn này lãng mạn nhất?"
+  },
+  {
+    "id": "s85",
+    "category": "su_that",
+    "text": "Bạn có thói quen xấu nào khi ngủ không?"
+  },
+  {
+    "id": "s86",
+    "category": "su_that",
+    "text": "Lần cuối bạn khóc là vì chuyện gì?"
+  },
+  {
+    "id": "s87",
+    "category": "su_that",
+    "text": "Bạn có từng nói dối để đi chơi với bạn bè?"
+  },
+  {
+    "id": "s88",
+    "category": "su_that",
+    "text": "Bạn thích nhất mùa nào trong năm và vì sao?"
+  },
+  {
+    "id": "s89",
+    "category": "su_that",
+    "text": "Bạn có từng lén đọc nhật ký của ai không?"
+  },
+  {
+    "id": "s90",
+    "category": "su_that",
+    "text": "Nếu được chọn một siêu năng lực, bạn chọn gì?"
+  },
+  {
+    "id": "s91",
+    "category": "su_that",
+    "text": "Bạn sợ nhất điều gì trong tương lai?"
+  },
+  {
+    "id": "s92",
+    "category": "su_that",
+    "text": "Bạn có từng hẹn hò với người hơn/ kém tuổi nhiều không?"
+  },
+  {
+    "id": "s93",
+    "category": "su_that",
+    "text": "Kỷ niệm đáng nhớ nhất với bạn thân của bạn là gì?"
+  },
+  {
+    "id": "s94",
+    "category": "su_that",
+    "text": "Bạn có tin vào linh cảm hay điềm báo không?"
+  },
+  {
+    "id": "s95",
+    "category": "su_that",
+    "text": "Nếu có một ngày được làm người khác, bạn sẽ làm ai?"
+  },
+  {
+    "id": "s96",
+    "category": "su_that",
+    "text": "Bạn có từng nói 'yêu' mà không thực lòng chưa?"
+  },
+  {
+    "id": "s97",
+    "category": "su_that",
+    "text": "Điều gì khiến bạn tự hào nhất về bản thân?"
+  },
+  {
+    "id": "s98",
+    "category": "su_that",
+    "text": "Bạn có từng bí mật thích bạn thân của mình không?"
+  },
+  {
+    "id": "s99",
+    "category": "su_that",
+    "text": "Bạn đã từng nói dối để tránh một cuộc hẹn nào chưa?"
+  },
+  {
+    "id": "s100",
+    "category": "su_that",
+    "text": "Điều xấu nhất bạn từng làm với người yêu cũ?"
+  },
+  {
+    "id": "s101",
+    "category": "su_that",
+    "text": "Bạn có từng lén xem điện thoại của người khác không?"
+  },
+  {
+    "id": "s102",
+    "category": "su_that",
+    "text": "Số tiền lớn nhất bạn từng mượn mà chưa trả?"
+  },
+  {
+    "id": "s103",
+    "category": "su_that",
+    "text": "Bạn có bao giờ giả vờ là người khác trên mạng xã hội không?"
+  },
+  {
+    "id": "s104",
+    "category": "su_that",
+    "text": "Bạn từng bị ai đó 'thả thính' mà bạn không nhận ra?"
+  },
+  {
+    "id": "s105",
+    "category": "su_that",
+    "text": "Bạn đã từng nói xấu sếp/giáo viên chưa? Nói gì?"
+  },
+  {
+    "id": "s106",
+    "category": "su_that",
+    "text": "Bạn có giấu gia đình chuyện tình cảm của mình không?"
+  },
+  {
+    "id": "s107",
+    "category": "su_that",
+    "text": "Nếu bạn phải thú nhận một bí mật động trời, đó là gì?"
+  },
+  {
+    "id": "s108",
+    "category": "su_that",
+    "text": "Bạn có thói quen gì kỳ lạ nhất?"
+  },
+  {
+    "id": "s109",
+    "category": "su_that",
+    "text": "Món ăn nào bạn không bao giờ ăn dù đói?"
+  },
+  {
+    "id": "s110",
+    "category": "su_that",
+    "text": "Bạn thích làm gì nhất khi rảnh rỗi?"
+  },
+  {
+    "id": "s111",
+    "category": "su_that",
+    "text": "Điều gì làm bạn cười nhiều nhất?"
+  },
+  {
+    "id": "s112",
+    "category": "su_that",
+    "text": "Bạn từng bị lạc đường ở đâu?"
+  },
+  {
+    "id": "s113",
+    "category": "su_that",
+    "text": "Bạn có kỷ niệm đẹp nhất với bạn thân là gì?"
+  },
+  {
+    "id": "s114",
+    "category": "su_that",
+    "text": "Bạn thích mùa nào nhất và vì sao?"
+  },
+  {
+    "id": "s115",
+    "category": "su_that",
+    "text": "Bạn có từng bắt chước ai đó không?"
+  },
+  {
+    "id": "s116",
+    "category": "su_that",
+    "text": "Nếu được đi du lịch 1 nơi, bạn chọn đâu?"
+  },
+  {
+    "id": "s117",
+    "category": "su_that",
+    "text": "Bạn thích uống gì nhất vào buổi sáng?"
+  },
+  {
+    "id": "s118",
+    "category": "su_that",
+    "text": "Bạn có từng viết nhật ký không?"
+  },
+  {
+    "id": "s119",
+    "category": "su_that",
+    "text": "Kỷ niệm đáng nhớ nhất thời đi học của bạn là gì?"
+  },
+  {
+    "id": "s120",
+    "category": "su_that",
+    "text": "Bạn có bao giờ nói chuyện với thú cưng không?"
+  },
+  {
+    "id": "s121",
+    "category": "su_that",
+    "text": "Bạn thích nghe thể loại nhạc nào nhất?"
+  },
+  {
+    "id": "s122",
+    "category": "su_that",
+    "text": "Bạn có từng hát trước đám đông không?"
+  },
+  {
+    "id": "s123",
+    "category": "su_that",
+    "text": "Màu sắc yêu thích của bạn là gì?"
+  },
+  {
+    "id": "s124",
+    "category": "su_that",
+    "text": "Bạn có thích xem phim kinh dị không?"
+  },
+  {
+    "id": "s125",
+    "category": "su_that",
+    "text": "Bạn có từng đọc sách trong tháng này không?"
+  },
+  {
+    "id": "s126",
+    "category": "su_that",
+    "text": "Bạn thích ăn gì nhất khi buồn?"
+  },
+  {
+    "id": "s127",
+    "category": "su_that",
+    "text": "Bạn có bao giờ đi du lịch một mình không?"
+  },
+  {
+    "id": "s128",
+    "category": "su_that",
+    "text": "Bạn có từng tham gia hoạt động từ thiện không?"
+  },
+  {
+    "id": "s129",
+    "category": "su_that",
+    "text": "Bạn thích chơi môn thể thao nào nhất?"
+  },
+  {
+    "id": "s130",
+    "category": "su_that",
+    "text": "Bạn có bao giờ trồng cây không?"
+  },
+  {
+    "id": "s131",
+    "category": "su_that",
+    "text": "Bạn có thích nấu ăn không? Món bạn giỏi nhất là gì?"
+  },
+  {
+    "id": "s132",
+    "category": "su_that",
+    "text": "Bạn có từng viết thư tay cho ai không?"
+  },
+  {
+    "id": "s133",
+    "category": "su_that",
+    "text": "Bạn thích đi đâu để thư giãn nhất?"
+  },
+  {
+    "id": "s134",
+    "category": "su_that",
+    "text": "Bạn có từng bị ngã trước đám đông không?"
+  },
+  {
+    "id": "s135",
+    "category": "su_that",
+    "text": "Bạn có bao giờ làm quen với người lạ không?"
+  },
+  {
+    "id": "s136",
+    "category": "su_that",
+    "text": "Bạn thích ngủ sớm hay thức khuya?"
+  },
+  {
+    "id": "s137",
+    "category": "su_that",
+    "text": "Bạn có từng đi bộ dưới mưa không?"
+  },
+  {
+    "id": "s138",
+    "category": "su_that",
+    "text": "Bạn có sở thích gì đặc biệt không?"
+  },
+  {
+    "id": "s139",
+    "category": "su_that",
+    "text": "Bạn có từng đóng kịch không?"
+  },
+  {
+    "id": "s140",
+    "category": "su_that",
+    "text": "Bạn thích uống trà hay cà phê?"
+  },
+  {
+    "id": "s141",
+    "category": "su_that",
+    "text": "Bạn có từng nhặt được đồ gì không?"
+  },
+  {
+    "id": "s142",
+    "category": "su_that",
+    "text": "Bạn có kỷ niệm buồn nhất là gì?"
+  },
+  {
+    "id": "s143",
+    "category": "su_that",
+    "text": "Bạn thích món ăn vặt gì nhất?"
+  },
+  {
+    "id": "s144",
+    "category": "su_that",
+    "text": "Bạn có từng làm vỡ đồ gì quan trọng không?"
+  },
+  {
+    "id": "s145",
+    "category": "su_that",
+    "text": "Bạn có thích mùi gì nhất?"
+  },
+  {
+    "id": "s146",
+    "category": "su_that",
+    "text": "Bạn có từng ngắm hoàng hôn không?"
+  },
+  {
+    "id": "s147",
+    "category": "su_that",
+    "text": "Bạn thích xem phim thể loại nào nhất?"
+  },
+  {
+    "id": "s148",
+    "category": "su_that",
+    "text": "Bạn có từng tập thể dục thường xuyên không?"
+  },
+  {
+    "id": "s149",
+    "category": "su_that",
+    "text": "Bạn có bao giờ đếm sao không?"
+  },
+  {
+    "id": "s150",
+    "category": "su_that",
+    "text": "Bạn có từng viết thơ không?"
+  },
+  {
+    "id": "s151",
+    "category": "su_that",
+    "text": "Bạn thích loài hoa gì nhất?"
+  },
+  {
+    "id": "s152",
+    "category": "su_that",
+    "text": "Bạn có từng làm bánh không?"
+  },
+  {
+    "id": "s153",
+    "category": "su_that",
+    "text": "Bạn có thói quen xấu nào khi học không?"
+  },
+  {
+    "id": "s154",
+    "category": "su_that",
+    "text": "Bạn có từng đi cắm trại không?"
+  },
+  {
+    "id": "s155",
+    "category": "su_that",
+    "text": "Bạn có thích mặc đồ gì nhất?"
+  },
+  {
+    "id": "s156",
+    "category": "su_that",
+    "text": "Bạn có từng tham gia cuộc thi không?"
+  },
+  {
+    "id": "s157",
+    "category": "su_that",
+    "text": "Bạn có bao giờ chơi game không?"
+  },
+  {
+    "id": "s158",
+    "category": "su_that",
+    "text": "Bạn có từng làm điều gì ngốc nghếch nhất?"
+  },
+  {
+    "id": "s159",
+    "category": "su_that",
+    "text": "Bạn có thích đi biển không?"
+  },
+  {
+    "id": "s160",
+    "category": "su_that",
+    "text": "Bạn có từng lên núi không?"
+  },
+  {
+    "id": "s161",
+    "category": "su_that",
+    "text": "Bạn có thích mùa đông không?"
+  },
+  {
+    "id": "s162",
+    "category": "su_that",
+    "text": "Bạn có từng làm hoạt hình cho ai không?"
+  },
+  {
+    "id": "s163",
+    "category": "su_that",
+    "text": "Bạn có bao giờ nghe nhạc khi ngủ không?"
+  },
+  {
+    "id": "s164",
+    "category": "su_that",
+    "text": "Bạn có từng viết thư cho tương lai không?"
+  },
+  {
+    "id": "s165",
+    "category": "su_that",
+    "text": "Bạn có thích xem hoạt hình không?"
+  },
+  {
+    "id": "s166",
+    "category": "su_that",
+    "text": "Bạn có từng chơi với trẻ em không?"
+  },
+  {
+    "id": "s167",
+    "category": "su_that",
+    "text": "Bạn có bao giờ làm vườn không?"
+  },
+  {
+    "id": "s168",
+    "category": "su_that",
+    "text": "Bạn có từng nuôi cá không?"
+  },
+  {
+    "id": "s169",
+    "category": "su_that",
+    "text": "Bạn có thích mùa thu không?"
+  },
+  {
+    "id": "s170",
+    "category": "su_that",
+    "text": "Bạn có từng chụp ảnh phong cảnh không?"
+  },
+  {
+    "id": "s171",
+    "category": "su_that",
+    "text": "Bạn có bao giờ xem bình minh không?"
+  },
+  {
+    "id": "s172",
+    "category": "su_that",
+    "text": "Bạn có từng làm đồ thủ công không?"
+  },
+  {
+    "id": "s173",
+    "category": "su_that",
+    "text": "Bạn có thích món tráng miệng gì nhất?"
+  },
+  {
+    "id": "s174",
+    "category": "su_that",
+    "text": "Bạn có từng đi ăn một mình không?"
+  },
+  {
+    "id": "s175",
+    "category": "su_that",
+    "text": "Bạn có bao giờ tặng hoa cho ai không?"
+  },
+  {
+    "id": "s176",
+    "category": "su_that",
+    "text": "Bạn có từng được tặng hoa không?"
+  },
+  {
+    "id": "s177",
+    "category": "su_that",
+    "text": "Bạn có thích nghe mưa không?"
+  },
+  {
+    "id": "s178",
+    "category": "su_that",
+    "text": "Bạn có từng dùng đồ cũ không?"
+  },
+  {
+    "id": "s179",
+    "category": "su_that",
+    "text": "Bạn có bao giờ đi xem phim một mình không?"
+  },
+  {
+    "id": "s180",
+    "category": "su_that",
+    "text": "Bạn có từng hát karaoke không?"
+  },
+  {
+    "id": "s181",
+    "category": "su_that",
+    "text": "Bạn có thích mua sắm không?"
+  },
+  {
+    "id": "s182",
+    "category": "su_that",
+    "text": "Bạn có từng đi chợ không?"
+  },
+  {
+    "id": "s183",
+    "category": "su_that",
+    "text": "Bạn có bao giờ làm bữa sáng cho ai không?"
+  },
+  {
+    "id": "s184",
+    "category": "su_that",
+    "text": "Bạn có từng đón xe buýt không?"
+  },
+  {
+    "id": "s185",
+    "category": "su_that",
+    "text": "Bạn có thích đi bộ không?"
+  },
+  {
+    "id": "s186",
+    "category": "su_that",
+    "text": "Bạn có từng đi xe đạp không?"
+  },
+  {
+    "id": "s187",
+    "category": "su_that",
+    "text": "Bạn có bao giờ tắm mưa không?"
+  },
+  {
+    "id": "s188",
+    "category": "su_that",
+    "text": "Bạn có từng phơi nắng không?"
+  },
+  {
+    "id": "s189",
+    "category": "su_that",
+    "text": "Bạn có thích kem gì nhất?"
+  },
+  {
+    "id": "s190",
+    "category": "su_that",
+    "text": "Bạn có từng ăn vặt đêm không?"
+  },
+  {
+    "id": "s191",
+    "category": "su_that",
+    "text": "Bạn có bao giờ thức trắng không?"
+  },
+  {
+    "id": "s192",
+    "category": "su_that",
+    "text": "Bạn có từng ngủ gật trong giờ học không?"
+  },
+  {
+    "id": "s193",
+    "category": "su_that",
+    "text": "Bạn có thích mùi bánh mì nướng không?"
+  },
+  {
+    "id": "s194",
+    "category": "su_that",
+    "text": "Bạn có từng nấu mì không?"
+  },
+  {
+    "id": "s195",
+    "category": "su_that",
+    "text": "Bạn có bao giờ ăn cơm với ai không?"
+  },
+  {
+    "id": "s196",
+    "category": "su_that",
+    "text": "Bạn có từng rửa bát không?"
+  },
+  {
+    "id": "s197",
+    "category": "su_that",
+    "text": "Bạn có thích lau nhà không?"
+  },
+  {
+    "id": "s198",
+    "category": "su_that",
+    "text": "Bạn có từng dọn dẹp phòng không?"
+  },
+  {
+    "id": "s199",
+    "category": "su_that",
+    "text": "Bạn có bao giờ sắp xếp sách không?"
+  },
+  {
+    "id": "s200",
+    "category": "su_that",
+    "text": "Bạn có từng tưới cây không?"
+  },
+  {
+    "id": "s201",
+    "category": "su_that",
+    "text": "Bạn có thích mùi cỏ mới cắt không?"
+  },
+  {
+    "id": "s202",
+    "category": "su_that",
+    "text": "Bạn có từng đi bộ trên bãi biển không?"
+  },
+  {
+    "id": "s203",
+    "category": "su_that",
+    "text": "Bạn có bao giờ ngắm trăng không?"
+  },
+  {
+    "id": "s204",
+    "category": "su_that",
+    "text": "Bạn có từng đếm cừu để ngủ không?"
+  },
+  {
+    "id": "s205",
+    "category": "su_that",
+    "text": "Bạn có thích gối ôm không?"
+  },
+  {
+    "id": "s206",
+    "category": "su_that",
+    "text": "Bạn có từng mặc áo ngược không?"
+  },
+  {
+    "id": "s207",
+    "category": "su_that",
+    "text": "Bạn có bao giờ quên sinh nhật của ai không?"
+  },
+  {
+    "id": "s208",
+    "category": "su_that",
+    "text": "Bạn đã từng hối hận vì điều gì nhất?"
+  },
+  {
+    "id": "s209",
+    "category": "su_that",
+    "text": "Ai là người bạn yêu quý nhất trong gia đình?"
+  },
+  {
+    "id": "s210",
+    "category": "su_that",
+    "text": "Bạn có bao giờ nói dối để bảo vệ ai đó không?"
+  },
+  {
+    "id": "s211",
+    "category": "su_that",
+    "text": "Bạn có từng bí mật thích ai đó trong lớp không?"
+  },
+  {
+    "id": "s212",
+    "category": "su_that",
+    "text": "Bạn đã từng bị ai đó làm tổn thương nhất?"
+  },
+  {
+    "id": "s213",
+    "category": "su_that",
+    "text": "Bạn có bao giờ ghen với bạn thân không?"
+  },
+  {
+    "id": "s214",
+    "category": "su_that",
+    "text": "Điều bạn sợ nhất trong tình yêu là gì?"
+  },
+  {
+    "id": "s215",
+    "category": "su_that",
+    "text": "Bạn đã từng bỏ lỡ cơ hội nào quan trọng không?"
+  },
+  {
+    "id": "s216",
+    "category": "su_that",
+    "text": "Bạn có bao giờ giấu chuyện gì với bố mẹ không?"
+  },
+  {
+    "id": "s217",
+    "category": "su_that",
+    "text": "Bạn có từng yêu một người không đáp lại không?"
+  },
+  {
+    "id": "s218",
+    "category": "su_that",
+    "text": "Ai là người ảnh hưởng nhiều nhất đến bạn?"
+  },
+  {
+    "id": "s219",
+    "category": "su_that",
+    "text": "Bạn đã từng làm gì để gây ấn tượng với ai đó?"
+  },
+  {
+    "id": "s220",
+    "category": "su_that",
+    "text": "Bạn có bao giờ bị bạn thân phản bội không?"
+  },
+  {
+    "id": "s221",
+    "category": "su_that",
+    "text": "Bạn có từng quyết định thay đổi cuộc đời không?"
+  },
+  {
+    "id": "s222",
+    "category": "su_that",
+    "text": "Điều bạn tự hào nhất về bản thân là gì?"
+  },
+  {
+    "id": "s223",
+    "category": "su_that",
+    "text": "Bạn đã từng làm ai đó khóc chưa?"
+  },
+  {
+    "id": "s224",
+    "category": "su_that",
+    "text": "Bạn có bao giờ nhận ra mình sai nhưng không dám nhận không?"
+  },
+  {
+    "id": "s225",
+    "category": "su_that",
+    "text": "Bạn có từng bị áp lực từ gia đình không?"
+  },
+  {
+    "id": "s226",
+    "category": "su_that",
+    "text": "Điều gì làm bạn tự ti nhất?"
+  },
+  {
+    "id": "s227",
+    "category": "su_that",
+    "text": "Bạn có từng đánh mất một người bạn quan trọng không?"
+  },
+  {
+    "id": "s228",
+    "category": "su_that",
+    "text": "Bạn có bao giờ nói chuyện với người lạ trên mạng không?"
+  },
+  {
+    "id": "s229",
+    "category": "su_that",
+    "text": "Bạn đã từng làm gì để vượt qua nỗi buồn?"
+  },
+  {
+    "id": "s230",
+    "category": "su_that",
+    "text": "Bạn có từng có mâu thuẫn với sếp/thầy cô không?"
+  },
+  {
+    "id": "s231",
+    "category": "su_that",
+    "text": "Bạn có bao giờ cảm thấy cô đơn dù đang ở đám đông không?"
+  },
+  {
+    "id": "s232",
+    "category": "su_that",
+    "text": "Bạn có từng viết thư tình cho ai không?"
+  },
+  {
+    "id": "s233",
+    "category": "su_that",
+    "text": "Bạn có bao giờ nhận được thư tình không?"
+  },
+  {
+    "id": "s234",
+    "category": "su_that",
+    "text": "Điều gì khiến bạn tức giận nhất?"
+  },
+  {
+    "id": "s235",
+    "category": "su_that",
+    "text": "Bạn có từng bỏ cuộc giữa chừng vì nản không?"
+  },
+  {
+    "id": "s236",
+    "category": "su_that",
+    "text": "Bạn có bao giờ cảm thấy mình không đủ tốt không?"
+  },
+  {
+    "id": "s237",
+    "category": "su_that",
+    "text": "Bạn đã từng nói 'không' khi muốn nói 'có' không?"
+  },
+  {
+    "id": "s238",
+    "category": "su_that",
+    "text": "Bạn có từng giúp đỡ người xấu mà không biết không?"
+  },
+  {
+    "id": "s239",
+    "category": "su_that",
+    "text": "Bạn có bao giờ hối hận vì đã im lặng không?"
+  },
+  {
+    "id": "s240",
+    "category": "su_that",
+    "text": "Bạn có từng làm điều gì đó vì người khác mà họ không biết không?"
+  },
+  {
+    "id": "s241",
+    "category": "su_that",
+    "text": "Bạn có bao giờ bị người khác hiểu lầm không?"
+  },
+  {
+    "id": "s242",
+    "category": "su_that",
+    "text": "Bạn đã từng bỏ qua cơ hội nào vì sợ hãi không?"
+  },
+  {
+    "id": "s243",
+    "category": "su_that",
+    "text": "Bạn có từng có khoảng cách với gia đình không?"
+  },
+  {
+    "id": "s244",
+    "category": "su_that",
+    "text": "Bạn có bao giờ muốn thay đổi một điều ở quá khứ không?"
+  },
+  {
+    "id": "s245",
+    "category": "su_that",
+    "text": "Điều gì làm bạn cảm thấy an toàn nhất?"
+  },
+  {
+    "id": "s246",
+    "category": "su_that",
+    "text": "Bạn có từng thất vọng về người mình yêu không?"
+  },
+  {
+    "id": "s247",
+    "category": "su_that",
+    "text": "Bạn có bao giờ giấu nỗi buồn của mình không?"
+  },
+  {
+    "id": "s248",
+    "category": "su_that",
+    "text": "Bạn đã từng làm người khác thất vọng chưa?"
+  },
+  {
+    "id": "s249",
+    "category": "su_that",
+    "text": "Bạn có từng cố gắng để được ai đó công nhận không?"
+  },
+  {
+    "id": "s250",
+    "category": "su_that",
+    "text": "Bạn có bao giờ tự hỏi mình là ai không?"
+  },
+  {
+    "id": "s251",
+    "category": "su_that",
+    "text": "Bạn có từng tha thứ cho người đã làm tổn thương bạn không?"
+  },
+  {
+    "id": "s252",
+    "category": "su_that",
+    "text": "Bạn có bao giờ không tha thứ cho ai đó không?"
+  },
+  {
+    "id": "s253",
+    "category": "su_that",
+    "text": "Điều gì làm bạn mất niềm tin nhất?"
+  },
+  {
+    "id": "s254",
+    "category": "su_that",
+    "text": "Bạn có từng bị từ chối vì không đủ giỏi không?"
+  },
+  {
+    "id": "s255",
+    "category": "su_that",
+    "text": "Bạn có bao giờ tự hào về một điều nhỏ nhặt không?"
+  },
+  {
+    "id": "s256",
+    "category": "su_that",
+    "text": "Bạn đã từng có kỷ niệm khó quên với ai không?"
+  },
+  {
+    "id": "s257",
+    "category": "su_that",
+    "text": "Bạn có từng bị ám ảnh bởi một kỷ niệm không?"
+  },
+  {
+    "id": "s258",
+    "category": "su_that",
+    "text": "Bạn có bao giờ lo sợ về tương lai không?"
+  },
+  {
+    "id": "s259",
+    "category": "su_that",
+    "text": "Bạn có từng làm điều trái với lương tâm không?"
+  },
+  {
+    "id": "s260",
+    "category": "su_that",
+    "text": "Bạn có bao giờ cảm thấy mình may mắn không?"
+  },
+  {
+    "id": "s261",
+    "category": "su_that",
+    "text": "Bạn có từng bị mất niềm tin vào tình bạn không?"
+  },
+  {
+    "id": "s262",
+    "category": "su_that",
+    "text": "Bạn có bao giờ yêu ngay từ cái nhìn đầu tiên không?"
+  },
+  {
+    "id": "s263",
+    "category": "su_that",
+    "text": "Bạn có từng có một bí mật mà không ai biết không?"
+  },
+  {
+    "id": "s264",
+    "category": "su_that",
+    "text": "Bạn có bao giờ làm điều gì điên rồ vì tình yêu không?"
+  },
+  {
+    "id": "s265",
+    "category": "su_that",
+    "text": "Bạn có từng mất kết nối với một người quan trọng không?"
+  },
+  {
+    "id": "s266",
+    "category": "su_that",
+    "text": "Bạn có bao giờ cảm thấy bị bỏ rơi không?"
+  },
+  {
+    "id": "s267",
+    "category": "su_that",
+    "text": "Bạn có từng giúp đỡ một người khó khăn mà không mong đền đáp không?"
+  },
+  {
+    "id": "s268",
+    "category": "su_that",
+    "text": "Bạn có từng yêu hai người cùng lúc không?"
+  },
+  {
+    "id": "s269",
+    "category": "su_that",
+    "text": "Điều tệ nhất bạn từng làm trong một mối quan hệ là gì?"
+  },
+  {
+    "id": "s270",
+    "category": "su_that",
+    "text": "Bạn có bao giờ ngoại tình về cảm xúc không?"
+  },
+  {
+    "id": "s271",
+    "category": "su_that",
+    "text": "Bạn có từng bị phản bội trong tình yêu không?"
+  },
+  {
+    "id": "s272",
+    "category": "su_that",
+    "text": "Bạn có từng lợi dụng ai đó không?"
+  },
+  {
+    "id": "s273",
+    "category": "su_that",
+    "text": "Bạn có bao giờ nói dối về những điều quan trọng nhất?"
+  },
+  {
+    "id": "s274",
+    "category": "su_that",
+    "text": "Bạn có từng làm tổn thương ai đó cố ý không?"
+  },
+  {
+    "id": "s275",
+    "category": "su_that",
+    "text": "Bạn có bao giờ hối hận vì đã yêu ai đó không?"
+  },
+  {
+    "id": "s276",
+    "category": "su_that",
+    "text": "Bạn có từng có mối quan hệ bí mật không?"
+  },
+  {
+    "id": "s277",
+    "category": "su_that",
+    "text": "Bạn có bao giờ chọn tình yêu hơn gia đình không?"
+  },
+  {
+    "id": "s278",
+    "category": "su_that",
+    "text": "Bạn có từng đố kỵ với thành công của người khác không?"
+  },
+  {
+    "id": "s279",
+    "category": "su_that",
+    "text": "Bạn có bao giờ nói xấu người mà bạn vẫn tỏ ra thân không?"
+  },
+  {
+    "id": "s280",
+    "category": "su_that",
+    "text": "Bạn có từng lừa dối ai đó vì lợi ích cá nhân không?"
+  },
+  {
+    "id": "s281",
+    "category": "su_that",
+    "text": "Bạn có bao giờ cảm thấy tội lỗi vì đã làm gì đó không?"
+  },
+  {
+    "id": "s282",
+    "category": "su_that",
+    "text": "Bạn có từng đặt điều kiện trong tình yêu không?"
+  },
+  {
+    "id": "s283",
+    "category": "su_that",
+    "text": "Bạn có bao giờ chờ đợi một người không xứng đáng không?"
+  },
+  {
+    "id": "s284",
+    "category": "su_that",
+    "text": "Bạn có từng giả vờ yêu ai đó không?"
+  },
+  {
+    "id": "s285",
+    "category": "su_that",
+    "text": "Bạn có bao giờ bỏ rơi một người khi họ cần bạn nhất không?"
+  },
+  {
+    "id": "s286",
+    "category": "su_that",
+    "text": "Bạn có từng có suy nghĩ tiêu cực về bản thân không?"
+  },
+  {
+    "id": "s287",
+    "category": "su_that",
+    "text": "Bạn có bao giờ muốn trả thù ai đó không?"
+  },
+  {
+    "id": "s288",
+    "category": "su_that",
+    "text": "Bạn có từng làm điều gì đó vì ghen tuông không?"
+  },
+  {
+    "id": "s289",
+    "category": "su_that",
+    "text": "Bạn có bao giờ giấu một bí mật quá lớn không?"
+  },
+  {
+    "id": "s290",
+    "category": "su_that",
+    "text": "Bạn có từng hy sinh hạnh phúc của mình vì người khác không?"
+  },
+  {
+    "id": "s291",
+    "category": "su_that",
+    "text": "Bạn có bao giờ cảm thấy mình là người xấu không?"
+  },
+  {
+    "id": "s292",
+    "category": "su_that",
+    "text": "Bạn có từng cố gắng thay đổi ai đó không?"
+  },
+  {
+    "id": "s293",
+    "category": "su_that",
+    "text": "Bạn có bao giờ làm điều gì đó mất kiểm soát không?"
+  },
+  {
+    "id": "s294",
+    "category": "su_that",
+    "text": "Bạn có từng phải lựa chọn giữa tình bạn và tình yêu không?"
+  },
+  {
+    "id": "s295",
+    "category": "su_that",
+    "text": "Bạn có bao giờ cảm thấy mình không xứng đáng với hạnh phúc không?"
+  },
+  {
+    "id": "s296",
+    "category": "su_that",
+    "text": "Bạn có từng làm điều gì đó khiến bạn mất ngủ không?"
+  },
+  {
+    "id": "s297",
+    "category": "su_that",
+    "text": "Bạn có bao giờ chấp nhận tình yêu chỉ vì sợ cô đơn không?"
+  },
+  {
+    "id": "s298",
+    "category": "su_that",
+    "text": "Bạn có từng nói dối để tránh một cuộc chia tay không?"
+  },
+  {
+    "id": "s299",
+    "category": "su_that",
+    "text": "Bạn có bao giờ nghĩ về việc không tồn tại nữa không?"
+  },
+  {
+    "id": "s300",
+    "category": "su_that",
+    "text": "Bạn có từng phải giữ bí mật cho ai đó và nó ám ảnh bạn không?"
+  }
+]

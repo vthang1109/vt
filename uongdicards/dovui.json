@@ -1,0 +1,807 @@
+[
+  {
+    "id": "q1",
+    "category": "do_vui",
+    "text": "🧠 Cái gì càng ngày càng nhỏ đi nếu bạn không dùng nó? (Đáp án: Cục xà phòng)"
+  },
+  {
+    "id": "q2",
+    "category": "do_vui",
+    "text": "🧠 Cái gì có đầu mà không có mắt, có thân mà không có chân? (Đáp án: Con rắn)"
+  },
+  {
+    "id": "q3",
+    "category": "do_vui",
+    "text": "🧠 Vật gì đi khắp thế giới mà chỉ đứng yên 1 chỗ? (Đáp án: Con tem)"
+  },
+  {
+    "id": "q4",
+    "category": "do_vui",
+    "text": "🧠 Cái gì bạn có thể bắt nhưng không thể ném? (Đáp án: Cảm lạnh (bị cảm))"
+  },
+  {
+    "id": "q5",
+    "category": "do_vui",
+    "text": "🧠 Càng lau càng bẩn, đó là gì? (Đáp án: Nước lau nhà / khăn lau)"
+  },
+  {
+    "id": "q6",
+    "category": "do_vui",
+    "text": "🧠 Cái gì luôn đi mà không bao giờ tới? (Đáp án: Ngày mai)"
+  },
+  {
+    "id": "q7",
+    "category": "do_vui",
+    "text": "🧠 Tháng nào trong năm có 28 ngày? (Đáp án: Tất cả các tháng đều có ít nhất 28 ngày)"
+  },
+  {
+    "id": "q8",
+    "category": "do_vui",
+    "text": "🧠 Vật gì có 4 chân nhưng không đi được? (Đáp án: Cái bàn / cái ghế)"
+  },
+  {
+    "id": "q9",
+    "category": "do_vui",
+    "text": "🧠 Cái gì mà càng lấy đi thì nó càng lớn? (Đáp án: Cái hố)"
+  },
+  {
+    "id": "q10",
+    "category": "do_vui",
+    "text": "🧠 Con gì đi bằng đầu? (Đáp án: Con người (đội mũ đi bằng chân, còn 'đi bằng đầu' là ẩn dụ - đố mẹo cho vui, tự chế đáp án hợp lý))"
+  },
+  {
+    "id": "q11",
+    "category": "do_vui",
+    "text": "🧠 Bạn mua tôi để ăn nhưng lại không ăn tôi, tôi là gì? (Đáp án: Cái đĩa/chén)"
+  },
+  {
+    "id": "q12",
+    "category": "do_vui",
+    "text": "🧠 Nó có thành phố nhưng không có nhà, có núi nhưng không có cây, có nước nhưng không có cá. Nó là gì? (Đáp án: Bản đồ)"
+  },
+  {
+    "id": "q13",
+    "category": "do_vui",
+    "text": "🧠 Cái gì luôn ở trước mặt bạn nhưng bạn không bao giờ nhìn thấy được? (Đáp án: Tương lai)"
+  },
+  {
+    "id": "q14",
+    "category": "do_vui",
+    "text": "🧠 Cái gì mà khi bạn cho đi thì nó vẫn còn nguyên? (Đáp án: Lời hứa / kiến thức)"
+  },
+  {
+    "id": "q15",
+    "category": "do_vui",
+    "text": "🧠 Vật gì có răng mà không nhai được? (Đáp án: Cái lược / cái cưa)"
+  },
+  {
+    "id": "q16",
+    "category": "do_vui",
+    "text": "🧠 Có 1 con vật, người ta cắt đuôi nó thì nó chạy nhanh hơn, đó là con gì? (Đáp án: Con diều (dây diều))"
+  },
+  {
+    "id": "q17",
+    "category": "do_vui",
+    "text": "🧠 Cái gì luôn tăng nhưng không bao giờ giảm khi bạn còn sống? (Đáp án: Tuổi)"
+  },
+  {
+    "id": "q18",
+    "category": "do_vui",
+    "text": "🧠 Cái gì bạn càng đổ nước vào thì nó càng nhẹ? (Đáp án: Cái phao / bong bóng nước (nhẹ hơn tương đối vì nổi))"
+  },
+  {
+    "id": "q19",
+    "category": "do_vui",
+    "text": "🧠 Ổ khóa nào mà không cần chìa để mở? (Đáp án: Ổ khóa số / khóa vân tay)"
+  },
+  {
+    "id": "q20",
+    "category": "do_vui",
+    "text": "🧠 Cái gì luôn nằm giữa trời và đất mà bạn không thể chạm tới? (Đáp án: Chữ 'và')"
+  },
+  {
+    "id": "q21",
+    "category": "do_vui",
+    "text": "🧠 Vật gì bạn không thể giữ được quá 1 phút dù rất nhẹ? (Đáp án: Hơi thở khi nín thở)"
+  },
+  {
+    "id": "q22",
+    "category": "do_vui",
+    "text": "🧠 Cầu gì mà không ai đi qua được? (Đáp án: Cầu vồng)"
+  },
+  {
+    "id": "q23",
+    "category": "do_vui",
+    "text": "🧠 Cái gì trong nhà bếp mà càng nóng càng dễ vỡ? (Đáp án: Đá lạnh (ngược - nóng thì đá tan không vỡ; đố mẹo: ly thủy tinh))"
+  },
+  {
+    "id": "q24",
+    "category": "do_vui",
+    "text": "🧠 Con gì ăn no rồi vẫn kêu đói? (Đáp án: Con dao (kêu 'đói' - đố mẹo dân gian, ý là con gì luôn 'kêu' như vậy))"
+  },
+  {
+    "id": "q25",
+    "category": "do_vui",
+    "text": "🧠 Nhà nào không có cửa sổ và cửa ra vào? (Đáp án: Nấm (nhà nấm - đố mẹo dân gian))"
+  },
+  {
+    "id": "q26",
+    "category": "do_vui",
+    "text": "🧠 Cái gì mà bạn phải làm vỡ trước khi dùng nó? (Đáp án: Quả trứng)"
+  },
+  {
+    "id": "q27",
+    "category": "do_vui",
+    "text": "🧠 Vua nào không có ngai vàng? (Đáp án: Vua Hùng thời khai quốc (mở, chấp nhận nhiều đáp án dí dỏm))"
+  },
+  {
+    "id": "q28",
+    "category": "do_vui",
+    "text": "🧠 Cây gì không có lá? (Đáp án: Cây... kim (cây kim, cây tiền không có lá theo nghĩa đen))"
+  },
+  {
+    "id": "q29",
+    "category": "do_vui",
+    "text": "🧠 Cái gì đứng yên mà lại đi khắp thế gian? (Đáp án: Con đường)"
+  },
+  {
+    "id": "q30",
+    "category": "do_vui",
+    "text": "🧠 Con gì càng to càng nhẹ, càng nhỏ càng nặng? (Đáp án: Cục đá bọt so với cục đá thường (đố mẹo, đáp án linh hoạt: bong bóng bay))"
+  },
+  {
+    "id": "q31",
+    "category": "do_vui",
+    "text": "🧠 Thủ đô của Việt Nam là gì? (Đáp án: Hà Nội)"
+  },
+  {
+    "id": "q32",
+    "category": "do_vui",
+    "text": "🧠 Việt Nam có bao nhiêu tỉnh thành hiện nay (trước sáp nhập 2025)? (Đáp án: 63 tỉnh thành)"
+  },
+  {
+    "id": "q33",
+    "category": "do_vui",
+    "text": "🧠 Sông dài nhất Việt Nam là sông nào? (Đáp án: Sông Mê Kông (đoạn qua VN gọi là sông Cửu Long/Tiền Giang-Hậu Giang))"
+  },
+  {
+    "id": "q34",
+    "category": "do_vui",
+    "text": "🧠 Đỉnh núi cao nhất Việt Nam là gì? (Đáp án: Fansipan)"
+  },
+  {
+    "id": "q35",
+    "category": "do_vui",
+    "text": "🧠 Ai là vị vua đầu tiên của nhà Nguyễn? (Đáp án: Vua Gia Long)"
+  },
+  {
+    "id": "q36",
+    "category": "do_vui",
+    "text": "🧠 Chợ Bến Thành nằm ở thành phố nào? (Đáp án: TP. Hồ Chí Minh)"
+  },
+  {
+    "id": "q37",
+    "category": "do_vui",
+    "text": "🧠 Việt Nam giành huy chương vàng Olympic đầu tiên ở môn gì? (Đáp án: Bắn súng (Hoàng Xuân Vinh, Rio 2016))"
+  },
+  {
+    "id": "q38",
+    "category": "do_vui",
+    "text": "🧠 1 năm có bao nhiêu tuần? (Đáp án: 52 tuần)"
+  },
+  {
+    "id": "q39",
+    "category": "do_vui",
+    "text": "🧠 Loài động vật nào được coi là biểu tượng quốc gia của Úc (cùng đà điểu emu)? (Đáp án: Kangaroo)"
+  },
+  {
+    "id": "q40",
+    "category": "do_vui",
+    "text": "🧠 Ngọn núi cao nhất thế giới là gì? (Đáp án: Everest)"
+  },
+  {
+    "id": "q41",
+    "category": "do_vui",
+    "text": "🧠 Đại dương lớn nhất thế giới là gì? (Đáp án: Thái Bình Dương)"
+  },
+  {
+    "id": "q42",
+    "category": "do_vui",
+    "text": "🧠 Quốc gia nào có dân số đông nhất thế giới hiện nay? (Đáp án: Ấn Độ)"
+  },
+  {
+    "id": "q43",
+    "category": "do_vui",
+    "text": "🧠 Ai được coi là cha đẻ của bóng đèn điện? (Đáp án: Thomas Edison)"
+  },
+  {
+    "id": "q44",
+    "category": "do_vui",
+    "text": "🧠 Kim loại nào nhẹ nhất trong các kim loại phổ biến? (Đáp án: Liti (Lithium))"
+  },
+  {
+    "id": "q45",
+    "category": "do_vui",
+    "text": "🧠 Hành tinh nào gần Mặt Trời nhất? (Đáp án: Sao Thủy (Mercury))"
+  },
+  {
+    "id": "q46",
+    "category": "do_vui",
+    "text": "🧠 Cơ quan nào trong cơ thể người lớn nhất? (Đáp án: Da)"
+  },
+  {
+    "id": "q47",
+    "category": "do_vui",
+    "text": "🧠 1 giờ có bao nhiêu giây? (Đáp án: 3600 giây)"
+  },
+  {
+    "id": "q48",
+    "category": "do_vui",
+    "text": "🧠 Loài chim nào không biết bay nhưng bơi giỏi và sống ở Nam Cực? (Đáp án: Chim cánh cụt)"
+  },
+  {
+    "id": "q49",
+    "category": "do_vui",
+    "text": "🧠 Chất gì chiếm phần lớn khí quyển Trái Đất? (Đáp án: Khí Nitơ (khoảng 78%))"
+  },
+  {
+    "id": "q50",
+    "category": "do_vui",
+    "text": "🧠 Ai là tác giả của Truyện Kiều? (Đáp án: Nguyễn Du)"
+  },
+  {
+    "id": "q51",
+    "category": "do_vui",
+    "text": "🧠 Vịnh nào của Việt Nam được UNESCO công nhận là di sản thiên nhiên thế giới? (Đáp án: Vịnh Hạ Long)"
+  },
+  {
+    "id": "q52",
+    "category": "do_vui",
+    "text": "🧠 Loài cá nào lớn nhất thế giới? (Đáp án: Cá mập voi (whale shark))"
+  },
+  {
+    "id": "q53",
+    "category": "do_vui",
+    "text": "🧠 Bộ phim hoạt hình nào có nhân vật chuột nổi tiếng của Disney? (Đáp án: Mickey Mouse)"
+  },
+  {
+    "id": "q54",
+    "category": "do_vui",
+    "text": "🧠 Ai phát minh ra thuyết tương đối? (Đáp án: Albert Einstein)"
+  },
+  {
+    "id": "q55",
+    "category": "do_vui",
+    "text": "🧠 Việt Nam thống nhất đất nước vào năm nào? (Đáp án: 1975 (30/4/1975))"
+  },
+  {
+    "id": "q56",
+    "category": "do_vui",
+    "text": "🧠 Đơn vị tiền tệ của Nhật Bản là gì? (Đáp án: Yên (Yen))"
+  },
+  {
+    "id": "q57",
+    "category": "do_vui",
+    "text": "🧠 Loài động vật nào có cổ dài nhất? (Đáp án: Hươu cao cổ)"
+  },
+  {
+    "id": "q58",
+    "category": "do_vui",
+    "text": "🧠 Số Pi (π) xấp xỉ bằng bao nhiêu? (Đáp án: 3.14)"
+  },
+  {
+    "id": "q59",
+    "category": "do_vui",
+    "text": "🧠 Nước nào có diện tích lớn nhất thế giới? (Đáp án: Nga)"
+  },
+  {
+    "id": "q60",
+    "category": "do_vui",
+    "text": "🧠 Ai là người đầu tiên đặt chân lên Mặt Trăng? (Đáp án: Neil Armstrong)"
+  },
+  {
+    "id": "q61",
+    "category": "do_vui",
+    "text": "🧠 Hồ nước ngọt lớn nhất Việt Nam là hồ nào? (Đáp án: Hồ Ba Bể (hoặc hồ Lắk tùy tiêu chí))"
+  },
+  {
+    "id": "q62",
+    "category": "do_vui",
+    "text": "🧠 Cầu Rồng nổi tiếng nằm ở thành phố nào? (Đáp án: Đà Nẵng)"
+  },
+  {
+    "id": "q63",
+    "category": "do_vui",
+    "text": "🧠 1 thập kỷ có bao nhiêu năm? (Đáp án: 10 năm)"
+  },
+  {
+    "id": "q64",
+    "category": "do_vui",
+    "text": "🧠 Loài hoa nào được coi là quốc hoa của Việt Nam (được đề xuất phổ biến)? (Đáp án: Hoa sen)"
+  },
+  {
+    "id": "q65",
+    "category": "do_vui",
+    "text": "🧠 Ai là chủ tịch nước đầu tiên của nước Việt Nam Dân chủ Cộng hòa? (Đáp án: Chủ tịch Hồ Chí Minh)"
+  },
+  {
+    "id": "q66",
+    "category": "do_vui",
+    "text": "🧠 Kim tự tháp cổ đại nổi tiếng nằm ở quốc gia nào? (Đáp án: Ai Cập)"
+  },
+  {
+    "id": "q67",
+    "category": "do_vui",
+    "text": "🧠 Ngôn ngữ nào có nhiều người sử dụng bản ngữ nhất thế giới? (Đáp án: Tiếng Trung (Quan Thoại))"
+  },
+  {
+    "id": "q68",
+    "category": "do_vui",
+    "text": "🧠 Bộ não người chiếm khoảng bao nhiêu % trọng lượng cơ thể? (Đáp án: Khoảng 2%)"
+  },
+  {
+    "id": "q69",
+    "category": "do_vui",
+    "text": "🧠 15 + 27 bằng bao nhiêu? (Đáp án: 42)"
+  },
+  {
+    "id": "q70",
+    "category": "do_vui",
+    "text": "🧠 Một hình vuông có 4 cạnh bằng nhau, vậy hình tam giác đều có mấy cạnh bằng nhau? (Đáp án: 3 cạnh)"
+  },
+  {
+    "id": "q71",
+    "category": "do_vui",
+    "text": "🧠 100 chia 4 bằng bao nhiêu? (Đáp án: 25)"
+  },
+  {
+    "id": "q72",
+    "category": "do_vui",
+    "text": "🧠 Nếu hôm nay là thứ 3, thì 10 ngày sau là thứ mấy? (Đáp án: Thứ 6 (10 ngày = 1 tuần + 3 ngày))"
+  },
+  {
+    "id": "q73",
+    "category": "do_vui",
+    "text": "🧠 7 x 8 bằng bao nhiêu? (Đáp án: 56)"
+  },
+  {
+    "id": "q74",
+    "category": "do_vui",
+    "text": "🧠 Số nào tiếp theo trong dãy: 2, 4, 8, 16, ...? (Đáp án: 32)"
+  },
+  {
+    "id": "q75",
+    "category": "do_vui",
+    "text": "🧠 Một giờ rưỡi bằng bao nhiêu phút? (Đáp án: 90 phút)"
+  },
+  {
+    "id": "q76",
+    "category": "do_vui",
+    "text": "🧠 Nếu có 3 quả táo và bạn lấy đi 2 quả, bạn còn lại bao nhiêu quả? (Đáp án: 2 quả (1 quả cũ còn lại + 2 quả bạn đang cầm trên tay))"
+  },
+  {
+    "id": "q77",
+    "category": "do_vui",
+    "text": "🧠 Căn bậc hai của 81 là bao nhiêu? (Đáp án: 9)"
+  },
+  {
+    "id": "q78",
+    "category": "do_vui",
+    "text": "🧠 Có bao nhiêu góc vuông trong 1 hình chữ nhật? (Đáp án: 4 góc)"
+  },
+  {
+    "id": "q79",
+    "category": "do_vui",
+    "text": "🧠 125 - 48 bằng bao nhiêu? (Đáp án: 77)"
+  },
+  {
+    "id": "q80",
+    "category": "do_vui",
+    "text": "🧠 Nếu 5 con mèo bắt 5 con chuột trong 5 phút, thì 100 con mèo bắt 100 con chuột mất bao lâu? (Đáp án: 5 phút)"
+  },
+  {
+    "id": "q81",
+    "category": "do_vui",
+    "text": "🧠 Số nguyên tố nhỏ nhất là số nào? (Đáp án: 2)"
+  },
+  {
+    "id": "q82",
+    "category": "do_vui",
+    "text": "🧠 Một tuần có bao nhiêu giờ? (Đáp án: 168 giờ)"
+  },
+  {
+    "id": "q83",
+    "category": "do_vui",
+    "text": "🧠 9 x 9 bằng bao nhiêu? (Đáp án: 81)"
+  },
+  {
+    "id": "q84",
+    "category": "do_vui",
+    "text": "🧠 Thành phố nào được gọi là 'Thành phố ngàn hoa' của Việt Nam? (Đáp án: Đà Lạt)"
+  },
+  {
+    "id": "q85",
+    "category": "do_vui",
+    "text": "🧠 Sa Pa thuộc tỉnh nào của Việt Nam? (Đáp án: Lào Cai)"
+  },
+  {
+    "id": "q86",
+    "category": "do_vui",
+    "text": "🧠 Đảo lớn nhất Việt Nam là đảo nào? (Đáp án: Đảo Phú Quốc)"
+  },
+  {
+    "id": "q87",
+    "category": "do_vui",
+    "text": "🧠 Con sông chảy qua thủ đô Hà Nội là sông nào? (Đáp án: Sông Hồng)"
+  },
+  {
+    "id": "q88",
+    "category": "do_vui",
+    "text": "🧠 Quốc gia nào có hình dáng giống chiếc ủng trên bản đồ? (Đáp án: Ý (Italy))"
+  },
+  {
+    "id": "q89",
+    "category": "do_vui",
+    "text": "🧠 Kênh đào nổi tiếng nối Địa Trung Hải và Biển Đỏ là kênh gì? (Đáp án: Kênh đào Suez)"
+  },
+  {
+    "id": "q90",
+    "category": "do_vui",
+    "text": "🧠 Thành phố nào được gọi là 'Kinh đô ánh sáng'? (Đáp án: Paris)"
+  },
+  {
+    "id": "q91",
+    "category": "do_vui",
+    "text": "🧠 Núi lửa nào nổi tiếng ở Indonesia thường được nhắc tới? (Đáp án: Núi Krakatoa hoặc Merapi)"
+  },
+  {
+    "id": "q92",
+    "category": "do_vui",
+    "text": "🧠 Sa mạc lớn nhất thế giới (nóng) là sa mạc nào? (Đáp án: Sahara)"
+  },
+  {
+    "id": "q93",
+    "category": "do_vui",
+    "text": "🧠 Đất nước nào có nhiều múi giờ nhất thế giới (tính cả lãnh thổ hải ngoại)? (Đáp án: Pháp)"
+  },
+  {
+    "id": "q94",
+    "category": "do_vui",
+    "text": "🧠 Hai Bà Trưng khởi nghĩa chống quân xâm lược nào? (Đáp án: Nhà Đông Hán (Trung Quốc))"
+  },
+  {
+    "id": "q95",
+    "category": "do_vui",
+    "text": "🧠 Chiến thắng Điện Biên Phủ diễn ra vào năm nào? (Đáp án: 1954)"
+  },
+  {
+    "id": "q96",
+    "category": "do_vui",
+    "text": "🧠 Ai là vị vua cuối cùng của triều đại phong kiến Việt Nam? (Đáp án: Vua Bảo Đại)"
+  },
+  {
+    "id": "q97",
+    "category": "do_vui",
+    "text": "🧠 Tết Nguyên Đán còn được gọi là Tết gì? (Đáp án: Tết Âm lịch / Tết cổ truyền)"
+  },
+  {
+    "id": "q98",
+    "category": "do_vui",
+    "text": "🧠 Áo dài được coi là trang phục truyền thống của ai? (Đáp án: Người Việt Nam (phụ nữ Việt Nam))"
+  },
+  {
+    "id": "q99",
+    "category": "do_vui",
+    "text": "🧠 Bánh chưng tượng trưng cho điều gì trong văn hóa Việt? (Đáp án: Đất (bánh dày tượng trưng cho Trời))"
+  },
+  {
+    "id": "q100",
+    "category": "do_vui",
+    "text": "🧠 Văn Miếu - Quốc Tử Giám là trường đại học đầu tiên của Việt Nam, xây ở đâu? (Đáp án: Hà Nội)"
+  },
+  {
+    "id": "q101",
+    "category": "do_vui",
+    "text": "🧠 Ngày Giỗ Tổ Hùng Vương là ngày nào âm lịch? (Đáp án: Mùng 10 tháng 3 âm lịch)"
+  },
+  {
+    "id": "q102",
+    "category": "do_vui",
+    "text": "🧠 Nước sôi ở bao nhiêu độ C (ở áp suất thường)? (Đáp án: 100 độ C)"
+  },
+  {
+    "id": "q103",
+    "category": "do_vui",
+    "text": "🧠 Công thức hóa học của nước là gì? (Đáp án: H2O)"
+  },
+  {
+    "id": "q104",
+    "category": "do_vui",
+    "text": "🧠 Ánh sáng di chuyển với tốc độ khoảng bao nhiêu km/s? (Đáp án: Khoảng 300.000 km/s)"
+  },
+  {
+    "id": "q105",
+    "category": "do_vui",
+    "text": "🧠 Bộ phận nào của cơ thể sản xuất insulin? (Đáp án: Tuyến tụy)"
+  },
+  {
+    "id": "q106",
+    "category": "do_vui",
+    "text": "🧠 Khí nào cần thiết cho con người hít thở để sống? (Đáp án: Oxy)"
+  },
+  {
+    "id": "q107",
+    "category": "do_vui",
+    "text": "🧠 Trái Đất quay quanh Mặt Trời mất bao lâu? (Đáp án: 365 ngày (1 năm))"
+  },
+  {
+    "id": "q108",
+    "category": "do_vui",
+    "text": "🧠 Chất nào làm cho lá cây có màu xanh? (Đáp án: Diệp lục (Chlorophyll))"
+  },
+  {
+    "id": "q109",
+    "category": "do_vui",
+    "text": "🧠 Con người có bao nhiêu chiếc xương khi trưởng thành? (Đáp án: 206 xương)"
+  },
+  {
+    "id": "q110",
+    "category": "do_vui",
+    "text": "🧠 Nhiệt độ đóng băng của nước là bao nhiêu độ C? (Đáp án: 0 độ C)"
+  },
+  {
+    "id": "q111",
+    "category": "do_vui",
+    "text": "🧠 Hành tinh nào được gọi là 'Hành tinh Đỏ'? (Đáp án: Sao Hỏa (Mars))"
+  },
+  {
+    "id": "q112",
+    "category": "do_vui",
+    "text": "🧠 Môn thể thao nào dùng vợt và quả cầu lông? (Đáp án: Cầu lông)"
+  },
+  {
+    "id": "q113",
+    "category": "do_vui",
+    "text": "🧠 World Cup bóng đá được tổ chức bao nhiêu năm 1 lần? (Đáp án: 4 năm)"
+  },
+  {
+    "id": "q114",
+    "category": "do_vui",
+    "text": "🧠 Đội tuyển bóng đá Việt Nam thường gọi là đội gì? (Đáp án: Đội tuyển Rồng Vàng)"
+  },
+  {
+    "id": "q115",
+    "category": "do_vui",
+    "text": "🧠 Một trận bóng đá chuyên nghiệp kéo dài bao nhiêu phút (chưa kể bù giờ)? (Đáp án: 90 phút)"
+  },
+  {
+    "id": "q116",
+    "category": "do_vui",
+    "text": "🧠 Môn cờ nào có 32 quân, chơi trên bàn 8x8 ô? (Đáp án: Cờ vua)"
+  },
+  {
+    "id": "q117",
+    "category": "do_vui",
+    "text": "🧠 Ngày Quốc tế Lao động là ngày nào? (Đáp án: 1 tháng 5)"
+  },
+  {
+    "id": "q118",
+    "category": "do_vui",
+    "text": "🧠 Ngày Quốc tế Phụ nữ là ngày nào? (Đáp án: 8 tháng 3)"
+  },
+  {
+    "id": "q119",
+    "category": "do_vui",
+    "text": "🧠 Loại đồ uống nào được lên men từ lúa mạch, phổ biến trong các bàn nhậu? (Đáp án: Bia)"
+  },
+  {
+    "id": "q120",
+    "category": "do_vui",
+    "text": "🧠 Một ly bia tiêu chuẩn thường chứa khoảng bao nhiêu ml? (Đáp án: 330ml hoặc 500ml)"
+  },
+  {
+    "id": "q121",
+    "category": "do_vui",
+    "text": "🧠 Karaoke có nguồn gốc từ quốc gia nào? (Đáp án: Nhật Bản)"
+  },
+  {
+    "id": "q122",
+    "category": "do_vui",
+    "text": "🧠 Con vật nào được mệnh danh là 'chúa tể sơn lâm'? (Đáp án: Con hổ)"
+  },
+  {
+    "id": "q123",
+    "category": "do_vui",
+    "text": "🧠 Loài chim nào có thể bay lùi? (Đáp án: Chim ruồi (hummingbird))"
+  },
+  {
+    "id": "q124",
+    "category": "do_vui",
+    "text": "🧠 Số 0 do nền văn minh nào phát minh ra? (Đáp án: Ấn Độ)"
+  },
+  {
+    "id": "q125",
+    "category": "do_vui",
+    "text": "🧠 Bảng tuần hoàn hóa học có bao nhiêu nguyên tố (tính đến hiện tại, khoảng)? (Đáp án: Khoảng 118 nguyên tố)"
+  },
+  {
+    "id": "q126",
+    "category": "do_vui",
+    "text": "🧠 Người ta thường dùng gì để đo nhiệt độ cơ thể? (Đáp án: Nhiệt kế)"
+  },
+  {
+    "id": "q127",
+    "category": "do_vui",
+    "text": "🧠 Loài động vật nào ngủ đứng? (Đáp án: Con ngựa (và voi))"
+  },
+  {
+    "id": "q128",
+    "category": "do_vui",
+    "text": "🧠 Cầu Vàng nổi tiếng với 2 bàn tay khổng lồ nằm ở đâu? (Đáp án: Đà Nẵng (Bà Nà Hills))"
+  },
+  {
+    "id": "q129",
+    "category": "do_vui",
+    "text": "🧠 Tháp Eiffel nằm ở thành phố nào? (Đáp án: Paris, Pháp)"
+  },
+  {
+    "id": "q130",
+    "category": "do_vui",
+    "text": "🧠 Ai được coi là 'ông tổ' môn hội họa Phục Hưng vẽ bức Mona Lisa? (Đáp án: Leonardo da Vinci)"
+  },
+  {
+    "id": "q131",
+    "category": "do_vui",
+    "text": "🧠 Loại trái cây nào được mệnh danh là 'vua của các loại trái cây' ở Đông Nam Á? (Đáp án: Sầu riêng)"
+  },
+  {
+    "id": "q132",
+    "category": "do_vui",
+    "text": "🧠 Cà phê nổi tiếng nhất của Việt Nam thường được trồng nhiều ở tỉnh nào? (Đáp án: Đắk Lắk (Buôn Ma Thuột))"
+  },
+  {
+    "id": "q133",
+    "category": "do_vui",
+    "text": "🧠 1 kg bằng bao nhiêu gam? (Đáp án: 1000 gam)"
+  },
+  {
+    "id": "q134",
+    "category": "do_vui",
+    "text": "🧠 Đơn vị đo tốc độ ánh sáng thường dùng năm nào? (Đáp án: Năm ánh sáng)"
+  },
+  {
+    "id": "q135",
+    "category": "do_vui",
+    "text": "🧠 Người máy biết chơi cờ vua đầu tiên đánh bại vô địch thế giới tên là gì? (Đáp án: Deep Blue)"
+  },
+  {
+    "id": "q136",
+    "category": "do_vui",
+    "text": "🧠 Vịnh biển nào ở miền Trung Việt Nam nổi tiếng với cát trắng, nước trong ở Nha Trang? (Đáp án: Vịnh Nha Trang)"
+  },
+  {
+    "id": "q137",
+    "category": "do_vui",
+    "text": "🧠 Ai là người sáng lập ra hãng xe điện Tesla? (Đáp án: Elon Musk)"
+  },
+  {
+    "id": "q138",
+    "category": "do_vui",
+    "text": "🧠 1 thế kỷ có bao nhiêu năm? (Đáp án: 100 năm)"
+  },
+  {
+    "id": "q139",
+    "category": "do_vui",
+    "text": "🧠 Bộ phim hoạt hình nào có nhân vật chú cá hề đi tìm con? (Đáp án: Đi Tìm Nemo (Finding Nemo))"
+  },
+  {
+    "id": "q140",
+    "category": "do_vui",
+    "text": "🧠 Ngọn hải đăng cổ nhất Việt Nam nằm ở đâu? (Đáp án: Mũi Kê Gà hoặc Mũi Điện tùy nguồn)"
+  },
+  {
+    "id": "q141",
+    "category": "do_vui",
+    "text": "🧠 Chợ nổi nào nổi tiếng ở miền Tây Nam Bộ? (Đáp án: Chợ nổi Cái Răng (Cần Thơ))"
+  },
+  {
+    "id": "q142",
+    "category": "do_vui",
+    "text": "🧠 Ai là nhà bác học phát minh ra bóng đèn dây tóc và máy hát? (Đáp án: Thomas Edison)"
+  },
+  {
+    "id": "q143",
+    "category": "do_vui",
+    "text": "🧠 Loài rắn nào không có nọc độc nhưng siết chết con mồi? (Đáp án: Trăn (Python))"
+  },
+  {
+    "id": "q144",
+    "category": "do_vui",
+    "text": "🧠 Phở là món ăn có nguồn gốc từ miền nào của Việt Nam? (Đáp án: Miền Bắc (Nam Định/Hà Nội))"
+  },
+  {
+    "id": "q145",
+    "category": "do_vui",
+    "text": "🧠 Số Fibonacci bắt đầu bằng 2 số nào? (Đáp án: 0 và 1 (hoặc 1 và 1))"
+  },
+  {
+    "id": "q146",
+    "category": "do_vui",
+    "text": "🧠 Ai là tác giả bài thơ 'Nam quốc sơn hà' được coi là bản tuyên ngôn độc lập đầu tiên? (Đáp án: Lý Thường Kiệt (tương truyền))"
+  },
+  {
+    "id": "q147",
+    "category": "do_vui",
+    "text": "🧠 Trò chơi dân gian nào dùng dây thừng kéo giữa 2 đội? (Đáp án: Kéo co)"
+  },
+  {
+    "id": "q148",
+    "category": "do_vui",
+    "text": "🧠 Bộ Kim Tự Tháp Giza nổi tiếng nhất nằm gần thành phố nào của Ai Cập? (Đáp án: Cairo)"
+  },
+  {
+    "id": "q149",
+    "category": "do_vui",
+    "text": "🧠 1 lít nước nặng bao nhiêu kg? (Đáp án: 1 kg)"
+  },
+  {
+    "id": "q150",
+    "category": "do_vui",
+    "text": "🧠 Vệ tinh tự nhiên duy nhất của Trái Đất tên là gì? (Đáp án: Mặt Trăng)"
+  },
+  {
+    "id": "q151",
+    "category": "do_vui",
+    "text": "🧠 Ai là người phát minh ra điện thoại? (Đáp án: Alexander Graham Bell)"
+  },
+  {
+    "id": "q152",
+    "category": "do_vui",
+    "text": "🧠 Cây gì được coi là biểu tượng của mùa xuân miền Bắc Việt Nam? (Đáp án: Hoa đào)"
+  },
+  {
+    "id": "q153",
+    "category": "do_vui",
+    "text": "🧠 Cây gì được coi là biểu tượng của mùa xuân miền Nam Việt Nam? (Đáp án: Hoa mai)"
+  },
+  {
+    "id": "q154",
+    "category": "do_vui",
+    "text": "🧠 Múi giờ Việt Nam là UTC cộng mấy? (Đáp án: UTC+7)"
+  },
+  {
+    "id": "q155",
+    "category": "do_vui",
+    "text": "🧠 Ai là người viết bộ truyện tranh Doraemon? (Đáp án: Fujiko F. Fujio)"
+  },
+  {
+    "id": "q156",
+    "category": "do_vui",
+    "text": "🧠 1 đô la Mỹ bằng khoảng bao nhiêu VNĐ (ước lượng phổ biến)? (Đáp án: Khoảng 24.000 - 26.000 VNĐ (tùy thời điểm))"
+  },
+  {
+    "id": "q157",
+    "category": "do_vui",
+    "text": "🧠 Loài cây nào cho ta gỗ và nhựa để làm cao su? (Đáp án: Cây cao su)"
+  },
+  {
+    "id": "q158",
+    "category": "do_vui",
+    "text": "🧠 Ngôi sao gần Trái Đất nhất (ngoài Mặt Trời) tên là gì? (Đáp án: Proxima Centauri)"
+  },
+  {
+    "id": "q159",
+    "category": "do_vui",
+    "text": "🧠 Ai là người sáng lập ra Facebook? (Đáp án: Mark Zuckerberg)"
+  },
+  {
+    "id": "q160",
+    "category": "do_vui",
+    "text": "🧠 Đại danh nào của Việt Nam được UNESCO công nhận là Thủ đô của gió và cát? (Đáp án: Ninh Thuận (Mũi Né - Phan Thiết cũng nổi tiếng))"
+  },
+  {
+    "id": "q161",
+    "category": "do_vui",
+    "text": "🧠 Truyền thuyết nào kể về việc Sơn Tinh - Thủy Tinh tranh giành công chúa Mỵ Nương? (Đáp án: Sơn Tinh, Thủy Tinh)"
+  }
+]
