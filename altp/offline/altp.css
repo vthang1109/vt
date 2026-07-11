@@ -1,0 +1,205 @@
+/* ===================== LAYOUT ===================== */
+.altp-wrap {
+  min-height: 100vh;
+  padding: 14px 12px 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===================== CÂU HỎI ===================== */
+.altp-qbox {
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(124, 58, 237, 0.06));
+  border: 2px solid #fbbf24;
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.35);
+  border-radius: 16px;
+  padding: 18px 16px;
+  margin-bottom: 14px;
+  text-align: center;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+.altp-qtext {
+  font-weight: 800;
+  font-size: 17px;
+  color: #e0f2fe;
+  line-height: 1.4;
+  max-height: 100%;
+  overflow-y: auto;
+}
+#altp-profit.timer { color: #38bdf8; }
+#altp-profit.timer.warn { color: #ef4444; animation: seatPulse 0.6s ease-in-out infinite alternate; }
+@keyframes seatPulse {
+  from { text-shadow: 0 0 6px rgba(239, 68, 68, 0.3); }
+  to   { text-shadow: 0 0 16px rgba(239, 68, 68, 0.9); }
+}
+
+/* ===================== ĐÁP ÁN ===================== */
+.altp-play-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  align-items: stretch;
+}
+.altp-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  flex: 1;
+  align-content: start;
+}
+@media (max-width: 480px) {
+  .altp-options { grid-template-columns: 1fr; }
+}
+.altp-opt {
+  padding: 14px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: rgba(255, 255, 255, 0.03);
+  color: #e0f2fe;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  display: flex;
+  gap: 8px;
+}
+.altp-opt:hover:not(:disabled) {
+  border-color: rgba(251, 191, 36, 0.6);
+  background: rgba(251, 191, 36, 0.08);
+}
+.altp-opt .altp-opt-key { color: #fbbf24; font-weight: 900; }
+.altp-opt:disabled { opacity: 0.35; cursor: not-allowed; }
+.altp-opt.picked { border-color: #fbbf24 !important; background: linear-gradient(135deg, #fde68a, #f59e0b) !important; color: #ffffff !important; box-shadow: 0 0 20px rgba(251, 191, 36, 0.6); }
+.altp-opt.picked .altp-opt-key { color: #ffffff !important; }
+.altp-opt.correct { border-color: #22c55e !important; background: linear-gradient(135deg, #86efac, #16a34a) !important; color: #ffffff !important; box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); animation: resultBlink 0.5s ease-in-out 4; }
+.altp-opt.correct .altp-opt-key { color: #ffffff !important; }
+.altp-opt.wrong { border-color: #ef4444 !important; background: linear-gradient(135deg, #fca5a5, #dc2626) !important; color: #ffffff !important; box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); animation: resultBlink 0.5s ease-in-out 4; }
+.altp-opt.wrong .altp-opt-key { color: #ffffff !important; }
+.altp-opt.hidden-5050 { visibility: hidden; }
+@keyframes resultBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ===================== TRỢ GIÚP ===================== */
+.altp-lifelines {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+.altp-life-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid rgba(56, 189, 248, 0.4);
+  background: rgba(0, 0, 0, 0.3);
+  color: #e0f2fe;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.altp-life-btn:disabled { opacity: 0.25; cursor: not-allowed; filter: grayscale(1); }
+.altp-life-btn:hover:not(:disabled) { border-color: #fbbf24; box-shadow: 0 0 14px rgba(251, 191, 36, 0.4); }
+.altp-life-btn-stop { border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.12); }
+.altp-life-btn-stop:hover { border-color: #ef4444; box-shadow: 0 0 14px rgba(239, 68, 68, 0.5); }
+
+.altp-audience {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  justify-content: center;
+  height: 70px;
+  margin: 8px 0 14px;
+}
+.altp-audience-bar { width: 22%; background: linear-gradient(180deg, #38bdf8, #0ea5e9); border-radius: 6px 6px 0 0; position: relative; transition: height 0.5s; }
+.altp-audience-bar span { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 11px; color: #cbd5e1; }
+
+.altp-phone-msg {
+  text-align: center;
+  color: #a78bfa;
+  font-size: 13px;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+/* ===================== HÀNG NÚT HÀNH ĐỘNG ===================== */
+.altp-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.altp-actions button {
+  padding: 11px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-family: "Science Gothic", sans-serif;
+  font-size: 13px;
+}
+.altp-btn-start { background: linear-gradient(135deg, #34d399, #059669); color: #fff; }
+.altp-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ===================== THANG ĐIỂM (PRIZE LADDER) ===================== */
+.altp-ladder {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 4px;
+  margin-bottom: 14px;
+  max-height: 260px;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.25);
+}
+.altp-ladder-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #94a3b8;
+}
+.altp-ladder-row.safe { color: #38bdf8; font-weight: 700; }
+.altp-ladder-row.current { background: rgba(251, 191, 36, 0.2); color: #fbbf24; font-weight: 900; }
+.altp-ladder-row.passed { color: #34d399; }
+
+/* ===================== MODAL CÀI ĐẶT (thay hamburger dropdown) ===================== */
+.altp-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  display: none; align-items: center; justify-content: center; z-index: 60;
+}
+.altp-modal-box {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 360px;
+  width: 90%;
+}
+.altp-modal-title { font-weight: 900; font-size: 16px; color: #fbbf24; margin-bottom: 12px; text-align: center; }
+.altp-setting-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #e0f2fe; font-size: 13px; }
+.altp-setting-row select, .altp-setting-row button.toggle {
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(56,189,248,0.3); color: #e0f2fe;
+  border-radius: 8px; padding: 4px 10px; font-family: "Science Gothic", sans-serif;
+}
+.altp-modal-close { margin-top: 14px; width: 100%; padding: 10px; border-radius: 10px; border: none; background: linear-gradient(135deg, #f87171, #dc2626); color: #fff; font-family: "Science Gothic", sans-serif; font-weight: 500; cursor: pointer; }
+.altp-rules-text { font-size: 13px; color: #cbd5e1; line-height: 1.6; max-height: 300px; overflow-y: auto; }
+
+
