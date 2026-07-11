@@ -33,38 +33,281 @@
   margin-bottom: 22px;
 }
 
-.ts-mode-cards {
+.stat-profit.ts-earned {
+  color: #34d399;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+}
+
+.ts-shuffle-toggle {
   display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
   justify-content: center;
+  gap: 28px;
+  margin-bottom: 16px;
+}
+.ts-toggle-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 6px 2px;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+.ts-toggle-btn:hover { color: #e0f2fe; }
+.ts-toggle-btn.active { color: #38bdf8; }
+.ts-toggle-btn.active::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -3px;
+  height: 2px;
+  background: #38bdf8;
+  border-radius: 2px;
+}
+
+.ts-lb-open-btn {
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  color: #fbbf24;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ts-lb-open-btn:hover {
+  background: rgba(251, 191, 36, 0.22);
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.3);
+}
+
+/* ===================== BXH MODAL ===================== */
+.ts-lb-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(4px);
+  padding: 16px;
+}
+.ts-lb-panel {
+  width: 100%;
+  max-width: 420px;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 18px;
+  box-shadow: 0 0 40px rgba(56, 189, 248, 0.15);
+  overflow: hidden;
+  animation: tsFadeIn 0.2s ease-out;
+}
+.ts-lb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+}
+.ts-lb-header h3 {
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: #e0f2fe;
+  margin: 0;
+}
+.ts-lb-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ts-lb-refresh {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 6px;
+  transition: transform 0.2s;
+}
+.ts-lb-refresh:hover { color: #38bdf8; transform: rotate(90deg); }
+.ts-lb-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.ts-lb-close:hover { color: #e0f2fe; }
+
+.ts-lb-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 10px 12px 0;
+}
+.ts-lb-tab-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  color: #94a3b8;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 12.5px;
+  padding: 8px 6px;
+  border-radius: 10px 10px 0 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ts-lb-tab-btn.active {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  border-color: #38bdf8;
+}
+
+.ts-lb-list {
+  padding: 10px 12px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ts-lb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(56, 189, 248, 0.12);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.ts-lb-rank {
+  width: 32px;
+  flex-shrink: 0;
+  text-align: center;
+  font-weight: 700;
+  color: #e0f2fe;
+  font-size: 13px;
+}
+.ts-lb-rank-1 { color: #fbbf24; }
+.ts-lb-rank-2 { color: #cbd5e1; }
+.ts-lb-rank-3 { color: #cd7f32; }
+
+.ts-lb-row-1 {
+  border: 1.5px solid #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.45);
+  animation: tsLbGlow 1.8s ease-in-out infinite;
+}
+@keyframes tsLbGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(251, 191, 36, 0.35); }
+  50% { box-shadow: 0 0 18px rgba(251, 191, 36, 0.65); }
+}
+.ts-lb-row-2 {
+  border: 1.5px solid #cbd5e1;
+  background: rgba(203, 213, 225, 0.1);
+}
+.ts-lb-row-3 {
+  border: 1.5px solid #cd7f32;
+  background: rgba(205, 127, 50, 0.1);
+}
+.ts-lb-name {
+  flex: 1;
+  color: #e0f2fe;
+  font-size: 13px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ts-lb-value {
+  flex-shrink: 0;
+  color: #34d399;
+  font-weight: 700;
+  font-size: 13px;
+}
+.ts-lb-tag {
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #a78bfa;
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  background: rgba(167, 139, 250, 0.12);
+  border-radius: 999px;
+  padding: 1px 6px;
+  vertical-align: middle;
+}
+.ts-lb-loading, .ts-lb-empty {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+  padding: 24px 0;
+}
+
+.ts-mode-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 auto;
 }
 .ts-mode-card {
-  flex: 1 1 220px;
-  max-width: 260px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  border-radius: 16px;
-  padding: 22px 16px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 12px 18px;
+  border-radius: 20px;
   cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(56, 189, 248, 0.12);
+  transition: all 0.3s;
+  overflow: hidden;
   text-align: center;
-  transition: all 0.25s;
   color: #e0f2fe;
 }
 .ts-mode-card:hover {
-  border-color: #38bdf8;
-  box-shadow: 0 0 22px rgba(56, 189, 248, 0.25);
-  transform: translateY(-3px);
+  transform: translateY(-6px);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 16px 40px rgba(56, 189, 248, 0.15);
 }
-.ts-mode-icon { font-size: 32px; margin-bottom: 8px; }
+.ts-mode-emoji { font-size: 40px; line-height: 1; }
 .ts-mode-name {
   font-family: "Science Gothic", sans-serif;
-  font-weight: 500;
-  font-size: 15px;
-  color: #fbbf24;
-  margin-bottom: 6px;
+  font-weight: 800;
+  font-size: 14px;
+  color: #e0f2fe;
 }
-.ts-mode-sub { font-size: 12px; color: #94a3b8; line-height: 1.4; }
+.ts-mode-sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: #38bdf8;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+.ts-mode-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+.ts-mode-badge.ready { background: rgba(52, 211, 153, 0.15); color: #34d399; border-color: rgba(52, 211, 153, 0.3); }
+.ts-mode-badge.hot { background: rgba(249, 115, 22, 0.15); color: #fb923c; border-color: rgba(249, 115, 22, 0.3); }
 
 /* ===================== BẢNG SỐ ===================== */
 .ts-board {
@@ -113,6 +356,14 @@
   cursor: default;
   animation: tsPop 0.25s ease-out;
 }
+.ts-cell.destroyed {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  border-color: #ef4444;
+  color: #fff;
+  opacity: 0.75;
+  cursor: default;
+  animation: tsShake 0.3s;
+}
 @keyframes tsPop {
   0%   { transform: scale(0.7); }
   100% { transform: scale(1); }
@@ -131,18 +382,44 @@
 
 /* ===================== TRẠNG THÁI LƯỢT (DUO) ===================== */
 .stat-bet.turn-p1 {
-  color: #34d399;
+  color: #fbbf24;
   font-weight: 700;
-  text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+  border: 2px solid #fbbf24;
+  background: rgba(251, 191, 36, 0.15);
+  border-radius: 8px;
+  padding: 2px 8px;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
 }
 .stat-profit.turn-p2 {
   color: #60a5fa;
   font-weight: 700;
+  border: 2px solid #60a5fa;
+  background: rgba(96, 165, 250, 0.15);
+  border-radius: 8px;
+  padding: 2px 8px;
   text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
 }
 .stat-score-sub.turn-warn {
   color: #ef4444;
   font-weight: 600;
+}
+.stat-bet.ts-win, .stat-profit.ts-win {
+  color: #34d399;
+  font-weight: 700;
+  border: 2px solid #34d399;
+  background: rgba(52, 211, 153, 0.15);
+  border-radius: 8px;
+  padding: 2px 8px;
+  text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+}
+.stat-bet.ts-lose, .stat-profit.ts-lose {
+  color: #ef4444;
+  font-weight: 700;
+  border: 2px solid #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  border-radius: 8px;
+  padding: 2px 8px;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
 }
 .ts-num {
   font-weight: 700;
@@ -150,7 +427,7 @@
 .ts-countdown {
   display: inline-block;
   margin-left: 8px;
-  font-size: 13px;
+  font-size: inherit;
   font-weight: 600;
   color: #94a3b8;
   vertical-align: middle;
@@ -164,22 +441,3 @@
   .ts-cell { font-size: 11px; border-radius: 6px; }
 }
 
-/* ===================== ACTIONS ===================== */
-.ts-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-.ts-actions button {
-  padding: 11px 20px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-  font-family: "Science Gothic", sans-serif;
-  font-size: 13px;
-}
-.btn-restart { background: linear-gradient(135deg, #34d399, #059669); color: #fff; }
-.btn-change-mode { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; }

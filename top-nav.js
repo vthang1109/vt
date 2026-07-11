@@ -190,13 +190,6 @@ window.TopNav = (() => {
 
   `;
 
-  const MENU = [
-    { icon: '📱', label: 'App',  href: 'applications.html' },
-    { icon: '🎮', label: 'Game', href: 'games.html' },
-    { icon: '🛒', label: 'Shop', href: 'shop.html' },
-    { icon: '🎒', label: 'Bag',  href: 'bag.html' },
-  ];
-
   function injectStyles() {
     if (document.getElementById('vt-top-nav-styles')) return;
     const s = document.createElement('style');
@@ -206,7 +199,6 @@ window.TopNav = (() => {
   }
 
   function buildHTML() {
-    const menuHTML   = MENU.map(i   => `<a href="${i.href}"><span>${i.icon}</span>${i.label}</a>`).join('');
     return `
       <div class="vt-top-nav" id="vtTopNav">
         <a class="vt-nav-logo" href="index.html">
@@ -228,8 +220,8 @@ window.TopNav = (() => {
         <button class="vt-dd-action leave-btn" id="vtDdLeave">
           <span>🚪</span> Rời phòng
         </button>
-        <div class="dd-divider"></div>
-        ${menuHTML}
+        <div class="dd-divider" id="vtDdDividerCustom" style="display:none"></div>
+        <div id="vtNavCustom"></div>
       </div>`;
   }
 
@@ -277,6 +269,7 @@ window.TopNav = (() => {
       document.body.insertAdjacentHTML('afterbegin', buildHTML());
     }
     bindEvents();
+    renderMenuActions();
     if (document.body.dataset.hidePoints !== 'true') {
       listenBalance();
     }
@@ -301,6 +294,37 @@ function setPoints(pts) {
     };
   }
 
+  let _pendingMenuActions = null;
+
+  function renderMenuActions() {
+    const container = document.getElementById('vtNavCustom');
+    const divider = document.getElementById('vtDdDividerCustom');
+    if (!container) return;
+    const actions = _pendingMenuActions;
+    if (!actions || !actions.length) {
+      container.innerHTML = '';
+      if (divider) divider.style.display = 'none';
+      return;
+    }
+    container.innerHTML = actions.map((a, i) =>
+      `<button class="vt-dd-action" id="vtCustomAction${i}"><span>${a.icon || ''}</span>${a.label}</button>`
+    ).join('');
+    actions.forEach((a, i) => {
+      const btn = document.getElementById(`vtCustomAction${i}`);
+      if (btn) btn.onclick = () => {
+        document.getElementById('vtNavDropdown')?.classList.remove('open');
+        document.getElementById('vtHamburger')?.classList.remove('open');
+        a.onClick();
+      };
+    });
+    if (divider) divider.style.display = 'block';
+  }
+
+  function setMenuActions(actions) {
+    _pendingMenuActions = actions;
+    renderMenuActions(); // no-op nếu DOM dropdown chưa dựng xong, init() sẽ tự áp dụng lại
+  }
+
   function setRoomId(code, icon) {
     const el = document.getElementById('vtRoomId');
     const logoContent = document.getElementById('vtLogoContent');
@@ -316,7 +340,7 @@ function setPoints(pts) {
     if (logoContent) logoContent.style.display = 'none';
   }
 
-  return { init, setPoints, setLeaveAction, setRoomId, getBalance };
+  return { init, setPoints, setLeaveAction, setRoomId, setMenuActions, getBalance };
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
