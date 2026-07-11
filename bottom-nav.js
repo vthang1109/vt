@@ -166,6 +166,21 @@ window.BottomNav = (() => {
     }
   `;
 
+  // BASE = thư mục chứa chính file bottom-nav.js (vd: vt-main/ hoặc vt-main/js/).
+  // Dùng document.currentScript (không phải import.meta.url) để KHÔNG bắt buộc
+  // các trang phải khai báo <script type="module">. import.meta.url chỉ hợp lệ
+  // trong module script -> nếu có 1 trang quên type="module" thì cả file lỗi cú
+  // pháp ngay lúc parse, không chạy được dòng nào (nav biến mất hoàn toàn).
+  // document.currentScript hoạt động bình thường với <script src="..."> thường.
+  const BASE = (() => {
+    const script = document.currentScript ||
+      document.querySelector('script[src*="bottom-nav.js"]');
+    return script ? new URL('.', script.src).href : new URL('.', document.baseURI).href;
+  })();
+  function resolveHref(path) {
+    return path == null ? null : new URL(path, BASE).href;
+  }
+
   const TABS = [
     {
       key: 'home', label: 'Trang chủ', href: 'index.html',
@@ -227,7 +242,7 @@ window.BottomNav = (() => {
           <span class="vt-bn-label">${tab.label}</span>
         </button>`;
       }
-      return `<a class="${cls}" href="${tab.href}" data-key="${tab.key}">
+      return `<a class="${cls}" href="${resolveHref(tab.href)}" data-key="${tab.key}">
         <span class="vt-bn-icon">${tab.svg}<span class="vt-bn-badge" id="vt-badge-${tab.key}"></span></span>
         <span class="vt-bn-label">${tab.label}</span>
       </a>`;
@@ -241,12 +256,12 @@ window.BottomNav = (() => {
         <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 4px"></div>
         <div style="font-family:'Science Gothic', sans-serif;font-size:12px;font-weight:500;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">🛒 Shop & Túi đồ</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 18px">
-          <a href="shop.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <a href="${resolveHref('shop.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
             <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))">🛒</div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Shop</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Gacha · Mua vật phẩm</span>
           </a>
-          <a href="bag.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <a href="${resolveHref('bag.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
             <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2))">🎒</div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Túi đồ</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Thú cưng · Vật phẩm</span>
@@ -259,12 +274,12 @@ window.BottomNav = (() => {
         <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 4px"></div>
         <div style="font-family:'Science Gothic', sans-serif;font-size:12px;font-weight:500;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">📱 Ứng dụng & Trò chơi</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 18px">
-          <a href="applications.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <a href="${resolveHref('applications.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
             <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))">📱</div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Ứng dụng</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Offline · Không cần login</span>
           </a>
-          <a href="games.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <a href="${resolveHref('games.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
             <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2))">🎮</div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Game</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Mini games · Xếp hạng</span>
@@ -278,9 +293,9 @@ window.BottomNav = (() => {
           <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 0"></div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px">
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;letter-spacing:.5px;color:#7dd3fc">👤 Hồ sơ</span>
-            <a href="profile.html" style="font-size:12px;font-weight:400;color:#0288D1;text-decoration:none;font-family:'Science Gothic', sans-serif">Xem đầy đủ →</a>
+            <a href="${resolveHref('profile.html')}" style="font-size:12px;font-weight:400;color:#0288D1;text-decoration:none;font-family:'Science Gothic', sans-serif">Xem đầy đủ →</a>
           </div>
-          <a href="profile.html" id="vtPpProfileCard" style="display:flex;align-items:center;gap:14px;margin:0 14px 14px;padding:14px 16px;background:rgba(2,136,209,0.07);border:1px solid rgba(2,136,209,0.18);border-radius:16px;text-decoration:none;cursor:pointer">
+          <a href="${resolveHref('profile.html')}" id="vtPpProfileCard" style="display:flex;align-items:center;gap:14px;margin:0 14px 14px;padding:14px 16px;background:rgba(2,136,209,0.07);border:1px solid rgba(2,136,209,0.18);border-radius:16px;text-decoration:none;cursor:pointer">
             <div id="vtPpAvatar" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0288d1,#38bdf8);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:22px;color:#fff;flex-shrink:0;border:2px solid rgba(2,136,209,0.4)">?</div>
             <div style="flex:1;min-width:0">
               <div id="vtPpUsername" style="font-weight:500;font-size:16px;color:#e0f2fe;font-family:'Science Gothic', sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Đang tải...</div>
@@ -315,11 +330,18 @@ window.BottomNav = (() => {
     document.getElementById('vtPanelBackdrop').classList.toggle('open', show);
   }
   function _anyOpen() { return _profileOpen || _appsOpen || _shopOpen; }
+  // Gỡ 'active' khỏi cả 3 tab toggle (apps/shop/profile) trước khi bật 1 tab —
+  // tránh trường hợp tab của trang hiện tại (vd 'shop' trên shop.html) và tab
+  // vừa bấm cùng sáng 1 lúc.
+  function _clearToggleActive() {
+    ['apps', 'shop', 'profile'].forEach(k => document.getElementById(`vt-${k}-tab`)?.classList.remove('active'));
+  }
 
   // ── profile ──────────────────────────────────────────────
   function openPanel() {
     _closeAll();
     _profileOpen = true;
+    _clearToggleActive();
     document.getElementById('vtProfilePanel').classList.add('open');
     document.getElementById('vt-profile-tab').classList.add('active');
     _backdrop(true);
@@ -338,6 +360,7 @@ window.BottomNav = (() => {
   function openShopPanel() {
     _closeAll();
     _shopOpen = true;
+    _clearToggleActive();
     document.getElementById('vtShopPanel').classList.add('open');
     document.getElementById('vt-shop-tab').classList.add('active');
     _backdrop(true);
@@ -354,6 +377,7 @@ window.BottomNav = (() => {
   function openAppsPanel() {
     _closeAll();
     _appsOpen = true;
+    _clearToggleActive();
     document.getElementById('vtAppsPanel').classList.add('open');
     document.getElementById('vt-apps-tab').classList.add('active');
     _backdrop(true);
@@ -379,6 +403,8 @@ window.BottomNav = (() => {
     const activeKey = document.getElementById('vtBottomNav')?.dataset?.activeKey;
     if (activeKey !== key) {
       document.getElementById(`vt-${key}-tab`)?.classList.remove('active');
+    } else {
+      document.getElementById(`vt-${key}-tab`)?.classList.add('active');
     }
   }
 
@@ -392,11 +418,22 @@ window.BottomNav = (() => {
 
   // ── init ─────────────────────────────────────────────────
   function init(opts = {}) {
+    // Chặn double-init: nếu nav đã tồn tại trong DOM (do trang gọi init() thủ
+    // công + listener DOMContentLoaded tự động bên dưới cùng chạy), bỏ qua lần
+    // gọi sau. Double-init từng gây lỗi: HTML/id (#vt-profile-tab, #vtProfilePanel...)
+    // bị chèn 2 lần -> bindEvents() gắn listener vào bộ đầu tiên (bị bộ thứ hai
+    // vẽ đè lên), nên bấm vào bộ hiển thị không có tác dụng, và các hàm update
+    // DOM trong quests.js (render profile/quest) cũng cập nhật nhầm bộ bị che
+    // khuất -> panel hiển thị luôn kẹt ở "Đang tải...".
+    if (document.getElementById('vtBottomNav')) return;
     const activeKey = opts.active || 'home';
     injectStyles();
     document.body.classList.add('has-bottom-nav');
     document.body.insertAdjacentHTML('beforeend', buildHTML(activeKey));
     bindEvents();
+    // Tự nạp quests.js (không cần khai báo <script> thủ công ở từng trang).
+    // import() cache theo URL nên gọi nhiều lần / nhiều trang vẫn chỉ chạy 1 lần.
+    import('./quests.js').catch(err => console.warn('BottomNav: không load được quests.js', err));
   }
 
   function setBadge(key, count) {
