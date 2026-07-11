@@ -16,6 +16,14 @@ window.TopNav = (() => {
   let _currentBalance = 0;
   let _unsubBalance = null;
 
+  // Xác định thư mục gốc chứa top-nav.js (và logo.png) dựa trên URL của chính
+  // script này, để logo hiển thị đúng dù trang HTML nằm sâu bao nhiêu cấp thư mục.
+  const _scriptEl = document.currentScript;
+  const _basePath = _scriptEl && _scriptEl.src
+    ? _scriptEl.src.substring(0, _scriptEl.src.lastIndexOf('/') + 1)
+    : '';
+  const LOGO_SRC = _basePath + 'logo.png';
+
   async function listenBalance() {
     try {
       const { auth, subscribeBalance, onAuthStateChanged } = await import('./points.js');
@@ -201,7 +209,7 @@ window.TopNav = (() => {
     return `
       <div class="vt-top-nav" id="vtTopNav">
         <a class="vt-nav-logo" href="index.html">
-          <span class="vt-logo-content" id="vtLogoContent"><img src="logo.png" alt="logo"><span class="logo-vt">VT</span><span class="logo-world">World</span></span>
+          <span class="vt-logo-content" id="vtLogoContent"><img src="${LOGO_SRC}" alt="logo"><span class="logo-vt">VT</span><span class="logo-world">World</span></span>
           <span class="vt-room-id" id="vtRoomId"></span>
         </a>
         <div class="vt-nav-right">
@@ -259,6 +267,7 @@ window.TopNav = (() => {
   }
 
   function init() {
+    if (document.getElementById('vtTopNav')) return; // chặn init trùng (double-call sẽ chèn thêm 1 bộ nav)
     injectStyles();
     document.body.classList.add('has-top-nav');
     const root = document.getElementById('top-nav-root');
