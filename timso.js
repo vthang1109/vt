@@ -69,6 +69,8 @@ class TimSo {
         });
 
         window.game = this;
+        clearTimeout(window.__tsReadyTimeout);
+        document.body.classList.remove('ts-loading');
         this.setupMenuActions();
     }
 
@@ -154,7 +156,7 @@ class TimSo {
             else if (owner === 2) cls += ' correct-p2';
             else if (owner === 'destroyed') cls += ' destroyed';
             const disabled = owner !== undefined ? 'disabled' : '';
-            return `<button class="${cls}" data-num="${n}" onclick="window.game.tap(${n})" ${disabled}>${n}</button>`;
+            return `<button class="${cls}" data-num="${n}" onclick="window.game?.tap(${n})" ${disabled}>${n}</button>`;
         }).join('');
     }
 

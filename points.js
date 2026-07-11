@@ -3,6 +3,7 @@ import {
     getFirestore, doc, getDoc, updateDoc, setDoc, serverTimestamp, onSnapshot, increment, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+export { onAuthStateChanged };
 
 const firebaseConfig = {
   apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -81,14 +82,36 @@ export async function claimDailyLogin() {
 }
 
 // ========== ĐỒNG BỘ ĐIỂM TỰ ĐỘNG ==========
+let _syncStarted = false;
+let _currentData = null;
+const _dataListeners = new Set();
+
+// Phát toàn bộ doc user (points, pet, shards...) cho các module khác dùng chung
+// thay vì mỗi module tự mở onSnapshot riêng
+export function subscribeUserData(cb) {
+    if (_currentData) cb(_currentData);
+    _dataListeners.add(cb);
+    return () => _dataListeners.delete(cb);
+}
+
+// Cho các game đăng ký nhận điểm real-time thay vì tự mở onSnapshot riêng
+export function subscribeBalance(cb) {
+    return subscribeUserData(data => cb(data?.points || 0));
+}
+
 export function initPointsSync() {
+    if (_syncStarted) return; // chặn double-listener
+    _syncStarted = true;
     onAuthStateChanged(auth, user => {
         if (!user) return;
         const userRef = doc(db, 'users', user.uid);
         onSnapshot(userRef, snap => {
             if (!snap.exists()) return;
-            const pts = snap.data().points || 0;
+            const data = snap.data();
+            _currentData = data;
+            _dataListeners.forEach(cb => cb(data)); // phát cho các module khác, KHÔNG tốn read thêm
 
+            const pts = data.points || 0;
             // Cập nhật TopNav (dùng đúng API)
             if (window.TopNav) {
                 window.TopNav.setPoints(pts);

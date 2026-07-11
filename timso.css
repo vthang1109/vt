@@ -441,3 +441,31 @@
   .ts-cell { font-size: 11px; border-radius: 6px; }
 }
 
+
+/* ===================== LOADING STATE ===================== */
+.ts-loading .ts-mode-select {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ===================== CẢNH BÁO LOAD LỖI ===================== */
+.ts-load-warn {
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.4);
+  color: #fca5a5;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.ts-load-warn button {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 4px;
+}

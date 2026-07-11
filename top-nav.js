@@ -18,8 +18,7 @@ window.TopNav = (() => {
 
   async function listenBalance() {
     try {
-      const { auth, subscribeBalance } = await import('./points.js');
-      const { onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+      const { auth, subscribeBalance, onAuthStateChanged } = await import('./points.js');
       onAuthStateChanged(auth, (user) => {
         if (_unsubBalance) { _unsubBalance(); _unsubBalance = null; }
         if (!user) return;
