@@ -1,0 +1,5002 @@
+[
+  {
+    "q": "Sông nào dài nhất Việt Nam?",
+    "options": [
+      "Sông Mê Kông",
+      "Sông Đồng Nai",
+      "Sông Mã",
+      "Sông Hồng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Núi nào cao nhất Việt Nam?",
+    "options": [
+      "Bà Đen",
+      "Ngọc Linh",
+      "Yên Tử",
+      "Fansipan"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Vịnh Hạ Long thuộc tỉnh nào?",
+    "options": [
+      "Hải Phòng",
+      "Quảng Ninh",
+      "Thanh Hóa",
+      "Nam Định"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đồng bằng nào lớn nhất Việt Nam?",
+    "options": [
+      "Đồng bằng sông Cửu Long",
+      "Đồng bằng Nghệ An",
+      "Đồng bằng sông Hồng",
+      "Đồng bằng Thanh Hóa"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cầu Rồng nổi tiếng nằm ở thành phố nào của Việt Nam?",
+    "options": [
+      "Huế",
+      "Đà Nẵng",
+      "Hà Nội",
+      "TP.HCM"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Địa danh nào được UNESCO công nhận là Di sản Thiên nhiên Thế giới đầu tiên của Việt Nam?",
+    "options": [
+      "Vịnh Hạ Long",
+      "Cát Bà",
+      "Phong Nha - Kẻ Bàng",
+      "Tràng An"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Thủ đô cũ của Việt Nam thời nhà Nguyễn là thành phố nào?",
+    "options": [
+      "Hà Nội",
+      "Đà Nẵng",
+      "Hội An",
+      "Huế"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Việt Nam có đường biên giới chung với bao nhiêu quốc gia?",
+    "options": [
+      "4",
+      "3",
+      "5",
+      "2"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đảo nào lớn nhất Việt Nam?",
+    "options": [
+      "Cát Bà",
+      "Lý Sơn",
+      "Phú Quốc",
+      "Côn Đảo"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Tỉnh nào có diện tích lớn nhất Việt Nam?",
+    "options": [
+      "Sơn La",
+      "Nghệ An",
+      "Đắk Lắk",
+      "Gia Lai"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Thành phố nào được mệnh danh là 'Thành phố ngàn hoa'?",
+    "options": [
+      "Sa Pa",
+      "Huế",
+      "Hội An",
+      "Đà Lạt"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Sông Hương chảy qua thành phố nào?",
+    "options": [
+      "Đà Nẵng",
+      "Hà Nội",
+      "Nha Trang",
+      "Huế"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Địa danh nào là điểm cực Bắc của Việt Nam?",
+    "options": [
+      "Lũng Cú",
+      "Mũi Cà Mau",
+      "A Pa Chải",
+      "Móng Cái"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Mũi Cà Mau là điểm cực nào của Việt Nam?",
+    "options": [
+      "Cực Bắc",
+      "Cực Đông",
+      "Cực Tây",
+      "Cực Nam"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Hồ nào lớn nhất Hà Nội?",
+    "options": [
+      "Hồ Gươm",
+      "Hồ Trúc Bạch",
+      "Hồ Thiền Quang",
+      "Hồ Tây"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Thành phố nào được gọi là 'Hòn ngọc Viễn Đông'?",
+    "options": [
+      "Hà Nội",
+      "Đà Nẵng",
+      "Hải Phòng",
+      "Sài Gòn"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cao nguyên nào lớn nhất Việt Nam?",
+    "options": [
+      "Đắk Lắk",
+      "Mộc Châu",
+      "Lâm Viên",
+      "Kon Tum"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Bán đảo Sơn Trà nằm ở thành phố nào?",
+    "options": [
+      "Quy Nhơn",
+      "Nha Trang",
+      "Vũng Tàu",
+      "Đà Nẵng"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chợ nổi Cái Răng nằm ở tỉnh/thành nào?",
+    "options": [
+      "Bến Tre",
+      "Tiền Giang",
+      "Cần Thơ",
+      "An Giang"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Động Phong Nha thuộc tỉnh nào?",
+    "options": [
+      "Quảng Trị",
+      "Hà Tĩnh",
+      "Nghệ An",
+      "Quảng Bình"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Thác nước nào lớn giáp biên giới Trung Quốc, nổi tiếng nhất Việt Nam?",
+    "options": [
+      "Thác Pongour",
+      "Thác Dray Nur",
+      "Thác Datanla",
+      "Thác Bản Giốc"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Hoàng Sa và Trường Sa là hai quần đảo thuộc chủ quyền của quốc gia nào?",
+    "options": [
+      "Việt Nam",
+      "Trung Quốc",
+      "Philippines",
+      "Malaysia"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Phố cổ Hội An thuộc tỉnh nào?",
+    "options": [
+      "Đà Nẵng",
+      "Quảng Nam",
+      "Quảng Ngãi",
+      "Thừa Thiên Huế"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Địa hình chủ yếu của Việt Nam là gì?",
+    "options": [
+      "Đồng bằng",
+      "Đồi núi",
+      "Cao nguyên băng",
+      "Sa mạc"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Sông Cửu Long còn có tên gọi khác là gì?",
+    "options": [
+      "Sông Thái Bình",
+      "Sông Đồng Nai",
+      "Sông Hồng",
+      "Sông Mê Kông"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đèo nào được coi là 'đệ nhất hùng quan' của Việt Nam?",
+    "options": [
+      "Đèo Ngang",
+      "Đèo Pha Đin",
+      "Đèo Hải Vân",
+      "Đèo Cả"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Tỉnh nào của Việt Nam có cửa khẩu quốc tế Mộc Bài?",
+    "options": [
+      "An Giang",
+      "Tây Ninh",
+      "Đồng Tháp",
+      "Long An"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Bãi biển nào được xem là nổi tiếng nhất tại Nha Trang?",
+    "options": [
+      "Bãi Dài",
+      "Bãi Dương",
+      "Bãi Trước",
+      "Bãi Sau"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Việt Nam nằm ở khu vực nào của châu Á?",
+    "options": [
+      "Đông Á",
+      "Đông Nam Á",
+      "Nam Á",
+      "Tây Á"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cửa khẩu nào nối Việt Nam với Trung Quốc tại Lạng Sơn?",
+    "options": [
+      "Lào Cai",
+      "Móng Cái",
+      "Tây Trang",
+      "Hữu Nghị"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Thành phố biển nào là trung tâm du lịch nổi tiếng của tỉnh Khánh Hòa?",
+    "options": [
+      "Quy Nhơn",
+      "Nha Trang",
+      "Phan Thiết",
+      "Tuy Hòa"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ruộng bậc thang nổi tiếng ở Việt Nam thường thấy tại vùng nào?",
+    "options": [
+      "Đông Nam Bộ",
+      "Đồng bằng sông Cửu Long",
+      "Tây Bắc",
+      "Tây Nguyên"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Vườn quốc gia nào là nơi sinh sống của Sao la, loài thú quý hiếm?",
+    "options": [
+      "Bạch Mã",
+      "Cát Tiên",
+      "Cúc Phương",
+      "Vũ Quang"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Tỉnh nào của Việt Nam giáp với cả Lào và Campuchia?",
+    "options": [
+      "Gia Lai",
+      "Kon Tum",
+      "Đắk Lắk",
+      "Đắk Nông"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Thành phố nào là trung tâm kinh tế lớn nhất Việt Nam?",
+    "options": [
+      "Đà Nẵng",
+      "Hải Phòng",
+      "TP. Hồ Chí Minh",
+      "Hà Nội"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đỉnh núi nào được mệnh danh là 'nóc nhà Đông Dương'?",
+    "options": [
+      "Pu Ta Leng",
+      "Fansipan",
+      "Tà Chì Nhù",
+      "Ngọc Linh"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Sông nào chảy qua thành phố Đà Nẵng?",
+    "options": [
+      "Sông Trà Khúc",
+      "Sông Cầu",
+      "Sông Hàn",
+      "Sông Thu Bồn"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Địa danh nào là điểm cực Tây của Việt Nam?",
+    "options": [
+      "A Pa Chải",
+      "Móng Cái",
+      "Lũng Cú",
+      "Mũi Cà Mau"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Bãi biển Mỹ Khê nổi tiếng thuộc thành phố nào?",
+    "options": [
+      "Nha Trang",
+      "Quy Nhơn",
+      "Vũng Tàu",
+      "Đà Nẵng"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Địa danh nào được gọi là 'Vịnh Hạ Long trên cạn'?",
+    "options": [
+      "Tuyệt Tình Cốc",
+      "Tam Cốc",
+      "Thung Nham",
+      "Tràng An"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là chủ tịch nước đầu tiên của nước Việt Nam Dân chủ Cộng hòa?",
+    "options": [
+      "Tôn Đức Thắng",
+      "Hồ Chí Minh",
+      "Trường Chinh",
+      "Phạm Văn Đồng"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Việt Nam gia nhập ASEAN vào năm nào?",
+    "options": [
+      "1990",
+      "1995",
+      "1997",
+      "2000"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chiến thắng nào đánh dấu sự kết thúc chế độ phong kiến ở Việt Nam?",
+    "options": [
+      "Giải phóng miền Nam 1975",
+      "Khởi nghĩa Yên Thế",
+      "Cách mạng Tháng Tám 1945",
+      "Điện Biên Phủ 1954"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Bộ luật nào được coi là bộ luật thành văn đầy đủ đầu tiên của Việt Nam thời phong kiến?",
+    "options": [
+      "Gia Long",
+      "Hình thư",
+      "Hồng Đức",
+      "Quốc triều Hình luật"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chiến dịch nào giải phóng hoàn toàn miền Nam Việt Nam năm 1975?",
+    "options": [
+      "Chiến dịch Tây Nguyên",
+      "Chiến dịch Hồ Chí Minh",
+      "Chiến dịch Mậu Thân",
+      "Chiến dịch Điện Biên Phủ"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Triều đại phong kiến nào tồn tại lâu nhất trong lịch sử Việt Nam?",
+    "options": [
+      "Nhà Trần",
+      "Nhà Nguyễn",
+      "Nhà Lý",
+      "Nhà Hậu Lê"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là vị vua đầu tiên của nhà Nguyễn?",
+    "options": [
+      "Minh Mạng",
+      "Gia Long",
+      "Tự Đức",
+      "Thiệu Trị"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Hai Bà Trưng khởi nghĩa chống lại quân xâm lược nào?",
+    "options": [
+      "Nhà Tống",
+      "Nhà Nguyên",
+      "Nhà Hán",
+      "Nhà Đường"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là người lãnh đạo cuộc khởi nghĩa Lam Sơn?",
+    "options": [
+      "Lý Thường Kiệt",
+      "Quang Trung",
+      "Trần Hưng Đạo",
+      "Lê Lợi"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Trận Bạch Đằng năm 938 do ai lãnh đạo, đánh bại quân Nam Hán?",
+    "options": [
+      "Đinh Bộ Lĩnh",
+      "Trần Hưng Đạo",
+      "Ngô Quyền",
+      "Lê Hoàn"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là người lãnh đạo nghĩa quân Tây Sơn đánh bại quân Thanh?",
+    "options": [
+      "Nguyễn Huệ (Quang Trung)",
+      "Nguyễn Nhạc",
+      "Nguyễn Lữ",
+      "Nguyễn Ánh"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Hiệp định Genève về Việt Nam được ký kết vào năm nào?",
+    "options": [
+      "1954",
+      "1945",
+      "1968",
+      "1975"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Hiệp định Paris chấm dứt chiến tranh Việt Nam được ký năm nào?",
+    "options": [
+      "1968",
+      "1972",
+      "1975",
+      "1973"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ngày Quốc khánh nước Cộng hòa Xã hội Chủ nghĩa Việt Nam là ngày nào?",
+    "options": [
+      "1/5",
+      "19/8",
+      "30/4",
+      "2/9"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chiến dịch Điện Biên Phủ kết thúc thắng lợi vào năm nào?",
+    "options": [
+      "1945",
+      "1965",
+      "1954",
+      "1975"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là vị vua cuối cùng của triều Nguyễn?",
+    "options": [
+      "Thành Thái",
+      "Duy Tân",
+      "Khải Định",
+      "Bảo Đại"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Văn Miếu - Quốc Tử Giám được xây dựng dưới triều đại nào?",
+    "options": [
+      "Nhà Trần",
+      "Nhà Lý",
+      "Nhà Lê",
+      "Nhà Nguyễn"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nhà Trần đã ba lần đánh bại quân xâm lược nào?",
+    "options": [
+      "Nhà Thanh",
+      "Nhà Minh",
+      "Nhà Tống",
+      "Nguyên Mông"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là tác giả của bản 'Tuyên ngôn Độc lập' năm 1945?",
+    "options": [
+      "Hồ Chí Minh",
+      "Võ Nguyên Giáp",
+      "Trường Chinh",
+      "Phạm Văn Đồng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đại tướng nào chỉ huy chiến dịch Điện Biên Phủ?",
+    "options": [
+      "Chu Huy Mân",
+      "Nguyễn Chí Thanh",
+      "Võ Nguyên Giáp",
+      "Văn Tiến Dũng"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Khởi nghĩa Yên Thế do ai lãnh đạo?",
+    "options": [
+      "Hoàng Hoa Thám",
+      "Trương Định",
+      "Nguyễn Trung Trực",
+      "Phan Đình Phùng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Vương triều nào dời đô từ Hoa Lư về Thăng Long?",
+    "options": [
+      "Nhà Đinh",
+      "Nhà Lê",
+      "Nhà Lý",
+      "Nhà Trần"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là người đã ban 'Chiếu dời đô'?",
+    "options": [
+      "Đinh Tiên Hoàng",
+      "Lý Thái Tổ",
+      "Lý Thánh Tông",
+      "Lê Đại Hành"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Trận Ngọc Hồi - Đống Đa diễn ra vào năm nào?",
+    "options": [
+      "1789",
+      "1802",
+      "1771",
+      "1785"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là người sáng lập triều đại nhà Lý?",
+    "options": [
+      "Lý Công Uẩn",
+      "Lý Anh Tông",
+      "Lý Nhân Tông",
+      "Lý Thánh Tông"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chữ Quốc ngữ được sáng tạo dựa trên bảng chữ cái nào?",
+    "options": [
+      "Nôm",
+      "Latinh",
+      "Hán tự",
+      "Phạn"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Phong trào Cần Vương diễn ra nhằm chống lại thế lực nào?",
+    "options": [
+      "Thực dân Pháp",
+      "Nhật Bản",
+      "Nhà Thanh",
+      "Nhà Nguyên"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là vị anh hùng dân tộc gắn liền với câu nói 'Ta thà làm quỷ nước Nam...'?",
+    "options": [
+      "Trần Bình Trọng",
+      "Phạm Ngũ Lão",
+      "Yết Kiêu",
+      "Trần Quốc Toản"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Sự kiện lịch sử nào đánh dấu ngày thống nhất đất nước Việt Nam?",
+    "options": [
+      "2/9/1945",
+      "19/8/1945",
+      "30/4/1975",
+      "7/5/1954"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là người phát động phong trào Đông Du đầu thế kỷ 20?",
+    "options": [
+      "Phan Châu Trinh",
+      "Phan Bội Châu",
+      "Huỳnh Thúc Kháng",
+      "Lương Văn Can"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nhà Hồ do ai sáng lập?",
+    "options": [
+      "Hồ Xuân Hương",
+      "Hồ Nguyên Trừng",
+      "Hồ Quý Ly",
+      "Hồ Hán Thương"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đinh Bộ Lĩnh lên ngôi hoàng đế, lập ra triều đại nào?",
+    "options": [
+      "Nhà Đinh",
+      "Nhà Ngô",
+      "Nhà Lý",
+      "Nhà Lê"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cuộc Tổng tiến công và nổi dậy Mậu Thân diễn ra vào năm nào?",
+    "options": [
+      "1968",
+      "1975",
+      "1972",
+      "1965"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là người lãnh đạo phong trào Đông Kinh Nghĩa Thục?",
+    "options": [
+      "Lương Văn Can",
+      "Phan Bội Châu",
+      "Phan Châu Trinh",
+      "Nguyễn Thái Học"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Địa danh nào gắn với chiến thắng của Ngô Quyền trên sông năm 938?",
+    "options": [
+      "Sông Lam",
+      "Sông Hồng",
+      "Sông Mã",
+      "Sông Bạch Đằng"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Vua Lê Thánh Tông nổi tiếng với bộ luật nào?",
+    "options": [
+      "Luật Hồng Đức",
+      "Luật Gia Long",
+      "Luật Hình sự",
+      "Hình thư"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là nhà lãnh đạo khởi nghĩa cùng với Trưng Trắc chống nhà Hán?",
+    "options": [
+      "Triệu Thị Trinh",
+      "Lê Chân",
+      "Bùi Thị Xuân",
+      "Trưng Nhị"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Việt Nam trở thành thành viên chính thức của Liên Hợp Quốc vào năm nào?",
+    "options": [
+      "1995",
+      "1975",
+      "1977",
+      "1954"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Bà Triệu (Triệu Thị Trinh) khởi nghĩa chống lại quân xâm lược nào?",
+    "options": [
+      "Nhà Tống",
+      "Nhà Ngô",
+      "Nhà Hán",
+      "Nhà Đường"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là người viết bản 'Bình Ngô đại cáo'?",
+    "options": [
+      "Lê Lợi",
+      "Trần Hưng Đạo",
+      "Nguyễn Du",
+      "Nguyễn Trãi"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là tác giả tiểu thuyết 'Số Đỏ'?",
+    "options": [
+      "Nguyễn Công Hoan",
+      "Nam Cao",
+      "Ngô Tất Tố",
+      "Vũ Trọng Phụng"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Tác phẩm 'Nhật ký trong tù' là của ai?",
+    "options": [
+      "Tố Hữu",
+      "Chế Lan Viên",
+      "Hồ Chí Minh",
+      "Xuân Diệu"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là tác giả của 'Truyện Kiều'?",
+    "options": [
+      "Nguyễn Trãi",
+      "Hồ Xuân Hương",
+      "Nguyễn Du",
+      "Nguyễn Đình Chiểu"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nhân vật chính trong 'Truyện Kiều' tên là gì?",
+    "options": [
+      "Đạm Tiên",
+      "Thúy Vân",
+      "Thúy Kiều",
+      "Hoạn Thư"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là tác giả truyện ngắn 'Chí Phèo'?",
+    "options": [
+      "Nam Cao",
+      "Kim Lân",
+      "Nguyễn Công Hoan",
+      "Ngô Tất Tố"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Tác phẩm 'Tắt đèn' là của nhà văn nào?",
+    "options": [
+      "Vũ Trọng Phụng",
+      "Ngô Tất Tố",
+      "Nam Cao",
+      "Nguyên Hồng"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai được mệnh danh là 'Bà chúa thơ Nôm'?",
+    "options": [
+      "Sương Nguyệt Ánh",
+      "Hồ Xuân Hương",
+      "Đoàn Thị Điểm",
+      "Bà Huyện Thanh Quan"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là tác giả bài thơ 'Việt Bắc'?",
+    "options": [
+      "Chế Lan Viên",
+      "Tố Hữu",
+      "Huy Cận",
+      "Xuân Diệu"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nhà thơ nào được mệnh danh là 'Ông hoàng thơ tình'?",
+    "options": [
+      "Nguyễn Bính",
+      "Hàn Mặc Tử",
+      "Xuân Diệu",
+      "Huy Cận"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là tác giả truyện 'Dế Mèn phiêu lưu ký'?",
+    "options": [
+      "Nguyễn Nhật Ánh",
+      "Nam Cao",
+      "Tô Hoài",
+      "Nguyễn Huy Tưởng"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Tác giả 'Lão Hạc' là ai?",
+    "options": [
+      "Ngô Tất Tố",
+      "Nam Cao",
+      "Vũ Trọng Phụng",
+      "Nguyên Hồng"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Bài thơ 'Nam quốc sơn hà' được coi là bản tuyên ngôn độc lập đầu tiên, tương truyền là của ai?",
+    "options": [
+      "Lý Thường Kiệt",
+      "Lê Lợi",
+      "Trần Hưng Đạo",
+      "Nguyễn Trãi"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là tác giả tập thơ 'Nhật ký trong tù' viết bằng chữ Hán?",
+    "options": [
+      "Sóng Hồng",
+      "Xuân Diệu",
+      "Hồ Chí Minh",
+      "Tố Hữu"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nguyễn Đình Chiểu nổi tiếng với tác phẩm nào?",
+    "options": [
+      "Truyện Kiều",
+      "Cung oán ngâm khúc",
+      "Chinh phụ ngâm",
+      "Lục Vân Tiên"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là tác giả 'Chinh phụ ngâm' (bản dịch Nôm nổi tiếng)?",
+    "options": [
+      "Hồ Xuân Hương",
+      "Ngô Chi Lan",
+      "Đoàn Thị Điểm",
+      "Bà Huyện Thanh Quan"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là tác giả tiểu thuyết 'Sống mòn'?",
+    "options": [
+      "Ngô Tất Tố",
+      "Nguyên Hồng",
+      "Vũ Trọng Phụng",
+      "Nam Cao"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhà văn Nguyễn Nhật Ánh nổi tiếng với tác phẩm thiếu nhi nào?",
+    "options": [
+      "Kính vạn hoa",
+      "Tắt đèn",
+      "Số Đỏ",
+      "Dế Mèn phiêu lưu ký"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là tác giả bài thơ 'Đây thôn Vĩ Dạ'?",
+    "options": [
+      "Huy Cận",
+      "Xuân Diệu",
+      "Chế Lan Viên",
+      "Hàn Mặc Tử"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Tác phẩm 'Vợ chồng A Phủ' là của nhà văn nào?",
+    "options": [
+      "Nguyễn Minh Châu",
+      "Kim Lân",
+      "Tô Hoài",
+      "Nam Cao"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là tác giả truyện ngắn 'Vợ nhặt'?",
+    "options": [
+      "Tô Hoài",
+      "Nam Cao",
+      "Nguyễn Công Hoan",
+      "Kim Lân"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Thể loại văn học dân gian nào kể về các nhân vật thần thánh, có yếu tố kỳ ảo giải thích nguồn gốc?",
+    "options": [
+      "Ca dao",
+      "Truyện cười",
+      "Thần thoại",
+      "Tục ngữ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Tác phẩm 'Bình Ngô đại cáo' được coi là áng văn gì?",
+    "options": [
+      "Tiểu thuyết",
+      "Truyện ngắn",
+      "Tuyên ngôn độc lập",
+      "Thơ tình"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là tác giả 'Truyện Lục Vân Tiên'?",
+    "options": [
+      "Nguyễn Trãi",
+      "Nguyễn Đình Chiểu",
+      "Nguyễn Khuyến",
+      "Nguyễn Du"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nhà thơ nào nổi tiếng với phong cách trào phúng, hay viết về làng quê Bắc Bộ như 'Thu điếu'?",
+    "options": [
+      "Nguyễn Bính",
+      "Nguyễn Khuyến",
+      "Tú Xương",
+      "Tản Đà"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là tác giả 'Số phận con người' phiên bản Việt hóa nổi tiếng (tên thật Trần Hữu Tri)?",
+    "options": [
+      "Nguyên Hồng",
+      "Nam Cao",
+      "Vũ Trọng Phụng",
+      "Ngô Tất Tố"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Tác phẩm 'Những ngày thơ ấu' là hồi ký của nhà văn nào?",
+    "options": [
+      "Ngô Tất Tố",
+      "Nam Cao",
+      "Tô Hoài",
+      "Nguyên Hồng"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là tác giả bài thơ 'Tràng giang'?",
+    "options": [
+      "Chế Lan Viên",
+      "Xuân Diệu",
+      "Hàn Mặc Tử",
+      "Huy Cận"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhà thơ Tản Đà tên thật là gì?",
+    "options": [
+      "Nguyễn Bính",
+      "Nguyễn Khắc Hiếu",
+      "Nguyễn Trãi",
+      "Nguyễn Đình Chiểu"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là tác giả tiểu thuyết 'Giông tố'?",
+    "options": [
+      "Nguyên Hồng",
+      "Vũ Trọng Phụng",
+      "Nam Cao",
+      "Ngô Tất Tố"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Bài thơ 'Ông đồ' nổi tiếng là sáng tác của ai?",
+    "options": [
+      "Huy Cận",
+      "Vũ Đình Liên",
+      "Xuân Diệu",
+      "Nguyễn Bính"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Hành tinh nào gần Mặt Trời nhất?",
+    "options": [
+      "Sao Hỏa",
+      "Sao Kim",
+      "Sao Thủy",
+      "Trái Đất"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Bộ phận nào của cây thực hiện quang hợp chính?",
+    "options": [
+      "Lá",
+      "Thân",
+      "Hoa",
+      "Rễ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đơn vị đo cường độ dòng điện là gì?",
+    "options": [
+      "Volt",
+      "Ampe",
+      "Ohm",
+      "Watt"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chất nào chiếm phần lớn trong khí quyển Trái Đất?",
+    "options": [
+      "Hydro",
+      "Oxy",
+      "Nitơ",
+      "CO2"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đơn vị đo nhiệt độ phổ biến ở Việt Nam là gì?",
+    "options": [
+      "Celsius",
+      "Kelvin",
+      "Rankine",
+      "Fahrenheit"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Loại virus nào gây ra đại dịch COVID-19?",
+    "options": [
+      "Ebola",
+      "SARS-CoV-2",
+      "HIV",
+      "Influenza"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là tác giả của thuyết vạn vật hấp dẫn?",
+    "options": [
+      "Newton",
+      "Galileo",
+      "Einstein",
+      "Copernicus"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Loại khoáng chất nào cần thiết cho xương chắc khỏe?",
+    "options": [
+      "Kẽm",
+      "Sắt",
+      "Canxi",
+      "Magie"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Loại sóng nào dùng để truyền tín hiệu WiFi?",
+    "options": [
+      "Sóng âm",
+      "Sóng địa chấn",
+      "Sóng ánh sáng",
+      "Sóng vô tuyến"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Loại tế bào máu nào có chức năng vận chuyển oxy?",
+    "options": [
+      "Hồng cầu",
+      "Bạch cầu",
+      "Tiểu cầu",
+      "Huyết tương"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chất khí nào cây xanh hấp thụ trong quá trình quang hợp?",
+    "options": [
+      "CO2",
+      "Hydro",
+      "Nitơ",
+      "Oxy"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Nước có công thức hóa học là gì?",
+    "options": [
+      "NaCl",
+      "O2",
+      "CO2",
+      "H2O"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Kim loại nào nhẹ nhất trong các kim loại thông dụng?",
+    "options": [
+      "Đồng",
+      "Liti",
+      "Nhôm",
+      "Sắt"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cơ quan nào trong cơ thể người có chức năng bơm máu?",
+    "options": [
+      "Phổi",
+      "Tim",
+      "Thận",
+      "Gan"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đơn vị đo công suất điện là gì?",
+    "options": [
+      "Volt",
+      "Watt",
+      "Ampe",
+      "Ohm"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chất nào có công thức hóa học NaCl?",
+    "options": [
+      "Vôi",
+      "Muối ăn",
+      "Đường",
+      "Giấm"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ánh sáng trắng khi đi qua lăng kính sẽ tách thành mấy màu cơ bản?",
+    "options": [
+      "8",
+      "5",
+      "6",
+      "7"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Bộ não người nằm trong hệ cơ quan nào?",
+    "options": [
+      "Hệ tuần hoàn",
+      "Hệ tiêu hóa",
+      "Hệ thần kinh",
+      "Hệ hô hấp"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đơn vị cơ bản của sự sống là gì?",
+    "options": [
+      "Tế bào",
+      "Mô",
+      "Cơ quan",
+      "Phân tử"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chất khí nào con người thải ra khi hô hấp?",
+    "options": [
+      "CO2",
+      "Oxy",
+      "Hydro",
+      "Nitơ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Định luật bảo toàn năng lượng phát biểu điều gì?",
+    "options": [
+      "Năng lượng có thể tự sinh ra",
+      "Năng lượng luôn tăng",
+      "Năng lượng không tự sinh ra hay mất đi, chỉ chuyển hóa",
+      "Năng lượng luôn giảm"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Kim loại nào được dùng làm dây tóc bóng đèn?",
+    "options": [
+      "Kẽm",
+      "Đồng",
+      "Wolfram (Vonfram)",
+      "Nhôm"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cơ thể người có bao nhiêu đôi xương sườn?",
+    "options": [
+      "16",
+      "14",
+      "12",
+      "10"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Chất nào là thành phần chính tạo nên máu có màu đỏ?",
+    "options": [
+      "Hemoglobin",
+      "Canxi",
+      "Bạch cầu",
+      "Huyết tương"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đơn vị đo tần số là gì?",
+    "options": [
+      "Joule",
+      "Pascal",
+      "Newton",
+      "Hertz"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Loại năng lượng nào Mặt Trời cung cấp cho Trái Đất chủ yếu?",
+    "options": [
+      "Năng lượng ánh sáng và nhiệt",
+      "Năng lượng điện",
+      "Năng lượng hạt nhân",
+      "Năng lượng gió"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "pH bằng 7 cho biết dung dịch có tính chất gì?",
+    "options": [
+      "Axit",
+      "Trung tính",
+      "Muối",
+      "Bazơ"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Bộ phận nào của cơ thể giúp lọc máu và tạo nước tiểu?",
+    "options": [
+      "Lách",
+      "Phổi",
+      "Thận",
+      "Gan"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Chất nào được coi là 'khí trơ' phổ biến dùng trong bóng đèn?",
+    "options": [
+      "CO2",
+      "Hydro",
+      "Oxy",
+      "Argon"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Vitamin nào giúp cơ thể hấp thụ canxi tốt hơn, có nhiều khi phơi nắng?",
+    "options": [
+      "Vitamin A",
+      "Vitamin K",
+      "Vitamin C",
+      "Vitamin D"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Loại phản ứng hóa học nào giải phóng nhiệt?",
+    "options": [
+      "Phản ứng thu nhiệt",
+      "Phản ứng oxi hóa khử",
+      "Phản ứng trung hòa",
+      "Phản ứng tỏa nhiệt"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cấu trúc DNA có hình dạng như thế nào?",
+    "options": [
+      "Hình vuông",
+      "Chuỗi xoắn kép",
+      "Hình cầu",
+      "Hình tam giác"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đơn vị đo áp suất là gì?",
+    "options": [
+      "Joule",
+      "Newton",
+      "Pascal",
+      "Watt"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Bộ phận nào của mắt có chức năng điều tiết ánh sáng đi vào?",
+    "options": [
+      "Võng mạc",
+      "Thủy tinh thể",
+      "Giác mạc",
+      "Đồng tử"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Khí nào cần thiết cho quá trình hô hấp của con người?",
+    "options": [
+      "Nitơ",
+      "Oxy",
+      "CO2",
+      "Heli"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Kim loại nào có tính dẫn điện tốt nhất?",
+    "options": [
+      "Bạc",
+      "Nhôm",
+      "Sắt",
+      "Vàng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chu kỳ bán rã liên quan đến hiện tượng vật lý nào?",
+    "options": [
+      "Điện từ",
+      "Quang học",
+      "Phóng xạ",
+      "Cơ học"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Loại mô nào có chức năng co giãn giúp cơ thể vận động?",
+    "options": [
+      "Mô cơ",
+      "Mô thần kinh",
+      "Mô liên kết",
+      "Mô biểu bì"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Trạng thái vật chất nào có hình dạng và thể tích cố định?",
+    "options": [
+      "Plasma",
+      "Rắn",
+      "Lỏng",
+      "Khí"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đường trong cơ thể được lưu trữ chủ yếu dưới dạng gì ở gan?",
+    "options": [
+      "Lactose",
+      "Fructose",
+      "Glycogen",
+      "Glucose"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Hiện tượng nào xảy ra khi ánh sáng bị bẻ cong khi đi qua các môi trường khác nhau?",
+    "options": [
+      "Khúc xạ",
+      "Giao thoa",
+      "Nhiễu xạ",
+      "Phản xạ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cơ quan nào chịu trách nhiệm chính trong việc trao đổi khí ở người?",
+    "options": [
+      "Gan",
+      "Phổi",
+      "Tim",
+      "Dạ dày"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chất xúc tác trong phản ứng hóa học có vai trò gì?",
+    "options": [
+      "Tăng tốc độ phản ứng mà không bị tiêu hao",
+      "Làm chậm phản ứng",
+      "Thay đổi sản phẩm",
+      "Ngăn phản ứng xảy ra"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đơn vị đo khối lượng cơ bản trong hệ SI là gì?",
+    "options": [
+      "Gram",
+      "Kilogram",
+      "Tấn",
+      "Pound"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Não bộ con người được chia thành mấy bán cầu chính?",
+    "options": [
+      "1",
+      "2",
+      "4",
+      "3"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chất khí nào gây ra hiệu ứng nhà kính chủ yếu?",
+    "options": [
+      "Oxy",
+      "CO2",
+      "Heli",
+      "Nitơ"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Enzyme trong cơ thể có vai trò gì?",
+    "options": [
+      "Vận chuyển oxy",
+      "Xúc tác các phản ứng sinh hóa",
+      "Chống lại vi khuẩn",
+      "Tạo năng lượng trực tiếp"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Từ trường Trái Đất có tác dụng gì đối với sự sống?",
+    "options": [
+      "Tạo ra mưa",
+      "Bảo vệ khỏi bức xạ vũ trụ",
+      "Không có tác dụng gì",
+      "Gây ra động đất"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Loại xương nào lớn nhất và dài nhất trong cơ thể người?",
+    "options": [
+      "Xương đùi",
+      "Xương cánh tay",
+      "Xương sống",
+      "Xương sườn"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ánh sáng di chuyển với vận tốc xấp xỉ bao nhiêu km/s trong chân không?",
+    "options": [
+      "300.000 km/s",
+      "1.000.000 km/s",
+      "150.000 km/s",
+      "500.000 km/s"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Số Pi (π) xấp xỉ bằng bao nhiêu?",
+    "options": [
+      "1.41",
+      "2.71",
+      "3.14",
+      "1.61"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Kết quả của phép tính 7 x 8 là bao nhiêu?",
+    "options": [
+      "64",
+      "48",
+      "56",
+      "54"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Một tam giác đều có bao nhiêu góc bằng nhau?",
+    "options": [
+      "3",
+      "1",
+      "2",
+      "4"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Số nào là số nguyên tố?",
+    "options": [
+      "4",
+      "9",
+      "7",
+      "6"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Diện tích hình vuông cạnh 5cm là bao nhiêu?",
+    "options": [
+      "25 cm²",
+      "20 cm²",
+      "50 cm²",
+      "10 cm²"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Tổng ba góc trong một tam giác bằng bao nhiêu độ?",
+    "options": [
+      "180 độ",
+      "360 độ",
+      "90 độ",
+      "270 độ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Số 0 có phải là số tự nhiên không?",
+    "options": [
+      "Không xác định",
+      "Có",
+      "Không",
+      "Chỉ trong một số hệ"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Căn bậc hai của 144 là bao nhiêu?",
+    "options": [
+      "14",
+      "10",
+      "11",
+      "12"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Một hình tròn có bao nhiêu độ?",
+    "options": [
+      "270 độ",
+      "180 độ",
+      "90 độ",
+      "360 độ"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Kết quả của 15% của 200 là bao nhiêu?",
+    "options": [
+      "15",
+      "20",
+      "30",
+      "25"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Số nào sau đây là số chẵn?",
+    "options": [
+      "15",
+      "9",
+      "12",
+      "7"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Chu vi hình chữ nhật có chiều dài 8cm và chiều rộng 3cm là bao nhiêu?",
+    "options": [
+      "24 cm",
+      "22 cm",
+      "11 cm",
+      "16 cm"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Phân số 1/2 tương đương với bao nhiêu phần trăm?",
+    "options": [
+      "25%",
+      "75%",
+      "50%",
+      "100%"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Số nào là bội số chung nhỏ nhất của 4 và 6?",
+    "options": [
+      "10",
+      "24",
+      "12",
+      "8"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Kết quả của 9² (9 mũ 2) là bao nhiêu?",
+    "options": [
+      "18",
+      "72",
+      "99",
+      "81"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Một hình lập phương có bao nhiêu mặt?",
+    "options": [
+      "4",
+      "12",
+      "8",
+      "6"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Số La Mã 'X' tương ứng với số nào?",
+    "options": [
+      "10",
+      "5",
+      "100",
+      "50"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Kết quả phép chia 144 : 12 là bao nhiêu?",
+    "options": [
+      "11",
+      "14",
+      "10",
+      "12"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ước chung lớn nhất (ƯCLN) của 12 và 18 là bao nhiêu?",
+    "options": [
+      "2",
+      "9",
+      "3",
+      "6"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Tam giác vuông có một góc bằng bao nhiêu độ?",
+    "options": [
+      "90 độ",
+      "60 độ",
+      "120 độ",
+      "45 độ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Olympic hiện đại đầu tiên tổ chức tại đâu?",
+    "options": [
+      "Pháp",
+      "Hy Lạp",
+      "Ý",
+      "Anh"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Kim tự tháp Giza nằm ở quốc gia nào?",
+    "options": [
+      "Trung Quốc",
+      "Peru",
+      "Ai Cập",
+      "Mexico"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đâu là thủ đô của Hàn Quốc?",
+    "options": [
+      "Seoul",
+      "Incheon",
+      "Daegu",
+      "Busan"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đâu là quốc gia có dân số đông nhất thế giới hiện nay?",
+    "options": [
+      "Ấn Độ",
+      "Trung Quốc",
+      "Mỹ",
+      "Indonesia"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Sông nào dài nhất thế giới?",
+    "options": [
+      "Sông Nile",
+      "Sông Trường Giang",
+      "Sông Mississippi",
+      "Sông Amazon"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Núi nào cao nhất thế giới?",
+    "options": [
+      "Annapurna",
+      "Kangchenjunga",
+      "K2",
+      "Everest"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Sa mạc nào lớn nhất thế giới (tính cả sa mạc lạnh)?",
+    "options": [
+      "Gobi",
+      "Sahara",
+      "Kalahari",
+      "Nam Cực"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Quốc gia nào có diện tích lớn nhất thế giới?",
+    "options": [
+      "Nga",
+      "Canada",
+      "Trung Quốc",
+      "Mỹ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Thành phố nào được gọi là 'Kinh đô ánh sáng'?",
+    "options": [
+      "London",
+      "Paris",
+      "New York",
+      "Rome"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Tháp Eiffel nằm ở thành phố nào?",
+    "options": [
+      "Paris",
+      "London",
+      "Madrid",
+      "Berlin"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Vạn Lý Trường Thành nằm ở quốc gia nào?",
+    "options": [
+      "Mông Cổ",
+      "Nhật Bản",
+      "Hàn Quốc",
+      "Trung Quốc"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đại dương nào lớn nhất thế giới?",
+    "options": [
+      "Thái Bình Dương",
+      "Ấn Độ Dương",
+      "Đại Tây Dương",
+      "Bắc Băng Dương"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Châu lục nào lớn nhất thế giới?",
+    "options": [
+      "Châu Âu",
+      "Châu Mỹ",
+      "Châu Á",
+      "Châu Phi"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Quốc gia nào có hình dạng giống chiếc ủng trên bản đồ?",
+    "options": [
+      "Bồ Đào Nha",
+      "Ý",
+      "Tây Ban Nha",
+      "Hy Lạp"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Thủ đô của nước Nhật Bản là gì?",
+    "options": [
+      "Tokyo",
+      "Kyoto",
+      "Yokohama",
+      "Osaka"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Tượng Nữ thần Tự do nằm ở thành phố nào?",
+    "options": [
+      "Los Angeles",
+      "Chicago",
+      "New York",
+      "Washington D.C."
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Thủ đô của nước Anh là gì?",
+    "options": [
+      "Liverpool",
+      "Birmingham",
+      "London",
+      "Manchester"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Quốc gia nào được mệnh danh là 'xứ sở hoa tulip'?",
+    "options": [
+      "Hà Lan",
+      "Bỉ",
+      "Đan Mạch",
+      "Đức"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Hồ nước ngọt lớn nhất thế giới tính theo diện tích là hồ nào?",
+    "options": [
+      "Hồ Superior",
+      "Hồ Baikal",
+      "Hồ Victoria",
+      "Hồ Michigan"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Quốc gia nào có nhiều múi giờ nhất thế giới?",
+    "options": [
+      "Trung Quốc",
+      "Nga",
+      "Pháp",
+      "Mỹ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đâu là thủ đô của nước Úc?",
+    "options": [
+      "Perth",
+      "Melbourne",
+      "Canberra",
+      "Sydney"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Rừng nhiệt đới lớn nhất thế giới nằm ở khu vực nào?",
+    "options": [
+      "Đông Nam Á",
+      "Trung Phi",
+      "Amazon (Nam Mỹ)",
+      "Ấn Độ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ngọn núi lửa nào nổi tiếng ở Indonesia gắn với thảm họa lịch sử năm 1883?",
+    "options": [
+      "Krakatoa",
+      "Merapi",
+      "Fuji",
+      "Etna"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Quốc gia nào nằm hoàn toàn trong lãnh thổ một quốc gia khác - Vatican?",
+    "options": [
+      "Tây Ban Nha",
+      "Ý",
+      "Thụy Sĩ",
+      "Pháp"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Kênh đào nào nối Địa Trung Hải với Biển Đỏ?",
+    "options": [
+      "Kênh đào Kiel",
+      "Kênh đào Panama",
+      "Kênh đào Suez",
+      "Kênh đào Corinth"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Thủ đô của nước Pháp là gì?",
+    "options": [
+      "Nice",
+      "Lyon",
+      "Marseille",
+      "Paris"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đâu là quốc gia nhỏ nhất thế giới về diện tích?",
+    "options": [
+      "San Marino",
+      "Vatican",
+      "Monaco",
+      "Liechtenstein"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ngọn núi Phú Sĩ (Fuji) nằm ở quốc gia nào?",
+    "options": [
+      "Trung Quốc",
+      "Hàn Quốc",
+      "Đài Loan",
+      "Nhật Bản"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Thành phố nào được mệnh danh là 'Thành phố không bao giờ ngủ'?",
+    "options": [
+      "Chicago",
+      "Los Angeles",
+      "New York",
+      "Las Vegas"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đâu là quốc gia có nhiều đảo nhất thế giới?",
+    "options": [
+      "Philippines",
+      "Na Uy",
+      "Thụy Điển",
+      "Indonesia"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Biển nào được coi là mặn nhất và không có sự sống của cá lớn?",
+    "options": [
+      "Biển Chết",
+      "Biển Đen",
+      "Biển Địa Trung Hải",
+      "Biển Đỏ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Thủ đô của Nga là thành phố nào?",
+    "options": [
+      "Saint Petersburg",
+      "Moscow",
+      "Kazan",
+      "Novosibirsk"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ngọn núi Kilimanjaro nằm ở châu lục nào?",
+    "options": [
+      "Châu Mỹ",
+      "Châu Phi",
+      "Châu Á",
+      "Châu Âu"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Thủ đô của Ấn Độ là thành phố nào?",
+    "options": [
+      "Mumbai",
+      "New Delhi",
+      "Bangalore",
+      "Kolkata"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đâu là quốc gia có số lượng người nói tiếng Bồ Đào Nha nhiều nhất?",
+    "options": [
+      "Bồ Đào Nha",
+      "Brazil",
+      "Angola",
+      "Mozambique"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Thủ đô của nước Đức là gì?",
+    "options": [
+      "Munich",
+      "Hamburg",
+      "Berlin",
+      "Frankfurt"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Quần đảo Hawaii thuộc quốc gia nào?",
+    "options": [
+      "New Zealand",
+      "Mỹ",
+      "Nhật Bản",
+      "Úc"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Sông Amazon chảy chủ yếu qua quốc gia nào?",
+    "options": [
+      "Peru",
+      "Argentina",
+      "Brazil",
+      "Colombia"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Thủ đô của Thái Lan là thành phố nào?",
+    "options": [
+      "Chiang Mai",
+      "Pattaya",
+      "Phuket",
+      "Bangkok"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đâu là quốc gia duy nhất nằm trên hai châu lục Á - Âu rõ rệt?",
+    "options": [
+      "Nga",
+      "Kazakhstan",
+      "Ai Cập",
+      "Thổ Nhĩ Kỳ"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai được coi là cha đẻ của thuyết tiến hóa?",
+    "options": [
+      "Darwin",
+      "Einstein",
+      "Mendel",
+      "Newton"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai sáng tác bản giao hưởng nổi tiếng 'Định mệnh'?",
+    "options": [
+      "Bach",
+      "Beethoven",
+      "Chopin",
+      "Mozart"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là người đầu tiên bay vào vũ trụ?",
+    "options": [
+      "Neil Armstrong",
+      "Buzz Aldrin",
+      "Yuri Gagarin",
+      "John Glenn"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là người sáng lập ra hãng Microsoft?",
+    "options": [
+      "Elon Musk",
+      "Bill Gates",
+      "Steve Jobs",
+      "Mark Zuckerberg"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chiến tranh thế giới thứ hai kết thúc vào năm nào?",
+    "options": [
+      "1950",
+      "1947",
+      "1943",
+      "1945"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chiến tranh thế giới thứ nhất bắt đầu vào năm nào?",
+    "options": [
+      "1918",
+      "1914",
+      "1939",
+      "1904"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là vị hoàng đế nổi tiếng của Pháp, từng chinh phục phần lớn châu Âu đầu thế kỷ 19?",
+    "options": [
+      "Louis Napoleon",
+      "Napoleon Bonaparte",
+      "Louis XIV",
+      "Charles de Gaulle"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Bức tường Berlin sụp đổ vào năm nào?",
+    "options": [
+      "1991",
+      "1985",
+      "1995",
+      "1989"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là tổng thống đầu tiên của nước Mỹ?",
+    "options": [
+      "Abraham Lincoln",
+      "Thomas Jefferson",
+      "John Adams",
+      "George Washington"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đế chế La Mã cổ đại có thủ đô là thành phố nào?",
+    "options": [
+      "Cairo",
+      "Constantinople",
+      "Rome",
+      "Athens"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cuộc cách mạng công nghiệp bắt đầu đầu tiên tại quốc gia nào?",
+    "options": [
+      "Pháp",
+      "Mỹ",
+      "Đức",
+      "Anh"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là nhà lãnh đạo phong trào đấu tranh bất bạo động, giành độc lập cho Ấn Độ?",
+    "options": [
+      "Nehru",
+      "Martin Luther King",
+      "Mahatma Gandhi",
+      "Nelson Mandela"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Vạn Lý Trường Thành được xây dựng chủ yếu để làm gì?",
+    "options": [
+      "Giao thông",
+      "Phòng thủ chống xâm lược",
+      "Trang trí",
+      "Thủy lợi"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là nhà lãnh đạo nổi tiếng đấu tranh chống chế độ apartheid ở Nam Phi?",
+    "options": [
+      "Nelson Mandela",
+      "Jomo Kenyatta",
+      "Kwame Nkrumah",
+      "Desmond Tutu"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Thế chiến thứ hai kết thúc ở châu Âu khi nước nào đầu hàng?",
+    "options": [
+      "Ý",
+      "Đức",
+      "Áo",
+      "Nhật Bản"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là vị vua Ai Cập cổ đại nổi tiếng với lăng mộ được phát hiện gần như nguyên vẹn?",
+    "options": [
+      "Ramses II",
+      "Akhenaten",
+      "Cleopatra",
+      "Tutankhamun"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cách mạng Pháp bắt đầu vào năm nào?",
+    "options": [
+      "1804",
+      "1799",
+      "1789",
+      "1776"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là nhà khoa học phát minh ra bóng đèn điện?",
+    "options": [
+      "Thomas Edison",
+      "James Watt",
+      "Nikola Tesla",
+      "Alexander Graham Bell"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Nền văn minh nào xây dựng nên Kim tự tháp Giza?",
+    "options": [
+      "Ai Cập cổ đại",
+      "Lưỡng Hà",
+      "La Mã cổ đại",
+      "Hy Lạp cổ đại"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là nhà bác học phát minh ra điện thoại?",
+    "options": [
+      "Alexander Graham Bell",
+      "Guglielmo Marconi",
+      "Thomas Edison",
+      "Nikola Tesla"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Trận Trân Châu Cảng xảy ra vào năm nào?",
+    "options": [
+      "1937",
+      "1939",
+      "1941",
+      "1945"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Liên Xô tan rã vào năm nào?",
+    "options": [
+      "1991",
+      "1989",
+      "1993",
+      "1995"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là hoàng đế đầu tiên thống nhất Trung Quốc?",
+    "options": [
+      "Tần Thủy Hoàng",
+      "Càn Long",
+      "Hán Vũ Đế",
+      "Đường Thái Tông"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cuộc Đại chiến thế giới thứ nhất kết thúc bằng hiệp ước nào?",
+    "options": [
+      "Hiệp ước Westphalia",
+      "Hiệp ước Vienna",
+      "Hiệp ước Versailles",
+      "Hiệp ước Paris"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là nhà lãnh đạo Liên Xô trong phần lớn Thế chiến thứ hai?",
+    "options": [
+      "Lenin",
+      "Khrushchev",
+      "Gorbachev",
+      "Stalin"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Kim tự tháp cổ đại nào được xem là một trong Bảy kỳ quan thế giới cổ đại còn tồn tại?",
+    "options": [
+      "Kim tự tháp Giza",
+      "Vườn treo Babylon",
+      "Đền Artemis",
+      "Tượng thần Zeus"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Nền văn minh Maya phát triển rực rỡ ở khu vực nào?",
+    "options": [
+      "Đông Nam Á",
+      "Nam Âu",
+      "Trung Mỹ",
+      "Bắc Phi"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là nhà thám hiểm được cho là người tìm ra châu Mỹ năm 1492?",
+    "options": [
+      "James Cook",
+      "Christopher Columbus",
+      "Ferdinand Magellan",
+      "Vasco da Gama"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chiến tranh Lạnh chủ yếu là cuộc đối đầu giữa hai siêu cường nào?",
+    "options": [
+      "Anh và Pháp",
+      "Trung Quốc và Ấn Độ",
+      "Đức và Nhật",
+      "Mỹ và Liên Xô"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đế chế Ottoman có trung tâm chủ yếu ở khu vực nào?",
+    "options": [
+      "Đông Á",
+      "Tây Âu",
+      "Trung Đông",
+      "Bắc Âu"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là nữ hoàng nổi tiếng của Ai Cập cổ đại, có mối tình với Julius Caesar và Mark Antony?",
+    "options": [
+      "Hatshepsut",
+      "Cleopatra",
+      "Nefertari",
+      "Nefertiti"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Sự kiện nào đánh dấu khởi đầu của cuộc Cách mạng công nghiệp lần thứ nhất?",
+    "options": [
+      "Phát minh máy bay",
+      "Phát minh máy hơi nước",
+      "Phát minh điện thoại",
+      "Phát minh internet"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là nhà lãnh đạo phong trào dân quyền da đen nổi tiếng ở Mỹ với bài diễn văn 'Tôi có một giấc mơ'?",
+    "options": [
+      "Martin Luther King Jr.",
+      "Rosa Parks",
+      "Malcolm X",
+      "Barack Obama"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Thành Rome cổ đại được xây dựng trên bao nhiêu ngọn đồi?",
+    "options": [
+      "12",
+      "5",
+      "9",
+      "7"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là hoàng đế nổi tiếng của đế chế Mông Cổ, người lập ra đế quốc lớn nhất lịch sử?",
+    "options": [
+      "Hốt Tất Liệt",
+      "Oa Khoát Đài",
+      "A Lỗ Đài",
+      "Thành Cát Tư Hãn"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cách mạng công nghiệp lần thứ nhất chủ yếu diễn ra vào thế kỷ nào?",
+    "options": [
+      "Thế kỷ 19",
+      "Thế kỷ 18",
+      "Thế kỷ 20",
+      "Thế kỷ 17"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đế quốc nào được coi là lớn nhất trong lịch sử nhân loại về diện tích?",
+    "options": [
+      "Đế quốc Ottoman",
+      "Đế quốc La Mã",
+      "Đế quốc Anh",
+      "Đế quốc Mông Cổ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là người phát minh ra máy in với chữ rời đầu tiên ở châu Âu?",
+    "options": [
+      "Johannes Gutenberg",
+      "Galileo Galilei",
+      "Isaac Newton",
+      "Leonardo da Vinci"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Sự kiện 11/9/2001 xảy ra tại quốc gia nào?",
+    "options": [
+      "Anh",
+      "Mỹ",
+      "Đức",
+      "Pháp"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là vị tướng nổi tiếng của Carthage từng vượt dãy Alps để tấn công La Mã?",
+    "options": [
+      "Julius Caesar",
+      "Hannibal",
+      "Alexander Đại đế",
+      "Scipio"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Hệ Mặt Trời có bao nhiêu hành tinh chính thức?",
+    "options": [
+      "7",
+      "8",
+      "10",
+      "9"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ngôi sao gần Trái Đất nhất là ngôi sao nào?",
+    "options": [
+      "Alpha Centauri",
+      "Mặt Trời",
+      "Sao Bắc Cực",
+      "Sao Kim"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Hành tinh nào được gọi là 'Hành tinh Đỏ'?",
+    "options": [
+      "Sao Mộc",
+      "Sao Kim",
+      "Sao Hỏa",
+      "Sao Thổ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Hành tinh nào lớn nhất trong Hệ Mặt Trời?",
+    "options": [
+      "Sao Mộc",
+      "Trái Đất",
+      "Sao Thổ",
+      "Sao Hải Vương"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Mặt Trăng quay quanh Trái Đất mất khoảng bao lâu?",
+    "options": [
+      "1 tuần",
+      "1 ngày",
+      "1 tháng (khoảng 27-29 ngày)",
+      "1 năm"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Hành tinh nào có vành đai nổi bật và dễ nhận biết nhất?",
+    "options": [
+      "Sao Thổ",
+      "Sao Hải Vương",
+      "Sao Thiên Vương",
+      "Sao Mộc"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Thiên hà chứa Hệ Mặt Trời của chúng ta có tên là gì?",
+    "options": [
+      "Tiên Nữ (Andromeda)",
+      "Ngân Hà (Milky Way)",
+      "Nhân Mã",
+      "Xoáy Ốc"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Sao chổi được cấu tạo chủ yếu từ chất gì?",
+    "options": [
+      "Đá và kim loại",
+      "Khí Hydro",
+      "Băng, bụi và đá",
+      "Plasma"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Hiện tượng nhật thực xảy ra khi nào?",
+    "options": [
+      "Sao Kim che Mặt Trời",
+      "Mặt Trời che Trái Đất",
+      "Mặt Trăng che Mặt Trời",
+      "Trái Đất che Mặt Trăng"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Trạm vũ trụ quốc tế viết tắt là gì?",
+    "options": [
+      "NASA",
+      "ESA",
+      "ISS",
+      "JAXA"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Hành tinh nào được gọi là 'Sao Hôm' hoặc 'Sao Mai' khi nhìn từ Trái Đất?",
+    "options": [
+      "Sao Thủy",
+      "Sao Kim",
+      "Sao Hỏa",
+      "Sao Mộc"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là người đầu tiên đặt chân lên Mặt Trăng?",
+    "options": [
+      "John Glenn",
+      "Buzz Aldrin",
+      "Neil Armstrong",
+      "Yuri Gagarin"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Một năm ánh sáng dùng để đo đại lượng gì?",
+    "options": [
+      "Thời gian",
+      "Khối lượng",
+      "Nhiệt độ",
+      "Khoảng cách"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Hố đen (black hole) hình thành từ đâu?",
+    "options": [
+      "Va chạm thiên thạch",
+      "Bụi vũ trụ tụ lại",
+      "Vụ nổ Mặt Trời",
+      "Sự sụp đổ của ngôi sao lớn"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Sao Diêm Vương (Pluto) hiện được phân loại là gì?",
+    "options": [
+      "Hành tinh",
+      "Hành tinh lùn",
+      "Sao chổi",
+      "Tiểu hành tinh"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Hành tinh nào được mệnh danh là 'song sinh' của Trái Đất do kích thước tương đồng?",
+    "options": [
+      "Sao Hỏa",
+      "Sao Mộc",
+      "Sao Thủy",
+      "Sao Kim"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Vành đai tiểu hành tinh chính nằm giữa hai hành tinh nào?",
+    "options": [
+      "Sao Hỏa và Sao Mộc",
+      "Sao Mộc và Sao Thổ",
+      "Sao Thổ và Sao Thiên Vương",
+      "Trái Đất và Sao Hỏa"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Hiện tượng nào giải thích vì sao bầu trời có màu xanh vào ban ngày?",
+    "options": [
+      "Tán xạ Rayleigh",
+      "Hấp thụ ánh sáng",
+      "Khúc xạ ánh sáng",
+      "Phản xạ toàn phần"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Vệ tinh tự nhiên duy nhất của Trái Đất là gì?",
+    "options": [
+      "Mặt Trăng",
+      "Phobos",
+      "Europa",
+      "Titan"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Kính viễn vọng không gian nổi tiếng mang tên nhà thiên văn học nào, được phóng năm 1990?",
+    "options": [
+      "Hubble",
+      "Galileo",
+      "Newton",
+      "Kepler"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đâu là ngôn ngữ lập trình phổ biến dùng cho phát triển web phía client?",
+    "options": [
+      "Python",
+      "C++",
+      "Java",
+      "JavaScript"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "CPU là viết tắt của cụm từ nào?",
+    "options": [
+      "Computer Personal Unit",
+      "Central Program Unit",
+      "Central Processing Unit",
+      "Core Processing Unit"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "RAM là viết tắt của cụm từ nào?",
+    "options": [
+      "Random Analog Memory",
+      "Read Access Memory",
+      "Random Access Memory",
+      "Rapid Access Memory"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là người đồng sáng lập ra hãng Apple?",
+    "options": [
+      "Steve Jobs",
+      "Larry Page",
+      "Bill Gates",
+      "Jeff Bezos"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "HTML là viết tắt của gì?",
+    "options": [
+      "HyperText Markup Language",
+      "Hyperlink Text Manual",
+      "Home Tool Markup Language",
+      "High Tech Modern Language"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đâu là hệ điều hành di động phổ biến do Google phát triển?",
+    "options": [
+      "Symbian",
+      "Android",
+      "Windows Phone",
+      "iOS"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Mạng xã hội nào do Mark Zuckerberg sáng lập?",
+    "options": [
+      "LinkedIn",
+      "Facebook",
+      "Instagram",
+      "Twitter"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đâu là trình duyệt web do Google phát triển?",
+    "options": [
+      "Chrome",
+      "Safari",
+      "Edge",
+      "Firefox"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "AI là viết tắt của cụm từ nào?",
+    "options": [
+      "Application Interface",
+      "Artificial Intelligence",
+      "Automated Information",
+      "Advanced Interface"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đâu là công ty sản xuất chip xử lý nổi tiếng, đối thủ chính của AMD?",
+    "options": [
+      "Samsung",
+      "Qualcomm",
+      "Nvidia",
+      "Intel"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "USB là viết tắt của gì?",
+    "options": [
+      "United System Bus",
+      "Universal Serial Bus",
+      "Unit Serial Board",
+      "Universal System Board"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đâu là ngôn ngữ lập trình được đặt tên theo một loài rắn?",
+    "options": [
+      "Python",
+      "Java",
+      "Ruby",
+      "C++"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Wikipedia là gì?",
+    "options": [
+      "Bách khoa toàn thư mở trực tuyến",
+      "Mạng xã hội",
+      "Công cụ tìm kiếm",
+      "Nền tảng thương mại điện tử"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đâu là công ty sở hữu YouTube?",
+    "options": [
+      "Microsoft",
+      "Meta",
+      "Amazon",
+      "Google"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "GPU chủ yếu được dùng để xử lý loại tác vụ nào?",
+    "options": [
+      "Đồ họa hình ảnh",
+      "Âm thanh",
+      "Lưu trữ",
+      "Mạng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đâu là hãng công nghệ đã tạo ra ChatGPT?",
+    "options": [
+      "Meta",
+      "Google",
+      "Microsoft",
+      "OpenAI"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Định dạng ảnh nào hỗ trợ nền trong suốt phổ biến?",
+    "options": [
+      "BMP",
+      "PNG",
+      "JPEG",
+      "GIF cũ"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đâu là mạng xã hội chia sẻ video ngắn nổi tiếng có nguồn gốc từ Trung Quốc?",
+    "options": [
+      "Twitter",
+      "Snapchat",
+      "Instagram",
+      "TikTok"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Wifi hoạt động dựa trên loại sóng nào?",
+    "options": [
+      "Sóng siêu âm",
+      "Sóng hồng ngoại",
+      "Sóng âm",
+      "Sóng vô tuyến"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đâu là hệ điều hành máy tính do Microsoft phát triển?",
+    "options": [
+      "Android",
+      "Windows",
+      "macOS",
+      "Linux"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Blockchain là công nghệ nền tảng cho loại tiền tệ nào?",
+    "options": [
+      "Tiền xu",
+      "Tiền giấy",
+      "Tiền điện tử (cryptocurrency)",
+      "Séc ngân hàng"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đâu là công ty thương mại điện tử lớn nhất thế giới do Jeff Bezos sáng lập?",
+    "options": [
+      "Shopee",
+      "Amazon",
+      "eBay",
+      "Alibaba"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Thuật ngữ 'Cloud Computing' nghĩa là gì?",
+    "options": [
+      "Máy tính bảng",
+      "Mạng nội bộ",
+      "Phần cứng máy tính",
+      "Điện toán đám mây"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đâu là định dạng file nén phổ biến?",
+    "options": [
+      "PDF",
+      "DOC",
+      "ZIP",
+      "MP3"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai được coi là 'cha đẻ' của World Wide Web?",
+    "options": [
+      "Larry Page",
+      "Tim Berners-Lee",
+      "Bill Gates",
+      "Steve Jobs"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đâu là môn thể thao vua ở Việt Nam?",
+    "options": [
+      "Bóng chuyền",
+      "Bóng rổ",
+      "Bóng đá",
+      "Cầu lông"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Một trận bóng đá chính thức kéo dài bao nhiêu phút (không tính hiệp phụ)?",
+    "options": [
+      "80 phút",
+      "90 phút",
+      "120 phút",
+      "100 phút"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Môn thể thao nào sử dụng thuật ngữ 'ace' khi giao bóng thắng trực tiếp?",
+    "options": [
+      "Cầu lông",
+      "Bóng bàn",
+      "Quần vợt (Tennis)",
+      "Bóng chuyền"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "World Cup bóng đá nam được tổ chức mấy năm một lần?",
+    "options": [
+      "4 năm",
+      "2 năm",
+      "3 năm",
+      "5 năm"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đội tuyển bóng đá nào vô địch World Cup nhiều lần nhất tính đến 2022?",
+    "options": [
+      "Argentina",
+      "Đức",
+      "Ý",
+      "Brazil"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Môn võ nào có nguồn gốc từ Việt Nam?",
+    "options": [
+      "Vovinam",
+      "Taekwondo",
+      "Judo",
+      "Karate"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Một đội bóng chuyền tiêu chuẩn có bao nhiêu cầu thủ trên sân mỗi bên?",
+    "options": [
+      "9",
+      "7",
+      "6",
+      "5"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Giải đấu bóng đá nào được coi là danh giá nhất cấp câu lạc bộ châu Âu?",
+    "options": [
+      "Conference League",
+      "Europa League",
+      "Community Shield",
+      "UEFA Champions League"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cầu thủ nào được mệnh danh là 'Vua bóng đá' (Pelé) đến từ quốc gia nào?",
+    "options": [
+      "Uruguay",
+      "Argentina",
+      "Bồ Đào Nha",
+      "Brazil"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Môn thể thao nào sử dụng vợt và quả cầu lông làm dụng cụ thi đấu chính?",
+    "options": [
+      "Squash",
+      "Cầu lông",
+      "Bóng bàn",
+      "Tennis"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "SEA Games là đại hội thể thao của khu vực nào?",
+    "options": [
+      "Đông Á",
+      "Nam Á",
+      "Trung Á",
+      "Đông Nam Á"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Môn bơi nào có kiểu bơi mà người bơi úp mặt xuống nước, quạt tay đối xứng như ếch?",
+    "options": [
+      "Bơi bướm",
+      "Bơi tự do",
+      "Bơi ngửa",
+      "Bơi ếch"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Một hiệp đấu boxing chuyên nghiệp tiêu chuẩn kéo dài bao nhiêu phút?",
+    "options": [
+      "3 phút",
+      "4 phút",
+      "2 phút",
+      "5 phút"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Golf là môn thể thao sử dụng dụng cụ chính là gì?",
+    "options": [
+      "Vợt và bóng",
+      "Dây và bóng",
+      "Gậy và bóng",
+      "Cung và tên"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đội tuyển bóng đá Việt Nam vô địch AFF Cup (ASEAN Cup) lần đầu tiên vào năm nào?",
+    "options": [
+      "2010",
+      "2018",
+      "2016",
+      "2008"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Môn thể thao nào Việt Nam có huy chương vàng Olympic đầu tiên (Hoàng Xuân Vinh, 2016)?",
+    "options": [
+      "Judo",
+      "Taekwondo",
+      "Cử tạ",
+      "Bắn súng"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Marathon là cuộc thi chạy với cự ly tiêu chuẩn khoảng bao nhiêu km?",
+    "options": [
+      "42.195 km",
+      "21 km",
+      "50 km",
+      "30 km"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Trong bóng rổ, một đội có bao nhiêu cầu thủ trên sân mỗi bên?",
+    "options": [
+      "4",
+      "6",
+      "5",
+      "7"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Giải đấu quần vợt Grand Slam nào tổ chức trên mặt sân đất nện tại Pháp?",
+    "options": [
+      "Wimbledon",
+      "Roland Garros (Pháp Mở Rộng)",
+      "US Open",
+      "Úc Mở Rộng"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Môn thể thao nào có thuật ngữ 'home run'?",
+    "options": [
+      "Bóng bầu dục",
+      "Golf",
+      "Cricket",
+      "Bóng chày (Baseball)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đấu trường Olympic đầu tiên trong lịch sử được tổ chức ở quốc gia nào?",
+    "options": [
+      "Hy Lạp",
+      "Anh",
+      "Pháp",
+      "Ý"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Xe đạp Tour de France là giải đua nổi tiếng của quốc gia nào?",
+    "options": [
+      "Bỉ",
+      "Ý",
+      "Pháp",
+      "Tây Ban Nha"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Môn thể thao dưới nước nào không dùng dụng cụ hỗ trợ bơi mà thi đấu theo đội hình nghệ thuật?",
+    "options": [
+      "Lặn",
+      "Bóng nước",
+      "Bơi tự do",
+      "Bơi nghệ thuật (đồng đội)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cầu thủ Messi thi đấu chủ yếu ở vị trí nào trên sân?",
+    "options": [
+      "Thủ môn",
+      "Hậu vệ",
+      "Tiền đạo/tiền vệ tấn công",
+      "Trung vệ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Trong bóng đá, thẻ đỏ có ý nghĩa gì với cầu thủ vi phạm?",
+    "options": [
+      "Cảnh cáo",
+      "Phạt tiền",
+      "Không có ý nghĩa gì",
+      "Bị truất quyền thi đấu (đuổi khỏi sân)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhạc cụ nào có 88 phím, phổ biến trong nhạc cổ điển?",
+    "options": [
+      "Piano",
+      "Guitar",
+      "Violin",
+      "Sáo"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Bản Quốc ca Việt Nam có tên là gì?",
+    "options": [
+      "Tiến Quân Ca",
+      "Việt Nam Quê Hương Tôi",
+      "Như Có Bác Trong Ngày Đại Thắng",
+      "Đất Nước Trọn Niềm Vui"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là tác giả của bài Quốc ca Việt Nam?",
+    "options": [
+      "Văn Cao",
+      "Văn Ký",
+      "Trịnh Công Sơn",
+      "Phạm Duy"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Nhạc sĩ nào được mệnh danh là 'nhạc sĩ của tình yêu và thân phận con người' với các ca khúc như Diễm Xưa?",
+    "options": [
+      "Phạm Duy",
+      "Văn Cao",
+      "Trịnh Công Sơn",
+      "Ngô Thụy Miên"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Thể loại nhạc nào có nguồn gốc từ cộng đồng người Mỹ gốc Phi, gắn liền với ứng tấu (improvisation)?",
+    "options": [
+      "Classical",
+      "Jazz",
+      "Pop",
+      "Rock"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nhóm nhạc nào được coi là biểu tượng âm nhạc Anh thập niên 1960 với các thành viên như John Lennon?",
+    "options": [
+      "Pink Floyd",
+      "The Rolling Stones",
+      "Queen",
+      "The Beatles"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhạc cụ dân tộc nào của Việt Nam chỉ có một dây?",
+    "options": [
+      "Đàn bầu",
+      "Đàn tranh",
+      "Đàn nguyệt",
+      "Đàn nhị"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ca sĩ nào được mệnh danh là 'Ông hoàng nhạc Pop' của thế giới (Michael...)?",
+    "options": [
+      "Prince",
+      "Freddie Mercury",
+      "Michael Jackson",
+      "Elvis Presley"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nhạc kịch (opera) là loại hình nghệ thuật kết hợp giữa âm nhạc và gì?",
+    "options": [
+      "Hội họa",
+      "Điêu khắc",
+      "Nhiếp ảnh",
+      "Kịch nói/diễn xuất và ca hát"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đàn T'rưng là nhạc cụ đặc trưng của vùng nào tại Việt Nam?",
+    "options": [
+      "Đồng bằng sông Cửu Long",
+      "Tây Nguyên",
+      "Tây Bắc",
+      "Đông Bắc"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Beethoven, một trong những nhà soạn nhạc vĩ đại nhất, đến từ quốc gia nào?",
+    "options": [
+      "Ý",
+      "Áo",
+      "Pháp",
+      "Đức"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhạc Bolero có nguồn gốc xuất xứ ban đầu từ đâu?",
+    "options": [
+      "Pháp",
+      "Tây Ban Nha/Mỹ Latinh",
+      "Việt Nam",
+      "Ý"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đâu là tên gọi của thể loại âm nhạc dân gian Việt Nam được UNESCO công nhận, gắn liền với xứ Kinh Bắc?",
+    "options": [
+      "Quan họ",
+      "Ca trù",
+      "Cải lương",
+      "Chèo"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Nhạc cụ nào có hình dáng cong, dùng cung kéo, phổ biến trong dàn nhạc giao hưởng?",
+    "options": [
+      "Kèn",
+      "Violin",
+      "Trống",
+      "Guitar"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cải lương là loại hình nghệ thuật sân khấu đặc trưng của vùng miền nào Việt Nam?",
+    "options": [
+      "Miền Trung",
+      "Miền Bắc",
+      "Tây Nguyên",
+      "Miền Nam"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ca sĩ nào được mệnh danh là Nữ hoàng nhạc Pop thế giới?",
+    "options": [
+      "Celine Dion",
+      "Mariah Carey",
+      "Madonna",
+      "Whitney Houston"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ban nhạc rock nào nổi tiếng với ca khúc 'Bohemian Rhapsody'?",
+    "options": [
+      "The Beatles",
+      "Queen",
+      "Pink Floyd",
+      "Led Zeppelin"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nhạc Vàng là dòng nhạc trữ tình phổ biến ở miền Nam Việt Nam thời kỳ nào?",
+    "options": [
+      "Thời kháng chiến chống Pháp",
+      "Thời hiện đại",
+      "Trước 1975",
+      "Sau 2000"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đàn nguyệt còn được gọi là gì trong dân gian Việt Nam?",
+    "options": [
+      "Đàn kìm",
+      "Đàn nhị",
+      "Đàn tứ",
+      "Đàn tam"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Thể loại nhạc điện tử EDM là viết tắt của cụm từ nào?",
+    "options": [
+      "Electronic Dance Music",
+      "Electric Digital Music",
+      "Easy Dance Music",
+      "Electronic Disco Mix"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Giải thưởng điện ảnh danh giá nhất Hollywood có tên là gì?",
+    "options": [
+      "Tony",
+      "Grammy",
+      "Oscar (Viện Hàn lâm)",
+      "Emmy"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Bộ phim hoạt hình nào của Disney kể về nàng công chúa băng giá Elsa?",
+    "options": [
+      "Frozen",
+      "Moana",
+      "Encanto",
+      "Tangled"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Hãng phim nào sản xuất loạt phim siêu anh hùng Iron Man, Avengers?",
+    "options": [
+      "Marvel Studios",
+      "DC Studios",
+      "Warner Bros",
+      "Universal"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đạo diễn nào nổi tiếng với các phim như Titanic và Avatar?",
+    "options": [
+      "Peter Jackson",
+      "Christopher Nolan",
+      "James Cameron",
+      "Steven Spielberg"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Liên hoan phim nào được tổ chức hàng năm tại Pháp, nổi tiếng với thảm đỏ Cannes?",
+    "options": [
+      "Liên hoan phim Berlin",
+      "Liên hoan phim Sundance",
+      "Liên hoan phim Cannes",
+      "Liên hoan phim Venice"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Phim 'Titanic' phát hành năm nào?",
+    "options": [
+      "2001",
+      "1999",
+      "1995",
+      "1997"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhân vật Harry Potter được chuyển thể từ tiểu thuyết của tác giả nào?",
+    "options": [
+      "J.K. Rowling",
+      "J.R.R. Tolkien",
+      "C.S. Lewis",
+      "Suzanne Collins"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Giải Oscar cho Phim hay nhất là hạng mục quan trọng nhất của lễ trao giải nào?",
+    "options": [
+      "Emmy",
+      "Grammy",
+      "Viện Hàn lâm Mỹ (Oscar)",
+      "Cannes"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Bộ phim hoạt hình nào của Pixar kể về hành trình của chú cá hề tìm con?",
+    "options": [
+      "Ratatouille",
+      "Up",
+      "Cars",
+      "Finding Nemo"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai đóng vai chính trong loạt phim 'Iron Man' của Marvel?",
+    "options": [
+      "Chris Hemsworth",
+      "Chris Evans",
+      "Mark Ruffalo",
+      "Robert Downey Jr."
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Điện ảnh Việt Nam có phim nào từng đạt giải cao tại Cannes (Camera Vàng) năm 1993?",
+    "options": [
+      "Bao giờ cho đến tháng Mười",
+      "Mê Thảo thời vang bóng",
+      "Mùi đu đủ xanh",
+      "Cánh đồng hoang"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Thể loại phim nào tập trung khai thác yếu tố kinh dị, gây sợ hãi cho khán giả?",
+    "options": [
+      "Hài kịch",
+      "Lãng mạn",
+      "Tài liệu",
+      "Kinh dị (Horror)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Bộ phim 'Vua Sư Tử' (The Lion King) là sản phẩm của hãng nào?",
+    "options": [
+      "DreamWorks",
+      "Pixar",
+      "Disney",
+      "Warner Bros"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nữ diễn viên nào thủ vai công chúa Elsa lồng tiếng trong Frozen bản gốc tiếng Anh?",
+    "options": [
+      "Kristen Bell",
+      "Emma Watson",
+      "Idina Menzel",
+      "Anne Hathaway"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Phim 'Ký sinh trùng' (Parasite) đạt giải Oscar Phim hay nhất là điện ảnh của quốc gia nào?",
+    "options": [
+      "Hàn Quốc",
+      "Trung Quốc",
+      "Thái Lan",
+      "Nhật Bản"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Loạt phim 'Star Wars' được sáng tạo bởi ai?",
+    "options": [
+      "Ridley Scott",
+      "George Lucas",
+      "Steven Spielberg",
+      "James Cameron"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nhân vật Batman xuất hiện lần đầu trong truyện tranh của hãng nào?",
+    "options": [
+      "Marvel Comics",
+      "DC Comics",
+      "Image Comics",
+      "Dark Horse"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Bộ phim hoạt hình 'Doraemon' có nguồn gốc từ quốc gia nào?",
+    "options": [
+      "Trung Quốc",
+      "Hàn Quốc",
+      "Nhật Bản",
+      "Đài Loan"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là đạo diễn nổi tiếng của loạt phim 'Inception' và 'Interstellar'?",
+    "options": [
+      "Steven Spielberg",
+      "Christopher Nolan",
+      "James Cameron",
+      "Denis Villeneuve"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Phim 'Cha Cõng Con' hay các phim gia đình Việt thường được chiếu dịp lễ nào?",
+    "options": [
+      "Giáng sinh",
+      "Quốc khánh",
+      "Tết Nguyên Đán",
+      "Trung thu"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cơ quan nào trong cơ thể được coi là 'nhà máy lọc độc' chính?",
+    "options": [
+      "Tim",
+      "Phổi",
+      "Lách",
+      "Gan"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Bệnh tiểu đường liên quan chủ yếu đến rối loạn của hormone nào?",
+    "options": [
+      "Adrenaline",
+      "Estrogen",
+      "Testosterone",
+      "Insulin"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Vitamin nào có nhiều trong trái cây họ cam quýt, giúp tăng đề kháng?",
+    "options": [
+      "Vitamin C",
+      "Vitamin D",
+      "Vitamin E",
+      "Vitamin A"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Huyết áp bình thường ở người trưởng thành khỏe mạnh thường được coi là khoảng bao nhiêu mmHg?",
+    "options": [
+      "120/80",
+      "160/100",
+      "180/120",
+      "90/60"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Loại vắc xin nào giúp phòng bệnh uốn ván?",
+    "options": [
+      "Vắc xin BCG",
+      "Vắc xin viêm gan B",
+      "Vắc xin sởi",
+      "Vắc xin uốn ván (TT)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cơ quan nào chịu trách nhiệm sản xuất insulin trong cơ thể?",
+    "options": [
+      "Thận",
+      "Lách",
+      "Tụy (tuyến tụy)",
+      "Gan"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Bệnh sốt xuất huyết lây truyền chủ yếu qua trung gian nào?",
+    "options": [
+      "Muỗi Aedes",
+      "Chuột",
+      "Nước uống",
+      "Ruồi"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chỉ số BMI dùng để đánh giá điều gì của cơ thể?",
+    "options": [
+      "Chiều cao",
+      "Cân nặng so với chiều cao (thể trạng)",
+      "Nhịp tim",
+      "Huyết áp"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Xương nào là xương dài và cứng nhất cơ thể người?",
+    "options": [
+      "Xương cánh tay",
+      "Xương đùi",
+      "Xương chậu",
+      "Xương sườn"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Loại thực phẩm nào là nguồn chính cung cấp chất đạm (protein)?",
+    "options": [
+      "Rau xanh",
+      "Thịt, cá, trứng",
+      "Gạo",
+      "Dầu ăn"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Bệnh nào gây ra bởi thiếu hụt vitamin C nghiêm trọng?",
+    "options": [
+      "Bệnh Pellagra",
+      "Bệnh Scorbut (Scurvy)",
+      "Bệnh còi xương",
+      "Bệnh Beriberi"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nhịp tim trung bình của người trưởng thành khi nghỉ ngơi khoảng bao nhiêu lần/phút?",
+    "options": [
+      "40-50",
+      "150-180",
+      "60-100",
+      "120-140"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cơ quan nào chịu trách nhiệm chính điều hòa thân nhiệt cơ thể?",
+    "options": [
+      "Thận",
+      "Da",
+      "Gan",
+      "Phổi"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Loại tế bào nào của hệ miễn dịch có chức năng tiêu diệt vi khuẩn, virus xâm nhập?",
+    "options": [
+      "Bạch cầu",
+      "Hồng cầu",
+      "Tiểu cầu",
+      "Huyết tương"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Bệnh cúm (Influenza) do tác nhân nào gây ra?",
+    "options": [
+      "Ký sinh trùng",
+      "Nấm",
+      "Virus",
+      "Vi khuẩn"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Rửa tay bằng xà phòng đúng cách nên kéo dài tối thiểu bao nhiêu giây?",
+    "options": [
+      "60 giây",
+      "5 giây",
+      "20 giây",
+      "10 giây"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cơ quan nào là bộ phận chính giúp con người thăng bằng, nằm trong tai?",
+    "options": [
+      "Vành tai",
+      "Ốc tai",
+      "Màng nhĩ",
+      "Tiền đình"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chế độ ăn nào được khuyến nghị hạn chế cho người bị cao huyết áp?",
+    "options": [
+      "Nhiều rau xanh",
+      "Nhiều muối",
+      "Nhiều nước",
+      "Nhiều trái cây"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Loại xét nghiệm nào dùng để đo lượng đường trong máu?",
+    "options": [
+      "Xét nghiệm đường huyết",
+      "Xét nghiệm nước tiểu tổng quát",
+      "Điện tâm đồ",
+      "Siêu âm"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Giấc ngủ đủ mỗi đêm cho người trưởng thành thường được khuyến nghị khoảng bao nhiêu giờ?",
+    "options": [
+      "2-3 giờ",
+      "10-12 giờ",
+      "4-5 giờ",
+      "7-9 giờ"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Động vật nào là biểu tượng của WWF (Quỹ Quốc tế Bảo vệ Thiên nhiên)?",
+    "options": [
+      "Sư tử",
+      "Hổ",
+      "Gấu trúc",
+      "Voi"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Động vật nào được coi là loài lớn nhất còn tồn tại trên Trái Đất (sống ở đại dương)?",
+    "options": [
+      "Cá nhà táng",
+      "Cá voi sát thủ",
+      "Cá mập trắng",
+      "Cá voi xanh"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Loài chim nào không biết bay nhưng chạy rất nhanh, sống chủ yếu ở châu Phi?",
+    "options": [
+      "Đà điểu",
+      "Kiwi",
+      "Công",
+      "Chim cánh cụt"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Loài động vật nào có cổ dài nhất trong tự nhiên?",
+    "options": [
+      "Ngựa vằn",
+      "Hươu cao cổ",
+      "Voi",
+      "Lạc đà"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Con vật nào được coi là 'chúa sơn lâm' trong văn hóa Việt Nam?",
+    "options": [
+      "Gấu",
+      "Voi",
+      "Hổ",
+      "Sư tử"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Loài linh trưởng nào gần gũi nhất với con người về mặt di truyền?",
+    "options": [
+      "Vượn",
+      "Đười ươi",
+      "Tinh tinh (Chimpanzee)",
+      "Khỉ đột"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Loài thú có túi đặc trưng của nước Úc là con gì?",
+    "options": [
+      "Kangaroo (Chuột túi)",
+      "Cả B và C",
+      "Gấu trúc",
+      "Koala"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cây nào được coi là biểu tượng của mùa xuân miền Bắc Việt Nam?",
+    "options": [
+      "Hoa sen",
+      "Hoa cúc",
+      "Hoa mai",
+      "Hoa đào"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Hoa nào là quốc hoa (biểu tượng) của Việt Nam?",
+    "options": [
+      "Hoa đào",
+      "Hoa mai",
+      "Hoa hồng",
+      "Hoa sen"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Loài động vật nào nổi tiếng có khả năng đổi màu da để ngụy trang?",
+    "options": [
+      "Thằn lằn",
+      "Ếch",
+      "Rắn",
+      "Tắc kè hoa"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cây lúa là cây lương thực chính của khu vực nào trên thế giới?",
+    "options": [
+      "Châu Á",
+      "Bắc Mỹ",
+      "Châu Đại Dương",
+      "Châu Âu"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Loài động vật nào được biết đến là 'vua của rừng xanh' ở châu Phi?",
+    "options": [
+      "Linh cẩu",
+      "Hổ",
+      "Báo",
+      "Sư tử"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cây nào cho ta gỗ và nhựa để sản xuất cao su tự nhiên?",
+    "options": [
+      "Cây dừa",
+      "Cây cao su",
+      "Cây tre",
+      "Cây thông"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Loài chim nào được coi là biểu tượng của hòa bình?",
+    "options": [
+      "Chim công",
+      "Chim sẻ",
+      "Chim bồ câu",
+      "Chim đại bàng"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Động vật nào có thể sống cả trên cạn và dưới nước, thuộc lớp lưỡng cư?",
+    "options": [
+      "Ếch",
+      "Thằn lằn",
+      "Rắn",
+      "Cá sấu"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cây tre có đặc điểm nổi bật nào liên quan đến tốc độ sinh trưởng?",
+    "options": [
+      "Không phát triển chiều cao",
+      "Chỉ mọc dưới nước",
+      "Mọc rất chậm",
+      "Mọc rất nhanh"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Loài động vật nào là biểu tượng của quốc gia Trung Quốc?",
+    "options": [
+      "Rồng (huyền thoại)",
+      "Gấu trúc",
+      "Hổ",
+      "Cả A và C"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Sen là loài hoa gắn liền với hình ảnh biểu tượng nào trong văn hóa Việt Nam?",
+    "options": [
+      "Sự giàu sang",
+      "Sự thanh cao, tinh khiết",
+      "Sự chiến thắng",
+      "Sự trường thọ"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Loài động vật nào có tuổi thọ trung bình cao nhất trong tự nhiên (có thể sống hàng trăm năm)?",
+    "options": [
+      "Cá voi",
+      "Rùa biển khổng lồ",
+      "Khỉ",
+      "Voi"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cây cà phê được trồng nhiều nhất tại khu vực nào của Việt Nam?",
+    "options": [
+      "Duyên hải Nam Trung Bộ",
+      "Đồng bằng sông Cửu Long",
+      "Đồng bằng sông Hồng",
+      "Tây Nguyên"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Loài động vật nào là biểu tượng phổ biến của năm trong 12 con giáp, đứng đầu tiên?",
+    "options": [
+      "Rồng",
+      "Hổ",
+      "Chuột",
+      "Trâu"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cây xương rồng thích nghi tốt với môi trường nào?",
+    "options": [
+      "Lạnh giá",
+      "Khô hạn, sa mạc",
+      "Ẩm ướt",
+      "Nước mặn"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Loài động vật nào nổi tiếng có thể phun mực để tự vệ?",
+    "options": [
+      "Bạch tuộc",
+      "Sứa",
+      "Cá heo",
+      "Cá mập"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Rừng ngập mặn thường phát triển tốt ở khu vực nào?",
+    "options": [
+      "Vùng núi cao",
+      "Đồng bằng khô",
+      "Vùng ven biển, cửa sông",
+      "Sa mạc"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Loài hoa nào nở về đêm và tỏa hương thơm đặc trưng, thường gọi là 'nữ hoàng bóng đêm'?",
+    "options": [
+      "Hoa lan",
+      "Hoa hồng",
+      "Hoa cúc",
+      "Hoa quỳnh"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Động vật nào được xem là loài nhanh nhất trên cạn?",
+    "options": [
+      "Sư tử",
+      "Ngựa vằn",
+      "Linh dương",
+      "Báo Gêpa (Cheetah)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cây bàng thường được trồng phổ biến ở đâu tại Việt Nam do bóng mát?",
+    "options": [
+      "Sa mạc",
+      "Trong nhà kính",
+      "Sân trường và đường phố",
+      "Chỉ ở miền núi"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Loài động vật nào có khả năng thay đổi giới tính trong đời sống (như một số loài cá hề)?",
+    "options": [
+      "Cá hề (Clownfish)",
+      "Cá vàng",
+      "Cá mập",
+      "Cá heo"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cây dừa được trồng phổ biến nhất ở tỉnh nào của Việt Nam?",
+    "options": [
+      "Bến Tre",
+      "Cà Mau",
+      "Cần Thơ",
+      "An Giang"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Loài động vật nào là biểu tượng đặc trưng của vùng đất Tây Nguyên Việt Nam?",
+    "options": [
+      "Chim cánh cụt",
+      "Hải cẩu",
+      "Cá sấu",
+      "Voi"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Món ăn nào được coi là biểu tượng ẩm thực nổi tiếng nhất của Việt Nam trên thế giới?",
+    "options": [
+      "Phở",
+      "Bánh mì",
+      "Gỏi cuốn",
+      "Bún chả"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Phở có nguồn gốc xuất xứ đầu tiên từ khu vực nào của Việt Nam?",
+    "options": [
+      "Miền Trung",
+      "Miền Nam",
+      "Miền Bắc",
+      "Tây Nguyên"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nước mắm là loại gia vị đặc trưng được làm chủ yếu từ nguyên liệu gì?",
+    "options": [
+      "Đậu nành",
+      "Muối và đường",
+      "Tôm",
+      "Cá"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Món bánh xèo có đặc trưng vỏ bánh làm từ bột gì?",
+    "options": [
+      "Bột năng",
+      "Bột bắp",
+      "Bột mì",
+      "Bột gạo"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Món ăn nào của Huế nổi tiếng với vị cay đặc trưng và sợi bún to?",
+    "options": [
+      "Bún bò Huế",
+      "Bún riêu",
+      "Phở",
+      "Bún chả"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Bánh chưng truyền thống của người Việt thường xuất hiện nhiều nhất vào dịp nào?",
+    "options": [
+      "Lễ Vu Lan",
+      "Giáng sinh",
+      "Tết Nguyên Đán",
+      "Tết Trung thu"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Gia vị nào được coi là 'linh hồn' không thể thiếu của nhiều món ăn Việt Nam?",
+    "options": [
+      "Tiêu",
+      "Muối",
+      "Đường",
+      "Nước mắm"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Món ăn nào của Việt Nam thường được cuộn bằng bánh tráng, ăn kèm rau sống, chấm nước mắm hoặc tương?",
+    "options": [
+      "Bánh mì",
+      "Gỏi cuốn",
+      "Bánh cuốn",
+      "Cơm tấm"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cà phê sữa đá là thức uống đặc trưng nổi tiếng của thành phố nào?",
+    "options": [
+      "Sài Gòn (TP.HCM)",
+      "Hà Nội",
+      "Huế",
+      "Đà Nẵng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Món 'cơm tấm' có nguyên liệu chính là loại gạo nào?",
+    "options": [
+      "Gạo lứt",
+      "Gạo tấm (hạt gạo vỡ)",
+      "Gạo nàng thơm",
+      "Gạo nếp"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Bánh mì Việt Nam có nguồn gốc ảnh hưởng từ nền ẩm thực nào?",
+    "options": [
+      "Pháp",
+      "Nhật Bản",
+      "Trung Quốc",
+      "Hàn Quốc"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Món sushi nổi tiếng có nguồn gốc từ quốc gia nào?",
+    "options": [
+      "Trung Quốc",
+      "Thái Lan",
+      "Nhật Bản",
+      "Hàn Quốc"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Món kim chi là món ăn truyền thống đặc trưng của quốc gia nào?",
+    "options": [
+      "Việt Nam",
+      "Trung Quốc",
+      "Hàn Quốc",
+      "Nhật Bản"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Pizza có nguồn gốc xuất xứ từ quốc gia nào?",
+    "options": [
+      "Ý",
+      "Pháp",
+      "Hy Lạp",
+      "Tây Ban Nha"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Món bún đậu mắm tôm là món ăn đặc trưng phổ biến ở vùng miền nào Việt Nam?",
+    "options": [
+      "Miền Nam",
+      "Miền Bắc",
+      "Tây Nguyên",
+      "Miền Trung"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Trái cây nào được mệnh danh là 'vua của các loại trái cây' ở Việt Nam do mùi đặc trưng nồng?",
+    "options": [
+      "Xoài",
+      "Mít",
+      "Chôm chôm",
+      "Sầu riêng"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chè là món tráng miệng phổ biến của Việt Nam, thường được nấu từ nguyên liệu chủ đạo nào?",
+    "options": [
+      "Thịt",
+      "Rau củ mặn",
+      "Đậu, nếp, nước cốt dừa",
+      "Cá"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Món 'bánh cuốn' thường được ăn kèm với loại chả nào phổ biến?",
+    "options": [
+      "Chả cá",
+      "Chả tôm",
+      "Chả mực",
+      "Chả lụa"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Trà đá là thức uống giải khát phổ biến, đặc trưng nhất ở khu vực nào của Việt Nam?",
+    "options": [
+      "Không phổ biến ở Việt Nam",
+      "Miền Bắc và miền Nam nói chung",
+      "Chỉ ở Tây Nguyên",
+      "Chỉ ở miền Trung"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Món hủ tiếu có nguồn gốc ảnh hưởng đậm nét từ cộng đồng nào tại miền Nam Việt Nam?",
+    "options": [
+      "Người Pháp",
+      "Người Nhật",
+      "Người Hoa (Triều Châu)",
+      "Người Hàn"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là nhà bác học nổi tiếng với thuyết tương đối, công thức E=mc²?",
+    "options": [
+      "Stephen Hawking",
+      "Albert Einstein",
+      "Niels Bohr",
+      "Isaac Newton"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai được coi là danh họa vẽ bức tranh nổi tiếng 'Mona Lisa'?",
+    "options": [
+      "Raphael",
+      "Vincent van Gogh",
+      "Michelangelo",
+      "Leonardo da Vinci"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhà văn nào nổi tiếng với tác phẩm 'Romeo và Juliet'?",
+    "options": [
+      "Victor Hugo",
+      "William Shakespeare",
+      "Charles Dickens",
+      "Mark Twain"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là nhà khoa học phát minh ra thuyết tiến hóa bằng chọn lọc tự nhiên?",
+    "options": [
+      "Charles Darwin",
+      "Gregor Mendel",
+      "Louis Pasteur",
+      "Alfred Wallace"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai được coi là nhà soạn nhạc thiên tài, sáng tác nhiều kiệt tác dù bị điếc?",
+    "options": [
+      "Bach",
+      "Beethoven",
+      "Chopin",
+      "Mozart"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nhà khoa học nữ nào đoạt hai giải Nobel ở hai lĩnh vực khác nhau (Vật lý và Hóa học)?",
+    "options": [
+      "Rosalind Franklin",
+      "Ada Lovelace",
+      "Dorothy Hodgkin",
+      "Marie Curie"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là họa sĩ nổi tiếng người Hà Lan với bức tranh 'Đêm đầy sao' (Starry Night)?",
+    "options": [
+      "Pablo Picasso",
+      "Vincent van Gogh",
+      "Claude Monet",
+      "Salvador Dalí"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là nhà phát minh nổi tiếng người Mỹ với hơn 1000 bằng sáng chế, trong đó có bóng đèn?",
+    "options": [
+      "Nikola Tesla",
+      "Benjamin Franklin",
+      "Thomas Edison",
+      "Alexander Graham Bell"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nhà bác học nào được coi là người đặt nền móng cho vật lý cổ điển với ba định luật chuyển động?",
+    "options": [
+      "Isaac Newton",
+      "Albert Einstein",
+      "Galileo Galilei",
+      "James Maxwell"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là tác giả của thuyết di truyền học hiện đại, qua các thí nghiệm với đậu Hà Lan?",
+    "options": [
+      "Louis Pasteur",
+      "Charles Darwin",
+      "Gregor Mendel",
+      "James Watson"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nhà văn nào nổi tiếng với bộ tiểu thuyết 'Chiến tranh và Hòa bình'?",
+    "options": [
+      "Leo Tolstoy",
+      "Fyodor Dostoevsky",
+      "Ivan Turgenev",
+      "Anton Chekhov"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai được coi là 'ông tổ' của y học phương Tây, gắn liền với lời thề Hippocrates?",
+    "options": [
+      "Pasteur",
+      "Galen",
+      "Hippocrates",
+      "Avicenna"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nhà triết học nào là thầy của Aristotle, học trò của Socrates?",
+    "options": [
+      "Heraclitus",
+      "Pythagoras",
+      "Plato",
+      "Democritus"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là nhà khoa học phát minh ra vắc xin phòng bệnh dại và tiệt trùng bằng phương pháp Pasteur hóa?",
+    "options": [
+      "Edward Jenner",
+      "Alexander Fleming",
+      "Robert Koch",
+      "Louis Pasteur"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhà soạn nhạc nào được mệnh danh là 'thần đồng âm nhạc' khi sáng tác từ năm 5 tuổi?",
+    "options": [
+      "Mozart",
+      "Bach",
+      "Haydn",
+      "Beethoven"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là nhà khoa học phát hiện ra penicillin, mở đường cho kháng sinh hiện đại?",
+    "options": [
+      "Louis Pasteur",
+      "Jonas Salk",
+      "Alexander Fleming",
+      "Robert Koch"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nhà văn Việt Nam nào được xem là đại thi hào dân tộc, tác giả 'Truyện Kiều'?",
+    "options": [
+      "Nguyễn Bỉnh Khiêm",
+      "Nguyễn Đình Chiểu",
+      "Nguyễn Trãi",
+      "Nguyễn Du"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là họa sĩ nổi tiếng với phong trào lập thể (Cubism), đồng sáng lập cùng Georges Braque?",
+    "options": [
+      "Henri Matisse",
+      "Pablo Picasso",
+      "Salvador Dalí",
+      "Claude Monet"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là nhà bác học người Ý nổi tiếng với kính thiên văn và ủng hộ thuyết Nhật tâm?",
+    "options": [
+      "Tycho Brahe",
+      "Galileo Galilei",
+      "Nicolaus Copernicus",
+      "Johannes Kepler"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nhà triết học - chính trị gia nào được coi là cha đẻ của chủ nghĩa Mác?",
+    "options": [
+      "Karl Marx",
+      "Friedrich Engels",
+      "Vladimir Lenin",
+      "Georg Hegel"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là nữ hoàng Anh trị vì lâu nhất trong lịch sử trước khi qua đời năm 2022?",
+    "options": [
+      "Nữ hoàng Elizabeth II",
+      "Nữ hoàng Anne",
+      "Nữ hoàng Mary I",
+      "Nữ hoàng Victoria"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Nhà khoa học nào phát triển lý thuyết lượng tử, đoạt giải Nobel Vật lý năm 1922?",
+    "options": [
+      "Max Planck",
+      "Erwin Schrödinger",
+      "Werner Heisenberg",
+      "Niels Bohr"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là nhà văn Anh nổi tiếng với tác phẩm 'Oliver Twist' và 'A Christmas Carol'?",
+    "options": [
+      "Jane Austen",
+      "Charles Dickens",
+      "Mark Twain",
+      "William Shakespeare"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là nhà điêu khắc, kiến trúc sư người Ý nổi tiếng với bức tượng David và trần nhà nguyện Sistine?",
+    "options": [
+      "Raphael",
+      "Donatello",
+      "Michelangelo",
+      "Leonardo da Vinci"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là tổng thống Mỹ nổi tiếng với việc bãi bỏ chế độ nô lệ, bị ám sát năm 1865?",
+    "options": [
+      "Theodore Roosevelt",
+      "Thomas Jefferson",
+      "Abraham Lincoln",
+      "George Washington"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Tết Nguyên Đán của người Việt được tính theo lịch nào?",
+    "options": [
+      "Lịch Do Thái",
+      "Âm lịch",
+      "Lịch Hồi giáo",
+      "Dương lịch"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Món ăn nào không thể thiếu trên mâm cỗ ngày Tết cổ truyền miền Bắc, gói bằng lá dong?",
+    "options": [
+      "Bánh giầy",
+      "Bánh chưng",
+      "Bánh tét",
+      "Bánh ít"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Miền Nam Việt Nam thường gói loại bánh nào thay cho bánh chưng vào dịp Tết?",
+    "options": [
+      "Bánh tét",
+      "Bánh giò",
+      "Bánh bao",
+      "Bánh chưng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Áo dài được coi là trang phục truyền thống đặc trưng của giới tính nào tại Việt Nam (dù cả nam nữ đều có thể mặc)?",
+    "options": [
+      "Chỉ nam giới",
+      "Chỉ người già",
+      "Chủ yếu nữ giới",
+      "Chỉ trẻ em"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Lễ hội Chùa Hương diễn ra chủ yếu ở địa phương nào?",
+    "options": [
+      "TP.HCM",
+      "Huế",
+      "Hà Nội",
+      "Đà Nẵng"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Tục lệ 'lì xì' (mừng tuổi) trong ngày Tết mang ý nghĩa gì?",
+    "options": [
+      "Không có ý nghĩa đặc biệt",
+      "Thể hiện sự giàu có",
+      "Trả nợ",
+      "Chúc may mắn, tài lộc đầu năm"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Tết Trung Thu ở Việt Nam dành đặc biệt cho đối tượng nào?",
+    "options": [
+      "Trẻ em",
+      "Người già",
+      "Học sinh cấp 3",
+      "Nông dân"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chiếc nón lá là biểu tượng văn hóa gắn liền với hình ảnh người phụ nữ ở khu vực nào?",
+    "options": [
+      "Tây Nguyên",
+      "Miền núi phía Bắc",
+      "Đồng bằng, đặc biệt xứ Huế",
+      "Chỉ ở thành thị"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Trong văn hóa Việt Nam, màu sắc nào thường tượng trưng cho sự may mắn, hạnh phúc trong dịp cưới hỏi, lễ Tết?",
+    "options": [
+      "Màu trắng",
+      "Màu đỏ",
+      "Màu xám",
+      "Màu đen"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Hát Xoan là loại hình di sản văn hóa phi vật thể gắn liền với tỉnh nào?",
+    "options": [
+      "Nghệ An",
+      "Thanh Hóa",
+      "Bắc Ninh",
+      "Phú Thọ"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Lễ hội Đền Hùng nhằm tưởng nhớ ai?",
+    "options": [
+      "Trần Hưng Đạo",
+      "Các Vua Hùng",
+      "Hai Bà Trưng",
+      "Hồ Chí Minh"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nghi lễ 'cúng ông Công ông Táo' diễn ra vào ngày nào theo âm lịch?",
+    "options": [
+      "23 tháng Chạp",
+      "30 tháng Chạp",
+      "Rằm tháng Giêng",
+      "Mùng 1 Tết"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chợ tình Khâu Vai là nét văn hóa đặc sắc của dân tộc thiểu số ở tỉnh nào?",
+    "options": [
+      "Lào Cai",
+      "Sơn La",
+      "Hà Giang",
+      "Lai Châu"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đờn ca tài tử là loại hình nghệ thuật dân gian đặc trưng của vùng nào Việt Nam, được UNESCO công nhận?",
+    "options": [
+      "Miền Bắc",
+      "Miền Trung",
+      "Tây Nguyên",
+      "Nam Bộ"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Trang phục truyền thống của người phụ nữ Việt xưa với áo tứ thân thường thấy ở vùng nào?",
+    "options": [
+      "Nam Bộ",
+      "Miền Trung",
+      "Tây Nguyên",
+      "Bắc Bộ"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ngày Giỗ Tổ Hùng Vương là ngày mấy theo âm lịch?",
+    "options": [
+      "5/5",
+      "1/1",
+      "15/8",
+      "10/3"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Lễ hội Cầu Ngư là lễ hội truyền thống gắn liền với cộng đồng nào?",
+    "options": [
+      "Nông dân trồng lúa",
+      "Thợ thủ công",
+      "Người dân miền núi",
+      "Ngư dân ven biển"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Tục ăn trầu cau của người Việt xưa thường gắn liền với sự kiện nào?",
+    "options": [
+      "Cưới hỏi và các nghi lễ truyền thống",
+      "Chỉ dành cho vua chúa",
+      "Lễ tang duy nhất",
+      "Chỉ ăn hàng ngày không có ý nghĩa"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chữ Nôm là hệ thống chữ viết được người Việt sáng tạo dựa trên nền tảng nào?",
+    "options": [
+      "Chữ Hán",
+      "Chữ Latinh",
+      "Chữ Phạn",
+      "Chữ Khmer"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Múa rối nước là loại hình nghệ thuật dân gian độc đáo bắt nguồn từ khu vực nào của Việt Nam?",
+    "options": [
+      "Tây Nguyên",
+      "Nam Bộ",
+      "Đồng bằng Bắc Bộ",
+      "Duyên hải Nam Trung Bộ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đơn vị tiền tệ chính thức của Việt Nam là gì?",
+    "options": [
+      "Đồng (VND)",
+      "Nhân dân tệ",
+      "Won",
+      "Baht"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Tổ chức nào chịu trách nhiệm điều hành chính sách tiền tệ quốc gia tại Việt Nam?",
+    "options": [
+      "Tổng cục Thống kê",
+      "Bộ Tài chính",
+      "Bộ Kế hoạch Đầu tư",
+      "Ngân hàng Nhà nước Việt Nam"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "GDP là viết tắt của chỉ số kinh tế nào?",
+    "options": [
+      "Tổng sản phẩm quốc nội",
+      "Chỉ số giá tiêu dùng",
+      "Tổng vốn đầu tư",
+      "Tổng thu nhập quốc dân"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Việt Nam chính thức gia nhập Tổ chức Thương mại Thế giới (WTO) vào năm nào?",
+    "options": [
+      "2007",
+      "2000",
+      "2005",
+      "2010"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ngành kinh tế nào chiếm tỷ trọng xuất khẩu lớn của Việt Nam liên quan đến may mặc và điện tử?",
+    "options": [
+      "Du lịch",
+      "Khai khoáng",
+      "Công nghiệp chế biến, chế tạo",
+      "Nông nghiệp"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Lạm phát là hiện tượng gì trong kinh tế?",
+    "options": [
+      "Mức giá chung tăng liên tục theo thời gian",
+      "Giá cả hàng hóa giảm liên tục",
+      "Thất nghiệp tăng cao",
+      "Tỷ giá hối đoái cố định"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đâu là một trong những mặt hàng nông sản xuất khẩu chủ lực của Việt Nam?",
+    "options": [
+      "Ô tô",
+      "Gạo",
+      "Máy bay",
+      "Than đá"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chứng khoán là hình thức đầu tư liên quan đến việc mua bán loại tài sản nào?",
+    "options": [
+      "Bất động sản",
+      "Ngoại tệ duy nhất",
+      "Vàng bạc",
+      "Cổ phiếu, trái phiếu"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Việt Nam là thành viên của khối thương mại tự do khu vực nào?",
+    "options": [
+      "NAFTA",
+      "Mercosur",
+      "ASEAN",
+      "EU"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Thuế giá trị gia tăng thường được viết tắt là gì tại Việt Nam?",
+    "options": [
+      "FDI",
+      "VAT",
+      "GDP",
+      "CPI"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "FDI là viết tắt của khái niệm kinh tế nào?",
+    "options": [
+      "Đầu tư trực tiếp nước ngoài",
+      "Tổng sản phẩm nội địa",
+      "Chỉ số giá tiêu dùng",
+      "Quỹ dự trữ quốc tế"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ngành du lịch đóng vai trò như thế nào đối với nền kinh tế Việt Nam hiện nay?",
+    "options": [
+      "Đang bị loại bỏ",
+      "Chỉ phục vụ nhu cầu nội địa",
+      "Không quan trọng",
+      "Là một ngành kinh tế mũi nhọn quan trọng"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Sàn giao dịch chứng khoán lớn nhất Việt Nam đặt tại thành phố nào?",
+    "options": [
+      "TP. Hồ Chí Minh",
+      "Đà Nẵng",
+      "Hà Nội",
+      "Hải Phòng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chỉ số CPI dùng để đo lường điều gì?",
+    "options": [
+      "Tỷ giá hối đoái",
+      "Chỉ số giá tiêu dùng (lạm phát)",
+      "Tăng trưởng GDP",
+      "Tỷ lệ thất nghiệp"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Khu vực kinh tế nào bao gồm các doanh nghiệp do cá nhân, tổ chức tư nhân sở hữu và điều hành?",
+    "options": [
+      "Kinh tế có vốn đầu tư nước ngoài",
+      "Kinh tế nhà nước",
+      "Kinh tế tập thể",
+      "Kinh tế tư nhân"
+    ],
+    "correct": 3
+  }
+]

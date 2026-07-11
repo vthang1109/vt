@@ -331,6 +331,8 @@ class TimSo {
                     this.lastReward = actualAmount;
                     this.updateStatus();
                     window.showToast(`🎉 Hoàn thành trong ${finalTime.toFixed(1)}s +${actualAmount} điểm`, 'success');
+                    window.VTQuests?.trackPlay('timso');
+                    window.VTQuests?.trackEarn(actualAmount);
                 })
                 .catch(() => window.showToast(`🎉 Hoàn thành trong ${finalTime.toFixed(1)}s`, 'success'));
         } else if (this.mode === 'destroy') {
@@ -352,6 +354,8 @@ class TimSo {
                     this.lastReward = actualAmount;
                     this.updateStatus();
                     window.showToast(`💥 Kết thúc! Tìm được ${foundCount}/100 số +${actualAmount} điểm`, 'success');
+                    window.VTQuests?.trackPlay('timso');
+                    window.VTQuests?.trackEarn(actualAmount);
                 })
                 .catch(() => window.showToast(`💥 Kết thúc! Tìm được ${foundCount}/100 số`, 'success'));
         } else {
@@ -378,6 +382,7 @@ class TimSo {
             document.getElementById('ts-target').textContent = winner ? `🏆 P${winner}` : '🤝';
             document.getElementById('ts-sub').textContent = winner ? `Người ${winner} thắng!` : 'Hoà!';
             window.showToast(winner ? `🎉 Người ${winner} thắng!` : '🤝 Hoà!', 'success');
+            window.VTQuests?.trackPlay('timso');
         }
     }
 
