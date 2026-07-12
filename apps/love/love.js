@@ -1,8 +1,8 @@
-// love.js — VTWorld Love App 💝 (Firestore + Avatar & Tên thật từ Profile)
+// love.js — VTWorld Love App 💝 (Firestore + Kết đôi Online + Cây sinh lãi)
 import { auth, db } from '../../points.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, collection, where, getDocs, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { addPoints, subscribeUserData } from '../../points.js';
+import { doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, collection, where, getDocs, increment, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { addPoints } from '../../points.js';
 
 class LoveApp {
   constructor() {
@@ -10,76 +10,43 @@ class LoveApp {
     this.user = null;
     this.coupleId = null;
     this.data = null;
-    this.currentTab = 'home';
+    this.currentTab = null;
     this.unsubFirestore = null;
-    this.unsubUser = null;
-    this.userProfile = null;
-    this.profileReady = false;
     this.init();
   }
 
   async init() {
     await new Promise((resolve) => {
-      const unsub = onAuthStateChanged(auth, async (user) => {
+      const unsub = onAuthStateChanged(auth, (user) => {
         unsub();
         if (user) {
           this.uid = user.uid;
           this.user = user;
-
-          // Lấy ngay profile từ Firestore
-          try {
-            const userDoc = await getDoc(doc(db, 'users', this.uid));
-            if (userDoc.exists()) {
-              const data = userDoc.data();
-              this.userProfile = {
-                nickname: data.nickname || '',
-                avatarUrl: data.avatarUrl || '',
-              };
-            }
-          } catch (e) { console.error(e); }
-          this.profileReady = true;
-
-          // Lắng nghe thay đổi sau này
-          this.unsubUser = subscribeUserData(data => {
-            if (data) {
-              this.userProfile = {
-                nickname: data.nickname || '',
-                avatarUrl: data.avatarUrl || '',
-              };
-            }
-          });
-
           resolve();
         } else {
           location.href = '../../index.html';
         }
       });
     });
-
     window.loveApp = this;
+    await this.loadMyProfile();
     await this.checkCouple();
   }
 
-  getUserName() {
-    if (this.userProfile?.nickname) return this.userProfile.nickname;
-    return this.user?.displayName || this.user?.email?.split('@')[0] || 'Người ấy';
-  }
-
-  getUserAvatar() {
-    return this.userProfile?.avatarUrl || null;
-  }
-
-  async refreshUserProfile() {
+  async loadMyProfile() {
+    if (this.myProfile) return this.myProfile;
     try {
-      const userDoc = await getDoc(doc(db, 'users', this.uid));
-      if (userDoc.exists()) {
-        const data = userDoc.data();
-        this.userProfile = {
-          nickname: data.nickname || '',
-          avatarUrl: data.avatarUrl || '',
-        };
-      }
-    } catch (e) { console.error(e); }
+      const snap = await getDoc(doc(db, 'users', this.uid));
+      const d = snap.exists() ? snap.data() : {};
+      this.myProfile = {
+        name: d.nickname || this.user?.displayName || this.user?.email?.split('@')[0] || 'Người ấy',
+        avatarUrl: d.avatarUrl || ''
+      };
+    } catch (e) {
+      console.error(e);
+      this.myProfile = { name: this.user?.displayName || this.user?.email?.split('@')[0] || 'Người ấy', avatarUrl: '' };
+    }
+    return this.myProfile;
   }
 
   // ========== CHECK COUPLE ==========
@@ -109,12 +76,20 @@ class LoveApp {
 
   cleanupListener() {
     if (this.unsubFirestore) { this.unsubFirestore(); this.unsubFirestore = null; }
-    if (this.unsubUser) { this.unsubUser(); this.unsubUser = null; }
+  }
+
+  getMySide() {
+    return this.data?.person1?.uid === this.uid ? 'person1' : 'person2';
+  }
+
+  getOtherSide() {
+    return this.getMySide() === 'person1' ? 'person2' : 'person1';
   }
 
   // ========== LANDING ==========
   showLanding() {
     this.cleanupListener(); this.coupleId = null; this.data = null;
+    window.TopNav?.setMenuActions([]);
     document.getElementById('love-status').style.display = 'none';
     document.getElementById('love-tabs').style.display = 'none';
     document.getElementById('love-content').innerHTML = `
@@ -134,9 +109,7 @@ class LoveApp {
 
   // ========== TẠO HỒ SƠ ==========
   async createCouple() {
-    await this.refreshUserProfile();
-    const myName = this.getUserName();
-    const myAvatar = this.getUserAvatar();
+    const { name: myName, avatarUrl: myAvatar } = await this.loadMyProfile();
     const inviteCode = String(Math.floor(1000 + Math.random() * 9000));
     const coupleData = {
       person1: { uid: this.uid, name: myName, avatarUrl: myAvatar },
@@ -152,6 +125,10 @@ class LoveApp {
       harvestLog: {},
       lastRewardedLevel: 0,
       treesPlanted: 0,
+      quiz: {
+        person1: { questions: [], locked: false, result: null },
+        person2: { questions: [], locked: false, result: null }
+      },
       createdAt: new Date().toISOString(),
       createdBy: this.uid
     };
@@ -177,8 +154,8 @@ class LoveApp {
   }
 
   // ========== JOIN ==========
-  showJoinForm() {
-    const myName = this.getUserName();
+  async showJoinForm() {
+    const { name: myName } = await this.loadMyProfile();
     document.getElementById('love-content').innerHTML = `
       <div style="max-width:400px;margin:30px auto;padding:28px 20px;border-radius:20px;background:rgba(255,255,255,0.03);border:1px solid rgba(244,114,182,0.2);animation:fadeUp 0.4s ease both">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
@@ -209,15 +186,10 @@ class LoveApp {
       const coupleData = coupleDoc.data();
       if (coupleData.person2) { window.showToast('Mã mời đã có người join!', 'error'); return; }
       if (coupleData.person1.uid === this.uid) { window.showToast('Không thể tự kết đôi!', 'warn'); return; }
-
-      await this.refreshUserProfile();
-      const myName = this.getUserName();
-      const myAvatar = this.getUserAvatar();
-
+      const { name: myName, avatarUrl: myAvatar } = await this.loadMyProfile();
       await updateDoc(doc(db, 'love_apps', coupleDoc.id), {
         person2: { uid: this.uid, name: myName, avatarUrl: myAvatar }
       });
-
       this.coupleId = coupleDoc.id;
       window.showToast('Kết đôi thành công! 💕🎉', 'success');
       this.listenCouple();
@@ -229,21 +201,38 @@ class LoveApp {
     if (!this.coupleId) return;
     document.getElementById('love-status').style.display = '';
     document.getElementById('love-tabs').style.display = '';
+    window.TopNav?.setMenuActions([{ icon: '💔', label: 'Xoá mối quan hệ', onClick: () => this.confirmDeleteRelationship() }]);
     const loveRef = doc(db, 'love_apps', this.coupleId);
-    if (this.unsubFirestore) this.unsubFirestore();
+    this.cleanupListener();
     this.unsubFirestore = onSnapshot(loveRef, (snap) => {
       if (!snap.exists()) {
         window.showToast('Hồ sơ không tồn tại!', 'error');
-        this.coupleId = null; this.data = null; this.showLanding();
+        this.cleanupListener(); this.coupleId = null; this.data = null; this.showLanding();
         return;
       }
       this.data = snap.data();
       this.data._loaded = true;
+      this.syncMyProfileToCouple();
       if (!this.data.person2) { this.showWaitingForPartner(); return; }
       if (!this.data.startDate) { this.showSetDate(); return; }
       this.renderAll();
       this.bindTabs();
     });
+  }
+
+  async syncMyProfileToCouple() {
+    if (!this.coupleId || !this.data) return;
+    const myKey = this.data.person1?.uid === this.uid ? 'person1' : (this.data.person2?.uid === this.uid ? 'person2' : null);
+    if (!myKey) return;
+    const { name, avatarUrl } = await this.loadMyProfile();
+    const current = this.data[myKey] || {};
+    if (current.name === name && (current.avatarUrl || '') === avatarUrl) return;
+    try {
+      await updateDoc(doc(db, 'love_apps', this.coupleId), {
+        [`${myKey}.name`]: name,
+        [`${myKey}.avatarUrl`]: avatarUrl
+      });
+    } catch (e) { console.error(e); }
   }
 
   showWaitingForPartner() {
@@ -264,10 +253,11 @@ class LoveApp {
       if (!confirm('Bạn có chắc muốn hủy hồ sơ này?')) return;
       const idToDelete = this.coupleId;
       try {
+        this.cleanupListener(); this.coupleId = null; this.data = null;
         await deleteDoc(doc(db, 'love_apps', idToDelete));
         window.showToast('Đã hủy hồ sơ!', 'info');
       } catch (e) { console.error(e); window.showToast('Lỗi hủy hồ sơ!', 'error'); }
-      this.coupleId = null; this.data = null; this.showLanding();
+      this.showLanding();
     });
   }
 
@@ -301,16 +291,15 @@ class LoveApp {
 
   renderStatusBar() {
     if (!this.data?._loaded || !this.data.person2) return;
-    const p1 = this.data.person1;
-    const p2 = this.data.person2;
+    const p1 = this.data.person1?.name || '?';
+    const p2 = this.data.person2?.name || '?';
     const startDate = this.data.startDate;
     const days = this.getDaysSince(startDate);
-
-    document.getElementById('love-status').className = 'bc-status cat-thu_thach';
-    document.getElementById('love-left').textContent = `💖 ${p1.name}`;
-    document.getElementById('love-mid').textContent = days;
-    document.getElementById('love-sub').textContent = startDate ? 'ngày yêu thương' : 'Chưa set ngày';
-    document.getElementById('love-right').textContent = `${p2.name} 💖`;
+    document.getElementById('love-left').textContent = `${p1}`;
+    document.getElementById('love-mid').textContent = startDate ? `${days}` : 'Chưa yêu';
+    document.getElementById('love-sub').textContent = startDate ? (days === 1 ? 'day' : 'days') : 'Chưa set ngày';
+    document.getElementById('love-right').textContent = `${p2}`;
+    document.getElementById('love-status').className = 'bc-status cat-love';
   }
 
   getDaysSince(dateStr) {
@@ -327,9 +316,32 @@ class LoveApp {
         tab.classList.add('active');
         this.renderTab(tab.dataset.tab);
         this.updateTabIndicator();
+        this.showContentView();
       });
     });
+    const backBtn = document.getElementById('love-back-btn');
+    if (backBtn) backBtn.addEventListener('click', () => this.showLobbyView());
     this.updateTabIndicator();
+  }
+
+  showContentView() {
+    const lobby = document.getElementById('love-tabs');
+    const content = document.getElementById('love-content');
+    const backBtn = document.getElementById('love-back-btn');
+    if (lobby) lobby.style.display = 'none';
+    if (content) content.style.display = '';
+    if (backBtn) backBtn.classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  showLobbyView() {
+    const lobby = document.getElementById('love-tabs');
+    const content = document.getElementById('love-content');
+    const backBtn = document.getElementById('love-back-btn');
+    if (lobby) lobby.style.display = '';
+    if (content) content.style.display = 'none';
+    if (backBtn) backBtn.classList.remove('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   updateTabIndicator() {
@@ -353,6 +365,7 @@ class LoveApp {
       case 'wishlist': content.innerHTML = this.renderWishlist(); this.bindWishlist(); break;
       case 'diary': content.innerHTML = this.renderDiary(); this.bindDiary(); break;
       case 'interact': content.innerHTML = this.renderInteract(); this.bindInteract(); break;
+      case 'quiz': content.innerHTML = this.renderQuiz(); this.bindQuiz(); break;
       case 'tree': content.innerHTML = this.renderTree(); this.bindTree(); break;
     }
     this.updateTabIndicator();
@@ -360,28 +373,22 @@ class LoveApp {
 
   // ========== HOME ==========
   renderHome() {
-    const p1 = this.data.person1;
-    const p2 = this.data.person2;
+    const p1 = this.data.person1?.name || '?';
+    const p2 = this.data.person2?.name || '?';
+    const p1Avatar = this.data.person1?.avatarUrl || '';
+    const p2Avatar = this.data.person2?.avatarUrl || '';
     const startDate = this.data.startDate;
     const days = this.getDaysSince(startDate);
     const nextMilestone = startDate ? this.getNextMilestone(days) : null;
-
-    const avatarHtml = (person) => {
-      if (person?.avatarUrl) {
-        return `<img src="${person.avatarUrl}" class="love-avatar-img" alt="${person.name}" />`;
-      }
-      return `<div class="love-avatar">${person?.name?.[0] || '?'}</div>`;
-    };
-
     return `
       <div class="love-home">
         <div class="love-couple-card">
           <div class="love-avatars">
-            ${avatarHtml(p1)}
+            <div class="love-avatar" style="${p1Avatar ? `background-image:url(${p1Avatar});background-size:cover;background-position:center` : ''}">${p1Avatar ? '' : (p1[0] || '?')}</div>
             <span class="love-heart-big">💕</span>
-            ${avatarHtml(p2)}
+            <div class="love-avatar" style="${p2Avatar ? `background-image:url(${p2Avatar});background-size:cover;background-position:center` : ''}">${p2Avatar ? '' : (p2[0] || '?')}</div>
           </div>
-          <div class="love-couple-names">${p1.name} & ${p2.name}</div>
+          <div class="love-couple-names">${p1} & ${p2}</div>
           ${startDate ? `
             <div class="love-days-count">${days}</div>
             <div class="love-days-label">ngày yêu thương</div>
@@ -392,7 +399,7 @@ class LoveApp {
             </div>
           `}
           <div style="margin-top:12px">
-            <button class="love-td-btn dare" onclick="window.loveApp.leaveCouple()" style="font-size:11px;padding:6px 14px">🚪 Rời</button>
+            <button class="love-td-btn dare" onclick="window.loveApp.confirmDeleteRelationship()" style="font-size:11px;padding:6px 14px">💔 Xoá mối quan hệ</button>
           </div>
         </div>
       </div>
@@ -404,20 +411,37 @@ class LoveApp {
   async leaveCouple() {
     const isPerson1 = this.data.person1?.uid === this.uid;
     if (isPerson1) {
-      if (!confirm('Bạn là người tạo hồ sơ. Rời đi sẽ xóa toàn bộ dữ liệu. Xác nhận?')) return;
       const idToDelete = this.coupleId;
       try {
+        this.cleanupListener(); this.coupleId = null; this.data = null;
         await deleteDoc(doc(db, 'love_apps', idToDelete));
         window.showToast('Đã xóa hồ sơ!', 'info');
       } catch (e) { console.error(e); }
     } else {
-      if (!confirm('Bạn có chắc muốn rời khỏi hồ sơ này?')) return;
       try {
         await updateDoc(doc(db, 'love_apps', this.coupleId), { person2: null });
         window.showToast('Đã rời khỏi hồ sơ!', 'info');
       } catch (e) { console.error(e); }
+      this.cleanupListener(); this.coupleId = null; this.data = null;
     }
-    this.coupleId = null; this.data = null; this.showLanding();
+    this.showLanding();
+  }
+
+  confirmDeleteRelationship() {
+    const overlay = document.createElement('div');
+    overlay.className = 'love-td-overlay open';
+    overlay.innerHTML = `
+      <div class="love-td-box">
+        <div style="font-size:20px;font-weight:800;color:#fce7f3;margin-bottom:10px">⚠️ Xoá mối quan hệ</div>
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:18px;text-align:left">Toàn bộ kỷ niệm, nhật ký, wishlist và cây tình yêu sẽ bị xoá vĩnh viễn. Hành động này không thể hoàn tác.</div>
+        <button class="love-td-btn dare" id="confirm-delete-rel" style="width:100%">🗑 Xác nhận xoá</button>
+        <button class="love-td-btn close" id="cancel-delete-rel" style="width:100%;margin-top:6px">Huỷ</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#confirm-delete-rel').addEventListener('click', () => { overlay.remove(); this.leaveCouple(); });
+    overlay.querySelector('#cancel-delete-rel').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
   }
 
   getNextMilestone(days) {
@@ -703,6 +727,242 @@ class LoveApp {
     overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
   }
 
+  // ========== LOVE QUIZ (soạn câu hỏi, đủ 10 câu thành bài kiểm tra) ==========
+  renderQuiz() {
+    const mySide = this.getMySide();
+    const otherSide = this.getOtherSide();
+    const myQuiz = this.data.quiz?.[mySide] || { questions: [], locked: false, result: null };
+    const otherQuiz = this.data.quiz?.[otherSide] || { questions: [], locked: false, result: null };
+    const otherName = this.data[otherSide]?.name || 'Người ấy';
+
+    const myCount = myQuiz.questions?.length || 0;
+    const myStatusHtml = myQuiz.locked
+      ? (myQuiz.result
+          ? `<div class="love-quiz-status done">✅ ${this.escapeHtml(otherName)} đã làm bài — đúng ${myQuiz.result.score}/${myQuiz.result.total}</div>`
+          : `<div class="love-quiz-status waiting">🔒 Đã khoá — đang chờ ${this.escapeHtml(otherName)} làm bài</div>`)
+      : `<div class="love-quiz-status">📝 ${myCount}/10 câu đã soạn</div>`;
+
+    const otherCount = otherQuiz.questions?.length || 0;
+    let otherAction;
+    if (!otherQuiz.locked) {
+      otherAction = `<div class="love-quiz-status">⏳ ${this.escapeHtml(otherName)} đang soạn câu hỏi (${otherCount}/10)</div>`;
+    } else if (!otherQuiz.result) {
+      otherAction = `<button class="love-quiz-btn" id="btn-take-quiz">📝 Làm bài kiểm tra</button>`;
+    } else {
+      otherAction = `
+        <div class="love-quiz-status done">✅ Bạn đúng ${otherQuiz.result.score}/${otherQuiz.result.total} câu</div>
+        <button class="love-quiz-btn ghost" id="btn-review-quiz">👀 Xem lại</button>
+      `;
+    }
+
+    return `
+      <div class="love-quiz">
+        <div class="love-quiz-card">
+          <div class="love-quiz-title">💗 Quiz về bạn</div>
+          <div class="love-quiz-sub">${this.escapeHtml(otherName)} sẽ làm bài kiểm tra để xem hiểu bạn đến đâu</div>
+          ${myStatusHtml}
+          <div class="love-quiz-actions">
+            ${!myQuiz.locked
+              ? `<button class="love-quiz-btn" id="btn-build-quiz">✏️ Soạn câu hỏi</button>`
+              : `<button class="love-quiz-btn ghost" id="btn-reset-quiz">🔄 Soạn lại từ đầu</button>`}
+          </div>
+        </div>
+        <div class="love-quiz-card">
+          <div class="love-quiz-title">🧠 Quiz về ${this.escapeHtml(otherName)}</div>
+          <div class="love-quiz-sub">Xem bạn hiểu ${this.escapeHtml(otherName)} đến đâu</div>
+          <div class="love-quiz-actions">${otherAction}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  bindQuiz() {
+    document.getElementById('btn-build-quiz')?.addEventListener('click', () => this.openQuizBuilder());
+    document.getElementById('btn-reset-quiz')?.addEventListener('click', () => this.confirmResetQuiz());
+    document.getElementById('btn-take-quiz')?.addEventListener('click', () => this.openQuizTaker(false));
+    document.getElementById('btn-review-quiz')?.addEventListener('click', () => this.openQuizTaker(true));
+  }
+
+  confirmResetQuiz() {
+    const overlay = document.createElement('div');
+    overlay.className = 'love-td-overlay open';
+    overlay.innerHTML = `
+      <div class="love-td-box">
+        <div style="font-size:18px;font-weight:800;color:#fce7f3;margin-bottom:10px">⚠️ Soạn lại từ đầu?</div>
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:18px;text-align:left">Toàn bộ câu hỏi và kết quả bài kiểm tra hiện tại sẽ bị xoá.</div>
+        <button class="love-td-btn dare" id="confirm-reset-quiz" style="width:100%">🗑 Xác nhận</button>
+        <button class="love-td-btn close" id="cancel-reset-quiz" style="width:100%;margin-top:6px">Huỷ</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#confirm-reset-quiz').addEventListener('click', async () => { overlay.remove(); await this.resetMyQuiz(); });
+    overlay.querySelector('#cancel-reset-quiz').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  }
+
+  async resetMyQuiz() {
+    const mySide = this.getMySide();
+    try {
+      await updateDoc(doc(db, 'love_apps', this.coupleId), {
+        [`quiz.${mySide}.questions`]: [],
+        [`quiz.${mySide}.locked`]: false,
+        [`quiz.${mySide}.result`]: null
+      });
+      window.showToast('Đã xoá, soạn lại nhé! 📝', 'info');
+    } catch (e) { console.error(e); }
+  }
+
+  openQuizBuilder() {
+    const mySide = this.getMySide();
+    let questions = [...(this.data.quiz?.[mySide]?.questions || [])];
+    const overlay = document.createElement('div');
+    overlay.className = 'love-td-overlay open';
+    overlay.innerHTML = `<div class="love-td-box love-quiz-box"></div>`;
+    document.body.appendChild(overlay);
+    const box = overlay.querySelector('.love-td-box');
+
+    const render = () => {
+      const locked = questions.length >= 10;
+      const listHtml = questions.map((item, i) => `
+        <div class="love-quiz-q-item">
+          <div class="love-quiz-q-text">${i + 1}. ${this.escapeHtml(item.q)}</div>
+          <button class="love-quiz-q-del" data-idx="${i}">✕</button>
+        </div>
+      `).join('');
+      box.innerHTML = `
+        <div style="font-size:18px;font-weight:800;color:#fce7f3;margin-bottom:6px">✏️ Soạn câu hỏi về bạn (${questions.length}/10)</div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:14px;text-align:left">Đủ 10 câu sẽ tự động khoá lại thành bài kiểm tra cho đối phương.</div>
+        <div class="love-quiz-q-list">${listHtml || '<div style="font-size:12px;color:#94a3b8;padding:8px 0">Chưa có câu nào</div>'}</div>
+        ${!locked ? `
+          <div class="love-quiz-form">
+            <input id="qz-question" class="love-quiz-input" placeholder="Câu hỏi (VD: Món ăn tôi thích nhất là gì?)" style="margin-bottom:8px">
+            <input class="qz-opt love-quiz-input" data-i="0" placeholder="Đáp án A" style="margin-bottom:6px">
+            <input class="qz-opt love-quiz-input" data-i="1" placeholder="Đáp án B" style="margin-bottom:6px">
+            <input class="qz-opt love-quiz-input" data-i="2" placeholder="Đáp án C" style="margin-bottom:6px">
+            <input class="qz-opt love-quiz-input" data-i="3" placeholder="Đáp án D" style="margin-bottom:10px">
+            <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;text-align:left">Chọn đáp án đúng:</div>
+            <div class="love-quiz-radio-row">
+              <label><input type="radio" name="qz-correct" value="0" checked> A</label>
+              <label><input type="radio" name="qz-correct" value="1"> B</label>
+              <label><input type="radio" name="qz-correct" value="2"> C</label>
+              <label><input type="radio" name="qz-correct" value="3"> D</label>
+            </div>
+            <button class="love-td-btn dare" id="qz-add-btn" style="width:100%;margin-top:10px">➕ Thêm câu hỏi</button>
+          </div>
+        ` : `<div style="font-size:13px;color:#34d399;margin-top:10px">🔒 Đủ 10 câu, bài kiểm tra đã khoá!</div>`}
+        <button class="love-td-btn close" id="qz-close-btn" style="width:100%;margin-top:10px">Đóng</button>
+      `;
+      box.querySelectorAll('.love-quiz-q-del').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const idx = parseInt(btn.dataset.idx);
+          questions = questions.filter((_, i) => i !== idx);
+          render();
+          try {
+            await updateDoc(doc(db, 'love_apps', this.coupleId), {
+              [`quiz.${mySide}.questions`]: questions,
+              [`quiz.${mySide}.locked`]: false
+            });
+          } catch (e) { console.error(e); }
+        });
+      });
+      document.getElementById('qz-add-btn')?.addEventListener('click', async () => {
+        const qText = document.getElementById('qz-question').value.trim();
+        const opts = Array.from(box.querySelectorAll('.qz-opt')).map(i => i.value.trim());
+        const correctIdx = parseInt(box.querySelector('input[name="qz-correct"]:checked').value);
+        if (!qText || opts.some(o => !o)) { window.showToast('Điền đủ câu hỏi và 4 đáp án!', 'warn'); return; }
+        questions = [...questions, { q: qText, options: opts, correct: correctIdx }];
+        const nowLocked = questions.length >= 10;
+        render();
+        try {
+          const updates = { [`quiz.${mySide}.questions`]: questions };
+          if (nowLocked) updates[`quiz.${mySide}.locked`] = true;
+          await updateDoc(doc(db, 'love_apps', this.coupleId), updates);
+          if (nowLocked) window.showToast('Đủ 10 câu! Bài kiểm tra đã khoá 🔒', 'success');
+        } catch (e) { console.error(e); }
+      });
+      document.getElementById('qz-close-btn').addEventListener('click', () => overlay.remove());
+    };
+    render();
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  }
+
+  openQuizTaker(reviewMode) {
+    const otherSide = this.getOtherSide();
+    const otherName = this.data[otherSide]?.name || 'Người ấy';
+    const quiz = this.data.quiz?.[otherSide] || { questions: [], result: null };
+    const questions = quiz.questions || [];
+    const overlay = document.createElement('div');
+    overlay.className = 'love-td-overlay open';
+    overlay.innerHTML = `<div class="love-td-box love-quiz-box"></div>`;
+    document.body.appendChild(overlay);
+    const box = overlay.querySelector('.love-td-box');
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+    if (reviewMode && quiz.result) {
+      const answers = quiz.result.answers || [];
+      const reviewHtml = questions.map((item, i) => {
+        const picked = answers[i];
+        const isRight = picked === item.correct;
+        return `
+          <div class="love-quiz-review-item ${isRight ? 'right' : 'wrong'}">
+            <div class="love-quiz-q-text">${i + 1}. ${this.escapeHtml(item.q)}</div>
+            <div class="love-quiz-review-answer">Bạn chọn: ${this.escapeHtml(item.options[picked] ?? '—')} ${isRight ? '✅' : '❌'}</div>
+            ${!isRight ? `<div class="love-quiz-review-answer correct">Đáp án đúng: ${this.escapeHtml(item.options[item.correct])}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+      box.innerHTML = `
+        <div style="font-size:18px;font-weight:800;color:#fce7f3;margin-bottom:10px">📋 Kết quả: ${quiz.result.score}/${quiz.result.total}</div>
+        <div class="love-quiz-q-list">${reviewHtml}</div>
+        <button class="love-td-btn close" id="qz-review-close" style="width:100%;margin-top:12px">Đóng</button>
+      `;
+      document.getElementById('qz-review-close').addEventListener('click', () => overlay.remove());
+      return;
+    }
+
+    const myAnswers = new Array(questions.length).fill(null);
+    const render = () => {
+      const qHtml = questions.map((item, i) => `
+        <div class="love-quiz-take-item">
+          <div class="love-quiz-q-text">${i + 1}. ${this.escapeHtml(item.q)}</div>
+          <div class="love-quiz-opt-list">
+            ${item.options.map((opt, oi) => `
+              <label class="love-quiz-opt-label">
+                <input type="radio" name="qz-take-${i}" value="${oi}" ${myAnswers[i] === oi ? 'checked' : ''}>
+                ${this.escapeHtml(opt)}
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+      box.innerHTML = `
+        <div style="font-size:18px;font-weight:800;color:#fce7f3;margin-bottom:12px">🧠 Quiz về ${this.escapeHtml(otherName)}</div>
+        <div class="love-quiz-q-list">${qHtml}</div>
+        <button class="love-td-btn dare" id="qz-submit-btn" style="width:100%;margin-top:10px">✅ Nộp bài</button>
+        <button class="love-td-btn close" id="qz-take-close" style="width:100%;margin-top:6px">Đóng</button>
+      `;
+      box.querySelectorAll('input[type=radio]').forEach(r => {
+        r.addEventListener('change', (e) => {
+          const idx = parseInt(e.target.name.split('-')[2]);
+          myAnswers[idx] = parseInt(e.target.value);
+        });
+      });
+      document.getElementById('qz-submit-btn').addEventListener('click', async () => {
+        if (myAnswers.some(a => a === null)) { window.showToast('Trả lời hết các câu nhé!', 'warn'); return; }
+        const score = myAnswers.reduce((sum, a, i) => sum + (a === questions[i].correct ? 1 : 0), 0);
+        try {
+          await updateDoc(doc(db, 'love_apps', this.coupleId), {
+            [`quiz.${otherSide}.result`]: { score, total: questions.length, answers: myAnswers, takenAt: new Date().toISOString() }
+          });
+          window.showToast(`Bạn đúng ${score}/${questions.length} câu! 🎉`, 'success');
+        } catch (e) { console.error(e); }
+        overlay.remove();
+      });
+      document.getElementById('qz-take-close').addEventListener('click', () => overlay.remove());
+    };
+    render();
+  }
+
   // ========== CÂY TÌNH YÊU (150 ngày + sinh lãi mỗi ngày) ==========
   getTreeLevel(days) {
     const base = './assets/tree/tree-';
@@ -804,6 +1064,7 @@ class LoveApp {
   }
 
   bindTree() {
+    // Tưới nước
     const waterBtn = document.getElementById('btn-water-tree');
     if (waterBtn) {
       waterBtn.addEventListener('click', async () => {
@@ -818,6 +1079,7 @@ class LoveApp {
       });
     }
 
+    // Bón phân
     const fertBtn = document.getElementById('btn-fertilize-tree');
     if (fertBtn) {
       fertBtn.addEventListener('click', async () => {
@@ -837,6 +1099,7 @@ class LoveApp {
       });
     }
 
+    // Thu lãi hàng ngày
     const harvestInterestBtn = document.getElementById('btn-harvest-interest');
     if (harvestInterestBtn) {
       harvestInterestBtn.addEventListener('click', async () => {
@@ -854,6 +1117,7 @@ class LoveApp {
       });
     }
 
+    // Reset cây
     const resetBtn = document.getElementById('btn-reset-tree');
     if (resetBtn) {
       resetBtn.addEventListener('click', async () => {
@@ -870,6 +1134,7 @@ class LoveApp {
       });
     }
 
+    // Kiểm tra lên cấp sau mỗi thay đổi (sẽ được gọi lại từ listenCouple)
     this.checkAndRewardLevelUp();
   }
 }

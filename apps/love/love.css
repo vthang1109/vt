@@ -1,48 +1,114 @@
 /* love.css — VTWorld Love App Style */
 
-/* ===== TABS (thanh ngang + gạch dưới trượt) ===== */
-.love-tabs {
-  display: flex;
-  position: relative;
-  gap: 0;
-  margin-bottom: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  overflow-x: auto;
-  scrollbar-width: none;
+/* ===== KHUNG TRANG: khoảng trống 2 bên giống games-page ===== */
+.love-wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 16px 24px;
+  box-sizing: border-box;
 }
-.love-tabs::-webkit-scrollbar { display: none; }
 
-.love-tab {
+/* ===== STATUS BAR: luôn hiện ở trên cùng khi cuộn ===== */
+#love-status {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* ===== LOBBY NAV (chia mục dạng lưới, kiểu games.html) ===== */
+.love-tabs {
+  display: block;
+  margin-bottom: 20px;
+}
+.love-category-section { margin-bottom: 22px; }
+.love-category-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.love-category-label .cat-icon { font-size: 16px; }
+.love-category-label .cat-name {
+  font-family: "Science Gothic", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #f9a8d4;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.love-category-label .cat-line {
   flex: 1;
-  padding: 10px 6px;
-  background: none;
-  border: none;
-  color: #94a3b8;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(244, 114, 182, 0.3), transparent);
+}
+.love-lobby-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+.love-lobby-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 22px 10px 16px;
+  border-radius: 18px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(244, 114, 182, 0.35);
+  transition: all 0.3s;
+  font-family: "Science Gothic", sans-serif;
+}
+.love-lobby-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(244, 114, 182, 0.4);
+  box-shadow: 0 12px 30px rgba(244, 114, 182, 0.15);
+}
+.love-lobby-card.active {
+  background: rgba(236, 72, 153, 0.12);
+  border-color: #f472b6;
+  box-shadow: 0 0 20px rgba(244, 114, 182, 0.2);
+}
+.llc-emoji { font-size: 30px; }
+.llc-name { font-size: 12px; font-weight: 700; color: #e0f2fe; text-align: center; }
+.love-lobby-card.active .llc-name { color: #f472b6; }
+.llc-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 800;
+  background: rgba(244, 114, 182, 0.15);
+  color: #f472b6;
+  border: 1px solid rgba(244, 114, 182, 0.35);
+}
+.llc-desc {
+  font-size: 10px;
+  font-weight: 600;
+  color: #fda4af;
+  opacity: 0.85;
+  text-align: center;
+}
+
+/* Nút quay lại danh mục (chỉ hiện sau khi đã chọn 1 mục) */
+.love-back-btn {
+  display: none;
+  margin: 0 auto 12px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(244, 114, 182, 0.3);
+  background: rgba(244, 114, 182, 0.08);
+  color: #f9a8d4;
   font-family: "Science Gothic", sans-serif;
   font-weight: 500;
   font-size: 12px;
   cursor: pointer;
-  position: relative;
-  white-space: nowrap;
-  transition: color 0.2s;
-  text-align: center;
-  z-index: 1;
 }
-.love-tab.active {
-  color: #f472b6;
-  font-weight: 700;
-}
+.love-back-btn.show { display: block; }
 
-/* Thanh gạch dưới */
-.love-tab-indicator {
-  position: absolute;
-  bottom: -1px;
-  height: 2px;
-  background: #f472b6;
-  border-radius: 2px 2px 0 0;
-  transition: left 0.3s ease, width 0.3s ease;
-  z-index: 0;
-}
 
 /* ===== CÂY TÌNH YÊU (kích thước nhỏ hơn) ===== */
 .love-tree-container {
@@ -422,12 +488,177 @@
   transform: translateY(-2px);
 }
 
+/* Love Quiz */
+.love-quiz {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: fadeUp 0.5s ease both;
+}
+.love-quiz-card {
+  padding: 20px 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(244, 114, 182, 0.2);
+  text-align: center;
+}
+.love-quiz-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fce7f3;
+  margin-bottom: 4px;
+}
+.love-quiz-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+.love-quiz-status {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f9a8d4;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(244, 114, 182, 0.08);
+}
+.love-quiz-status.waiting { color: #fbbf24; background: rgba(251, 191, 36, 0.08); }
+.love-quiz-status.done { color: #34d399; background: rgba(52, 211, 153, 0.08); }
+.love-quiz-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.love-quiz-btn {
+  padding: 11px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #f472b6, #ec4899);
+  color: #fff;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+.love-quiz-btn.ghost {
+  background: rgba(244, 114, 182, 0.08);
+  color: #f9a8d4;
+  border: 1px solid rgba(244, 114, 182, 0.3);
+}
+.love-quiz-box {
+  max-height: 82vh;
+  overflow-y: auto;
+}
+.love-quiz-q-list {
+  text-align: left;
+  max-height: 40vh;
+  overflow-y: auto;
+  margin-bottom: 4px;
+}
+.love-quiz-q-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  margin-bottom: 6px;
+}
+.love-quiz-q-text {
+  font-size: 12px;
+  color: #e0f2fe;
+  flex: 1;
+}
+.love-quiz-q-del {
+  background: none;
+  border: none;
+  color: #f87171;
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.7;
+}
+.love-quiz-form { margin-top: 8px; }
+.love-quiz-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(244, 114, 182, 0.3);
+  background: rgba(244, 114, 182, 0.05);
+  color: #e0f2fe;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+}
+.love-quiz-radio-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 12px;
+  color: #e0f2fe;
+}
+.love-quiz-radio-row label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.love-quiz-take-item {
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  margin-bottom: 10px;
+  text-align: left;
+}
+.love-quiz-opt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.love-quiz-opt-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #e0f2fe;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.love-quiz-review-item {
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.love-quiz-review-item.right { background: rgba(52, 211, 153, 0.06); }
+.love-quiz-review-item.wrong { background: rgba(248, 113, 113, 0.06); }
+.love-quiz-review-answer {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+.love-quiz-review-answer.correct { color: #34d399; }
+
 /* ===== STATUS BAR CUSTOMIZATION ===== */
-/* Hiển thị dòng phụ (ngày yêu thương) */
+/* Đồng bộ theo tông "Thua" (result-lose) của status-bar.css, đổi đỏ sang hồng */
+#love-status.cat-love {
+  --bc-right: rgba(70, 12, 40, 0.7);
+  --bc-right-border: #ec4899;
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
+}
+#love-status.cat-love .stat-score {
+  color: #f9a8d4;
+  text-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+}
+
+/* Hiển thị dòng phụ (số ngày yêu) */
 #love-sub {
   display: block !important;
   font-size: 11px;
-  color: #fb7185;
+  color: #f9a8d4;
   margin-top: 2px;
 }
 
@@ -435,6 +666,4 @@
 #love-mid {
   font-size: 24px;
   font-weight: 800;
-  color: #ffffff;
-  text-shadow: 0 0 12px rgba(251, 113, 133, 0.6);
 }

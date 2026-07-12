@@ -19,7 +19,7 @@
 
   <div class="love-wrap">
     <!-- STATUS BAR -->
-    <div class="bc-status" id="love-status">
+    <div class="bc-status cat-love" id="love-status">
       <span class="stat-bet" id="love-left"></span>
       <div class="stat-score-wrap">
         <span class="stat-score" id="love-mid">💝</span>
@@ -28,18 +28,33 @@
       <span class="stat-profit" id="love-right"></span>
     </div>
 
-        <!-- TAB ROW -->
+    <!-- LOBBY NAV (kiểu games.html, chia mục) -->
     <div class="love-tabs" id="love-tabs">
-      <button class="love-tab active" data-tab="home">🏠 Home</button>
-      <button class="love-tab" data-tab="timeline">📅 Kỷ niệm</button>
-      <button class="love-tab" data-tab="wishlist">📝 Wishlist</button>
-      <button class="love-tab" data-tab="diary">📖 Nhật ký</button>
-      <button class="love-tab" data-tab="interact">💬 Tương tác</button>
-      <button class="love-tab" data-tab="tree">🌳 Cây</button>
-      <div class="love-tab-indicator"></div>
+      <div class="love-category-section">
+        <div class="love-category-label"><span class="cat-icon">📔</span><span class="cat-name">Kỷ Niệm</span><div class="cat-line"></div></div>
+        <div class="love-lobby-grid">
+          <button class="love-tab love-lobby-card" data-tab="timeline"><span class="llc-badge">Mới</span><span class="llc-emoji">📅</span><span class="llc-name">Kỷ niệm</span><span class="llc-desc">Dòng thời gian yêu</span></button>
+          <button class="love-tab love-lobby-card" data-tab="diary"><span class="llc-badge">Riêng tư</span><span class="llc-emoji">📖</span><span class="llc-name">Nhật ký</span><span class="llc-desc">Ghi lại cảm xúc</span></button>
+        </div>
+      </div>
+      <div class="love-category-section">
+        <div class="love-category-label"><span class="cat-icon">💌</span><span class="cat-name">Kết Nối</span><div class="cat-line"></div></div>
+        <div class="love-lobby-grid">
+          <button class="love-tab love-lobby-card" data-tab="wishlist"><span class="llc-badge">Cùng làm</span><span class="llc-emoji">📝</span><span class="llc-name">Wishlist</span><span class="llc-desc">Điều muốn cùng nhau</span></button>
+          <button class="love-tab love-lobby-card" data-tab="interact"><span class="llc-badge">Vui nhộn</span><span class="llc-emoji">💬</span><span class="llc-name">Tương tác</span><span class="llc-desc">Trò chuyện & thử thách</span></button>
+          <button class="love-tab love-lobby-card" data-tab="quiz"><span class="llc-badge">Mới</span><span class="llc-emoji">🧠</span><span class="llc-name">Love Quiz</span><span class="llc-desc">Đố hiểu nhau đến đâu</span></button>
+        </div>
+      </div>
+      <div class="love-category-section">
+        <div class="love-category-label"><span class="cat-icon">🌳</span><span class="cat-name">Vườn Yêu</span><div class="cat-line"></div></div>
+        <div class="love-lobby-grid">
+          <button class="love-tab love-lobby-card" data-tab="tree"><span class="llc-badge">Đặc biệt</span><span class="llc-emoji">🌳</span><span class="llc-name">Cây tình yêu</span><span class="llc-desc">Vun đắp tình yêu</span></button>
+        </div>
+      </div>
     </div>
 
     <!-- TAB CONTENTS -->
+    <button class="love-back-btn" id="love-back-btn">↑ Danh mục</button>
     <div class="love-content" id="love-content"></div>
   </div>
 
