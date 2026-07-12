@@ -1,0 +1,5002 @@
+[
+  {
+    "q": "Đội tuyển nào vô địch World Cup đầu tiên năm 1930?",
+    "options": [
+      "Brazil",
+      "Uruguay",
+      "Ý",
+      "Argentina"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cầu thủ nào ghi nhiều bàn thắng nhất lịch sử World Cup (tính đến 2022)?",
+    "options": [
+      "Ronaldo Nazario",
+      "Pelé",
+      "Gerd Muller",
+      "Miroslav Klose"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "World Cup 1950 diễn ra tại quốc gia nào?",
+    "options": [
+      "Brazil",
+      "Uruguay",
+      "Chile",
+      "Thụy Điển"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đội tuyển nào giữ kỷ lục vô địch World Cup nhiều nhất (5 lần)?",
+    "options": [
+      "Argentina",
+      "Brazil",
+      "Đức",
+      "Ý"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Trận chung kết World Cup 1998 Pháp thắng Brazil với tỉ số nào?",
+    "options": [
+      "3-0",
+      "3-1",
+      "2-0",
+      "4-1"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là cầu thủ trẻ nhất từng ghi bàn tại World Cup?",
+    "options": [
+      "Pelé",
+      "Norman Whiteside",
+      "Kylian Mbappé",
+      "Michael Owen"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Câu lạc bộ nào vô địch Champions League/Cúp C1 nhiều nhất lịch sử?",
+    "options": [
+      "AC Milan",
+      "Bayern Munich",
+      "Real Madrid",
+      "Liverpool"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là huấn luyện viên dẫn dắt Real Madrid vô địch Champions League 3 mùa liên tiếp (2016-2018)?",
+    "options": [
+      "José Mourinho",
+      "Zinedine Zidane",
+      "Rafael Benitez",
+      "Carlo Ancelotti"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ballon d'Or đầu tiên (1956) thuộc về cầu thủ nào?",
+    "options": [
+      "Stanley Matthews",
+      "Alfredo Di Stéfano",
+      "Lev Yashin",
+      "Raymond Kopa"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Thủ môn duy nhất từng giành Ballon d'Or là ai?",
+    "options": [
+      "Manuel Neuer",
+      "Iker Casillas",
+      "Gianluigi Buffon",
+      "Lev Yashin"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "World Cup 2002 được đồng tổ chức bởi Nhật Bản và quốc gia nào?",
+    "options": [
+      "Trung Quốc",
+      "Đài Loan",
+      "Thái Lan",
+      "Hàn Quốc"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Câu lạc bộ nào của Anh giành cú ăn ba (treble) mùa giải 1998-1999?",
+    "options": [
+      "Chelsea",
+      "Arsenal",
+      "Liverpool",
+      "Manchester United"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là 'Vua phá lưới' World Cup 2014 với 6 bàn thắng?",
+    "options": [
+      "James Rodríguez",
+      "Thomas Müller",
+      "Lionel Messi",
+      "Neymar"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Trận đấu nào được gọi là 'Bàn tay của Chúa' (Hand of God)?",
+    "options": [
+      "Brazil vs Ý 1970",
+      "Argentina vs Anh 1986",
+      "Đức vs Pháp 1982",
+      "Hà Lan vs Argentina 1978"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đội tuyển nào vô địch Euro lần đầu tiên vào năm 1960?",
+    "options": [
+      "Tây Ban Nha",
+      "Pháp",
+      "Tây Đức",
+      "Liên Xô"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai giữ kỷ lục ghi nhiều bàn thắng nhất trong một mùa giải Champions League (17 bàn)?",
+    "options": [
+      "Cristiano Ronaldo",
+      "Lionel Messi",
+      "Ruud van Nistelrooy",
+      "Robert Lewandowski"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Sân vận động Maracanã nằm ở thành phố nào?",
+    "options": [
+      "São Paulo",
+      "Buenos Aires",
+      "Rio de Janeiro",
+      "Montevideo"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "World Cup 1966 do đội chủ nhà nào vô địch?",
+    "options": [
+      "Bồ Đào Nha",
+      "Anh",
+      "Tây Đức",
+      "Liên Xô"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cầu thủ nào được mệnh danh là 'Số 10 huyền thoại' của Argentina trước Messi, vô địch World Cup 1986?",
+    "options": [
+      "Daniel Passarella",
+      "Diego Maradona",
+      "Mario Kempes",
+      "Gabriel Batistuta"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đội tuyển Việt Nam vô địch AFF Cup (Suzuki Cup) lần đầu tiên vào năm nào?",
+    "options": [
+      "2008",
+      "2018",
+      "1998",
+      "2000"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Huấn luyện viên nào dẫn dắt đội tuyển Việt Nam vô địch AFF Cup 2018?",
+    "options": [
+      "Alfred Riedl",
+      "Toshiya Miura",
+      "Henrique Calisto",
+      "Park Hang-seo"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Câu lạc bộ nào của Đức từng vô địch Champions League mùa giải 2012-2013?",
+    "options": [
+      "Borussia Dortmund",
+      "Bayer Leverkusen",
+      "Bayern Munich",
+      "Schalke 04"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cầu thủ nào giành Quả bóng vàng nhiều nhất lịch sử (tính đến 2023)?",
+    "options": [
+      "Johan Cruyff",
+      "Cristiano Ronaldo",
+      "Lionel Messi",
+      "Michel Platini"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "World Cup nữ đầu tiên được tổ chức vào năm nào?",
+    "options": [
+      "1995",
+      "1999",
+      "1987",
+      "1991"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đội tuyển nào vô địch World Cup nữ 2019?",
+    "options": [
+      "Mỹ",
+      "Hà Lan",
+      "Nhật Bản",
+      "Đức"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là cầu thủ ghi bàn thắng nhanh nhất lịch sử World Cup (11 giây)?",
+    "options": [
+      "Roberto Cardozo",
+      "Bryan Robson",
+      "Vaclav Masek",
+      "Hakan Şükür"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Câu lạc bộ Barcelona có biệt danh nào?",
+    "options": [
+      "Rojiblanco",
+      "Blaugrana",
+      "Bianconeri",
+      "Merengue"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là chân sút vĩ đại nhất của bóng đá Hà Lan, cha đẻ 'Bóng đá tổng lực'?",
+    "options": [
+      "Ruud Gullit",
+      "Johan Cruyff",
+      "Marco van Basten",
+      "Dennis Bergkamp"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "World Cup 1974 diễn ra tại quốc gia nào?",
+    "options": [
+      "Argentina",
+      "Tây Đức",
+      "Tây Ban Nha",
+      "Ý"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai giữ kỷ lục là huấn luyện viên vô địch Champions League nhiều lần nhất?",
+    "options": [
+      "Bob Paisley",
+      "Carlo Ancelotti",
+      "Pep Guardiola",
+      "Zinedine Zidane"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đội bóng nào được gọi là 'Quỷ đỏ' tại Ngoại hạng Anh?",
+    "options": [
+      "Arsenal",
+      "Manchester United",
+      "Liverpool",
+      "Nottingham Forest"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "World Cup 1990 tổ chức tại đâu?",
+    "options": [
+      "Tây Ban Nha",
+      "Ý",
+      "Mexico",
+      "Pháp"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là 'Người ngoài hành tinh' của bóng đá Brazil, hai lần vô địch World Cup Vua phá lưới?",
+    "options": [
+      "Romário",
+      "Ronaldo Nazario",
+      "Rivaldo",
+      "Ronaldinho"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Giải đấu nào được coi là giải vô địch quốc gia lâu đời nhất thế giới còn hoạt động?",
+    "options": [
+      "FA Cup",
+      "Ngoại hạng Anh",
+      "Serie A",
+      "La Liga"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cầu thủ nào ghi bàn thắng quyết định giúp Đức vô địch World Cup 2014?",
+    "options": [
+      "Mesut Özil",
+      "Toni Kroos",
+      "Mario Götze",
+      "Thomas Müller"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Sân Wembley là sân nhà của đội tuyển quốc gia nào?",
+    "options": [
+      "Anh",
+      "Wales",
+      "Ireland",
+      "Scotland"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đội tuyển nào bị loại khỏi World Cup 1950 sau thất bại gây sốc trước Mỹ?",
+    "options": [
+      "Tây Ban Nha",
+      "Chile",
+      "Ý",
+      "Anh"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là chủ tịch FIFA giai đoạn xảy ra bê bối tham nhũng bị điều tra năm 2015?",
+    "options": [
+      "Sepp Blatter",
+      "Michel Platini",
+      "João Havelange",
+      "Gianni Infantino"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Kỷ lục chuyển nhượng đắt giá nhất lịch sử bóng đá (tính đến 2017) thuộc về thương vụ nào?",
+    "options": [
+      "Mbappé sang PSG",
+      "Neymar sang PSG",
+      "Pogba sang MU",
+      "Ronaldo sang Juventus"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đội tuyển nào vô địch Copa América nhiều lần nhất lịch sử?",
+    "options": [
+      "Brazil",
+      "Argentina",
+      "Uruguay",
+      "Chile"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "World Cup 2010 tổ chức tại châu lục nào lần đầu tiên?",
+    "options": [
+      "Châu Á",
+      "Châu Đại Dương",
+      "Châu Phi",
+      "Nam Mỹ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là cầu thủ lớn tuổi nhất từng ghi bàn tại World Cup?",
+    "options": [
+      "Essam El-Hadary",
+      "Roger Milla",
+      "Rigobert Song",
+      "Faryd Mondragón"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Câu lạc bộ Ý nào có biệt danh 'Bà đầm già'?",
+    "options": [
+      "Inter Milan",
+      "Juventus",
+      "AS Roma",
+      "AC Milan"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đội tuyển Nhật Bản gia nhập AFC (Liên đoàn bóng đá châu Á) chuyển từ liên đoàn nào?",
+    "options": [
+      "CONCACAF",
+      "OFC",
+      "UEFA",
+      "Không đổi liên đoàn"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là người ghi bàn thắng vàng (golden goal) nổi tiếng giúp Pháp vô địch Euro 2000?",
+    "options": [
+      "Sylvain Wiltord",
+      "Thierry Henry",
+      "Zinedine Zidane",
+      "David Trezeguet"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cầu thủ nào được xem là người tiên phong của lối chơi 'tiki-taka' tại Barcelona/Tây Ban Nha?",
+    "options": [
+      "Sergio Busquets",
+      "Xavi Hernández",
+      "Carles Puyol",
+      "Andrés Iniesta"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "World Cup 1978 do đội chủ nhà nào vô địch?",
+    "options": [
+      "Hà Lan",
+      "Argentina",
+      "Brazil",
+      "Peru"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đội tuyển nào chưa từng thua một trận World Cup nào trong lịch sử vòng bảng (kỷ lục bất bại dài)?",
+    "options": [
+      "Ý",
+      "Đức",
+      "Brazil",
+      "Tây Ban Nha"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cầu thủ nào giữ kỷ lục nhiều lần khoác áo đội tuyển quốc gia nhất thế giới?",
+    "options": [
+      "Soh Chin Ann",
+      "Cristiano Ronaldo",
+      "Lionel Messi",
+      "Bader Al-Mutawa"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "V-League (giải bóng đá vô địch quốc gia Việt Nam) ra đời chính thức mang tên chuyên nghiệp từ năm nào?",
+    "options": [
+      "1998",
+      "2000",
+      "2005",
+      "2001"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đội tuyển Việt Nam lọt vào tứ kết Asian Cup 2019 sau khi đánh bại đội nào ở vòng 1/8?",
+    "options": [
+      "Jordan",
+      "Iraq",
+      "Nhật Bản",
+      "Thái Lan"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Sân vận động Mỹ Đình có sức chứa khoảng bao nhiêu chỗ ngồi?",
+    "options": [
+      "40.000",
+      "20.000",
+      "30.000",
+      "60.000"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là 'Messi Lào' - biệt danh của một cầu thủ Đông Nam Á nổi tiếng?",
+    "options": [
+      "Chanathip Songkrasin",
+      "Neil Etheridge",
+      "Safee Sali",
+      "Bounphachan Bounkong"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đội tuyển Thái Lan giữ kỷ lục vô địch AFF Cup nhiều nhất với bao nhiêu lần (tính đến 2022)?",
+    "options": [
+      "4 lần",
+      "6 lần",
+      "7 lần",
+      "5 lần"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "World Cup 1934 tổ chức tại quốc gia nào?",
+    "options": [
+      "Ý",
+      "Pháp",
+      "Tây Ban Nha",
+      "Thụy Sĩ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cầu thủ nào ghi hat-trick trong trận chung kết World Cup (duy nhất tính đến 2022)?",
+    "options": [
+      "Ronaldo",
+      "Geoff Hurst",
+      "Pelé",
+      "Kylian Mbappé"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "World Cup 2022 tổ chức tại quốc gia nào, lần đầu tiên tại Trung Đông?",
+    "options": [
+      "UAE",
+      "Ả Rập Xê Út",
+      "Qatar",
+      "Kuwait"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đội tuyển nào vô địch World Cup 2022?",
+    "options": [
+      "Brazil",
+      "Argentina",
+      "Pháp",
+      "Croatia"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là 'Vua phá lưới' mọi thời đại của Champions League (tính đến 2023)?",
+    "options": [
+      "Cristiano Ronaldo",
+      "Lionel Messi",
+      "Karim Benzema",
+      "Robert Lewandowski"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Giải đấu bóng đá nào được gọi là 'Ao làng' châu Âu do quy mô nhỏ nhưng lâu đời, tổ chức tại Hà Lan?",
+    "options": [
+      "Bundesliga",
+      "Ligue 1",
+      "Eredivisie",
+      "Jupiler Pro League"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cầu thủ nào từng bị treo giò World Cup 2010 vì cắn đối thủ (trước khi lặp lại hành vi sau này)?",
+    "options": [
+      "Diego Simeone",
+      "Luis Suárez",
+      "Sergio Ramos",
+      "Diego Costa"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "HLV nào dẫn dắt Leicester City vô địch Ngoại hạng Anh gây sốc mùa 2015-2016?",
+    "options": [
+      "Nigel Pearson",
+      "Craig Shakespeare",
+      "Claudio Ranieri",
+      "Brendan Rodgers"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Trận derby thành Manchester diễn ra giữa hai câu lạc bộ nào?",
+    "options": [
+      "Man United và Man City",
+      "Man City và Everton",
+      "Man United và Liverpool",
+      "Man United và Chelsea"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "World Cup 1958 chứng kiến sự tỏa sáng của cầu thủ 17 tuổi nào?",
+    "options": [
+      "Didi",
+      "Pelé",
+      "Vavá",
+      "Garrincha"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là cầu thủ ghi bàn thắng ấn định chức vô địch World Cup 2006 cho Ý trên chấm luân lưu... về phía Pháp bị thua?",
+    "options": [
+      "Fabio Grosso",
+      "Zinedine Zidane",
+      "David Trezeguet",
+      "Andrea Pirlo"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đội tuyển nào bị Zidane húc đầu vào ngực cầu thủ Materazzi trong chung kết World Cup 2006?",
+    "options": [
+      "Ý",
+      "Đức",
+      "Bồ Đào Nha",
+      "Tây Ban Nha"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Kỷ lục vô địch Ngoại hạng Anh nhiều nhất thuộc về câu lạc bộ nào?",
+    "options": [
+      "Manchester City",
+      "Liverpool",
+      "Manchester United",
+      "Arsenal"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cầu thủ nào được gọi là 'Người sói' (biệt danh gắn với tốc độ và sức mạnh) từng chơi cho Liverpool và Barcelona?",
+    "options": [
+      "Mohamed Salah",
+      "Luis Suárez",
+      "Philippe Coutinho",
+      "Sadio Mané"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "World Cup 1994 tổ chức tại quốc gia nào - lần đầu tiên ở Bắc Mỹ mà không phải Mexico?",
+    "options": [
+      "Canada",
+      "Costa Rica",
+      "Mỹ",
+      "Mexico"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là thủ môn giữ sạch lưới (clean sheet) nhiều trận nhất lịch sử World Cup?",
+    "options": [
+      "Fabien Barthez",
+      "Peter Shilton",
+      "Iker Casillas",
+      "Gianluigi Buffon"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Trận 'Chung kết thế kỷ' Brazil vs Ý 1970 kết thúc tỉ số nào?",
+    "options": [
+      "4-1",
+      "4-0",
+      "3-1",
+      "2-1"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đội tuyển Đan Mạch tạo bất ngờ vô địch Euro 1992 sau khi thay thế đội nào bị cấm dự vì chiến tranh?",
+    "options": [
+      "Albania",
+      "Tiệp Khắc",
+      "Liên Xô",
+      "Nam Tư"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai được xem là 'Cầu thủ xuất sắc nhất thế kỷ 20' theo bình chọn của FIFA (đồng hạng)?",
+    "options": [
+      "Cruyff và Maradona",
+      "Pelé và Cruyff",
+      "Pelé và Maradona",
+      "Maradona và Beckenbauer"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Sân vận động Santiago Bernabéu là sân nhà của câu lạc bộ nào?",
+    "options": [
+      "Atlético Madrid",
+      "Barcelona",
+      "Real Madrid",
+      "Valencia"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cầu thủ nào ghi bàn thắng ở phút 90+6 giúp Man United ngược dòng vô địch Champions League 1999?",
+    "options": [
+      "Ryan Giggs",
+      "Teddy Sheringham",
+      "David Beckham",
+      "Ole Gunnar Solskjær"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "World Cup 2018 tổ chức tại quốc gia nào?",
+    "options": [
+      "Brazil",
+      "Ukraine",
+      "Ba Lan",
+      "Nga"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đội tuyển nào là á quân World Cup 2018?",
+    "options": [
+      "Bỉ",
+      "Croatia",
+      "Pháp",
+      "Anh"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là 'Bàn tay vàng' bắt penalty xuất sắc giúp Hà Lan vào bán kết World Cup 2014?",
+    "options": [
+      "Michel Vorm",
+      "Jasper Cillessen",
+      "Tim Krul",
+      "Maarten Stekelenburg"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Câu lạc bộ nào của Bồ Đào Nha là nơi khởi đầu sự nghiệp của Cristiano Ronaldo?",
+    "options": [
+      "Braga",
+      "Sporting CP",
+      "Benfica",
+      "Porto"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đội tuyển Iceland gây tiếng vang khi vào tứ kết Euro 2016 sau khi loại đội nào?",
+    "options": [
+      "Pháp",
+      "Anh",
+      "Ý",
+      "Đức"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là chân sút hàng đầu của bóng đá châu Phi, từng 4 lần giành Quả bóng vàng châu Phi và chơi cho Chelsea?",
+    "options": [
+      "Didier Drogba",
+      "Yaya Touré",
+      "Samuel Eto'o",
+      "George Weah"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "George Weah, cựu cầu thủ từng giành Ballon d'Or 1995, sau này trở thành gì?",
+    "options": [
+      "Tổng thống Liberia",
+      "Bộ trưởng Thể thao",
+      "Đại sứ UNICEF",
+      "Chủ tịch FIFA"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Kỷ lục là cầu thủ trẻ nhất giành Ballon d'Or thuộc về ai?",
+    "options": [
+      "Michael Owen",
+      "Kylian Mbappé",
+      "George Best",
+      "Ronaldo Nazario"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "World Cup 1962 tổ chức tại quốc gia nào?",
+    "options": [
+      "Argentina",
+      "Chile",
+      "Peru",
+      "Uruguay"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đội hình 'Cỗ máy màu da cam' là biệt danh của đội tuyển quốc gia nào?",
+    "options": [
+      "Thụy Điển",
+      "Bỉ",
+      "Đức",
+      "Hà Lan"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là người duy nhất vừa vô địch World Cup với tư cách cầu thủ vừa với tư cách huấn luyện viên?",
+    "options": [
+      "Didier Deschamps",
+      "Mario Zagallo",
+      "Berti Vogts",
+      "Franz Beckenbauer"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Câu lạc bộ nào giữ kỷ lục bất bại dài nhất một mùa giải Ngoại hạng Anh (Invincibles 2003-04)?",
+    "options": [
+      "Liverpool",
+      "Chelsea",
+      "Arsenal",
+      "Manchester United"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "World Cup 1986 tổ chức tại quốc gia nào sau khi Colombia rút lui đăng cai?",
+    "options": [
+      "Mexico",
+      "Tây Ban Nha",
+      "Brazil",
+      "Mỹ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là cầu thủ ghi bàn ấn định chức vô địch Euro 2020 (tổ chức 2021) cho Ý trên chấm luân lưu?",
+    "options": [
+      "Marcus Rashford",
+      "Bukayo Saka",
+      "Federico Bernardeschi",
+      "Jorginho"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đội tuyển Anh thua trận chung kết Euro nào trên chấm luân lưu vào năm 2021?",
+    "options": [
+      "Euro 2020 (Ý)",
+      "Euro 2012 (Tây Ban Nha)",
+      "Euro 2008 (Tây Ban Nha)",
+      "Euro 2016 (Bồ Đào Nha)"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cầu thủ nào được gọi là 'CR7'?",
+    "options": [
+      "Cristiano Ronaldo",
+      "Cristian Romero",
+      "Casemiro Ronaldo",
+      "Carlos Ronaldo"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Trung vệ nào ghi bàn thắng quyết định giúp Đức vô địch World Cup 1990?",
+    "options": [
+      "Rudi Völler",
+      "Andreas Brehme",
+      "Lothar Matthäus",
+      "Jürgen Klinsmann"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Huấn luyện viên nào dẫn dắt đội tuyển Việt Nam vô địch AFF Cup 2008?",
+    "options": [
+      "Alfred Riedl",
+      "Phan Thanh Hùng",
+      "Henrique Calisto",
+      "Park Hang-seo"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Sân Old Trafford là sân nhà của câu lạc bộ nào, biệt danh 'Nhà hát của những giấc mơ'?",
+    "options": [
+      "Manchester City",
+      "Manchester United",
+      "Everton",
+      "Liverpool"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "World Cup 2006 tổ chức tại quốc gia nào?",
+    "options": [
+      "Ý",
+      "Đức",
+      "Áo",
+      "Hà Lan"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cầu thủ nào giữ kỷ lục ghi bàn nhiều nhất trong lịch sử một câu lạc bộ (Barcelona)?",
+    "options": [
+      "Lionel Messi",
+      "László Kubala",
+      "Luis Suárez",
+      "Cesar Rodríguez"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là 'Người đặc biệt' - biệt danh tự phong của một HLV nổi tiếng người Bồ Đào Nha?",
+    "options": [
+      "José Mourinho",
+      "Fernando Santos",
+      "André Villas-Boas",
+      "Carlos Queiroz"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "World Cup 1970 là kỳ World Cup đầu tiên được truyền hình trực tiếp màu, diễn ra tại đâu?",
+    "options": [
+      "Argentina",
+      "Brazil",
+      "Peru",
+      "Mexico"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đội tuyển Bắc Triều Tiên gây bất ngờ loại Ý khỏi World Cup năm nào?",
+    "options": [
+      "1962",
+      "1970",
+      "1974",
+      "1966"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Câu lạc bộ nào của Đức có biệt danh 'Hùm xám'?",
+    "options": [
+      "RB Leipzig",
+      "Bayern Munich",
+      "Borussia Dortmund",
+      "Schalke 04"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là cầu thủ chơi nhiều trận nhất cho đội tuyển Brazil?",
+    "options": [
+      "Roberto Carlos",
+      "Cafu",
+      "Pelé",
+      "Neymar"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đội tuyển Hy Lạp gây địa chấn vô địch Euro nào?",
+    "options": [
+      "Euro 2000",
+      "Euro 1996",
+      "Euro 2004",
+      "Euro 2008"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "World Cup 2014 diễn ra tại quốc gia nào?",
+    "options": [
+      "Nam Phi",
+      "Brazil",
+      "Argentina",
+      "Nga"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Trận thua kỷ lục 1-7 của Brazil trước Đức diễn ra ở vòng đấu nào World Cup 2014?",
+    "options": [
+      "Tứ kết",
+      "Chung kết",
+      "Bán kết",
+      "Vòng bảng"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cầu thủ nào ghi 2 bàn chỉ trong vòng hơn 1 phút giúp Đức bứt phá trong trận thắng Brazil 7-1 tại bán kết World Cup 2014?",
+    "options": [
+      "Toni Kroos",
+      "Miroslav Klose",
+      "Mesut Özil",
+      "Thomas Müller"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Kỷ lục Cầu thủ ghi nhiều bàn nhất trong một trận đấu World Cup là ai (5 bàn)?",
+    "options": [
+      "Ronaldo Nazario",
+      "Just Fontaine",
+      "Oleg Salenko",
+      "Miroslav Klose"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là chân sút ghi nhiều bàn nhất trong một kỳ World Cup duy nhất (13 bàn, năm 1958)?",
+    "options": [
+      "Gerd Muller",
+      "Just Fontaine",
+      "Sándor Kocsis",
+      "Eusébio"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Câu lạc bộ Hy Lạp/Bồ Đào Nha nào vô địch Champions League 2004 gây bất ngờ (đội bóng)?",
+    "options": [
+      "Benfica",
+      "Panathinaikos",
+      "Sporting CP",
+      "Porto"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là huấn luyện viên đưa Porto vô địch Champions League 2004 trước khi nổi tiếng toàn cầu?",
+    "options": [
+      "André Villas-Boas",
+      "José Mourinho",
+      "Fernando Santos",
+      "Carlos Queiroz"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Kình địch 'El Clásico' là trận đấu giữa hai câu lạc bộ nào?",
+    "options": [
+      "Barcelona và Espanyol",
+      "Real Madrid và Atlético",
+      "Real Madrid và Barcelona",
+      "Sevilla và Real Betis"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đội tuyển Bỉ có 'thế hệ vàng' nổi bật đứng hạng mấy tại World Cup 2018?",
+    "options": [
+      "Hạng ba",
+      "Hạng tư",
+      "Vô địch",
+      "Hạng nhì"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Sân vận động Camp Nou là sân nhà của câu lạc bộ nào?",
+    "options": [
+      "Atlético Madrid",
+      "Espanyol",
+      "Real Madrid",
+      "Barcelona"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là cầu thủ Việt Nam ghi bàn thắng vào lưới Australia giúp ĐT Việt Nam giành vé dự Asian Cup từ vòng loại World Cup 2022?",
+    "options": [
+      "Nguyễn Tiến Linh",
+      "Quang Hải",
+      "Văn Toàn",
+      "Công Phượng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cầu thủ nào ghi bàn thắng 'cầu vồng trong tuyết' nổi tiếng ở chung kết U23 châu Á 2018 cho Việt Nam?",
+    "options": [
+      "Nguyễn Quang Hải",
+      "Đoàn Văn Hậu",
+      "Phan Văn Đức",
+      "Nguyễn Công Phượng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đội tuyển U23 Việt Nam giành ngôi á quân U23 châu Á năm nào?",
+    "options": [
+      "2020",
+      "2022",
+      "2018",
+      "2016"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "World Cup 1998 tổ chức tại quốc gia nào?",
+    "options": [
+      "Tây Ban Nha",
+      "Anh",
+      "Ý",
+      "Pháp"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là 'Vua phá lưới' World Cup 1998 với 6 bàn thắng?",
+    "options": [
+      "Zinedine Zidane",
+      "Ronaldo Nazario",
+      "Dennis Bergkamp",
+      "Davor Šuker"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Câu lạc bộ nào của Ý giữ kỷ lục vô địch Serie A nhiều nhất?",
+    "options": [
+      "Inter Milan",
+      "Juventus",
+      "AC Milan",
+      "AS Roma"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là 'Thánh' - biệt danh của một hậu vệ/tiền vệ huyền thoại người Ý từng chơi cho AC Milan (số 3)?",
+    "options": [
+      "Paolo Maldini",
+      "Franco Baresi",
+      "Fabio Cannavaro",
+      "Alessandro Nesta"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Kỷ lục Ngoại hạng Anh ghi bàn nhiều nhất trong một mùa giải (38 trận) thuộc về ai?",
+    "options": [
+      "Alan Shearer",
+      "Erling Haaland",
+      "Mohamed Salah",
+      "Cristiano Ronaldo"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "World Cup 1954 chứng kiến 'Kỳ tích Bern' khi đội nào đánh bại Hungary hùng mạnh ở chung kết?",
+    "options": [
+      "Tây Đức",
+      "Ý",
+      "Thụy Sĩ",
+      "Áo"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đế chế La Mã chính thức chia thành Đông và Tây vào năm nào?",
+    "options": [
+      "286",
+      "476",
+      "395",
+      "330"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là hoàng đế La Mã đầu tiên chính thức hợp pháp hóa Kitô giáo?",
+    "options": [
+      "Diocletian",
+      "Nero",
+      "Augustus",
+      "Constantine Đại đế"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cuộc Cách mạng Pháp bắt đầu vào năm nào với sự kiện phá ngục Bastille?",
+    "options": [
+      "1799",
+      "1789",
+      "1776",
+      "1804"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là lãnh đạo cuộc Cách mạng Nga năm 1917 dẫn đến sự thành lập Liên Xô?",
+    "options": [
+      "Joseph Stalin",
+      "Leon Trotsky",
+      "Vladimir Lenin",
+      "Karl Marx"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Chiến tranh Trăm Năm diễn ra chủ yếu giữa hai quốc gia nào?",
+    "options": [
+      "Anh và Tây Ban Nha",
+      "Pháp và Tây Ban Nha",
+      "Pháp và Đức",
+      "Anh và Pháp"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đế chế Ottoman sụp đổ sau sự kiện nào?",
+    "options": [
+      "Chiến tranh Balkan",
+      "Thế chiến thứ hai",
+      "Thế chiến thứ nhất",
+      "Cách mạng Pháp"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Bức tường Berlin sụp đổ vào năm nào?",
+    "options": [
+      "1991",
+      "1989",
+      "1985",
+      "1990"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là Pharaoh nữ nổi tiếng của Ai Cập cổ đại trị vì khoảng thế kỷ 15 TCN?",
+    "options": [
+      "Cleopatra",
+      "Hatshepsut",
+      "Nefertiti",
+      "Ankhesenamun"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cuộc thám hiểm của Christopher Columbus đến châu Mỹ diễn ra vào năm nào?",
+    "options": [
+      "1500",
+      "1512",
+      "1492",
+      "1488"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Chiến tranh Nha phiến lần thứ nhất diễn ra giữa Trung Quốc và quốc gia nào?",
+    "options": [
+      "Pháp",
+      "Nhật Bản",
+      "Anh",
+      "Mỹ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Hiệp ước Versailles năm 1919 chính thức kết thúc cuộc chiến nào?",
+    "options": [
+      "Thế chiến thứ nhất",
+      "Chiến tranh Balkan",
+      "Thế chiến thứ hai",
+      "Chiến tranh Pháp-Phổ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là hoàng đế Pháp bị đánh bại trong trận Waterloo năm 1815?",
+    "options": [
+      "Napoléon Bonaparte",
+      "Louis-Philippe",
+      "Napoléon III",
+      "Louis XVI"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cuộc Đại suy thoái kinh tế thế giới bắt đầu vào năm nào?",
+    "options": [
+      "1939",
+      "1933",
+      "1925",
+      "1929"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đế chế Mông Cổ đạt diện tích lớn nhất dưới thời của ai?",
+    "options": [
+      "Hốt Tất Liệt",
+      "Timur",
+      "Thành Cát Tư Hãn (mở rộng tiếp dưới các cháu)",
+      "Oa Khoát Đài"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Sự kiện nào châm ngòi trực tiếp cho Thế chiến thứ nhất?",
+    "options": [
+      "Ám sát Thái tử Áo-Hung Franz Ferdinand",
+      "Hiệp ước Versailles",
+      "Đức xâm lược Ba Lan",
+      "Cách mạng Nga"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là nhà lãnh đạo Đức Quốc xã trong Thế chiến thứ hai?",
+    "options": [
+      "Heinrich Himmler",
+      "Joseph Goebbels",
+      "Adolf Hitler",
+      "Hermann Göring"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Trận Trân Châu Cảng diễn ra vào năm nào, kéo Mỹ vào Thế chiến II?",
+    "options": [
+      "1940",
+      "1942",
+      "1941",
+      "1939"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cuộc khủng hoảng tên lửa Cuba diễn ra vào năm nào?",
+    "options": [
+      "1959",
+      "1963",
+      "1962",
+      "1961"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Bức tường thành Vạn Lý Trường Thành chủ yếu được xây dựng để phòng thủ trước thế lực nào?",
+    "options": [
+      "Nhật Bản",
+      "Đế chế La Mã",
+      "Ấn Độ",
+      "Các bộ tộc du mục phương Bắc"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là vị vua nổi tiếng đã thống nhất Trung Quốc lần đầu tiên, lập ra nhà Tần?",
+    "options": [
+      "Hán Cao Tổ",
+      "Tần Thủy Hoàng",
+      "Chu Vũ Vương",
+      "Đường Thái Tông"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cách mạng Công nghiệp bắt đầu đầu tiên tại quốc gia nào?",
+    "options": [
+      "Đức",
+      "Pháp",
+      "Mỹ",
+      "Anh"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đế chế Aztec bị người Tây Ban Nha nào chinh phục?",
+    "options": [
+      "Hernán Cortés",
+      "Ferdinand Magellan",
+      "Francisco Pizarro",
+      "Vasco da Gama"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đế chế Inca bị chinh phục bởi ai?",
+    "options": [
+      "Christopher Columbus",
+      "Francisco Pizarro",
+      "Juan Ponce de León",
+      "Hernán Cortés"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chiến tranh Lạnh chủ yếu diễn ra giữa hai siêu cường nào?",
+    "options": [
+      "Mỹ và Trung Quốc",
+      "Mỹ và Liên Xô",
+      "Anh và Liên Xô",
+      "Pháp và Đức"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là Tổng thống Mỹ trong thời gian xảy ra vụ ám sát năm 1963 tại Dallas?",
+    "options": [
+      "Dwight Eisenhower",
+      "John F. Kennedy",
+      "Lyndon B. Johnson",
+      "Richard Nixon"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cuộc diệt chủng Holocaust do Đức Quốc xã thực hiện chủ yếu nhắm vào cộng đồng nào?",
+    "options": [
+      "Người Digan",
+      "Người khuyết tật",
+      "Tất cả các nhóm trên",
+      "Người Do Thái"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đế chế Byzantine (Đông La Mã) sụp đổ vào năm nào khi Constantinopolis thất thủ?",
+    "options": [
+      "1204",
+      "1096",
+      "1453",
+      "1520"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là nhà thám hiểm đầu tiên hoàn thành chuyến đi vòng quanh thế giới bằng đường biển (dù bản thân mất giữa hành trình)?",
+    "options": [
+      "James Cook",
+      "Vasco da Gama",
+      "Ferdinand Magellan",
+      "Christopher Columbus"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Triều đại nào được xem là triều đại phong kiến cuối cùng của Trung Quốc?",
+    "options": [
+      "Nhà Tống",
+      "Nhà Nguyên",
+      "Nhà Minh",
+      "Nhà Thanh"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cách mạng Tháng Mười Nga diễn ra vào năm nào?",
+    "options": [
+      "1914",
+      "1917",
+      "1918",
+      "1905"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là lãnh tụ dẫn dắt phong trào độc lập bất bạo động của Ấn Độ khỏi Anh?",
+    "options": [
+      "Subhas Chandra Bose",
+      "Mahatma Gandhi",
+      "Jawaharlal Nehru",
+      "Bhagat Singh"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chiến tranh Triều Tiên (1950-1953) kết thúc bằng hiệp định gì mà không phải hiệp ước hòa bình chính thức?",
+    "options": [
+      "Hiệp ước Paris",
+      "Hiệp ước Versailles",
+      "Hiệp định Genève",
+      "Hiệp định đình chiến"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đế quốc Anh dưới thời nữ hoàng nào được gọi là 'đế chế mặt trời không bao giờ lặn' đạt đỉnh cao?",
+    "options": [
+      "Elizabeth I",
+      "Elizabeth II",
+      "Victoria",
+      "Anne"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cách mạng Văn hóa Trung Quốc do ai phát động vào năm 1966?",
+    "options": [
+      "Đặng Tiểu Bình",
+      "Lưu Thiếu Kỳ",
+      "Mao Trạch Đông",
+      "Chu Ân Lai"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là người đầu tiên đặt chân lên Mặt Trăng năm 1969?",
+    "options": [
+      "Buzz Aldrin",
+      "Yuri Gagarin",
+      "Michael Collins",
+      "Neil Armstrong"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Thế vận hội Olympic hiện đại đầu tiên được tổ chức tại đâu vào năm 1896?",
+    "options": [
+      "Paris",
+      "Rome",
+      "Athens",
+      "London"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đế chế Khmer cổ đại có kinh đô nổi tiếng nào, nơi có quần thể Angkor Wat?",
+    "options": [
+      "Angkor",
+      "Pagan",
+      "Champa",
+      "Sukhothai"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chiến tranh Balkan đầu thế kỷ 20 chủ yếu liên quan đến sự suy tàn của đế chế nào?",
+    "options": [
+      "Nga",
+      "Đức",
+      "Áo-Hung",
+      "Ottoman"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là nữ hoàng nổi tiếng của Ai Cập cổ đại có mối quan hệ với Julius Caesar và Mark Antony?",
+    "options": [
+      "Cleopatra VII",
+      "Nefertari",
+      "Nefertiti",
+      "Hatshepsut"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Hiệp định Genève 1954 chia Việt Nam tạm thời theo vĩ tuyến nào?",
+    "options": [
+      "16",
+      "17",
+      "38",
+      "20"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đế chế Habsburg là hoàng tộc thống trị chủ yếu tại quốc gia nào ở châu Âu?",
+    "options": [
+      "Tây Ban Nha",
+      "Áo",
+      "Ba Lan",
+      "Đức"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cuộc nổi dậy Spartacus là cuộc khởi nghĩa của nhóm người nào chống lại La Mã?",
+    "options": [
+      "Nông dân",
+      "Binh lính",
+      "Nô lệ",
+      "Quý tộc"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Chiến dịch quân sự 'Operation Overlord' (D-Day) diễn ra vào ngày nào?",
+    "options": [
+      "1/9/1939",
+      "7/12/1941",
+      "6/6/1944",
+      "8/5/1945"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là Thủ tướng Anh trong phần lớn thời gian Thế chiến thứ hai?",
+    "options": [
+      "Clement Attlee",
+      "Anthony Eden",
+      "Winston Churchill",
+      "Neville Chamberlain"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đế chế Tây Ban Nha ở châu Mỹ bị suy yếu nghiêm trọng sau thất bại của hạm đội nào năm 1588?",
+    "options": [
+      "Hạm đội Anh",
+      "Hạm đội Trafalgar",
+      "Hạm đội Armada",
+      "Hạm đội Bồ Đào Nha"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nhà Minh của Trung Quốc bị lật đổ bởi triều đại nào?",
+    "options": [
+      "Nhà Hán",
+      "Nhà Thanh",
+      "Nhà Nguyên",
+      "Nhà Tống"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cách mạng công nghiệp lần thứ hai gắn liền với sự phát triển của ngành nào?",
+    "options": [
+      "Nông nghiệp",
+      "Điện và thép",
+      "Dệt may",
+      "Đường sắt hơi nước"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là nhà lãnh đạo phát xít Ý trong Thế chiến thứ hai?",
+    "options": [
+      "Pietro Badoglio",
+      "Victor Emmanuel III",
+      "Italo Balbo",
+      "Benito Mussolini"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chiến tranh Việt-Pháp (Đông Dương) kết thúc bằng chiến thắng quyết định nào của Việt Nam?",
+    "options": [
+      "Hòa Bình",
+      "Việt Bắc",
+      "Biên Giới",
+      "Điện Biên Phủ"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đế chế La Mã cổ đại sử dụng hệ thống chữ số nào?",
+    "options": [
+      "Chữ số Ai Cập",
+      "Chữ số La Mã",
+      "Chữ số Hy Lạp",
+      "Chữ số Ả Rập"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Thảm họa Chernobyl xảy ra vào năm nào?",
+    "options": [
+      "1991",
+      "1986",
+      "1979",
+      "1984"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là người sáng lập nên đế chế Mông Cổ?",
+    "options": [
+      "Hốt Tất Liệt",
+      "Oa Khoát Đài",
+      "Timur",
+      "Thành Cát Tư Hãn"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Hiệp ước Munich năm 1938 liên quan đến việc nhượng bộ lãnh thổ nào cho Đức Quốc xã?",
+    "options": [
+      "Sudetenland (Tiệp Khắc)",
+      "Áo",
+      "Rhineland",
+      "Ba Lan"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chế độ Apartheid (phân biệt chủng tộc) từng tồn tại chính thức ở quốc gia nào?",
+    "options": [
+      "Nam Phi",
+      "Zimbabwe",
+      "Kenya",
+      "Namibia"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là Tổng thống Nam Phi đầu tiên được bầu sau khi chế độ Apartheid chấm dứt?",
+    "options": [
+      "Nelson Mandela",
+      "F.W. de Klerk",
+      "Jacob Zuma",
+      "Thabo Mbeki"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cuộc chiến tranh Anh-Boer diễn ra tại khu vực nào?",
+    "options": [
+      "Đông Phi",
+      "Tây Phi",
+      "Nam Phi",
+      "Bắc Phi"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Vương triều Nhà Đường của Trung Quốc được xem là thời kỳ hoàng kim về mặt nào?",
+    "options": [
+      "Văn hóa và nghệ thuật",
+      "Nông nghiệp",
+      "Hàng hải",
+      "Quân sự thuần túy"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là hoàng đế La Mã xây dựng Đấu trường Colosseum?",
+    "options": [
+      "Nero",
+      "Hadrian",
+      "Trajan",
+      "Vespasian"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chiến tranh Pháp-Phổ (1870-1871) dẫn đến sự thống nhất của quốc gia nào?",
+    "options": [
+      "Áo",
+      "Ba Lan",
+      "Ý",
+      "Đức"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là người phát động phong trào Cải cách Tin lành (Protestant Reformation) năm 1517?",
+    "options": [
+      "John Calvin",
+      "Ulrich Zwingli",
+      "Martin Luther",
+      "Henry VIII"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nhà nước Văn Lang được cho là ra đời dưới thời các vua nào?",
+    "options": [
+      "Triệu Đà",
+      "Hùng Vương",
+      "Lạc Long Quân",
+      "An Dương Vương"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "An Dương Vương lập ra nhà nước nào sau khi thay thế Văn Lang?",
+    "options": [
+      "Vạn Xuân",
+      "Âu Lạc",
+      "Đại Cồ Việt",
+      "Nam Việt"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là người lãnh đạo cuộc khởi nghĩa chống quân Nam Hán, giành độc lập cho Việt Nam qua trận Bạch Đằng 938?",
+    "options": [
+      "Đinh Bộ Lĩnh",
+      "Lê Hoàn",
+      "Khúc Thừa Dụ",
+      "Ngô Quyền"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Lý Thường Kiệt nổi tiếng với chiến công đánh bại quân xâm lược nào?",
+    "options": [
+      "Nhà Minh",
+      "Nhà Thanh",
+      "Nhà Nguyên",
+      "Nhà Tống"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Bài thơ 'Nam quốc sơn hà' được xem là bản tuyên ngôn độc lập đầu tiên, gắn liền với ai?",
+    "options": [
+      "Lý Thường Kiệt",
+      "Lê Lợi",
+      "Nguyễn Trãi",
+      "Trần Hưng Đạo"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Nhà Trần ba lần đánh bại quân xâm lược nào vào thế kỷ 13?",
+    "options": [
+      "Nguyên Mông",
+      "Nhà Minh",
+      "Nhà Tống",
+      "Xiêm La"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là vị tướng nổi tiếng với chiến thắng Bạch Đằng năm 1288 trước quân Nguyên Mông?",
+    "options": [
+      "Trần Quốc Toản",
+      "Trần Nhân Tông",
+      "Trần Khánh Dư",
+      "Trần Hưng Đạo"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Cuộc khởi nghĩa Lam Sơn do ai lãnh đạo, đánh đuổi quân Minh giành độc lập?",
+    "options": [
+      "Lê Lợi",
+      "Nguyễn Trãi",
+      "Lê Lai",
+      "Nguyễn Xí"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Tác phẩm 'Bình Ngô đại cáo' do ai soạn thảo?",
+    "options": [
+      "Lê Lợi",
+      "Nguyễn Trãi",
+      "Ngô Sĩ Liên",
+      "Nguyễn Bỉnh Khiêm"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là hoàng đế đầu tiên của nhà Nguyễn, thống nhất đất nước năm 1802?",
+    "options": [
+      "Tự Đức",
+      "Minh Mạng",
+      "Gia Long",
+      "Thiệu Trị"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Kinh đô của nhà Nguyễn đặt tại đâu?",
+    "options": [
+      "Hoa Lư",
+      "Thăng Long",
+      "Huế",
+      "Đông Đô"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là vị vua Quang Trung, nổi tiếng với chiến thắng Ngọc Hồi - Đống Đa năm 1789?",
+    "options": [
+      "Nguyễn Lữ",
+      "Nguyễn Ánh",
+      "Nguyễn Huệ",
+      "Nguyễn Nhạc"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Trận Ngọc Hồi - Đống Đa đánh bại quân xâm lược nào?",
+    "options": [
+      "Nhà Nguyên",
+      "Nhà Minh",
+      "Xiêm La",
+      "Nhà Thanh"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Phong trào Cần Vương cuối thế kỷ 19 nổ ra dưới danh nghĩa của vị vua nào?",
+    "options": [
+      "Hàm Nghi",
+      "Thành Thái",
+      "Đồng Khánh",
+      "Duy Tân"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là lãnh tụ khởi nghĩa Yên Thế chống Pháp kéo dài gần 30 năm?",
+    "options": [
+      "Nguyễn Thiện Thuật",
+      "Hoàng Hoa Thám",
+      "Tống Duy Tân",
+      "Phan Đình Phùng"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đảng Cộng sản Việt Nam được thành lập vào năm nào?",
+    "options": [
+      "1930",
+      "1941",
+      "1945",
+      "1925"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là người sáng lập Đảng Cộng sản Việt Nam?",
+    "options": [
+      "Hồ Chí Minh",
+      "Trần Phú",
+      "Hà Huy Tập",
+      "Lê Hồng Phong"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cách mạng Tháng Tám thành công vào năm nào?",
+    "options": [
+      "1930",
+      "1945",
+      "1954",
+      "1975"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Bản Tuyên ngôn Độc lập khai sinh nước Việt Nam Dân chủ Cộng hòa được đọc vào ngày nào?",
+    "options": [
+      "7/5/1954",
+      "19/8/1945",
+      "30/4/1975",
+      "2/9/1945"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chiến dịch Điện Biên Phủ kết thúc vào ngày nào?",
+    "options": [
+      "20/7/1954",
+      "30/4/1954",
+      "7/5/1954",
+      "1/5/1954"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Hiệp định Genève 1954 chia cắt Việt Nam tạm thời tại vĩ tuyến nào?",
+    "options": [
+      "16",
+      "20",
+      "17",
+      "38"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Chiến dịch nào đánh dấu kết thúc chiến tranh, thống nhất đất nước năm 1975?",
+    "options": [
+      "Chiến dịch Tây Nguyên",
+      "Chiến dịch Huế - Đà Nẵng",
+      "Chiến dịch Điện Biên Phủ",
+      "Chiến dịch Hồ Chí Minh"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là vị vua đặt quốc hiệu Đại Cồ Việt, đóng đô ở Hoa Lư?",
+    "options": [
+      "Ngô Quyền",
+      "Lý Thái Tổ",
+      "Lê Hoàn",
+      "Đinh Bộ Lĩnh"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Lý Thái Tổ dời đô từ Hoa Lư ra Thăng Long vào năm nào?",
+    "options": [
+      "1075",
+      "1010",
+      "1009",
+      "1054"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Tác phẩm 'Chiếu dời đô' do ai soạn?",
+    "options": [
+      "Lý Thái Tông",
+      "Lý Thánh Tông",
+      "Lý Nhân Tông",
+      "Lý Thái Tổ"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhà Hồ do ai sáng lập sau khi cướp ngôi nhà Trần?",
+    "options": [
+      "Hồ Quý Ly",
+      "Hồ Nguyên Trừng",
+      "Hồ Hán Thương",
+      "Hồ Đê"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cuộc khởi nghĩa Hai Bà Trưng nổ ra vào năm nào, chống quân Đông Hán?",
+    "options": [
+      "Năm 40",
+      "Năm 248",
+      "Năm 42",
+      "Năm 542"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Bà Triệu (Triệu Thị Trinh) lãnh đạo cuộc khởi nghĩa chống quân xâm lược nào?",
+    "options": [
+      "Lương",
+      "Đông Ngô",
+      "Đông Hán",
+      "Nam Hán"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Lý Bí (Lý Nam Đế) lập ra nhà nước nào vào năm 544?",
+    "options": [
+      "Vạn Xuân",
+      "Đại Việt",
+      "Đại Cồ Việt",
+      "Âu Lạc"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Quốc hiệu 'Đại Việt' được sử dụng lần đầu tiên dưới triều đại nào?",
+    "options": [
+      "Nhà Lê sơ",
+      "Nhà Đinh",
+      "Nhà Lý (Lý Thánh Tông)",
+      "Nhà Trần"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là tác giả bộ 'Đại Việt sử ký toàn thư'?",
+    "options": [
+      "Lê Văn Hưu",
+      "Phan Phu Tiên",
+      "Ngô Thì Sĩ",
+      "Ngô Sĩ Liên"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Trạng Trình là biệt danh dân gian của danh nhân nào?",
+    "options": [
+      "Mạc Đĩnh Chi",
+      "Nguyễn Trãi",
+      "Lương Thế Vinh",
+      "Nguyễn Bỉnh Khiêm"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chúa Trịnh và Chúa Nguyễn phân chia lãnh thổ Đàng Trong - Đàng Ngoài lấy ranh giới tự nhiên nào?",
+    "options": [
+      "Sông Bến Hải",
+      "Đèo Hải Vân",
+      "Sông Gianh",
+      "Sông Cả"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Phong trào Tây Sơn do ba anh em nào lãnh đạo?",
+    "options": [
+      "Nguyễn Ánh, Nguyễn Huệ, Nguyễn Lữ",
+      "Nguyễn Nhạc, Nguyễn Ánh, Nguyễn Lữ",
+      "Nguyễn Huệ, Nguyễn Lữ, Nguyễn Vương",
+      "Nguyễn Nhạc, Nguyễn Huệ, Nguyễn Lữ"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là hoàng đế đã tiến hành cải cách hành chính lớn, chia cả nước thành 30 tỉnh và 1 phủ?",
+    "options": [
+      "Gia Long",
+      "Thiệu Trị",
+      "Tự Đức",
+      "Minh Mạng"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Phong trào Duy Tân đầu thế kỷ 20 gắn liền chủ yếu với nhân vật nào?",
+    "options": [
+      "Trần Quý Cáp",
+      "Phan Châu Trinh",
+      "Phan Bội Châu",
+      "Huỳnh Thúc Kháng"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Phong trào Đông Kinh Nghĩa Thục được thành lập vào năm nào tại Hà Nội?",
+    "options": [
+      "1911",
+      "1905",
+      "1930",
+      "1907"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Xô Viết Nghệ Tĩnh là cao trào cách mạng diễn ra vào giai đoạn nào?",
+    "options": [
+      "1936-1939",
+      "1945-1946",
+      "1940-1941",
+      "1930-1931"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chủ tịch Hồ Chí Minh ra đi tìm đường cứu nước từ bến cảng nào năm 1911?",
+    "options": [
+      "Bến Nhà Rồng",
+      "Bến Bạch Đằng",
+      "Cảng Hải Phòng",
+      "Cảng Đà Nẵng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Hội nghị thành lập Đảng Cộng sản Việt Nam diễn ra tại đâu?",
+    "options": [
+      "Ma Cao",
+      "Hồng Kông (Cửu Long)",
+      "Paris",
+      "Quảng Châu"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chiến dịch Biên Giới Thu Đông diễn ra vào năm nào?",
+    "options": [
+      "1954",
+      "1949",
+      "1947",
+      "1950"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chiến thắng Việt Bắc Thu Đông năm 1947 đã đánh bại kế hoạch quân sự nào của Pháp?",
+    "options": [
+      "Đánh nhanh thắng nhanh",
+      "Chiến tranh tổng lực",
+      "De Lattre de Tassigny",
+      "Navarre"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Tổng tiến công và nổi dậy Tết Mậu Thân diễn ra vào năm nào?",
+    "options": [
+      "1975",
+      "1972",
+      "1968",
+      "1965"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Hiệp định Paris về chấm dứt chiến tranh, lập lại hòa bình ở Việt Nam được ký vào năm nào?",
+    "options": [
+      "1973",
+      "1970",
+      "1975",
+      "1972"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là Tổng Bí thư đầu tiên của Đảng Cộng sản Đông Dương?",
+    "options": [
+      "Lê Hồng Phong",
+      "Hà Huy Tập",
+      "Nguyễn Văn Cừ",
+      "Trần Phú"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chiến dịch Tây Nguyên năm 1975 mở màn bằng trận đánh then chốt tại đâu?",
+    "options": [
+      "Buôn Ma Thuột",
+      "Đà Lạt",
+      "Pleiku",
+      "Kon Tum"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đại thắng mùa Xuân 1975 kết thúc bằng sự kiện nào vào ngày 30/4?",
+    "options": [
+      "Giải phóng Đà Nẵng",
+      "Giải phóng Huế",
+      "Giải phóng Sài Gòn",
+      "Giải phóng Nha Trang"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Việt Nam gia nhập Liên Hợp Quốc vào năm nào?",
+    "options": [
+      "1975",
+      "1977",
+      "1986",
+      "1995"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đại hội Đảng nào đề ra đường lối Đổi Mới, mở đầu thời kỳ cải cách kinh tế?",
+    "options": [
+      "Đại hội IV (1976)",
+      "Đại hội VII (1991)",
+      "Đại hội V (1982)",
+      "Đại hội VI (1986)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là vị vua cuối cùng của triều đại phong kiến Việt Nam (nhà Nguyễn)?",
+    "options": [
+      "Khải Định",
+      "Hàm Nghi",
+      "Duy Tân",
+      "Bảo Đại"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chiếu Cần Vương kêu gọi văn thân, sĩ phu giúp vua chống Pháp được ban bố năm nào?",
+    "options": [
+      "1883",
+      "1890",
+      "1888",
+      "1885"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Hòa ước Giáp Tuất (1874) và Hòa ước Patenôtre (1884) đánh dấu sự kiện gì đối với Việt Nam?",
+    "options": [
+      "Việt Nam ký hòa ước với nhà Thanh",
+      "Việt Nam trở thành thuộc địa/bảo hộ của Pháp",
+      "Việt Nam giành độc lập",
+      "Việt Nam mở cửa thông thương"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là nhà yêu nước tổ chức phong trào Đông Du đưa thanh niên Việt Nam sang Nhật học tập?",
+    "options": [
+      "Nguyễn Thượng Hiền",
+      "Lương Văn Can",
+      "Phan Châu Trinh",
+      "Phan Bội Châu"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Khởi nghĩa Yên Bái năm 1930 do tổ chức nào lãnh đạo?",
+    "options": [
+      "Việt Nam Quốc dân Đảng",
+      "Đảng Cộng sản Đông Dương",
+      "Đông Dương Cộng sản Đảng",
+      "Tân Việt Cách mạng Đảng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là lãnh tụ khởi nghĩa Yên Bái, hy sinh cùng câu nói nổi tiếng 'Không thành công cũng thành nhân'?",
+    "options": [
+      "Phó Đức Chính",
+      "Cô Giang",
+      "Nguyễn Thái Học",
+      "Nguyễn Khắc Nhu"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Vương triều nào của Việt Nam tồn tại lâu nhất trong lịch sử?",
+    "options": [
+      "Nhà Hậu Lê (Lê sơ + Lê trung hưng)",
+      "Nhà Lý",
+      "Nhà Nguyễn",
+      "Nhà Trần"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là vị vua ban hành bộ luật Hồng Đức nổi tiếng?",
+    "options": [
+      "Lê Hiến Tông",
+      "Lê Thái Tổ",
+      "Lê Nhân Tông",
+      "Lê Thánh Tông"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Trận Rạch Gầm - Xoài Mút năm 1785 do Nguyễn Huệ chỉ huy đánh bại quân xâm lược nào?",
+    "options": [
+      "Nhà Thanh",
+      "Xiêm La (Thái Lan)",
+      "Chăm Pa",
+      "Chân Lạp"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chiến thắng Chi Lăng - Xương Giang gắn với cuộc khởi nghĩa nào?",
+    "options": [
+      "Khởi nghĩa Lý Bí",
+      "Khởi nghĩa Lam Sơn",
+      "Khởi nghĩa Tây Sơn",
+      "Khởi nghĩa Bà Triệu"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là vị vua cuối cùng của nhà Trần trước khi bị Hồ Quý Ly soán ngôi?",
+    "options": [
+      "Trần Phế Đế",
+      "Trần Nghệ Tông",
+      "Trần Duệ Tông",
+      "Trần Thiếu Đế"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đơn vị đo cường độ dòng điện trong hệ SI là gì?",
+    "options": [
+      "Ampere",
+      "Volt",
+      "Ohm",
+      "Watt"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai đề xuất thuyết tương đối rộng năm 1915?",
+    "options": [
+      "Albert Einstein",
+      "Max Planck",
+      "Isaac Newton",
+      "Niels Bohr"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Hằng số Planck liên quan mật thiết đến lĩnh vực vật lý nào?",
+    "options": [
+      "Điện từ học",
+      "Cơ học lượng tử",
+      "Nhiệt động lực học",
+      "Cơ học cổ điển"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nguyên lý bất định Heisenberg phát biểu về điều gì?",
+    "options": [
+      "Năng lượng không tự sinh ra hay mất đi",
+      "Không thể xác định đồng thời chính xác vị trí và động lượng",
+      "Ánh sáng có tính chất sóng-hạt",
+      "Vật chất không thể chuyển thành năng lượng"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Tốc độ ánh sáng trong chân không xấp xỉ bao nhiêu km/s?",
+    "options": [
+      "150.000 km/s",
+      "300.000 km/s",
+      "3.000.000 km/s",
+      "30.000 km/s"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Định luật thứ hai của Newton phát biểu công thức nào?",
+    "options": [
+      "F = ma",
+      "E = mc²",
+      "P = mv",
+      "F = mv"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai phát hiện ra hiện tượng phóng xạ tự nhiên đầu tiên?",
+    "options": [
+      "Wilhelm Röntgen",
+      "Marie Curie",
+      "Ernest Rutherford",
+      "Henri Becquerel"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Hạt nào được xem là hạt mang lực điện từ trong Mô hình chuẩn?",
+    "options": [
+      "Electron",
+      "Photon",
+      "Boson Higgs",
+      "Gluon"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nguyên lý Le Chatelier áp dụng trong lĩnh vực nào?",
+    "options": [
+      "Cơ học lượng tử",
+      "Cân bằng hóa học/nhiệt động lực học",
+      "Quang học",
+      "Điện từ học"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Hiện tượng siêu dẫn xảy ra khi nào?",
+    "options": [
+      "Khi có từ trường mạnh",
+      "Ở nhiệt độ rất thấp, điện trở bằng 0",
+      "Khi áp suất cực cao",
+      "Ở nhiệt độ rất cao"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là người đề xuất mô hình nguyên tử hành tinh (electron quay quanh hạt nhân)?",
+    "options": [
+      "John Dalton",
+      "Niels Bohr",
+      "J.J. Thomson",
+      "Ernest Rutherford"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Boson Higgs được xác nhận phát hiện tại cơ sở nghiên cứu nào vào năm 2012?",
+    "options": [
+      "NASA",
+      "Fermilab",
+      "MIT",
+      "CERN (LHC)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Định luật bảo toàn động lượng áp dụng trong hệ nào?",
+    "options": [
+      "Mọi hệ bất kỳ",
+      "Hệ hở",
+      "Hệ có ma sát",
+      "Hệ kín (không có ngoại lực)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Sóng điện từ không cần môi trường truyền vì lý do gì?",
+    "options": [
+      "Do có khối lượng nhỏ",
+      "Do vận tốc không đổi",
+      "Do có bước sóng ngắn",
+      "Do dao động của điện trường và từ trường"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai phát triển thuyết điện từ thống nhất giữa điện, từ và quang học (phương trình Maxwell)?",
+    "options": [
+      "James Clerk Maxwell",
+      "André-Marie Ampère",
+      "Heinrich Hertz",
+      "Michael Faraday"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Hiện tượng quang điện được giải thích thành công đầu tiên bởi ai, giúp ông đoạt giải Nobel?",
+    "options": [
+      "Robert Millikan",
+      "Niels Bohr",
+      "Albert Einstein",
+      "Max Planck"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đơn vị đo năng lượng trong hệ SI là gì?",
+    "options": [
+      "Newton",
+      "Calorie",
+      "Watt",
+      "Joule"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Định luật Coulomb mô tả lực tương tác giữa hai loại đối tượng nào?",
+    "options": [
+      "Hai điện tích điểm",
+      "Hai khối lượng",
+      "Hai nam châm",
+      "Hai dòng điện"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Thuyết Vụ Nổ Lớn (Big Bang) mô tả điều gì?",
+    "options": [
+      "Sự hình thành Trái Đất",
+      "Sự tiến hóa của sự sống",
+      "Nguồn gốc và sự giãn nở của vũ trụ",
+      "Chu kỳ của các thiên hà"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai đề xuất khái niệm 'phản vật chất' về mặt lý thuyết trước khi được thực nghiệm xác nhận?",
+    "options": [
+      "Werner Heisenberg",
+      "Paul Dirac",
+      "Wolfgang Pauli",
+      "Erwin Schrödinger"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Định luật Ohm liên hệ giữa các đại lượng nào?",
+    "options": [
+      "Áp suất, thể tích, nhiệt độ",
+      "Công suất, năng lượng, thời gian",
+      "Lực, khối lượng, gia tốc",
+      "Điện áp, dòng điện, điện trở"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Hiệu ứng Doppler được ứng dụng để giải thích hiện tượng nào trong thiên văn học?",
+    "options": [
+      "Sự dịch chuyển đỏ của các thiên hà",
+      "Bức xạ nền vũ trụ",
+      "Lực hấp dẫn",
+      "Sự hình thành sao"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai chứng minh thực nghiệm sự tồn tại của sóng điện từ, xác nhận lý thuyết Maxwell?",
+    "options": [
+      "Nikola Tesla",
+      "James Clerk Maxwell",
+      "Heinrich Hertz",
+      "Guglielmo Marconi"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nguyên tắc hoạt động của laser dựa trên hiện tượng vật lý nào?",
+    "options": [
+      "Phát xạ kích thích (stimulated emission)",
+      "Hấp thụ photon",
+      "Phát xạ tự phát",
+      "Hiệu ứng quang điện"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Định luật nhiệt động lực học thứ hai liên quan mật thiết đến khái niệm nào?",
+    "options": [
+      "Công suất",
+      "Áp suất",
+      "Nhiệt lượng",
+      "Entropy"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là nhà vật lý đề xuất phương trình sóng cơ bản trong cơ học lượng tử (phương trình sóng Schrödinger)?",
+    "options": [
+      "Werner Heisenberg",
+      "Max Born",
+      "Paul Dirac",
+      "Erwin Schrödinger"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Bức xạ nền vũ trụ (CMB) là bằng chứng quan trọng ủng hộ thuyết nào?",
+    "options": [
+      "Vũ trụ tĩnh",
+      "Đa vũ trụ",
+      "Vụ Nổ Lớn",
+      "Vũ trụ dao động"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Neutrino là loại hạt có đặc điểm nổi bật nào khiến việc phát hiện chúng rất khó khăn?",
+    "options": [
+      "Di chuyển chậm hơn ánh sáng nhiều",
+      "Có khối lượng rất lớn",
+      "Có điện tích lớn",
+      "Tương tác rất yếu với vật chất"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nguyên tố nào có ký hiệu hóa học là 'Fe'?",
+    "options": [
+      "Sắt",
+      "Flo",
+      "Fecmi",
+      "Franxi"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Bảng tuần hoàn các nguyên tố hóa học được sắp xếp chủ yếu theo thứ tự nào?",
+    "options": [
+      "Khối lượng nguyên tử giảm dần",
+      "Số hiệu nguyên tử tăng dần",
+      "Độ âm điện",
+      "Bán kính nguyên tử"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai được xem là người đặt nền móng cho bảng tuần hoàn hiện đại?",
+    "options": [
+      "Amedeo Avogadro",
+      "John Dalton",
+      "Dmitri Mendeleev",
+      "Antoine Lavoisier"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Liên kết ion hình thành do đâu?",
+    "options": [
+      "Sự chuyển electron giữa hai nguyên tử",
+      "Sự dùng chung electron",
+      "Lực hút giữa các phân tử",
+      "Sự chia sẻ proton"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "pH của một dung dịch trung tính (nước tinh khiết) ở 25°C là bao nhiêu?",
+    "options": [
+      "0",
+      "1",
+      "7",
+      "14"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Phản ứng oxi hóa - khử là phản ứng có sự thay đổi của đại lượng nào?",
+    "options": [
+      "Số oxi hóa",
+      "Khối lượng phân tử",
+      "Thể tích khí",
+      "Nhiệt độ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Nguyên tố nào phổ biến nhất trong vũ trụ?",
+    "options": [
+      "Heli",
+      "Hydro",
+      "Carbon",
+      "Oxy"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chất nào được gọi là 'nước cường toan', có khả năng hòa tan cả vàng và bạch kim?",
+    "options": [
+      "HCl loãng",
+      "NaOH đặc",
+      "Hỗn hợp HNO3 và HCl",
+      "H2SO4 đặc"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Định luật bảo toàn khối lượng trong phản ứng hóa học do ai phát biểu?",
+    "options": [
+      "John Dalton",
+      "Antoine Lavoisier",
+      "Joseph Proust",
+      "Amedeo Avogadro"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Cấu hình electron của nguyên tố có số hiệu nguyên tử 11 (Natri) là gì?",
+    "options": [
+      "1s²2s²2p⁶3s²",
+      "1s²2s²2p⁵3s²",
+      "1s²2s²2p⁶3s¹",
+      "1s²2s²2p⁶"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Chất xúc tác enzyme trong cơ thể sống chủ yếu có bản chất là gì?",
+    "options": [
+      "Axit nucleic",
+      "Carbohydrate",
+      "Protein",
+      "Lipid"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Phản ứng trùng hợp được sử dụng để sản xuất loại vật liệu nào?",
+    "options": [
+      "Kim loại hợp kim",
+      "Polymer/nhựa",
+      "Axit vô cơ",
+      "Muối khoáng"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nguyên tố nào có độ âm điện lớn nhất trong bảng tuần hoàn?",
+    "options": [
+      "Flo",
+      "Oxy",
+      "Clo",
+      "Nitơ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Số Avogadro có giá trị xấp xỉ bao nhiêu?",
+    "options": [
+      "1,602 x 10²³",
+      "3,14 x 10²³",
+      "6,022 x 10²³",
+      "6,022 x 10²⁰"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai đề xuất mô hình cấu trúc DNA dạng xoắn kép năm 1953?",
+    "options": [
+      "Linus Pauling",
+      "Gregor Mendel",
+      "James Watson và Francis Crick",
+      "Rosalind Franklin một mình"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Kim loại kiềm thổ nằm ở nhóm nào trong bảng tuần hoàn?",
+    "options": [
+      "Nhóm VIIIA",
+      "Nhóm VIIA",
+      "Nhóm IIA",
+      "Nhóm IA"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Phản ứng thủy phân là phản ứng có sự tham gia của chất nào?",
+    "options": [
+      "Bazơ mạnh",
+      "Axit mạnh",
+      "Nước",
+      "Oxy"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Chất nào là thành phần chính tạo nên tính axit của giấm ăn?",
+    "options": [
+      "Axit formic",
+      "Axit lactic",
+      "Axit axetic",
+      "Axit citric"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đồng vị là các nguyên tử có cùng số proton nhưng khác nhau về đại lượng nào?",
+    "options": [
+      "Số neutron",
+      "Số hiệu nguyên tử",
+      "Điện tích hạt nhân",
+      "Số electron"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Liên kết hydro là loại liên kết như thế nào so với liên kết cộng hóa trị?",
+    "options": [
+      "Không thể so sánh",
+      "Mạnh hơn nhiều",
+      "Yếu hơn nhiều",
+      "Tương đương"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Phản ứng nào xảy ra giữa axit và bazơ tạo thành muối và nước?",
+    "options": [
+      "Phản ứng thủy phân",
+      "Phản ứng trung hòa",
+      "Phản ứng trùng hợp",
+      "Phản ứng oxi hóa khử"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Kim cương và than chì đều được cấu tạo từ nguyên tố nào nhưng có cấu trúc tinh thể khác nhau?",
+    "options": [
+      "Carbon",
+      "Silic",
+      "Photpho",
+      "Lưu huỳnh"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là người đầu tiên tổng hợp thành công một hợp chất hữu cơ (ure) từ chất vô cơ, bác bỏ 'thuyết sinh lực'?",
+    "options": [
+      "Friedrich Wöhler",
+      "Justus von Liebig",
+      "Antoine Lavoisier",
+      "Louis Pasteur"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chất nào được sử dụng phổ biến làm chất tẩy trắng và khử trùng nước?",
+    "options": [
+      "Nitơ (N2)",
+      "Oxy (O2)",
+      "Clo (Cl2)",
+      "Heli (He)"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Phản ứng nhiệt hạch (fusion) khác phản ứng phân hạch (fission) chủ yếu ở điểm nào?",
+    "options": [
+      "Tách hạt nhân nặng thành nhẹ hơn",
+      "Chỉ xảy ra ở nhiệt độ phòng",
+      "Không giải phóng năng lượng",
+      "Kết hợp hạt nhân nhẹ thành hạt nhân nặng hơn"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nguyên tố nào được dùng làm chất bán dẫn phổ biến nhất trong công nghiệp điện tử?",
+    "options": [
+      "Carbon",
+      "Silic",
+      "Nhôm",
+      "Germani"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đơn vị cấu trúc và chức năng cơ bản của sự sống là gì?",
+    "options": [
+      "Tế bào",
+      "Cơ quan",
+      "Mô",
+      "Phân tử"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai được xem là cha đẻ của thuyết tiến hóa qua chọn lọc tự nhiên?",
+    "options": [
+      "Jean-Baptiste Lamarck",
+      "Gregor Mendel",
+      "Alfred Russel Wallace",
+      "Charles Darwin"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Quá trình quang hợp ở thực vật xảy ra chủ yếu tại bào quan nào?",
+    "options": [
+      "Ribosome",
+      "Nhân tế bào",
+      "Ty thể",
+      "Lục lạp"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "ADN (DNA) mang thông tin di truyền được cấu tạo từ bao nhiêu loại base nitơ?",
+    "options": [
+      "4 loại",
+      "3 loại",
+      "5 loại",
+      "2 loại"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai được xem là 'cha đẻ của Di truyền học' qua các thí nghiệm trên đậu Hà Lan?",
+    "options": [
+      "Gregor Mendel",
+      "Thomas Morgan",
+      "Charles Darwin",
+      "James Watson"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Quá trình phân bào nguyên phân (mitosis) tạo ra bao nhiêu tế bào con từ một tế bào mẹ?",
+    "options": [
+      "2 tế bào",
+      "1 tế bào",
+      "4 tế bào",
+      "3 tế bào"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Enzyme là chất xúc tác sinh học có bản chất hóa học chủ yếu là gì?",
+    "options": [
+      "Axit nucleic (một số ít là RNA)",
+      "Protein",
+      "Lipid",
+      "Carbohydrate"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Hệ tuần hoàn của con người vận chuyển máu nhờ cơ quan trung tâm nào?",
+    "options": [
+      "Phổi",
+      "Gan",
+      "Tim",
+      "Thận"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Quá trình hô hấp tế bào tạo ra năng lượng dưới dạng phân tử nào?",
+    "options": [
+      "ARN",
+      "Glucose",
+      "ATP",
+      "ADN"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nhóm máu ABO ở người được quy định bởi bao nhiêu alen chính?",
+    "options": [
+      "3 alen (IA, IB, IO)",
+      "1 alen",
+      "2 alen",
+      "4 alen"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là người khám phá ra cấu trúc xoắn kép của DNA cùng với Francis Crick?",
+    "options": [
+      "Rosalind Franklin (đóng góp dữ liệu quan trọng)",
+      "Erwin Chargaff",
+      "James Watson",
+      "Maurice Wilkins"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Vi khuẩn được phân loại vào giới sinh vật nào?",
+    "options": [
+      "Thực vật",
+      "Monera (Khởi sinh)",
+      "Nấm",
+      "Động vật"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Quá trình đột biến gen là sự thay đổi xảy ra ở cấp độ nào?",
+    "options": [
+      "Số lượng nhiễm sắc thể",
+      "Cấu trúc tế bào",
+      "Trình tự nucleotide trong ADN",
+      "Cấu trúc nhiễm sắc thể"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Hormone insulin do cơ quan nào trong cơ thể tiết ra?",
+    "options": [
+      "Tuyến tụy",
+      "Tuyến giáp",
+      "Tuyến thượng thận",
+      "Tuyến yên"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chuỗi thức ăn trong hệ sinh thái luôn bắt đầu từ nhóm sinh vật nào?",
+    "options": [
+      "Sinh vật phân giải",
+      "Sinh vật tiêu thụ bậc 1",
+      "Sinh vật sản xuất (thực vật)",
+      "Động vật ăn thịt"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai được xem là người sáng lập ngành vi sinh vật học, phát triển thuyết mầm bệnh?",
+    "options": [
+      "Alexander Fleming",
+      "Edward Jenner",
+      "Louis Pasteur",
+      "Robert Koch"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nhiễm sắc thể giới tính ở người quy định giới tính nam là cặp nào?",
+    "options": [
+      "XY",
+      "XO",
+      "YY",
+      "XX"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Quá trình giảm phân (meiosis) tạo ra tế bào có bộ nhiễm sắc thể như thế nào so với tế bào mẹ?",
+    "options": [
+      "Tăng gấp đôi",
+      "Giảm một nửa (đơn bội)",
+      "Giữ nguyên (lưỡng bội)",
+      "Tăng gấp ba"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Kháng sinh Penicillin được phát hiện bởi ai?",
+    "options": [
+      "Jonas Salk",
+      "Louis Pasteur",
+      "Alexander Fleming",
+      "Robert Koch"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Hệ thần kinh trung ương của con người bao gồm những bộ phận nào?",
+    "options": [
+      "Não, tủy sống và hạch giao cảm",
+      "Tủy sống và hạch thần kinh",
+      "Não và dây thần kinh ngoại biên",
+      "Não và tủy sống"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Quá trình nào giúp thực vật vận chuyển nước từ rễ lên lá?",
+    "options": [
+      "Quang hợp",
+      "Hô hấp tế bào",
+      "Thụ phấn",
+      "Sự thoát hơi nước tạo lực hút"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Virus khác vi khuẩn ở đặc điểm cơ bản nào?",
+    "options": [
+      "Virus lớn hơn vi khuẩn",
+      "Virus có thể tự sinh sản độc lập",
+      "Virus không có cấu trúc tế bào, cần ký sinh nội bào bắt buộc",
+      "Virus không chứa vật chất di truyền"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Chọn lọc tự nhiên hoạt động dựa trên nguyên tắc cơ bản nào theo Darwin?",
+    "options": [
+      "Mọi cá thể đều sinh sản như nhau",
+      "Sinh vật thích nghi tốt hơn có khả năng sống sót và sinh sản cao hơn",
+      "Sinh vật lớn hơn luôn thắng thế",
+      "Đột biến luôn có lợi"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Hệ miễn dịch của cơ thể sản sinh ra loại tế bào nào để chống lại mầm bệnh?",
+    "options": [
+      "Bạch cầu (tế bào lympho)",
+      "Hồng cầu",
+      "Tế bào thần kinh",
+      "Tiểu cầu"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Quá trình quang hợp tạo ra sản phẩm chính nào ngoài glucose?",
+    "options": [
+      "Nước",
+      "Carbon dioxide",
+      "Oxy",
+      "Nitơ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Tác phẩm 'Truyện Kiều' là sáng tác của đại thi hào nào?",
+    "options": [
+      "Nguyễn Du",
+      "Nguyễn Đình Chiểu",
+      "Hồ Xuân Hương",
+      "Nguyễn Trãi"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "'Truyện Kiều' được viết dựa trên cốt truyện của tác phẩm Trung Quốc nào?",
+    "options": [
+      "Tây du ký",
+      "Tam quốc diễn nghĩa",
+      "Kim Vân Kiều truyện",
+      "Hồng lâu mộng"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là tác giả của tác phẩm 'Lục Vân Tiên'?",
+    "options": [
+      "Nguyễn Du",
+      "Nguyễn Khuyến",
+      "Tú Xương",
+      "Nguyễn Đình Chiểu"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nữ sĩ nào nổi tiếng với thơ Nôm mang phong cách trào phúng, phóng khoáng, được mệnh danh 'Bà chúa thơ Nôm'?",
+    "options": [
+      "Hồ Xuân Hương",
+      "Đoàn Thị Điểm",
+      "Bà Huyện Thanh Quan",
+      "Sương Nguyệt Anh"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Tác phẩm 'Chinh phụ ngâm' nguyên tác chữ Hán của ai, được Đoàn Thị Điểm diễn Nôm?",
+    "options": [
+      "Nguyễn Gia Thiều",
+      "Nguyễn Huy Tự",
+      "Phạm Thái",
+      "Đặng Trần Côn"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Phong trào Thơ mới Việt Nam phát triển mạnh vào giai đoạn nào?",
+    "options": [
+      "1932-1945",
+      "1954-1975",
+      "1945-1954",
+      "1900-1920"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là tác giả của bài thơ 'Vội vàng', gương mặt tiêu biểu của phong trào Thơ mới?",
+    "options": [
+      "Hàn Mặc Tử",
+      "Xuân Diệu",
+      "Huy Cận",
+      "Chế Lan Viên"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Tác phẩm 'Số đỏ' - trào phúng nổi tiếng của văn học hiện thực phê phán - do ai sáng tác?",
+    "options": [
+      "Nguyễn Công Hoan",
+      "Nam Cao",
+      "Ngô Tất Tố",
+      "Vũ Trọng Phụng"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhân vật Chí Phèo là sáng tạo của nhà văn nào?",
+    "options": [
+      "Ngô Tất Tố",
+      "Vũ Trọng Phụng",
+      "Kim Lân",
+      "Nam Cao"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Tác phẩm 'Tắt đèn' với nhân vật chị Dậu là của tác giả nào?",
+    "options": [
+      "Nam Cao",
+      "Nguyên Hồng",
+      "Nguyễn Công Hoan",
+      "Ngô Tất Tố"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là tác giả tiểu thuyết 'Chiến tranh và Hòa bình'?",
+    "options": [
+      "Fyodor Dostoevsky",
+      "Anton Chekhov",
+      "Leo Tolstoy",
+      "Ivan Turgenev"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Tác phẩm 'Đôi mắt' và 'Sông Đà' lần lượt là của các tác giả nào?",
+    "options": [
+      "Kim Lân và Nam Cao",
+      "Tô Hoài và Nguyễn Tuân",
+      "Nguyễn Tuân và Nam Cao",
+      "Nam Cao và Nguyễn Tuân"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai được xem là 'người viết sử bằng thơ' với 'Truyện Kiều' phản ánh xã hội phong kiến?",
+    "options": [
+      "Cao Bá Quát",
+      "Nguyễn Trãi",
+      "Nguyễn Bỉnh Khiêm",
+      "Nguyễn Du"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đại thi hào William Shakespeare là tác giả của bi kịch nổi tiếng nào?",
+    "options": [
+      "Hamlet",
+      "Faust",
+      "Don Quixote",
+      "Odyssey"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Tác phẩm 'Trăm năm cô đơn' đoạt giải Nobel là của nhà văn nào?",
+    "options": [
+      "Gabriel García Márquez",
+      "Mario Vargas Llosa",
+      "Pablo Neruda",
+      "Jorge Luis Borges"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là tác giả của sử thi 'Iliad' và 'Odyssey'?",
+    "options": [
+      "Hesiod",
+      "Virgil",
+      "Homer",
+      "Sophocles"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Tác phẩm 'Những người khốn khổ' (Les Misérables) là của nhà văn Pháp nào?",
+    "options": [
+      "Émile Zola",
+      "Victor Hugo",
+      "Gustave Flaubert",
+      "Honoré de Balzac"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Nhà thơ nào được xem là đại diện tiêu biểu của trào lưu văn học lãng mạn Việt Nam với bút danh gắn liền bệnh phong và thơ điên?",
+    "options": [
+      "Huy Cận",
+      "Chế Lan Viên",
+      "Hàn Mặc Tử",
+      "Xuân Diệu"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "'Nhật ký trong tù' là tác phẩm thơ chữ Hán của ai?",
+    "options": [
+      "Tố Hữu",
+      "Hồ Chí Minh",
+      "Xuân Diệu",
+      "Nguyễn Ái Quốc (cùng là Hồ Chí Minh)"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là tác giả tập thơ 'Từ ấy', gắn liền với con đường cách mạng của nhà thơ?",
+    "options": [
+      "Huy Cận",
+      "Xuân Diệu",
+      "Chính Hữu",
+      "Tố Hữu"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Tác phẩm 'Vợ chồng A Phủ' là sáng tác của nhà văn nào?",
+    "options": [
+      "Nguyễn Tuân",
+      "Tô Hoài",
+      "Kim Lân",
+      "Nguyễn Minh Châu"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là tác giả truyện ngắn 'Vợ nhặt'?",
+    "options": [
+      "Nguyễn Công Hoan",
+      "Kim Lân",
+      "Nam Cao",
+      "Tô Hoài"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Tác phẩm sử thi 'Đăm Săn' thuộc nền văn học dân gian của dân tộc nào ở Việt Nam?",
+    "options": [
+      "Ê Đê",
+      "Ba Na",
+      "Mường",
+      "Gia Rai"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Nhà văn Nga nào là tác giả 'Tội ác và Hình phạt'?",
+    "options": [
+      "Anton Chekhov",
+      "Nikolai Gogol",
+      "Fyodor Dostoevsky",
+      "Leo Tolstoy"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Tác phẩm 'Ông già và biển cả' đoạt giải Nobel Văn học của Ernest Hemingway xuất bản năm nào?",
+    "options": [
+      "1961",
+      "1945",
+      "1940",
+      "1952"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "'Faust' là tác phẩm nổi tiếng của đại văn hào Đức nào?",
+    "options": [
+      "Heinrich Heine",
+      "Thomas Mann",
+      "Friedrich Schiller",
+      "Johann Wolfgang von Goethe"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là tác giả của tiểu thuyết 'Kiêu hãnh và Định kiến' (Pride and Prejudice)?",
+    "options": [
+      "Charlotte Brontë",
+      "Virginia Woolf",
+      "Emily Brontë",
+      "Jane Austen"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Bài thơ 'Đây thôn Vĩ Dạ' là sáng tác nổi tiếng của nhà thơ nào?",
+    "options": [
+      "Hàn Mặc Tử",
+      "Huy Cận",
+      "Chế Lan Viên",
+      "Xuân Diệu"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Bức tranh 'Mona Lisa' là tác phẩm của họa sĩ nào?",
+    "options": [
+      "Leonardo da Vinci",
+      "Sandro Botticelli",
+      "Raphael",
+      "Michelangelo"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Tác phẩm điêu khắc 'David' nổi tiếng do ai sáng tác?",
+    "options": [
+      "Michelangelo",
+      "Donatello",
+      "Bernini",
+      "Leonardo da Vinci"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Trường phái hội họa Ấn tượng (Impressionism) khởi nguồn tại quốc gia nào?",
+    "options": [
+      "Pháp",
+      "Tây Ban Nha",
+      "Hà Lan",
+      "Ý"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là họa sĩ nổi tiếng với bức 'Đêm đầy sao' (The Starry Night)?",
+    "options": [
+      "Claude Monet",
+      "Edgar Degas",
+      "Vincent van Gogh",
+      "Paul Cézanne"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Bức tranh 'Tiếng thét' (The Scream) là tác phẩm của họa sĩ nào?",
+    "options": [
+      "Gustav Klimt",
+      "Egon Schiele",
+      "Edvard Munch",
+      "Wassily Kandinsky"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nhà điêu khắc/kiến trúc sư nào thiết kế mái vòm Vương cung thánh đường Thánh Phêrô ở Vatican?",
+    "options": [
+      "Michelangelo",
+      "Raphael",
+      "Bramante",
+      "Bernini"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Trường phái Lập thể (Cubism) gắn liền với tên tuổi họa sĩ nào?",
+    "options": [
+      "Henri Matisse",
+      "Marc Chagall",
+      "Salvador Dalí",
+      "Pablo Picasso"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là họa sĩ nổi tiếng với những tác phẩm siêu thực như 'Sự bền bỉ của ký ức' (đồng hồ chảy)?",
+    "options": [
+      "Joan Miró",
+      "Max Ernst",
+      "René Magritte",
+      "Salvador Dalí"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhà soạn nhạc nào bị điếc nhưng vẫn sáng tác những bản giao hưởng vĩ đại như Bản giao hưởng số 9?",
+    "options": [
+      "Wolfgang Amadeus Mozart",
+      "Ludwig van Beethoven",
+      "Johann Sebastian Bach",
+      "Franz Schubert"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Vở opera 'Carmen' là tác phẩm của nhà soạn nhạc nào?",
+    "options": [
+      "Richard Wagner",
+      "Giacomo Puccini",
+      "Georges Bizet",
+      "Giuseppe Verdi"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Công trình kiến trúc Nhà thờ Sagrada Família ở Barcelona do kiến trúc sư nào thiết kế?",
+    "options": [
+      "Zaha Hadid",
+      "Antoni Gaudí",
+      "Frank Lloyd Wright",
+      "Le Corbusier"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Phong cách kiến trúc Gothic đặc trưng bởi yếu tố nào?",
+    "options": [
+      "Mái vòm bán cầu kiểu La Mã",
+      "Cột tròn kiểu Hy Lạp",
+      "Vòm nhọn và cửa sổ kính màu lớn",
+      "Đường nét tối giản hiện đại"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Nhà soạn nhạc Wolfgang Amadeus Mozart là người nước nào?",
+    "options": [
+      "Đức",
+      "Áo",
+      "Thụy Sĩ",
+      "Ý"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Bức bích họa 'Bữa tiệc ly' (The Last Supper) do ai vẽ?",
+    "options": [
+      "Michelangelo",
+      "Raphael",
+      "Leonardo da Vinci",
+      "Titian"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Trường phái nghệ thuật nào coi trọng việc thể hiện ánh sáng và khoảnh khắc thoáng qua thay vì chi tiết tỉ mỉ?",
+    "options": [
+      "Trường phái Baroque",
+      "Trường phái Phục Hưng",
+      "Trường phái Tân cổ điển",
+      "Trường phái Ấn tượng"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhã nhạc cung đình Huế được UNESCO công nhận là di sản văn hóa gì?",
+    "options": [
+      "Di sản thiên nhiên thế giới",
+      "Di sản văn hóa phi vật thể",
+      "Di sản văn hóa vật thể",
+      "Di sản tư liệu"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Loại hình nghệ thuật sân khấu truyền thống nào của Việt Nam gắn liền với vùng đồng bằng Bắc Bộ, sử dụng mặt nạ và con rối trên mặt nước?",
+    "options": [
+      "Tuồng",
+      "Cải lương",
+      "Chèo",
+      "Múa rối nước"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nghệ thuật Cải lương phát triển mạnh và có nguồn gốc chủ yếu từ vùng nào của Việt Nam?",
+    "options": [
+      "Tây Nguyên",
+      "Bắc Bộ",
+      "Trung Bộ",
+      "Nam Bộ"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Bản giao hưởng nổi tiếng 'Bốn mùa' (The Four Seasons) là sáng tác của nhà soạn nhạc nào?",
+    "options": [
+      "Antonio Vivaldi",
+      "Johann Sebastian Bach",
+      "George Frideric Handel",
+      "Joseph Haydn"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Trường phái nghệ thuật Baroque phát triển mạnh vào khoảng thế kỷ nào?",
+    "options": [
+      "Thế kỷ 19",
+      "Thế kỷ 17",
+      "Thế kỷ 15",
+      "Thế kỷ 20"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là tác giả của tác phẩm triết học 'Bàn về khế ước xã hội'?",
+    "options": [
+      "Montesquieu",
+      "Voltaire",
+      "Jean-Jacques Rousseau",
+      "John Locke"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Triết gia Hy Lạp cổ đại nào là thầy của Aristotle và học trò của Socrates?",
+    "options": [
+      "Pythagoras",
+      "Plato",
+      "Heraclitus",
+      "Democritus"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Học thuyết 'Tam đoạn luận' (logic hình thức) gắn liền với triết gia nào?",
+    "options": [
+      "Plato",
+      "Socrates",
+      "Aristotle",
+      "Epicurus"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là tác giả của học thuyết 'Cogito ergo sum' (Tôi tư duy nên tôi tồn tại)?",
+    "options": [
+      "Immanuel Kant",
+      "Baruch Spinoza",
+      "René Descartes",
+      "Gottfried Leibniz"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Triết gia Đức nào là tác giả của 'Phê phán lý tính thuần túy'?",
+    "options": [
+      "Arthur Schopenhauer",
+      "Friedrich Nietzsche",
+      "Georg Hegel",
+      "Immanuel Kant"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chủ nghĩa hiện sinh (Existentialism) gắn liền với triết gia nào của thế kỷ 20?",
+    "options": [
+      "Auguste Comte",
+      "Emmanuel Levinas",
+      "Karl Marx",
+      "Jean-Paul Sartre"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là người sáng lập học thuyết Nho giáo tại Trung Quốc?",
+    "options": [
+      "Lão Tử",
+      "Mặc Tử",
+      "Khổng Tử",
+      "Mạnh Tử"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Học thuyết Đạo giáo (Đạo Đức Kinh) gắn liền với triết gia nào?",
+    "options": [
+      "Trang Tử",
+      "Mặc Tử",
+      "Lão Tử",
+      "Khổng Tử"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Triết gia nào phát biểu câu nói nổi tiếng 'Thượng đế đã chết'?",
+    "options": [
+      "Friedrich Nietzsche",
+      "Arthur Schopenhauer",
+      "Søren Kierkegaard",
+      "Karl Marx"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chủ nghĩa duy vật biện chứng là nền tảng triết học của học thuyết nào?",
+    "options": [
+      "Chủ nghĩa Mác-Lênin",
+      "Chủ nghĩa hiện sinh",
+      "Chủ nghĩa duy tâm khách quan",
+      "Chủ nghĩa thực dụng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai được xem là 'cha đẻ của triết học phương Tây' với phương pháp vấn đáp (biện chứng)?",
+    "options": [
+      "Plato",
+      "Socrates",
+      "Thales",
+      "Aristotle"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Học thuyết Phật giáo về 'Tứ diệu đế' do ai sáng lập?",
+    "options": [
+      "Ma Ha Ca Diếp",
+      "Đức Phật Thích Ca Mâu Ni",
+      "Bồ Đề Đạt Ma",
+      "A Nan"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chủ nghĩa thực dụng (Pragmatism) là trường phái triết học có nguồn gốc chủ yếu từ quốc gia nào?",
+    "options": [
+      "Pháp",
+      "Mỹ",
+      "Anh",
+      "Đức"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Triết gia nào viết tác phẩm 'Tinh thần pháp luật', ảnh hưởng đến học thuyết tam quyền phân lập?",
+    "options": [
+      "Voltaire",
+      "John Locke",
+      "Rousseau",
+      "Montesquieu"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là triết gia cổ đại nổi tiếng với câu nói 'Con người không thể tắm hai lần trên cùng một dòng sông'?",
+    "options": [
+      "Heraclitus",
+      "Anaximander",
+      "Parmenides",
+      "Democritus"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Trường phái Khắc kỷ (Stoicism) coi trọng nguyên tắc sống nào?",
+    "options": [
+      "Chấp nhận số phận và kiềm chế cảm xúc theo lý trí",
+      "Theo đuổi khoái lạc tối đa",
+      "Sống ẩn dật tránh xã hội",
+      "Phủ nhận mọi giá trị đạo đức"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ngọn núi cao nhất thế giới so với mực nước biển là ngọn núi nào?",
+    "options": [
+      "Lhotse",
+      "Everest",
+      "Kangchenjunga",
+      "K2"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Sông dài nhất thế giới là con sông nào?",
+    "options": [
+      "Sông Mississippi",
+      "Sông Amazon",
+      "Sông Nile",
+      "Sông Dương Tử"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Sa mạc lớn nhất thế giới (tính cả sa mạc lạnh) là sa mạc nào?",
+    "options": [
+      "Gobi",
+      "Sahara",
+      "Ả Rập",
+      "Nam Cực"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Quốc gia nào có diện tích lớn nhất thế giới?",
+    "options": [
+      "Canada",
+      "Trung Quốc",
+      "Nga",
+      "Mỹ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Hồ nước ngọt lớn nhất thế giới theo diện tích là hồ nào?",
+    "options": [
+      "Hồ Victoria",
+      "Hồ Baikal",
+      "Hồ Superior",
+      "Hồ Michigan"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Hồ sâu nhất thế giới là hồ nào?",
+    "options": [
+      "Hồ Caspi",
+      "Hồ Tanganyika",
+      "Hồ Superior",
+      "Hồ Baikal"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Điểm thấp nhất trên bề mặt Trái Đất trên đất liền là ở đâu?",
+    "options": [
+      "Vịnh Ba Tư",
+      "Biển Chết",
+      "Thung lũng Chết",
+      "Biển Caspi"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Dãy núi nào dài nhất thế giới, chạy dọc theo bờ Tây Nam Mỹ?",
+    "options": [
+      "Alps",
+      "Rocky",
+      "Himalaya",
+      "Andes"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đồng bằng sông Cửu Long là vùng đất được bồi đắp chủ yếu bởi con sông nào?",
+    "options": [
+      "Sông Đồng Nai",
+      "Sông Mê Kông",
+      "Sông Sài Gòn",
+      "Sông Hồng"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Việt Nam có đường biên giới trên bộ giáp với bao nhiêu quốc gia?",
+    "options": [
+      "4 quốc gia",
+      "2 quốc gia",
+      "5 quốc gia",
+      "3 quốc gia (Trung Quốc, Lào, Campuchia)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đỉnh núi cao nhất Việt Nam là đỉnh nào?",
+    "options": [
+      "Bạch Mộc Lương Tử",
+      "Ngọc Linh",
+      "Pu Ta Leng",
+      "Fansipan"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Vịnh Hạ Long được UNESCO công nhận là di sản thiên nhiên thế giới vào năm nào?",
+    "options": [
+      "2000",
+      "1985",
+      "1990",
+      "1994"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Eo biển nào ngăn cách châu Á và châu Phi (điểm hẹp nhất giữa hai lục địa)?",
+    "options": [
+      "Eo biển Bosphorus",
+      "Eo biển Gibraltar",
+      "Eo biển Bab-el-Mandeb",
+      "Eo biển Hormuz"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Thác nước cao nhất thế giới là thác nào?",
+    "options": [
+      "Thác Angel",
+      "Thác Victoria",
+      "Thác Iguazu",
+      "Thác Niagara"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Núi lửa nào là núi lửa cao nhất châu Phi?",
+    "options": [
+      "Elgon",
+      "Kenya",
+      "Meru",
+      "Kilimanjaro"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Quần đảo Hoàng Sa và Trường Sa thuộc chủ quyền của Việt Nam nằm trên vùng biển nào?",
+    "options": [
+      "Biển Hoa Đông",
+      "Vịnh Bengal",
+      "Biển Đông",
+      "Biển Andaman"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Sông nào là ranh giới tự nhiên phân chia châu Âu và châu Á tại Nga?",
+    "options": [
+      "Dãy núi Ural (và sông Ural)",
+      "Sông Danube",
+      "Sông Don",
+      "Sông Volga"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đâu là quốc gia có dân số đông nhất thế giới hiện nay (vượt Trung Quốc)?",
+    "options": [
+      "Indonesia",
+      "Trung Quốc",
+      "Ấn Độ",
+      "Mỹ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Kênh đào nào nối liền Địa Trung Hải và Biển Đỏ, rút ngắn hành trình hàng hải châu Âu - châu Á?",
+    "options": [
+      "Kênh đào Corinth",
+      "Kênh đào Kiel",
+      "Kênh đào Suez",
+      "Kênh đào Panama"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Kênh đào Panama nối liền hai đại dương nào?",
+    "options": [
+      "Đại Tây Dương và Ấn Độ Dương",
+      "Bắc Băng Dương và Thái Bình Dương",
+      "Ấn Độ Dương và Thái Bình Dương",
+      "Thái Bình Dương và Đại Tây Dương"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Sa mạc Atacama, một trong những nơi khô hạn nhất thế giới, nằm ở quốc gia nào?",
+    "options": [
+      "Bolivia",
+      "Chile",
+      "Peru",
+      "Argentina"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đảo lớn nhất thế giới (không tính lục địa) là đảo nào?",
+    "options": [
+      "Borneo",
+      "Madagascar",
+      "Greenland",
+      "New Guinea"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Dãy núi Himalaya là ranh giới tự nhiên giữa Ấn Độ và quốc gia nào chủ yếu?",
+    "options": [
+      "Trung Quốc (Tây Tạng)",
+      "Bhutan",
+      "Pakistan",
+      "Nepal (nằm trên dãy)"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Vùng đất nào được gọi là 'nóc nhà thế giới' vì độ cao trung bình lớn?",
+    "options": [
+      "Cao nguyên Andes",
+      "Cao nguyên Tây Tạng",
+      "Cao nguyên Iran",
+      "Cao nguyên Đông Phi"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Biển hồ nước mặn lớn nhất thế giới (thực chất là hồ) là gì?",
+    "options": [
+      "Hồ Aral",
+      "Biển Caspi",
+      "Hồ Baikal",
+      "Biển Chết"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai được xem là cha đẻ của kinh tế học hiện đại với tác phẩm 'Của cải của các quốc gia'?",
+    "options": [
+      "Adam Smith",
+      "Karl Marx",
+      "John Maynard Keynes",
+      "David Ricardo"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Học thuyết kinh tế nào ủng hộ vai trò can thiệp của nhà nước để ổn định nền kinh tế trong thời kỳ suy thoái?",
+    "options": [
+      "Chủ nghĩa tự do kinh tế thuần túy",
+      "Kinh tế học Keynes",
+      "Chủ nghĩa trọng thương",
+      "Kinh tế học tân cổ điển"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Lạm phát là hiện tượng gì trong kinh tế?",
+    "options": [
+      "Tỷ lệ thất nghiệp tăng cao",
+      "Mức giá chung giảm liên tục",
+      "Mức giá chung của hàng hóa và dịch vụ tăng liên tục theo thời gian",
+      "Tổng sản phẩm quốc nội giảm"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "GDP là viết tắt của thuật ngữ kinh tế nào?",
+    "options": [
+      "Tổng giá trị xuất khẩu",
+      "Tổng sản phẩm quốc nội",
+      "Tổng thu nhập quốc dân",
+      "Tổng sản phẩm quốc gia"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ngân hàng Trung ương thực hiện chính sách tiền tệ chủ yếu thông qua công cụ nào?",
+    "options": [
+      "Thuế thu nhập",
+      "Thuế xuất nhập khẩu",
+      "Chi tiêu chính phủ",
+      "Lãi suất và cung tiền"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Học thuyết 'bàn tay vô hình' của Adam Smith đề cập đến điều gì?",
+    "options": [
+      "Kế hoạch hóa tập trung",
+      "Sự can thiệp của chính phủ vào thị trường",
+      "Sự độc quyền của nhà nước",
+      "Thị trường tự điều tiết thông qua cung cầu"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Tổ chức Thương mại Thế giới (WTO) có chức năng chính là gì?",
+    "options": [
+      "Điều tiết và thúc đẩy thương mại quốc tế",
+      "Quản lý dự trữ vàng quốc tế",
+      "Cho vay vốn phát triển",
+      "Ổn định tỷ giá hối đoái"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Việt Nam chính thức gia nhập WTO vào năm nào?",
+    "options": [
+      "2005",
+      "2006",
+      "2008",
+      "2007"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chỉ số CPI (Consumer Price Index) dùng để đo lường điều gì?",
+    "options": [
+      "Tổng sản phẩm quốc nội",
+      "Tỷ lệ thất nghiệp",
+      "Cán cân thương mại",
+      "Mức thay đổi giá cả hàng hóa tiêu dùng"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Karl Marx phân tích khái niệm 'giá trị thặng dư' trong tác phẩm nào?",
+    "options": [
+      "Chống Dühring",
+      "Tư bản luận (Das Kapital)",
+      "Tuyên ngôn Đảng Cộng sản",
+      "Hệ tư tưởng Đức"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đồng tiền chung của Liên minh châu Âu được gọi là gì?",
+    "options": [
+      "Pound",
+      "Mark",
+      "Franc",
+      "Euro"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Khủng hoảng tài chính toàn cầu năm 2008 khởi nguồn chủ yếu từ thị trường nào ở Mỹ?",
+    "options": [
+      "Thị trường bất động sản (nợ dưới chuẩn)",
+      "Thị trường chứng khoán công nghệ",
+      "Thị trường dầu mỏ",
+      "Thị trường vàng"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chính sách Đổi Mới của Việt Nam bắt đầu chuyển đổi nền kinh tế theo hướng nào?",
+    "options": [
+      "Kinh tế tư bản chủ nghĩa thuần túy",
+      "Kinh tế kế hoạch hóa tập trung hoàn toàn",
+      "Kinh tế thị trường định hướng xã hội chủ nghĩa",
+      "Kinh tế tự cung tự cấp"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Quỹ Tiền tệ Quốc tế (IMF) có nhiệm vụ chính nào?",
+    "options": [
+      "Ổn định hệ thống tài chính và tiền tệ quốc tế",
+      "Thúc đẩy thương mại tự do",
+      "Quản lý viện trợ nhân đạo",
+      "Xóa đói giảm nghèo trực tiếp"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ngôn ngữ lập trình C được phát triển đầu tiên bởi ai?",
+    "options": [
+      "Dennis Ritchie",
+      "Bjarne Stroustrup",
+      "Linus Torvalds",
+      "Ken Thompson"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là người sáng lập hệ điều hành Linux?",
+    "options": [
+      "Steve Wozniak",
+      "Richard Stallman",
+      "Linus Torvalds",
+      "Dennis Ritchie"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Thuật toán mã hóa RSA dựa trên độ khó của bài toán toán học nào?",
+    "options": [
+      "Phân tích thừa số nguyên tố của số lớn",
+      "Tìm căn bậc hai",
+      "Tính định thức ma trận",
+      "Giải phương trình vi phân"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "World Wide Web (WWW) được phát minh bởi ai vào năm 1989?",
+    "options": [
+      "Vint Cerf",
+      "Larry Page",
+      "Tim Berners-Lee",
+      "Marc Andreessen"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "CPU là viết tắt của thuật ngữ nào trong máy tính?",
+    "options": [
+      "Central Program Unit",
+      "Central Processing Unit",
+      "Core Processing Unit",
+      "Computer Processing Unit"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai đồng sáng lập Apple cùng Steve Jobs?",
+    "options": [
+      "Bill Gates",
+      "Jonathan Ive",
+      "Steve Wozniak",
+      "Tim Cook"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Giao thức nào được sử dụng để truyền tải các trang web trên Internet?",
+    "options": [
+      "SMTP",
+      "TCP (chỉ tầng vận chuyển)",
+      "HTTP/HTTPS",
+      "FTP"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Trí tuệ nhân tạo tạo sinh (Generative AI) hiện đại phổ biến dựa nhiều vào kiến trúc mạng nơ-ron nào?",
+    "options": [
+      "Mạng nơ-ron tích chập (CNN) thuần túy",
+      "Mạng nơ-ron hồi quy (RNN) thuần túy",
+      "Mạng Bayes",
+      "Transformer"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đơn vị đo dung lượng bộ nhớ máy tính cơ bản nhất là gì?",
+    "options": [
+      "Byte",
+      "Bit",
+      "Pixel",
+      "Hertz"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Anthropic, công ty phát triển Claude, được thành lập vào năm nào?",
+    "options": [
+      "2023",
+      "2015",
+      "2021",
+      "2019"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Công ty nào phát triển ngôn ngữ lập trình Python?",
+    "options": [
+      "Không thuộc một công ty, do Guido van Rossum tạo ra",
+      "Microsoft",
+      "Oracle",
+      "Google"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Thuật ngữ 'Bug' trong lập trình dùng để chỉ điều gì?",
+    "options": [
+      "Tính năng mới",
+      "Lỗi trong chương trình",
+      "Giao diện người dùng",
+      "Bản cập nhật"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Blockchain là công nghệ nền tảng cho loại tiền điện tử nào đầu tiên?",
+    "options": [
+      "Bitcoin",
+      "Litecoin",
+      "Ethereum",
+      "Dogecoin"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là người tạo ra ngôn ngữ lập trình Python?",
+    "options": [
+      "James Gosling",
+      "Yukihiro Matsumoto",
+      "Guido van Rossum",
+      "Bjarne Stroustrup"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "GPU chủ yếu được thiết kế tối ưu cho loại tác vụ nào?",
+    "options": [
+      "Xử lý tuần tự đơn luồng",
+      "Xử lý đồ họa và tính toán song song",
+      "Quản lý mạng",
+      "Lưu trữ dữ liệu lâu dài"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Hành tinh nào lớn nhất trong Hệ Mặt Trời?",
+    "options": [
+      "Trái Đất",
+      "Sao Thổ",
+      "Sao Mộc",
+      "Sao Thiên Vương"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là người đầu tiên đề xuất mô hình nhật tâm (Mặt Trời là trung tâm) một cách hệ thống thời Phục Hưng?",
+    "options": [
+      "Nicolaus Copernicus",
+      "Galileo Galilei",
+      "Johannes Kepler",
+      "Tycho Brahe"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Sao nào gần Trái Đất nhất sau Mặt Trời?",
+    "options": [
+      "Alpha Centauri A",
+      "Betelgeuse",
+      "Sirius",
+      "Proxima Centauri"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Hố đen (black hole) hình thành chủ yếu từ đâu?",
+    "options": [
+      "Sự va chạm giữa các thiên hà",
+      "Sự sụp đổ hấp dẫn của sao khối lượng lớn khi hết nhiên liệu",
+      "Sự nguội đi của sao lùn trắng",
+      "Vụ nổ siêu tân tinh loại Ia"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Kepler nổi tiếng với ba định luật mô tả điều gì?",
+    "options": [
+      "Sự khúc xạ ánh sáng",
+      "Lực hấp dẫn giữa hai vật",
+      "Chuyển động của các hành tinh quanh Mặt Trời",
+      "Chuyển động của con lắc"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Thiên hà chứa Hệ Mặt Trời của chúng ta có tên là gì?",
+    "options": [
+      "Tiên Nữ (Andromeda)",
+      "Ngân Hà (Milky Way)",
+      "Xoáy Ốc (Whirlpool)",
+      "Nhân Mã (Sagittarius)"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Ai là nhà du hành vũ trụ đầu tiên bay vào không gian năm 1961?",
+    "options": [
+      "Alan Shepard",
+      "John Glenn",
+      "Neil Armstrong",
+      "Yuri Gagarin"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Sao chổi Halley quay trở lại gần Trái Đất theo chu kỳ khoảng bao nhiêu năm?",
+    "options": [
+      "100 năm",
+      "76 năm",
+      "50 năm",
+      "150 năm"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Chương trình không gian nào của NASA đưa con người lên Mặt Trăng giai đoạn 1969-1972?",
+    "options": [
+      "Apollo",
+      "Mercury",
+      "Gemini",
+      "Artemis"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Kính viễn vọng không gian nào được phóng năm 1990, mang tên một nhà thiên văn học?",
+    "options": [
+      "Kính James Webb",
+      "Kính Hubble",
+      "Kính Spitzer",
+      "Kính Kepler"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Người phụ nữ đầu tiên bay vào vũ trụ là ai?",
+    "options": [
+      "Sally Ride",
+      "Mae Jemison",
+      "Kalpana Chawla",
+      "Valentina Tereshkova"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Hệ Mặt Trời có tổng cộng bao nhiêu hành tinh chính thức (sau khi Sao Diêm Vương bị loại năm 2006)?",
+    "options": [
+      "7 hành tinh",
+      "9 hành tinh",
+      "10 hành tinh",
+      "8 hành tinh"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là nhà bác học bị Giáo hội Công giáo xét xử vì ủng hộ thuyết nhật tâm?",
+    "options": [
+      "Nicolaus Copernicus",
+      "Galileo Galilei",
+      "Johannes Kepler",
+      "Giordano Bruno (bị thiêu, khác mức án)"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đơn vị thiên văn (AU) được định nghĩa dựa trên khoảng cách nào?",
+    "options": [
+      "Bán kính Ngân Hà",
+      "Khoảng cách từ Trái Đất đến Mặt Trăng",
+      "Khoảng cách ánh sáng đi trong một năm",
+      "Khoảng cách trung bình từ Trái Đất đến Mặt Trời"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là tác giả của thuyết vạn vật hấp dẫn, giải thích chuyển động của các thiên thể bằng lực hấp dẫn?",
+    "options": [
+      "Isaac Newton",
+      "Galileo Galilei",
+      "Johannes Kepler",
+      "Albert Einstein"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Kim tự tháp Giza vĩ đại nhất Ai Cập được xây dựng để làm gì?",
+    "options": [
+      "Lăng mộ cho Pharaoh",
+      "Kho lương thực",
+      "Đài quan sát thiên văn",
+      "Đền thờ thần Mặt Trời"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Bảy kỳ quan thế giới cổ đại, công trình duy nhất còn tồn tại đến ngày nay là gì?",
+    "options": [
+      "Tượng thần Zeus ở Olympia",
+      "Đền Artemis ở Ephesus",
+      "Vườn treo Babylon",
+      "Đại kim tự tháp Giza"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "UNESCO công nhận Vịnh Hạ Long, Phong Nha - Kẻ Bàng và địa danh nào khác là di sản thiên nhiên thế giới của Việt Nam?",
+    "options": [
+      "Cố đô Huế",
+      "Quần thể danh thắng Tràng An",
+      "Thánh địa Mỹ Sơn",
+      "Phố cổ Hội An"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Thánh địa Mỹ Sơn là di tích của nền văn hóa/vương quốc cổ nào ở Việt Nam?",
+    "options": [
+      "Đại Việt",
+      "Óc Eo",
+      "Phù Nam",
+      "Chăm Pa"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Chữ Quốc ngữ (chữ Latinh hóa tiếng Việt) được các giáo sĩ phương Tây sáng tạo, trong đó có vai trò nổi bật của ai?",
+    "options": [
+      "Girolamo Maiorica",
+      "Francisco de Pina",
+      "Alexandre de Rhodes",
+      "Christoforo Borri"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Trống đồng Đông Sơn là biểu tượng tiêu biểu của nền văn hóa nào ở Việt Nam thời cổ đại?",
+    "options": [
+      "Văn hóa Đông Sơn",
+      "Văn hóa Hòa Bình",
+      "Văn hóa Sa Huỳnh",
+      "Văn hóa Óc Eo"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Nền văn hóa Óc Eo gắn liền với vương quốc cổ nào ở Nam Bộ Việt Nam?",
+    "options": [
+      "Chăm Pa",
+      "Chân Lạp",
+      "Xiêm La",
+      "Phù Nam"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Áo dài truyền thống của Việt Nam được cách tân thành hình dáng hiện đại chủ yếu vào giai đoạn nào?",
+    "options": [
+      "Thập niên 1950",
+      "Thời Pháp thuộc đầu thế kỷ 20",
+      "Thời nhà Nguyễn thế kỷ 19",
+      "Thập niên 1930 (bởi họa sĩ Cát Tường/Lemur)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Nhã nhạc, Ca trù, Đờn ca tài tử đều là các loại hình được UNESCO công nhận thuộc thể loại di sản gì?",
+    "options": [
+      "Di sản văn hóa phi vật thể",
+      "Di sản thiên nhiên",
+      "Di sản hỗn hợp",
+      "Di sản tư liệu ký ức"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chợ nổi Cái Răng là nét văn hóa đặc trưng của vùng nào Việt Nam?",
+    "options": [
+      "Đồng bằng sông Hồng",
+      "Duyên hải miền Trung",
+      "Tây Nguyên",
+      "Đồng bằng sông Cửu Long (Cần Thơ)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là vị tổ nghề được tôn vinh trong tín ngưỡng thờ Hùng Vương, được UNESCO công nhận là di sản văn hóa phi vật thể năm 2012?",
+    "options": [
+      "Tín ngưỡng thờ Thành hoàng",
+      "Tín ngưỡng thờ tổ tiên",
+      "Tín ngưỡng thờ Mẫu",
+      "Tín ngưỡng thờ cúng Hùng Vương"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Giải Nobel Hòa bình được trao lần đầu tiên vào năm nào?",
+    "options": [
+      "1910",
+      "1901",
+      "1905",
+      "1895"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Tổ chức nào trao Giải Nobel hằng năm, được thành lập theo di chúc của Alfred Nobel?",
+    "options": [
+      "UNESCO",
+      "Viện Hàn lâm Hoàng gia Anh",
+      "Ủy ban Nobel (Thụy Điển/Na Uy)",
+      "Liên Hợp Quốc"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là người phụ nữ đầu tiên và duy nhất đoạt hai giải Nobel ở hai lĩnh vực khoa học khác nhau?",
+    "options": [
+      "Rosalind Franklin",
+      "Marie Curie",
+      "Dorothy Hodgkin",
+      "Ada Lovelace"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Thế vận hội Olympic mùa đông đầu tiên được tổ chức tại đâu vào năm 1924?",
+    "options": [
+      "Chamonix, Pháp",
+      "Lake Placid, Mỹ",
+      "Oslo, Na Uy",
+      "St. Moritz, Thụy Sĩ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Giải quần vợt Grand Slam nào được tổ chức trên mặt sân đất nện tại Pháp?",
+    "options": [
+      "Wimbledon",
+      "Roland Garros (Pháp mở rộng)",
+      "Úc mở rộng",
+      "US Open"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Giải đấu quần vợt Wimbledon được tổ chức tại quốc gia nào?",
+    "options": [
+      "Pháp",
+      "Úc",
+      "Mỹ",
+      "Anh"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Môn thể thao nào được mệnh danh là 'môn thể thao vua' trên toàn thế giới?",
+    "options": [
+      "Quần vợt",
+      "Cricket",
+      "Bóng đá",
+      "Bóng rổ"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Giải bóng rổ nhà nghề Mỹ NBA được thành lập vào năm nào?",
+    "options": [
+      "1950",
+      "1936",
+      "1946",
+      "1960"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Vận động viên nào giành nhiều huy chương vàng Olympic nhất lịch sử (bơi lội)?",
+    "options": [
+      "Mark Spitz",
+      "Usain Bolt",
+      "Michael Phelps",
+      "Carl Lewis"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Usain Bolt, vận động viên điền kinh huyền thoại, đến từ quốc gia nào?",
+    "options": [
+      "Jamaica",
+      "Kenya",
+      "Nam Phi",
+      "Mỹ"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cầu thủ nào giữ kỷ lục chuyển nhượng đắt giá nhất lịch sử tính đến nay (tính theo phí chuyển nhượng công bố)?",
+    "options": [
+      "Cristiano Ronaldo",
+      "Philippe Coutinho",
+      "Neymar (PSG, 2017)",
+      "Kylian Mbappé"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Đội tuyển nào là nhà vô địch Copa América 2021?",
+    "options": [
+      "Argentina",
+      "Uruguay",
+      "Brazil",
+      "Colombia"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là 'Vua phá lưới' mọi thời đại của đội tuyển Đức?",
+    "options": [
+      "Gerd Müller",
+      "Jürgen Klinsmann",
+      "Miroslav Klose",
+      "Rudi Völler"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Sân vận động nào được xem là 'thánh địa' của Liverpool?",
+    "options": [
+      "Goodison Park",
+      "Stamford Bridge",
+      "Anfield",
+      "Villa Park"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Giải đấu bóng đá nữ vô địch châu Âu (EURO nữ) 2022 được tổ chức tại quốc gia nào?",
+    "options": [
+      "Anh",
+      "Pháp",
+      "Hà Lan",
+      "Đức"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Cầu thủ nào ghi bàn thắng duy nhất giúp Tây Ban Nha vô địch World Cup 2010?",
+    "options": [
+      "Andrés Iniesta",
+      "David Villa",
+      "Fernando Torres",
+      "Xavi Hernández"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đội tuyển nào vô địch Nations League UEFA đầu tiên vào năm 2019?",
+    "options": [
+      "Bồ Đào Nha",
+      "Anh",
+      "Thụy Sĩ",
+      "Hà Lan"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là huấn luyện viên dẫn dắt đội tuyển Pháp vô địch World Cup 2018?",
+    "options": [
+      "Didier Deschamps",
+      "Zinedine Zidane",
+      "Raymond Domenech",
+      "Laurent Blanc"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Câu lạc bộ Ajax Amsterdam nổi tiếng với học viện đào tạo trẻ mang tên gì?",
+    "options": [
+      "De Toekomst",
+      "Clairefontaine",
+      "Cobham",
+      "La Masia"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "La Masia là học viện đào tạo trẻ nổi tiếng của câu lạc bộ nào?",
+    "options": [
+      "Real Madrid",
+      "Barcelona",
+      "Ajax",
+      "Bayern Munich"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đội tuyển nào giành ngôi vô địch bóng đá nam tại Olympic 2020 (tổ chức 2021)?",
+    "options": [
+      "Tây Ban Nha",
+      "Argentina",
+      "Brazil",
+      "Nhật Bản"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cầu thủ nào được gọi là 'Kun' - biệt danh thân mật của một tiền đạo Argentina từng chơi cho Manchester City?",
+    "options": [
+      "Sergio Agüero",
+      "Carlos Tevez",
+      "Ángel Di María",
+      "Gonzalo Higuaín"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Chiếc cúp vô địch World Cup hiện tại (từ 1974) có tên gọi chính thức là gì?",
+    "options": [
+      "Cúp Vô địch Thế giới",
+      "Cúp Jules Rimet",
+      "Cúp FIFA World Cup",
+      "Cúp Vàng"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Cúp Jules Rimet, chiếc cúp World Cup đầu tiên, được trao vĩnh viễn cho đội nào sau ba lần vô địch?",
+    "options": [
+      "Đức",
+      "Uruguay",
+      "Ý",
+      "Brazil"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Đội tuyển nào có biệt danh 'Những chú gà trống Gaulois'?",
+    "options": [
+      "Ý",
+      "Bỉ",
+      "Thụy Sĩ",
+      "Pháp"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Ai là đội trưởng của đội tuyển Argentina vô địch World Cup 2022?",
+    "options": [
+      "Emiliano Martínez",
+      "Rodrigo De Paul",
+      "Lionel Messi",
+      "Ángel Di María"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "Ai là thủ môn xuất sắc giúp Argentina vô địch World Cup 2022, giành luôn Găng tay vàng?",
+    "options": [
+      "Emiliano Martínez",
+      "Franco Armani",
+      "Agustín Rossi",
+      "Gerónimo Rulli"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Kình địch truyền thống giữa hai câu lạc bộ Ý nào được gọi là 'Derby della Madonnina'?",
+    "options": [
+      "AS Roma và Lazio",
+      "Napoli và Juventus",
+      "Juventus và Torino",
+      "AC Milan và Inter Milan"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Trận derby thành Rome diễn ra giữa hai câu lạc bộ nào?",
+    "options": [
+      "AS Roma và Lazio",
+      "Napoli và Roma",
+      "Inter và Roma",
+      "Juventus và Roma"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đội bóng nào đã để thua Manchester United trong trận chung kết Champions League 1999 đầy kịch tính ở phút bù giờ?",
+    "options": [
+      "Bayern Munich",
+      "Valencia",
+      "Juventus",
+      "Real Madrid"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Giải đấu nào được xem là 'World Cup dành cho câu lạc bộ' trước khi đổi định dạng năm 2025?",
+    "options": [
+      "Cúp C1",
+      "FIFA Club World Cup",
+      "UEFA Super Cup",
+      "Copa Libertadores"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Copa Libertadores là giải đấu cấp câu lạc bộ hàng đầu của châu lục nào?",
+    "options": [
+      "Châu Âu",
+      "Nam Mỹ",
+      "Châu Á",
+      "Châu Phi"
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Đội bóng nào giữ kỷ lục vô địch Copa Libertadores nhiều nhất lịch sử?",
+    "options": [
+      "São Paulo",
+      "River Plate",
+      "Boca Juniors",
+      "Independiente (Argentina)"
+    ],
+    "correct": 3
+  },
+  {
+    "q": "Thủ môn Đặng Văn Lâm, trụ cột của đội tuyển Việt Nam, sinh ra và trưởng thành bóng đá chủ yếu tại quốc gia nào?",
+    "options": [
+      "Nga",
+      "Séc",
+      "Bỉ",
+      "Ba Lan"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Ai là chân sút nội gắn bó lâu năm với CLB Hoàng Anh Gia Lai, cùng lứa Công Phượng?",
+    "options": [
+      "Nguyễn Tuấn Anh",
+      "Vũ Văn Thanh",
+      "Lương Xuân Trường",
+      "Nguyễn Văn Toàn"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Đội tuyển nào giành chức vô địch Euro 2024 tổ chức tại Đức?",
+    "options": [
+      "Hà Lan",
+      "Anh",
+      "Tây Ban Nha",
+      "Pháp"
+    ],
+    "correct": 2
+  }
+]
