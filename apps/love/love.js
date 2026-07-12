@@ -1,8 +1,8 @@
-// love.js — VTWorld Love App 💝 (Firestore + Kết đôi Online + Cây sinh lãi)
+// love.js — VTWorld Love App 💝 (Firestore + Avatar & Tên thật từ Profile)
 import { auth, db } from '../../points.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, collection, where, getDocs, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { addPoints } from '../../points.js';
+import { doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, collection, where, getDocs, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { addPoints, subscribeUserData } from '../../points.js';
 
 class LoveApp {
   constructor() {
@@ -12,28 +12,74 @@ class LoveApp {
     this.data = null;
     this.currentTab = 'home';
     this.unsubFirestore = null;
+    this.unsubUser = null;
+    this.userProfile = null;
+    this.profileReady = false;
     this.init();
   }
 
   async init() {
     await new Promise((resolve) => {
-      const unsub = onAuthStateChanged(auth, (user) => {
+      const unsub = onAuthStateChanged(auth, async (user) => {
         unsub();
         if (user) {
           this.uid = user.uid;
           this.user = user;
+
+          // Lấy ngay profile từ Firestore
+          try {
+            const userDoc = await getDoc(doc(db, 'users', this.uid));
+            if (userDoc.exists()) {
+              const data = userDoc.data();
+              this.userProfile = {
+                nickname: data.nickname || '',
+                avatarUrl: data.avatarUrl || '',
+              };
+            }
+          } catch (e) { console.error(e); }
+          this.profileReady = true;
+
+          // Lắng nghe thay đổi sau này
+          this.unsubUser = subscribeUserData(data => {
+            if (data) {
+              this.userProfile = {
+                nickname: data.nickname || '',
+                avatarUrl: data.avatarUrl || '',
+              };
+            }
+          });
+
           resolve();
         } else {
           location.href = '../../index.html';
         }
       });
     });
+
     window.loveApp = this;
     await this.checkCouple();
   }
 
   getUserName() {
+    if (this.userProfile?.nickname) return this.userProfile.nickname;
     return this.user?.displayName || this.user?.email?.split('@')[0] || 'Người ấy';
+  }
+
+  getUserAvatar() {
+    return this.userProfile?.avatarUrl || null;
+  }
+
+  async refreshUserProfile() {
+    try {
+      const userDoc = await getDoc(doc(db, 'users', this.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        this.userProfile = {
+          nickname: data.nickname || '',
+          avatarUrl: data.avatarUrl || '',
+        };
+      }
+    } catch (e) { console.error(e); }
   }
 
   // ========== CHECK COUPLE ==========
@@ -63,6 +109,7 @@ class LoveApp {
 
   cleanupListener() {
     if (this.unsubFirestore) { this.unsubFirestore(); this.unsubFirestore = null; }
+    if (this.unsubUser) { this.unsubUser(); this.unsubUser = null; }
   }
 
   // ========== LANDING ==========
@@ -87,10 +134,12 @@ class LoveApp {
 
   // ========== TẠO HỒ SƠ ==========
   async createCouple() {
+    await this.refreshUserProfile();
     const myName = this.getUserName();
+    const myAvatar = this.getUserAvatar();
     const inviteCode = String(Math.floor(1000 + Math.random() * 9000));
     const coupleData = {
-      person1: { uid: this.uid, name: myName },
+      person1: { uid: this.uid, name: myName, avatarUrl: myAvatar },
       person2: null,
       startDate: "",
       inviteCode,
@@ -160,9 +209,15 @@ class LoveApp {
       const coupleData = coupleDoc.data();
       if (coupleData.person2) { window.showToast('Mã mời đã có người join!', 'error'); return; }
       if (coupleData.person1.uid === this.uid) { window.showToast('Không thể tự kết đôi!', 'warn'); return; }
+
+      await this.refreshUserProfile();
+      const myName = this.getUserName();
+      const myAvatar = this.getUserAvatar();
+
       await updateDoc(doc(db, 'love_apps', coupleDoc.id), {
-        person2: { uid: this.uid, name: this.getUserName() }
+        person2: { uid: this.uid, name: myName, avatarUrl: myAvatar }
       });
+
       this.coupleId = coupleDoc.id;
       window.showToast('Kết đôi thành công! 💕🎉', 'success');
       this.listenCouple();
@@ -175,11 +230,11 @@ class LoveApp {
     document.getElementById('love-status').style.display = '';
     document.getElementById('love-tabs').style.display = '';
     const loveRef = doc(db, 'love_apps', this.coupleId);
-    this.cleanupListener();
+    if (this.unsubFirestore) this.unsubFirestore();
     this.unsubFirestore = onSnapshot(loveRef, (snap) => {
       if (!snap.exists()) {
         window.showToast('Hồ sơ không tồn tại!', 'error');
-        this.cleanupListener(); this.coupleId = null; this.data = null; this.showLanding();
+        this.coupleId = null; this.data = null; this.showLanding();
         return;
       }
       this.data = snap.data();
@@ -209,11 +264,10 @@ class LoveApp {
       if (!confirm('Bạn có chắc muốn hủy hồ sơ này?')) return;
       const idToDelete = this.coupleId;
       try {
-        this.cleanupListener(); this.coupleId = null; this.data = null;
         await deleteDoc(doc(db, 'love_apps', idToDelete));
         window.showToast('Đã hủy hồ sơ!', 'info');
       } catch (e) { console.error(e); window.showToast('Lỗi hủy hồ sơ!', 'error'); }
-      this.showLanding();
+      this.coupleId = null; this.data = null; this.showLanding();
     });
   }
 
@@ -247,15 +301,16 @@ class LoveApp {
 
   renderStatusBar() {
     if (!this.data?._loaded || !this.data.person2) return;
-    const p1 = this.data.person1?.name || '?';
-    const p2 = this.data.person2?.name || '?';
+    const p1 = this.data.person1;
+    const p2 = this.data.person2;
     const startDate = this.data.startDate;
     const days = this.getDaysSince(startDate);
-    document.getElementById('love-left').textContent = `💝 ${p1}`;
-    document.getElementById('love-mid').textContent = startDate ? 'ĐÃ YÊU NHAU' : 'ĐÃ KẾT ĐÔI';
-    document.getElementById('love-sub').textContent = startDate ? `${days} ngày` : 'Chưa set ngày';
-    document.getElementById('love-right').textContent = `${p2} ♥`;
-    document.getElementById('love-status').className = 'bc-status cat-may_man';
+
+    document.getElementById('love-status').className = 'bc-status cat-thu_thach';
+    document.getElementById('love-left').textContent = `💖 ${p1.name}`;
+    document.getElementById('love-mid').textContent = days;
+    document.getElementById('love-sub').textContent = startDate ? 'ngày yêu thương' : 'Chưa set ngày';
+    document.getElementById('love-right').textContent = `${p2.name} 💖`;
   }
 
   getDaysSince(dateStr) {
@@ -305,20 +360,28 @@ class LoveApp {
 
   // ========== HOME ==========
   renderHome() {
-    const p1 = this.data.person1?.name || '?';
-    const p2 = this.data.person2?.name || '?';
+    const p1 = this.data.person1;
+    const p2 = this.data.person2;
     const startDate = this.data.startDate;
     const days = this.getDaysSince(startDate);
     const nextMilestone = startDate ? this.getNextMilestone(days) : null;
+
+    const avatarHtml = (person) => {
+      if (person?.avatarUrl) {
+        return `<img src="${person.avatarUrl}" class="love-avatar-img" alt="${person.name}" />`;
+      }
+      return `<div class="love-avatar">${person?.name?.[0] || '?'}</div>`;
+    };
+
     return `
       <div class="love-home">
         <div class="love-couple-card">
           <div class="love-avatars">
-            <div class="love-avatar">${p1[0] || '?'}</div>
+            ${avatarHtml(p1)}
             <span class="love-heart-big">💕</span>
-            <div class="love-avatar">${p2[0] || '?'}</div>
+            ${avatarHtml(p2)}
           </div>
-          <div class="love-couple-names">${p1} & ${p2}</div>
+          <div class="love-couple-names">${p1.name} & ${p2.name}</div>
           ${startDate ? `
             <div class="love-days-count">${days}</div>
             <div class="love-days-label">ngày yêu thương</div>
@@ -344,7 +407,6 @@ class LoveApp {
       if (!confirm('Bạn là người tạo hồ sơ. Rời đi sẽ xóa toàn bộ dữ liệu. Xác nhận?')) return;
       const idToDelete = this.coupleId;
       try {
-        this.cleanupListener(); this.coupleId = null; this.data = null;
         await deleteDoc(doc(db, 'love_apps', idToDelete));
         window.showToast('Đã xóa hồ sơ!', 'info');
       } catch (e) { console.error(e); }
@@ -354,9 +416,8 @@ class LoveApp {
         await updateDoc(doc(db, 'love_apps', this.coupleId), { person2: null });
         window.showToast('Đã rời khỏi hồ sơ!', 'info');
       } catch (e) { console.error(e); }
-      this.cleanupListener(); this.coupleId = null; this.data = null;
     }
-    this.showLanding();
+    this.coupleId = null; this.data = null; this.showLanding();
   }
 
   getNextMilestone(days) {
@@ -743,7 +804,6 @@ class LoveApp {
   }
 
   bindTree() {
-    // Tưới nước
     const waterBtn = document.getElementById('btn-water-tree');
     if (waterBtn) {
       waterBtn.addEventListener('click', async () => {
@@ -758,7 +818,6 @@ class LoveApp {
       });
     }
 
-    // Bón phân
     const fertBtn = document.getElementById('btn-fertilize-tree');
     if (fertBtn) {
       fertBtn.addEventListener('click', async () => {
@@ -778,7 +837,6 @@ class LoveApp {
       });
     }
 
-    // Thu lãi hàng ngày
     const harvestInterestBtn = document.getElementById('btn-harvest-interest');
     if (harvestInterestBtn) {
       harvestInterestBtn.addEventListener('click', async () => {
@@ -796,7 +854,6 @@ class LoveApp {
       });
     }
 
-    // Reset cây
     const resetBtn = document.getElementById('btn-reset-tree');
     if (resetBtn) {
       resetBtn.addEventListener('click', async () => {
@@ -813,7 +870,6 @@ class LoveApp {
       });
     }
 
-    // Kiểm tra lên cấp sau mỗi thay đổi (sẽ được gọi lại từ listenCouple)
     this.checkAndRewardLevelUp();
   }
 }
