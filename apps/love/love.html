@@ -1,1 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Love App 💝</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="love.css"/>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+</head>
+<body data-bottom-nav="apps">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
 
+  <div id="top-nav-root"></div>
+
+  <div class="love-wrap">
+    <!-- STATUS BAR -->
+    <div class="bc-status" id="love-status">
+      <span class="stat-bet" id="love-left"></span>
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="love-mid">💝</span>
+        <span class="stat-score-sub" id="love-sub"></span>
+      </div>
+      <span class="stat-profit" id="love-right"></span>
+    </div>
+
+    <!-- TAB ROW -->
+    <div class="love-tabs" id="love-tabs">
+      <button class="love-tab active" data-tab="home">🏠 Home</button>
+      <button class="love-tab" data-tab="timeline">📅 Kỷ niệm</button>
+      <button class="love-tab" data-tab="quiz">❓ Quiz</button>
+      <button class="love-tab" data-tab="wishlist">📝 Wishlist</button>
+      <button class="love-tab" data-tab="game">🎮 Game</button>
+    </div>
+
+    <!-- TAB CONTENTS -->
+    <div class="love-content" id="love-content"></div>
+  </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();
+    addEventListener('resize',resize);
+    for(let i=0;i<30;i++){
+      particles.push({
+        x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+        vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3,
+        r:Math.random()*2+.5, type:Math.random()>.7?'heart':'dot'
+      });
+    }
+    (function loop(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p=>{
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
+        if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0;
+        ctx.beginPath();
+        if(p.type==='heart'){
+          const x=p.x, y=p.y, s=p.r*2;
+          ctx.moveTo(x,y+s*.3);
+          ctx.bezierCurveTo(x,y,x-s*.5,y-s*.3,x-s*.5,y-s*.7);
+          ctx.bezierCurveTo(x-s*.5,y-s*1.1,x,y-s*1.4,x,y-s*1.4);
+          ctx.bezierCurveTo(x,y-s*1.4,x+s*.5,y-s*1.1,x+s*.5,y-s*.7);
+          ctx.bezierCurveTo(x+s*.5,y-s*.3,x,y,x,y+s*.3);
+        }else{
+          ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        }
+        ctx.fillStyle=p.type==='heart'?'rgba(244,114,182,0.35)':'rgba(56,189,248,0.25)';
+        ctx.fill();
+      });
+      requestAnimationFrame(loop);
+    })();
+    window.showToast=function(msg,type='info'){
+      const container=document.getElementById('toastContainer');
+      if(!container)return;
+      container.style.display='block';
+      const toast=document.createElement('div');
+      toast.style.cssText='padding:10px 18px;margin:4px;border-radius:10px;font-size:13px;font-weight:700;font-family:"Science Gothic",sans-serif;animation:fadeUp 0.3s ease both;';
+      if(type==='success')toast.style.background='rgba(52,211,153,0.2)';else if(type==='error')toast.style.background='rgba(248,113,113,0.2)';else if(type==='warn')toast.style.background='rgba(251,191,36,0.2)';else toast.style.background='rgba(56,189,248,0.2)';
+      toast.style.color='#e0f2fe';toast.style.border='1px solid rgba(255,255,255,0.1)';
+      toast.textContent=msg;
+      container.appendChild(toast);
+      setTimeout(()=>{toast.style.opacity='0';toast.style.transition='opacity 0.3s';setTimeout(()=>toast.remove(),300);},2500);
+    };
+  </script>
+
+  <script type="module" src="love.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+{
+  "couple": {
+    "person1": "Vinh",
+    "person2": "Thảo",
+    "startDate": "2023-02-14",
+    "avatar1": "",
+    "avatar2": ""
+  },
+  "timeline": [
+    {
+      "date": "2023-02-14",
+      "title": "Ngày đầu yêu nhau 💕",
+      "desc": "Khoảnh khắc cả hai chính thức thuộc về nhau"
+    },
+    {
+      "date": "2023-06-01",
+      "title": "Chuyến đi Đà Lạt 🌸",
+      "desc": "Lần đầu đi chơi xa cùng nhau, ngắm hoa dã quỳ"
+    },
+    {
+      "date": "2023-12-24",
+      "title": "Giáng sinh đầu tiên 🎄",
+      "desc": "Đêm Noel ấm áp bên nhau, tặng quà bất ngờ"
+    },
+    {
+      "date": "2024-02-14",
+      "title": "Kỷ niệm 1 năm 💝",
+      "desc": "365 ngày yêu thương, hẹn hò lãng mạn"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Người ấy thích món gì nhất?",
+      "options": ["Phở", "Bún bò Huế", "Cơm tấm", "Hủ tiếu"],
+      "answer": 1
+    },
+    {
+      "question": "Màu sắc yêu thích của người ấy?",
+      "options": ["Hồng", "Xanh dương", "Tím", "Trắng"],
+      "answer": 0
+    },
+    {
+      "question": "Bài hát cả hai cùng thích?",
+      "options": ["Yêu", "Em của ngày hôm qua", "Nơi này có anh", "Say you do"],
+      "answer": 2
+    },
+    {
+      "question": "Người ấy sinh năm bao nhiêu?",
+      "options": ["2000", "2001", "2002", "2003"],
+      "answer": 1
+    },
+    {
+      "question": "Lần đầu hẹn hò ở đâu?",
+      "options": ["Rạp phim", "Quán cà phê", "Công viên", "Trà sữa"],
+      "answer": 1
+    }
+  ],
+  "wishlist": [
+    { "text": "Đi Phú Quốc cùng nhau", "done": false },
+    { "text": "Nấu một bữa ăn cho nhau", "done": true },
+    { "text": "Xem phim kinh dị ôm nhau", "done": false },
+    { "text": "Cùng nhau tập gym", "done": false },
+    { "text": "Chụp ảnh couple chuyên nghiệp", "done": false },
+    { "text": "Viết thư tay cho nhau", "done": true }
+  ],
+  "truthOrDare": {
+    "truth": [
+      "Lần đầu bạn biết mình thích đối phương là khi nào?",
+      "Điều gì ở đối phương khiến bạn cười nhiều nhất?",
+      "Khoảnh khắc nào bên nhau bạn nhớ nhất?",
+      "Bạn đã từng mơ về đối phương chưa? Mơ gì?",
+      "Điều gì bạn muốn nói với đối phương nhất lúc này?"
+    ],
+    "dare": [
+      "Gọi điện và nói 'Em yêu anh/chị' 3 lần",
+      "Chụp ảnh làm mặt xấu gửi cho đối phương",
+      "Nhắn tin 'Nhớ em/anh quá' ngay bây giờ",
+      "Hát một câu trong bài hát cả hai cùng thích",
+      "Kể một kỷ niệm đáng xấu hổ của bản thân"
+    ]
+  }
+}
