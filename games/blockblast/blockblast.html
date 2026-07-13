@@ -28,15 +28,22 @@
       <span class="stat-profit zero" id="bb-profit"></span>
     </div>
 
-    <!-- GAME BOARD -->
-    <div class="bb-board" id="bb-board"></div>
+    <!-- GAME AREA -->
+    <div class="bb-play-area" id="bb-play-area">
+      <!-- GAME BOARD -->
+      <div class="bb-board" id="bb-board"></div>
 
-    <!-- NEXT PIECES -->
-    <div class="bb-pieces" id="bb-pieces"></div>
+      <!-- NEXT PIECES -->
+      <div class="bb-pieces" id="bb-pieces"></div>
+    </div>
 
     <!-- BUTTONS -->
     <div class="bb-buttons">
+      <button id="bb-continue-btn" style="display:none">⟳ Chơi tiếp</button>
       <button id="bb-start-btn">▶ Chơi mới</button>
+      <button id="bb-help-btn" style="display:none" title="Quét sạch bàn cờ">
+        🧹<span id="bb-help-count" class="bb-help-badge">1</span>
+      </button>
     </div>
   </div>
 

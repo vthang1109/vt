@@ -30,6 +30,10 @@
   user-select: none;
   -webkit-user-select: none;
 }
+.bb-play-area.not-started {
+  display: none;
+}
+
 .bb-board.idle {
   opacity: 0.4;
   pointer-events: none;
@@ -50,14 +54,69 @@
 .bb-cell.invalid {
   background: rgba(248,113,113,0.6);
 }
+.bb-cell.will-clear {
+  background: rgba(251,191,36,0.55) !important;
+  box-shadow: inset 0 0 14px rgba(251,191,36,0.85), 0 0 10px rgba(251,191,36,0.6);
+  animation: bbWillClearPulse 0.55s ease-in-out infinite alternate;
+}
+@keyframes bbWillClearPulse {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.4); }
+}
+
+/* Nút trợ giúp: quét sạch bàn cờ — nút tròn cạnh nút Chơi mới */
+#bb-help-btn {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(251,191,36,0.6);
+  background: rgba(251,191,36,0.15);
+  color: #fde68a;
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+#bb-help-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(251,191,36,0.35);
+}
+#bb-help-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.bb-help-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 50%;
+  background: #ec4899;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  font-family: "Science Gothic", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0,0,0,0.3);
+}
 
 /* Pieces tray */
 .bb-pieces {
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-  flex-wrap: wrap;
-  padding: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  justify-items: center;
+  padding: 14px 10px;
   min-height: 90px;
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(56,189,248,0.3);
@@ -100,7 +159,19 @@
 .bb-buttons {
   display: flex;
   justify-content: center;
+  gap: 12px;
   margin-top: 12px;
+}
+#bb-continue-btn {
+  padding: 12px 28px;
+  border-radius: 50px;
+  border: 1px solid rgba(56,189,248,0.6);
+  background: rgba(56,189,248,0.15);
+  color: #e0f2fe;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
 }
 #bb-start-btn {
   padding: 12px 28px;
@@ -130,6 +201,35 @@
   gap: 2px;
 }
 .bb-drag-ghost .bb-piece-cell {
-  width: 26px;
-  height: 26px;
+  border-radius: 4px;
+}
+
+/* Combo popup */
+.bb-combo-popup {
+  position: fixed;
+  left: 50%;
+  top: 38%;
+  transform: translate(-50%, -50%) scale(0.5);
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 800;
+  font-size: 34px;
+  color: #fbbf24;
+  text-shadow: 0 0 20px rgba(251,191,36,0.8), 0 0 40px rgba(251,191,36,0.5);
+  z-index: 2000;
+  pointer-events: none;
+  opacity: 0;
+  animation: bbComboPop 0.9s ease forwards;
+  white-space: nowrap;
+}
+@keyframes bbComboPop {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  35%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  75%  { opacity: 1; transform: translate(-50%, -65%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -95%) scale(0.9); }
+}
+
+/* Chưa bắt đầu: ẩn hẳn bàn cờ + hộp 3 khối, chỉ hiện nút */
+.bb-play-area.not-started {
+  display: none;
 }
