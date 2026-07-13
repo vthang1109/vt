@@ -5,6 +5,9 @@ import {
     collection, addDoc, doc, onSnapshot, runTransaction, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+const PAUSE_SVG = '<rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect>';
+const PLAY_SVG = '<polygon points="7,4 20,12 7,20"></polygon>';
+
 // Thưởng điểm theo thời gian hoàn thành (chỉ chế độ 1 người — mốc thời gian
 // chống cày điểm, không thưởng chế độ 2 người vì chung 1 tài khoản đăng nhập)
 function calcSoloReward(timeSec, shuffleMode) {
@@ -49,6 +52,11 @@ class TimSo {
         // huỷ diệt
         this.destroyTimeLeft = 10;
         this.destroyTimerInterval = null;
+
+        // tạm dừng
+        this.isPaused = false;
+        this.pauseBtn = document.getElementById('ts-pause-btn');
+        this.pauseIcon = document.getElementById('ts-pause-icon');
 
         // bxh — denormalize: 1 doc top-10 / chế độ, subscribe 1 lần khi vào trang.
         // Mở BXH sau đó đọc thẳng từ cache client (this.lbLive) -> 0 read.
@@ -97,15 +105,20 @@ class TimSo {
         document.getElementById('ts-status').style.display = 'flex';
         document.getElementById('ts-board').style.display = 'grid';
         document.getElementById('ts-status')?.classList.toggle('ts-duo', mode === 'duo');
+        if (this.pauseBtn) this.pauseBtn.style.display = 'flex';
         this.startGame();
     }
 
     backToModeSelect() {
         this.stopTimers();
+        this.isPaused = false;
         document.getElementById('ts-mode-select').style.display = 'block';
         document.getElementById('ts-status').style.display = 'none';
         document.getElementById('ts-board').style.display = 'none';
         document.getElementById('ts-status')?.classList.remove('result-win', 'result-lose', 'result-draw', 'ts-duo');
+        document.getElementById('ts-board')?.classList.remove('ts-paused');
+        if (this.pauseBtn) { this.pauseBtn.style.display = 'none'; this.pauseBtn.classList.remove('paused'); }
+        if (this.pauseIcon) this.pauseIcon.innerHTML = PAUSE_SVG;
     }
 
     shuffle(arr) {
@@ -128,6 +141,10 @@ class TimSo {
     // ---------- bắt đầu ván mới ----------
     startGame() {
         this.stopTimers();
+        this.isPaused = false;
+        document.getElementById('ts-board')?.classList.remove('ts-paused');
+        if (this.pauseBtn) this.pauseBtn.classList.remove('paused');
+        if (this.pauseIcon) this.pauseIcon.innerHTML = PAUSE_SVG;
         this.grid = this.shuffle(Array.from({ length: 100 }, (_, i) => i + 1));
         this.found = new Map();
         this.target = 1;
@@ -268,9 +285,73 @@ class TimSo {
         this.startDestroyTimer();
     }
 
+    // ---------- tạm dừng ----------
+    togglePause() {
+        if (!this.mode || this.finished) return;
+        this.isPaused ? this.resumeGame() : this.pauseGame();
+    }
+
+    pauseGame() {
+        if (this.isPaused || this.finished) return;
+        this.isPaused = true;
+        clearInterval(this.timerInterval);
+        clearInterval(this.turnTimerInterval);
+        clearInterval(this.destroyTimerInterval);
+        this.timerInterval = null;
+        this.turnTimerInterval = null;
+        this.destroyTimerInterval = null;
+        document.getElementById('ts-board')?.classList.add('ts-paused');
+        this.pauseBtn?.classList.add('paused');
+        if (this.pauseIcon) this.pauseIcon.innerHTML = PLAY_SVG;
+        window.showToast('⏸️ Đã tạm dừng', 'info');
+    }
+
+    resumeGame() {
+        if (!this.isPaused) return;
+        this.isPaused = false;
+        document.getElementById('ts-board')?.classList.remove('ts-paused');
+        this.pauseBtn?.classList.remove('paused');
+        if (this.pauseIcon) this.pauseIcon.innerHTML = PAUSE_SVG;
+
+        if (this.mode === 'solo' || this.mode === 'destroy') {
+            this.startTime = performance.now() - this.elapsed * 1000;
+            this.timerInterval = setInterval(() => {
+                this.elapsed = (performance.now() - this.startTime) / 1000;
+                if (this.mode === 'solo') {
+                    const leftEl = document.getElementById('ts-left');
+                    if (leftEl) leftEl.textContent = `${this.elapsed.toFixed(1)}s`;
+                }
+            }, 100);
+        }
+        if (this.mode === 'destroy') {
+            this.destroyTimerInterval = setInterval(() => {
+                this.destroyTimeLeft--;
+                if (this.destroyTimeLeft <= 0) {
+                    clearInterval(this.destroyTimerInterval);
+                    this.destroyNumber();
+                } else {
+                    this.updateStatus();
+                }
+            }, 1000);
+        }
+        if (this.mode === 'duo') {
+            this.turnTimerInterval = setInterval(() => {
+                this.turnTimeLeft--;
+                if (this.turnTimeLeft <= 0) {
+                    clearInterval(this.turnTimerInterval);
+                    window.showToast(`⏰ Hết giờ! Đổi lượt sang Người ${this.turn === 1 ? 2 : 1}`, 'warn');
+                    this.switchTurn();
+                } else {
+                    this.updateStatus();
+                }
+            }, 1000);
+        }
+        window.showToast('▶️ Tiếp tục', 'info');
+    }
+
     // ---------- xử lý bấm số ----------
     tap(n) {
-        if (this.finished) return;
+        if (this.finished || this.isPaused) return;
         const cellEl = document.querySelector(`.ts-cell[data-num="${n}"]`);
         if (!cellEl || cellEl.disabled) return;
 
@@ -313,6 +394,7 @@ class TimSo {
     endGame() {
         this.finished = true;
         this.stopTimers();
+        if (this.pauseBtn) this.pauseBtn.style.display = 'none';
         const statusEl = document.getElementById('ts-status');
 
         if (this.mode === 'solo') {

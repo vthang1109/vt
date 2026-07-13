@@ -65,6 +65,14 @@
     <div class="ts-board" id="ts-board" style="display:none"></div>
   </div>
 
+  <!-- NÚT TẠM DỪNG (tròn, SVG thuần, góc dưới trái) -->
+  <button class="ts-pause-btn" id="ts-pause-btn" style="display:none" title="Tạm dừng" onclick="window.game?.togglePause()">
+    <svg id="ts-pause-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+      <rect x="6" y="5" width="4" height="14" rx="1"></rect>
+      <rect x="14" y="5" width="4" height="14" rx="1"></rect>
+    </svg>
+  </button>
+
   <!-- BẢNG XẾP HẠNG -->
   <div class="ts-lb-modal" id="ts-lb-modal">
     <div class="ts-lb-panel">
