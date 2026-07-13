@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Fruit Slash</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="fruitslash.css"/>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+</head>
+<body data-bottom-nav="games">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+
+  <div class="game-wrap">
+    <!-- STATUS BAR -->
+    <div class="bc-status" id="game-status">
+      <span class="stat-bet" id="fs-highscore">🏆 0</span>
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="fs-score">0</span>
+        <span class="stat-score-sub" id="fs-sub">Sẵn sàng</span>
+      </div>
+      <span class="stat-profit zero" id="fs-profit">+0</span>
+    </div>
+
+    <!-- GAME CANVAS -->
+    <div class="fs-canvas-wrap">
+      <canvas id="fs-canvas"></canvas>
+      <!-- Combo và Freeze hiển thị trong canvas -->
+      <div class="fs-combo" id="fs-combo">🔥 x1</div>
+      <div class="fs-freeze" id="fs-freeze">❄️ ĐÓNG BĂNG</div>
+    </div>
+
+    <!-- KẾT QUẢ (hiển thị dưới canvas khi game over) -->
+    <div class="fs-result" id="fs-result" style="display:none">
+      <div class="fs-result-score">Điểm: <span id="fs-final-score">0</span></div>
+      <div class="fs-result-reward">Thưởng: <span id="fs-reward">0</span>〄</div>
+      <button id="fs-replay-btn" class="btn-primary">🔄 Chơi lại</button>
+    </div>
+
+    <!-- OVERLAY CHỌN CHẾ ĐỘ (giữ nguyên) -->
+    <div class="fs-overlay" id="fs-overlay">
+      <div class="fs-overlay-box">
+        <h2>🍉 CHÉM HOA QUẢ</h2>
+        <div class="fs-mode-btns">
+          <button class="fs-mode-btn active" data-mode="timed">⏱ Tính giờ</button>
+          <button class="fs-mode-btn" data-mode="lives">❤️ 3 Mạng</button>
+        </div>
+        <div id="fs-time-select" class="fs-time-select">
+          <label>Thời gian:</label>
+          <select id="fs-time-selector">
+            <option value="60">60 giây</option>
+            <option value="90">90 giây</option>
+            <option value="120">120 giây</option>
+          </select>
+        </div>
+        <button id="fs-start-btn" class="btn-primary">▶ Bắt đầu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <!-- Scripts -->
+  <script>
+    // Particle background
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();
+    addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(56,189,248,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast=function(msg,type='info'){
+      const container=document.getElementById('toastContainer');
+      if(!container)return;
+      container.style.display='block';
+      const toast=document.createElement('div');
+      toast.style.cssText='padding:10px 18px;margin:4px;border-radius:10px;font-size:13px;font-weight:700;font-family:"Science Gothic",sans-serif;animation:fadeUp 0.3s ease both;';
+      if(type==='success')toast.style.background='rgba(52,211,153,0.2)';else if(type==='error')toast.style.background='rgba(248,113,113,0.2)';else if(type==='warn')toast.style.background='rgba(251,191,36,0.2)';else toast.style.background='rgba(56,189,248,0.2)';
+      toast.style.color='#e0f2fe';toast.style.border='1px solid rgba(255,255,255,0.1)';
+      toast.textContent=msg;
+      container.appendChild(toast);
+      setTimeout(()=>{toast.style.opacity='0';toast.style.transition='opacity 0.3s';setTimeout(()=>toast.remove(),300);},2500);
+    };
+  </script>
+
+  <script type="module" src="fruitslash.js"></script>
+</body>
+</html>
