@@ -52,7 +52,12 @@ window.BottomNav = (() => {
       stroke: rgba(148,163,184,0.7);
       transition: stroke 0.15s, fill 0.15s;
     }
+    .vt-bn-icon svg.vt-bn-fill {
+      fill: rgba(148,163,184,0.7);
+      stroke: none;
+    }
     .vt-bn-tab.active .vt-bn-icon svg { stroke: #0288D1; }
+    .vt-bn-tab.active .vt-bn-icon svg.vt-bn-fill { fill: #0288D1; stroke: none; }
     .vt-bn-tab.active .vt-bn-icon svg.fill-active { fill: #0288D1; stroke: #0288D1; }
     .vt-bn-label { display: none; }
     .vt-bn-badge {
@@ -184,23 +189,23 @@ window.BottomNav = (() => {
   const TABS = [
     {
       key: 'home', label: 'Trang chủ', href: 'index.html',
-      svg: `<svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1v-9.5z"/><path d="M9 21V13h6v8"/></svg>`,
+      svg: `<svg class="vt-bn-fill" viewBox="0 0 512 512"><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272l16 0 0 176c0 35.3 28.7 64 64 64l288 0c35.3 0 64-28.7 64-64l0-176 16 0c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1l-224-208zM240 320l32 0c26.5 0 48 21.5 48 48l0 96-128 0 0-96c0-26.5 21.5-48 48-48z"/></svg>`,
     },
     {
       key: 'apps', label: 'Ứng dụng', href: null,
-      svg: `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
+      svg: `<svg class="vt-bn-fill" viewBox="0 0 640 512"><path d="M448 64c106 0 192 86 192 192S554 448 448 448l-256 0C86 448 0 362 0 256S86 64 192 64l256 0zM192 176c-13.3 0-24 10.7-24 24l0 32-32 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l32 0 0 32c0 13.3 10.7 24 24 24s24-10.7 24-24l0-32 32 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-32 0 0-32c0-13.3-10.7-24-24-24zm240 96a32 32 0 1 0 0 64 32 32 0 1 0 0-64zm64-96a32 32 0 1 0 0 64 32 32 0 1 0 0-64z"/></svg>`,
     },
     {
-      key: 'chat', label: 'Chat', href: 'app/chat.html',
-      svg: `<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`,
+      key: 'chat', label: 'Chat', href: 'chat.html',
+      svg: `<svg class="vt-bn-fill" viewBox="0 0 512 512"><path d="M256 0c-13.3 0-26.3 1-39.1 3l3.7 23.7C232.1 24.9 244 24 256 24s23.9 .9 35.4 2.7L295.1 3C282.3 1 269.3 0 256 0zm60.8 7.3l-5.7 23.3c23.4 5.7 45.4 14.9 65.4 27.1l12.5-20.5c-22.1-13.4-46.4-23.6-72.2-29.9zm76.4 61.6c19.1 14 36 30.9 50.1 50.1l19.4-14.2C447 83.6 428.4 65 407.3 49.5L393.1 68.8zm81.7 54.2l-20.5 12.5c12.2 20 21.4 42 27.1 65.4l23.3-5.7c-6.3-25.8-16.5-50.1-29.9-72.2zm10.5 97.5c1.8 11.5 2.7 23.4 2.7 35.4s-.9 23.9-2.7 35.4l23.7 3.7c1.9-12.7 3-25.8 3-39.1s-1-26.3-3-39.1l-23.7 3.7zm-31 155.9l20.5 12.5c13.4-22.1 23.6-46.4 29.9-72.2l-23.3-5.7c-5.7 23.4-14.9 45.4-27.1 65.4zm8.2 30.8l-19.4-14.2c-14 19.1-30.9 36-50.1 50.1l14.2 19.4c21.1-15.5 39.8-34.1 55.2-55.2zm-86.1 47c-20 12.2-42 21.4-65.4 27.1l5.7 23.3c25.8-6.3 50.1-16.5 72.2-29.9l-12.5-20.5zM295.1 509l-3.7-23.7C279.9 487.1 268 488 256 488s-23.9-.9-35.4-2.7L216.9 509c12.7 1.9 25.8 3 39.1 3s26.3-1 39.1-3zm-94.1-27.6c-17.6-4.3-34.4-10.6-50.1-18.6l-7.8-4-32.8 7.7 5.5 23.4 24.3-5.7c17.4 8.9 35.9 15.8 55.3 20.5l5.7-23.3zM95.4 494.6L90 471.3 48.3 481c-10.4 2.4-19.7-6.9-17.3-17.3l9.7-41.6-23.4-5.5-9.7 41.6C1.2 486 26 510.8 53.8 504.4l41.6-9.7zm-50-92.9l7.7-32.8-4-7.8c-8-15.7-14.3-32.5-18.6-50.1L7.3 316.7C12 336.1 18.9 354.7 27.7 372l-5.7 24.3 23.4 5.5zM3 295.1l23.7-3.7C24.9 279.9 24 268 24 256s.9-23.9 2.7-35.4L3 216.9C1 229.7 0 242.7 0 256s1 26.3 3 39.1zm27.6-94.1c5.7-23.4 14.9-45.4 27.1-65.4L37.2 123.1c-13.4 22.1-23.6 46.4-29.9 72.2l23.3 5.7zm18.9-96.2l19.4 14.2c14-19.1 30.9-36 50.1-50.1L104.7 49.5C83.6 65 65 83.6 49.5 104.7zm86.1-47c20-12.2 42-21.4 65.4-27.1L195.2 7.3c-25.8 6.3-50.1 16.5-72.2 29.9l12.5 20.5zM256 464c114.9 0 208-93.1 208-208S370.9 48 256 48 48 141.1 48 256c0 36.4 9.4 70.7 25.8 100.5 1.6 2.9 2.1 6.2 1.4 9.4l-21.6 92.5 92.5-21.6c3.2-.7 6.5-.2 9.4 1.4 29.8 16.5 64 25.8 100.5 25.8z"/></svg>`,
     },
     {
       key: 'shop', label: 'Shop', href: null,
-      svg: `<svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>`,
+      svg: `<svg class="vt-bn-fill" viewBox="0 0 448 512"><path d="M388.5 104.1c-.2-1.1-.7-2.1-1.5-2.8s-1.8-1.2-2.9-1.2c-2 0-37.2-.8-37.2-.8s-21.6-20.8-29.6-28.8l0 432.7 125.7-31.2s-54-365.5-54.4-367.9zM288.9 70.5c-1.9-6.1-4.3-11.9-7.2-17.6-10.4-20-26-30.9-44.4-30.9-1.3 0-2.7 .1-4 .4-.4-.8-1.2-1.2-1.6-2-8-8.8-18.4-12.8-30.8-12.4-24 .8-48 18-67.2 48.8-13.6 21.6-24 48.8-26.8 70.1-27.6 8.4-46.8 14.4-47.2 14.8-14 4.4-14.4 4.8-16 18-1.2 10-38 291.8-38 291.8l302.6 52.5 0-438.3c-1.5 .1-2.9 .2-4.4 .4 0 0-5.6 1.6-14.8 4.4zM233.6 87.7c-16 4.8-33.6 10.4-50.8 15.6 4.8-18.8 14.4-37.6 25.6-50 4.4-4.4 10.4-9.6 17.2-12.8 6.8 14.4 8.4 34 8 47.2zM200.8 24.4c5-.2 10 1.1 14.4 3.6-6.4 3.2-12.8 8.4-18.8 14.4-15.2 16.4-26.8 42-31.6 66.5-14.4 4.4-28.8 8.8-42 12.8 8.8-38.4 41.2-96.4 78-97.2zM154.4 244.6c1.6 25.6 69.2 31.2 73.2 91.7 2.8 47.6-25.2 80.1-65.6 82.5-48.8 3.2-75.6-25.6-75.6-25.6l10.4-44s26.8 20.4 48.4 18.8c14-.8 19.2-12.4 18.8-20.4-2-33.6-57.2-31.6-60.8-86.9-3.2-46.4 27.2-93.3 94.5-97.7 26-1.6 39.2 4.8 39.2 4.8l-15.2 57.6s-17.2-8-37.6-6.4c-29.6 2-30 20.8-29.6 25.6zM249.6 82.9c0-12-1.6-29.2-7.2-43.6 18.4 3.6 27.2 24 31.2 36.4-7.2 2-15.2 4.4-24 7.2z"/></svg>`,
     },
     {
       key: 'profile', label: 'Hồ sơ', href: null,
-      svg: `<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+      svg: `<svg class="vt-bn-fill" viewBox="0 0 512 512"><path d="M399 384.2C376.9 345.8 335.4 320 288 320l-64 0c-47.4 0-88.9 25.8-111 64.2 35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0 256 256 0 1 1 -512 0zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"/></svg>`,
     },
   ];
 
@@ -256,13 +261,13 @@ window.BottomNav = (() => {
         <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 4px"></div>
         <div style="font-family:'Science Gothic', sans-serif;font-size:12px;font-weight:500;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">🛒 Shop & Túi đồ</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 18px">
-          <a href="${resolveHref('app/shop.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
-            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))">🛒</div>
+          <a href="${resolveHref('shop.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f6d2.png" width="30" height="30" alt="Shop"></div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Shop</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Gacha · Mua vật phẩm</span>
           </a>
-          <a href="${resolveHref('app/bag.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
-            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2))">🎒</div>
+          <a href="${resolveHref('bag.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2))"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f392.png" width="30" height="30" alt="Túi đồ"></div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Túi đồ</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Thú cưng · Vật phẩm</span>
           </a>
@@ -274,13 +279,13 @@ window.BottomNav = (() => {
         <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 4px"></div>
         <div style="font-family:'Science Gothic', sans-serif;font-size:12px;font-weight:500;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">📱 Ứng dụng & Trò chơi</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 18px">
-          <a href="${resolveHref('app/applications.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
-            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))">📱</div>
+          <a href="${resolveHref('applications.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f4f1.png" width="30" height="30" alt="Ứng dụng"></div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Ứng dụng</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Offline · Không cần login</span>
           </a>
           <a href="${resolveHref('games.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
-            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2))">🎮</div>
+            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2))"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f3ae.png" width="30" height="30" alt="Game"></div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Game</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Mini games · Xếp hạng</span>
           </a>
@@ -293,9 +298,9 @@ window.BottomNav = (() => {
           <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 0"></div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px">
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;letter-spacing:.5px;color:#7dd3fc">👤 Hồ sơ</span>
-            <a href="${resolveHref('app/profile.html')}" style="font-size:12px;font-weight:400;color:#0288D1;text-decoration:none;font-family:'Science Gothic', sans-serif">Xem đầy đủ →</a>
+            <a href="${resolveHref('profile.html')}" style="font-size:12px;font-weight:400;color:#0288D1;text-decoration:none;font-family:'Science Gothic', sans-serif">Xem đầy đủ →</a>
           </div>
-          <a href="${resolveHref('app/profile.html')}" id="vtPpProfileCard" style="display:flex;align-items:center;gap:14px;margin:0 14px 14px;padding:14px 16px;background:rgba(2,136,209,0.07);border:1px solid rgba(2,136,209,0.18);border-radius:16px;text-decoration:none;cursor:pointer">
+          <a href="${resolveHref('profile.html')}" id="vtPpProfileCard" style="display:flex;align-items:center;gap:14px;margin:0 14px 14px;padding:14px 16px;background:rgba(2,136,209,0.07);border:1px solid rgba(2,136,209,0.18);border-radius:16px;text-decoration:none;cursor:pointer">
             <div id="vtPpAvatar" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0288d1,#38bdf8);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:22px;color:#fff;flex-shrink:0;border:2px solid rgba(2,136,209,0.4)">?</div>
             <div style="flex:1;min-width:0">
               <div id="vtPpUsername" style="font-weight:500;font-size:16px;color:#e0f2fe;font-family:'Science Gothic', sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Đang tải...</div>
@@ -390,7 +395,6 @@ window.BottomNav = (() => {
   }
   function toggleAppsPanel() { _appsOpen ? closeAppsPanel() : openAppsPanel(); }
 
-  // Đóng tất cả panel không emit backdrop
   function _closeAll() {
     if (_profileOpen) { _profileOpen = false; document.getElementById('vtProfilePanel').classList.remove('open'); _restoreTab('profile'); }
     if (_shopOpen)    { _shopOpen    = false; document.getElementById('vtShopPanel').classList.remove('open');    _restoreTab('shop'); }
@@ -416,23 +420,14 @@ window.BottomNav = (() => {
     document.getElementById('vtPanelBackdrop')?.addEventListener('click', _closeAll);
   }
 
-  // ── init ─────────────────────────────────────────────────
+  // ── init
   function init(opts = {}) {
-    // Chặn double-init: nếu nav đã tồn tại trong DOM (do trang gọi init() thủ
-    // công + listener DOMContentLoaded tự động bên dưới cùng chạy), bỏ qua lần
-    // gọi sau. Double-init từng gây lỗi: HTML/id (#vt-profile-tab, #vtProfilePanel...)
-    // bị chèn 2 lần -> bindEvents() gắn listener vào bộ đầu tiên (bị bộ thứ hai
-    // vẽ đè lên), nên bấm vào bộ hiển thị không có tác dụng, và các hàm update
-    // DOM trong quests.js (render profile/quest) cũng cập nhật nhầm bộ bị che
-    // khuất -> panel hiển thị luôn kẹt ở "Đang tải...".
     if (document.getElementById('vtBottomNav')) return;
     const activeKey = opts.active || 'home';
     injectStyles();
     document.body.classList.add('has-bottom-nav');
     document.body.insertAdjacentHTML('beforeend', buildHTML(activeKey));
     bindEvents();
-    // Tự nạp quests.js (không cần khai báo <script> thủ công ở từng trang).
-    // import() cache theo URL nên gọi nhiều lần / nhiều trang vẫn chỉ chạy 1 lần.
     import('./quests.js').catch(err => console.warn('BottomNav: không load được quests.js', err));
   }
 
