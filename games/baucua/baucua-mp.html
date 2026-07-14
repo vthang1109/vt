@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Bầu Cua Online</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../quests.css"/>
+  <style>
+    .bc-wrap { min-height:100vh; padding:14px 12px 40px; max-width:760px; margin:0 auto; position:relative; z-index:1; }
+
+    /* ===== STATUS BAR (đồng bộ các game khác) ===== */
+    .bc-status {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:16px 16px;
+      border-radius:12px;
+      margin-bottom:12px;
+      font-weight:700;
+      font-size:13px;
+      --bc-right: rgba(148, 163, 184, 0.08);
+      --bc-left-border: rgba(251, 191, 36, 0.9);
+      --bc-right-border: rgba(56, 189, 248, 0.4);
+      background-image:
+        linear-gradient(135deg,
+          rgba(251, 191, 36, 0.1) 0%,
+          rgba(251, 191, 36, 0.1) 20%,
+          transparent 38%,
+          transparent 62%,
+          var(--bc-right) 80%,
+          var(--bc-right) 100%),
+        linear-gradient(#0a101e, #0a101e),
+        linear-gradient(135deg,
+          var(--bc-left-border) 0%,
+          var(--bc-left-border) 35%,
+          var(--bc-right-border) 65%,
+          var(--bc-right-border) 100%);
+      background-origin: padding-box, padding-box, border-box;
+      background-clip: padding-box, padding-box, border-box;
+      border: 1px solid transparent;
+      min-height: 64px;
+      width: 100%;
+      box-sizing: border-box;
+      transition: all 0.3s;
+      gap: 8px;
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.18);
+    }
+    .bc-status.rolling {
+      --bc-right: rgba(120, 90, 10, 0.55);
+      --bc-right-border: rgba(251, 191, 36, 0.9);
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.45);
+    }
+    .bc-status.result-win {
+      --bc-right: rgba(8, 60, 28, 0.7);
+      --bc-right-border: #22c55e;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+    }
+    .bc-status.result-lose {
+      --bc-right: rgba(70, 12, 12, 0.7);
+      --bc-right-border: #ef4444;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+    }
+    .bc-status.result-draw {
+      --bc-right: rgba(40, 45, 55, 0.7);
+      --bc-right-border: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    }
+    .bc-status .bc-stake {
+      color: #fbbf24;
+      font-family: "Science Gothic", sans-serif;
+      font-weight: 500;
+      font-size: 18px;
+      flex:1;
+      text-align:left;
+    }
+    .bc-status .bc-phase {
+      font-family: "Science Gothic", sans-serif;
+      font-weight: 500;
+      font-size: 16px;
+      letter-spacing: 1px;
+      color: #7dd3fc;
+      flex:1;
+      text-align:center;
+      transition: color 0.3s;
+    }
+    .bc-status.rolling .bc-phase { color:#fbbf24; }
+    .bc-status.result-win .bc-phase { color:#4ade80; }
+    .bc-status.result-lose .bc-phase { color:#f87171; }
+    .bc-status.result-draw .bc-phase { color:#ffffff; }
+    .bc-status .bc-profit {
+      font-family: "Science Gothic", sans-serif;
+      font-weight: 500;
+      font-size: 18px;
+      flex:1;
+      text-align:right;
+    }
+    .bc-status .bc-profit.positive { color: #4ade80; }
+    .bc-status .bc-profit.negative { color: #f87171; }
+    .bc-status .bc-profit.zero { color: #ffffff; }
+    .bc-status.rolling .bc-profit {
+      color:#fbbf24 !important;
+    }
+
+    .bc-dice { display:flex; justify-content:center; gap:14px; margin:18px 0; }
+    .bc-die { width:80px; height:80px; border-radius:18px; background:linear-gradient(160deg,#fef3c7,#fbbf24); display:flex; align-items:center; justify-content:center; font-size:46px; box-shadow: 0 8px 24px rgba(251,191,36,.4), inset 0 -3px 8px rgba(0,0,0,.15); transition:all .3s; }
+    .bc-die.rolling { animation: bcRoll .12s infinite linear; }
+    @keyframes bcRoll { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+    .bc-die.win { box-shadow: 0 8px 24px rgba(52,211,153,.6), inset 0 -3px 8px rgba(0,0,0,.15), 0 0 0 3px #34d399; }
+
+    /* Board - full width */
+    .bc-board {
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:10px;
+      margin-bottom:14px;
+    }
+    @media (min-width: 600px){ 
+      .bc-board { grid-template-columns:repeat(6, 1fr); } 
+    }
+    
+    .bc-tile { 
+      background:rgba(15,23,42,0.6);
+      border:2px solid rgba(251,191,36,0.1);
+      border-radius:16px;
+      padding:14px 5px;
+      cursor:pointer;
+      transition:all 0.25s;
+      text-align:center;
+      font-family:"Science Gothic", sans-serif;
+      font-weight:400;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      min-height:80px;
+      position:relative;
+    }
+    .bc-tile:hover { background:rgba(251,191,36,0.08); border-color:#fbbf24; }
+    
+    .bc-tile.has-bet {
+      border-color: #fbbf24 !important;
+      box-shadow: 0 0 24px rgba(251,191,36,0.35), inset 0 0 30px rgba(251,191,36,0.05) !important;
+      transform: translateY(-3px);
+    }
+    
+    .bc-tile.hot { 
+      background:linear-gradient(135deg,rgba(52,211,153,.18),rgba(5,150,105,.06)); 
+      border-color:rgba(52,211,153,.6); 
+      box-shadow: 0 0 24px rgba(52,211,153,.3); 
+    }
+    .bc-tile-icon { font-size:38px; display:block; }
+    .bc-tile-bet {
+      margin-top:8px;
+      background:#1e293b;
+      color:#fbbf24;
+      padding:3px 8px;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:500;
+      font-family:"Science Gothic", sans-serif;
+      min-height:22px;
+    }
+    .bc-tile.disabled { opacity:.55; cursor:not-allowed; }
+    .bc-tile.disabled:hover { transform:none; background:rgba(15,23,42,0.6); border-color:rgba(251,191,36,0.1); }
+    .bc-tile-mult { 
+      position:absolute; 
+      top:4px; 
+      right:6px; 
+      font-family:"Science Gothic", sans-serif; 
+      font-weight:500; 
+      color:#34d399; 
+      font-size:12px; 
+      text-shadow:0 0 8px rgba(52,211,153,.6); 
+    }
+
+    /* Hàng chip + nút - CÙNG 1 HÀNG NGANG */
+    .bc-bottom-row {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .bc-chip {
+      padding:12px 0;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.1);
+      background:#1e293b;
+      color:#fff;
+      font-weight:400;
+      cursor:pointer;
+      font-family:"Science Gothic", sans-serif;
+      font-size:13px;
+      transition:all .2s;
+      text-align:center;
+      width:64px;
+      flex-shrink:0;
+    }
+    .bc-chip:hover { border-color:rgba(251,191,36,0.5); }
+    .bc-chip.active { 
+      background:linear-gradient(135deg, #fbbf24, #f59e0b);
+      border-color:#fff;
+      box-shadow:0 0 12px #fbbf24;
+      color:#1e293b;
+    }
+
+    /* Nút Xoá, Lắc, Mới - cùng kích thước với chip */
+    .btn-action {
+      padding:12px 0;
+      width:64px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:500;
+      font-family:"Science Gothic", sans-serif;
+      font-size:13px;
+      white-space:nowrap;
+      flex-shrink:0;
+      text-align:center;
+    }
+    .btn-clear { background:#dc2626; color:#fff; }
+    .btn-clear:hover { background:#b91c1c; }
+    .btn-roll { background:linear-gradient(135deg,#f87171,#dc2626); color:#fff; box-shadow:0 4px 12px rgba(220,38,38,.4); width:auto; padding:12px 16px; }
+    .btn-roll:disabled { opacity:.5; cursor:not-allowed; box-shadow:none; }
+    .btn-next { background:linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; }
+
+    /* ===== PLAYER CARD - TO HƠN, TÊN SÁT GÓC TRÊN TRÁI ===== */
+    .bc-players { 
+      display:grid; 
+      grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); 
+      gap:12px; 
+      margin-top:14px; 
+    }
+
+    .bc-pl { 
+      padding: 10px 12px 32px 12px;
+      border-radius: 12px; 
+      background: rgba(255,255,255,.03); 
+      border: 1px solid rgba(255,255,255,.06); 
+      transition: all .3s; 
+      position: relative; 
+      min-height: 70px;
+    }
+
+    .bc-pl.win { 
+      border-color: rgba(52,211,153,.6); 
+      box-shadow: 0 0 20px rgba(52,211,153,.3); 
+      background: rgba(52,211,153,.08); 
+    }
+    .bc-pl.lose { 
+      border-color: rgba(248,113,113,.4); 
+      box-shadow: 0 0 20px rgba(248,113,113,.2); 
+      background: rgba(248,113,113,.06); 
+    }
+
+    /* TÊN SÁT GÓC TRÊN BÊN TRÁI */
+    .bc-pl-name { 
+      font-weight: 800; 
+      color: #e0f2fe; 
+      font-size: 14px; 
+      padding-right: 40px;
+      line-height: 1.4;
+      text-align: left;
+    }
+
+    /* === ICON TRÒN GÓC TRÊN PHẢI (THẮNG/THUA) === */
+    .bc-pl-status {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 18px;
+      pointer-events: none;
+    }
+
+    /* === BADGE TIỀN CƯỢC - GÓC DƯỚI BÊN PHẢI === */
+    .bc-pl-bet-badge {
+      position: absolute;
+      bottom: 6px;
+      right: 8px;
+      padding: 3px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(251,191,36,0.4);
+      background: rgba(251,191,36,0.1);
+      color: #fbbf24;
+      font-family: "Science Gothic", sans-serif;
+      font-weight: 500;
+      font-size: 12px;
+      pointer-events: none;
+    }
+
+    /* === BADGE KẾT QUẢ (THẮNG/THUA) - GÓC DƯỚI BÊN TRÁI === */
+    .bc-pl-result-badge {
+      position: absolute;
+      bottom: 6px;
+      left: 8px;
+      padding: 3px 12px;
+      border-radius: 6px;
+      font-family: "Science Gothic", sans-serif;
+      font-weight: 500;
+      font-size: 13px;
+      pointer-events: none;
+    }
+    .bc-pl-result-badge.win {
+      color: #34d399;
+      border: 1px solid rgba(52,211,153,0.4);
+      background: rgba(52,211,153,0.1);
+    }
+    .bc-pl-result-badge.lose {
+      color: #f87171;
+      border: 1px solid rgba(248,113,113,0.4);
+      background: rgba(248,113,113,0.1);
+    }
+    .bc-pl-result-badge.draw {
+      color: #94a3b8;
+      border: 1px solid rgba(148,163,184,0.3);
+      background: rgba(148,163,184,0.08);
+    }
+
+    /* Xóa style cũ */
+    .bc-pl-bet { display: none !important; }
+    .bc-pl-result { display: none !important; }
+
+    /* Nav override - room id style */
+    .vt-top-nav .vt-nav-logo .vt-room-id {
+      font-family: "Science Gothic", sans-serif;
+      color: #fbbf24;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(251,191,36,.1);
+      border: 1px solid rgba(251,191,36,.4);
+      display: inline-block;
+      letter-spacing: 0.5px;
+    }
+    .vt-top-nav .vt-nav-logo .vt-room-id .room-icon {
+      margin-right: 6px;
+    }
+
+    @media (max-width: 480px) {
+      .bc-status { flex-direction:row; flex-wrap:wrap; gap:4px; font-size:12px; }
+      .bc-bottom-row { 
+        flex-direction:row; 
+        flex-wrap:wrap;
+        justify-content:center;
+        gap:6px;
+      }
+      .bc-chip { 
+        width:48px; 
+        padding:10px 0; 
+        font-size:11px; 
+      }
+      .btn-action {
+        width:48px;
+        padding:10px 0; 
+        font-size:11px; 
+      }
+      .btn-roll { width:auto; padding:10px 14px; }
+      .bc-tile { min-height:65px; padding:10px 4px; }
+      .bc-tile-icon { font-size:30px; }
+      .bc-players { grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:8px; }
+      .bc-pl { min-height:60px; padding:8px 10px 28px 10px; }
+      .bc-pl-name { font-size:12px; }
+      .bc-pl-status { font-size:15px; }
+      .bc-pl-bet-badge { font-size:10px; padding:2px 8px; }
+      .bc-pl-result-badge { font-size:11px; padding:2px 8px; }
+    }
+  </style>
+</head>
+<body data-bottom-nav="games">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <!-- TOP NAV -->
+  <div id="top-nav-root"></div>
+  <script src="../../top-nav.js"></script>
+
+  <div class="bc-wrap">
+    <!-- STATUS BAR -->
+    <div class="bc-status" id="bc-status">
+      <span class="bc-stake" id="bc-stake">0</span>
+      <span class="bc-phase" id="bc-phase">BET</span>
+      <span class="bc-profit zero" id="bc-profit">+0</span>
+    </div>
+
+    <div class="bc-dice" id="bc-dice">
+      <div class="bc-die">?</div>
+      <div class="bc-die">?</div>
+      <div class="bc-die">?</div>
+    </div>
+
+    <!-- Board full width -->
+    <div class="bc-board" id="bc-board"></div>
+
+    <!-- Hàng chip + nút -->
+    <div class="bc-bottom-row">
+      <button class="bc-chip" data-v="100">100</button>
+      <button class="bc-chip active" data-v="500">500</button>
+      <button class="bc-chip" data-v="1000">1K</button>
+      <button class="bc-chip" data-v="5000">5K</button>
+      <button class="btn-action btn-clear" onclick="clearMyBets()">Xoá</button>
+      <button class="btn-action btn-roll" id="btn-roll" onclick="hostRoll()" style="display:none">🎲 Lắc</button>
+      <button class="btn-action btn-next" id="btn-next" onclick="hostNext()" style="display:none">Mới</button>
+    </div>
+
+    <div class="bc-players" id="bc-players"></div>
+  </div>
+
+  <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
+
+  <!-- BOTTOM NAV -->
+  <script src="../../bottom-nav.js"></script>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(251,191,36,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast=function(msg,type='info'){};
+  </script>
+  <script type="module" src="baucua-mp.js"></script>
+</body>
+</html>
