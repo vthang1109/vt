@@ -32,35 +32,44 @@
     <!-- GAME CANVAS -->
     <div class="fs-canvas-wrap">
       <canvas id="fs-canvas"></canvas>
-      <!-- Combo và Freeze hiển thị trong canvas -->
+      <!-- Combo, Freeze và Hit sao thưởng hiển thị trong canvas -->
       <div class="fs-combo" id="fs-combo">🔥 x1</div>
-      <div class="fs-freeze" id="fs-freeze">❄️ ĐÓNG BĂNG</div>
+      <div class="fs-bonus-hit" id="fs-bonus-hit">0 Hit</div>
+
+      <!-- KẾT QUẢ (hiển thị ngay trong bàn chứa hoa quả khi game over) -->
+      <div class="fs-result" id="fs-result" style="display:none">
+        <div class="fs-result-score">Điểm: <span id="fs-final-score">0</span></div>
+        <div class="fs-result-reward">Thưởng: <span id="fs-reward">0</span>〄</div>
+        <button id="fs-replay-btn" class="btn-primary">🔄 Chơi lại</button>
+      </div>
     </div>
 
-    <!-- KẾT QUẢ (hiển thị dưới canvas khi game over) -->
-    <div class="fs-result" id="fs-result" style="display:none">
-      <div class="fs-result-score">Điểm: <span id="fs-final-score">0</span></div>
-      <div class="fs-result-reward">Thưởng: <span id="fs-reward">0</span>〄</div>
-      <button id="fs-replay-btn" class="btn-primary">🔄 Chơi lại</button>
-    </div>
-
-    <!-- OVERLAY CHỌN CHẾ ĐỘ (giữ nguyên) -->
+    <!-- OVERLAY CHỌN CHẾ ĐỘ (kiểu Pong) -->
     <div class="fs-overlay" id="fs-overlay">
       <div class="fs-overlay-box">
-        <h2>🍉 CHÉM HOA QUẢ</h2>
-        <div class="fs-mode-btns">
-          <button class="fs-mode-btn active" data-mode="timed">⏱ Tính giờ</button>
-          <button class="fs-mode-btn" data-mode="lives">❤️ 3 Mạng</button>
+        <div class="fs-logo">🍉</div>
+        <h1 class="fs-title">Chém Hoa Quả</h1>
+        <p class="fs-subtitle">Vung tay chém trái cây · Đạt điểm cao nhất</p>
+
+        <div class="fs-mode-list">
+          <div class="fs-mode-card" data-mode="timed">
+            <span class="fs-mode-icon">⏱</span>
+            <div>
+              <div class="fs-mode-name">Tính Giờ</div>
+              <div class="fs-mode-desc">60 giây · Chém càng nhiều càng tốt</div>
+            </div>
+            <span class="fs-mode-badge">Chơi ngay</span>
+          </div>
+
+          <div class="fs-mode-card" data-mode="lives">
+            <span class="fs-mode-icon">❤️</span>
+            <div>
+              <div class="fs-mode-name">3 Mạng</div>
+              <div class="fs-mode-desc">Mất 3 mạng là thua · Không giới hạn giờ</div>
+            </div>
+            <span class="fs-mode-badge">Chơi ngay</span>
+          </div>
         </div>
-        <div id="fs-time-select" class="fs-time-select">
-          <label>Thời gian:</label>
-          <select id="fs-time-selector">
-            <option value="60">60 giây</option>
-            <option value="90">90 giây</option>
-            <option value="120">120 giây</option>
-          </select>
-        </div>
-        <button id="fs-start-btn" class="btn-primary">▶ Bắt đầu</button>
       </div>
     </div>
   </div>

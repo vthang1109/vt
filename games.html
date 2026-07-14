@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -198,4 +199,192 @@
     });
   </script>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VTWorld — Games</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="games.css" />
+  <link rel="stylesheet" href="quests.css" />
+
+  <!-- Top & Bottom Nav (sẽ load sau) -->
+  <script src="top-nav.js"></script>
+  <script src="bottom-nav.js"></script>
+
+  <!-- Firebase + Quests + Points (module) -->
+  <script type="module" src="points.js"></script>
+  <script type="module" src="quests.js"></script>
+</head>
+<body data-bottom-nav="home">
+  <!-- TopNav sẽ tự động chèn vào đây nếu có #top-nav-root -->
+  <div id="top-nav-root"></div>
+
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div class="games-page">
+    <!-- Hero -->
+    <div class="games-hero">
+      <h1>🎮 <span>Game</span> Center</h1>
+      <p>Chơi game · Kiếm điểm · Leo rank</p>
+    </div>
+
+    <!-- Tab chuyển đổi -->
+    <div class="nav-tabs">
+      <a class="nav-tab active" href="games.html">🎮 GAMES</a>
+      <a class="nav-tab" href="applications.html">📱 ỨNG DỤNG</a>
+    </div>
+
+    <!-- Bảng xếp hạng & Phòng chơi -->
+    <div class="category-section">
+      <div class="category-label"><span class="cat-icon">🏆</span><span class="cat-name">Bảng Xếp Hạng & Online</span><div class="cat-line"></div></div>
+      <div class="game-lobby-grid">
+        <a class="game-lobby-card card-feature-gold" href="leaderboard.html">
+          <span class="glc-badge gold">#1</span>
+          <span class="glc-emoji">🏆</span>
+          <span class="glc-name">Top giàu nhất</span>
+          <span class="glc-pts">Bxh vip</span>
+        </a>
+        <a class="game-lobby-card card-feature-purple" href="rooms.html">
+          <span class="glc-badge ready">Live</span>
+          <span class="glc-emoji">👥</span>
+          <span class="glc-name">Online Rooms</span>
+          <span class="glc-pts">Play and Friend</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Casino -->
+    <div class="category-section">
+      <div class="category-label"><span class="cat-icon">🃏</span><span class="cat-name">CASINO</span><div class="cat-line"></div></div>
+      <div class="game-lobby-grid">
+        <a class="game-lobby-card" href="slot.html"><span class="glc-badge ready">Hot</span><span class="glc-emoji">🎇</span><span class="glc-name">No Hu</span><span class="glc-pts">777</span></a>
+         <a class="game-lobby-card" href="baucua.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🦞</span><span class="glc-name">Bầu Cua</span><span class="glc-pts">Thử vận may</span></a>
+        <a class="game-lobby-card" href="tienlen.html"><span class="glc-badge ready">Mới</span><span class="glc-emoji">♥️</span><span class="glc-name">Tiến Lên</span><span class="glc-pts">Cược & Tố</span></a>
+        <a class="game-lobby-card" href="xidach.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">♣️</span><span class="glc-name">Xì dách</span><span class="glc-pts">Cược & Thắng</span></a>
+        <a class="game-lobby-card" href="baicao.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">♦️</span><span class="glc-name">Bài Cào</span><span class="glc-pts">Sáp - Liêng</span></a>
+        <a class="game-lobby-card" href="taixiu.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🎲</span><span class="glc-name">Tài Xỉu</span><span class="glc-pts">Cược & Thắng</span></a>
+      </div>
+    </div>
+
+    <!-- Trí Tuệ -->
+    <div class="category-section">
+      <div class="category-label"><span class="cat-icon">🧠</span><span class="cat-name">Trí Tuệ</span><div class="cat-line"></div></div>
+      <div class="game-lobby-grid">
+        <a class="game-lobby-card" href="chess.html"><span class="glc-badge ready">Mới</span><span class="glc-emoji">♟️</span><span class="glc-name">Chess</span><span class="glc-pts">500~5000</span></a>
+        <a class="game-lobby-card" href="xiangqi.html"><span class="glc-badge ready">Mới</span><span class="glc-emoji">🐘</span><span class="glc-name">Cờ Tướng</span><span class="glc-pts">500~5000</span></a>
+        <a class="game-lobby-card" href="caro.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">⭕</span><span class="glc-name">Caro</span><span class="glc-pts">50~150</span></a>
+        <a class="game-lobby-card" href="quiz.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">❓</span><span class="glc-name">Quiz</span><span class="glc-pts">+40đ / thắng</span></a>
+        <a class="game-lobby-card" href="altp/offline/altp.html"><span class="glc-badge ready">Mới</span><span class="glc-emoji">💰</span><span class="glc-name">Ai Là Triệu Phú</span><span class="glc-pts">10~30.000đ</span></a>
+        <a class="game-lobby-card" href="timso.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🔟</span><span class="glc-name">100 Number</span><span class="glc-pts">100~800</span></a>
+        </div>
+    </div>
+
+    <!-- Hành Động -->
+    <div class="category-section">
+      <div class="category-label"><span class="cat-icon">🕹️</span><span class="cat-name">Hành Động</span><div class="cat-line"></div></div>
+      <div class="game-lobby-grid">
+        <a class="game-lobby-card" href="snake.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🐍</span><span class="glc-name">Rắn săn mồi</span><span class="glc-pts">+10~80đ</span></a>
+        <a class="game-lobby-card" href="bird.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🐦</span><span class="glc-name">Flappy Bird</span><span class="glc-pts">+10~20đ</span></a>
+        <a class="game-lobby-card" href="dino.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🦕</span><span class="glc-name">Dinosaur</span><span class="glc-pts">+20~80đ</span></a>
+        <a class="game-lobby-card" href="football.html"><span class="glc-badge ready">Mới</span><span class="glc-emoji">⚽</span><span class="glc-name">Bóng Đá</span><span class="glc-pts">+5~50đ</span></a>
+        <a class="game-lobby-card" href="pong.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🏓</span><span class="glc-name">Pong</span><span class="glc-pts">+50~150đ</span></a>
+        <a class="game-lobby-card" href="games/fruitslash/fruitslash.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🍉</span><span class="glc-name">Chém Hoa Quả</span><span class="glc-pts">+10~200đ</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background particles -->
+  <script>
+    (function initParticles() {
+      const canvas = document.getElementById('bg-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resize();
+      window.addEventListener('resize', resize);
+      for (let i = 0; i < 40; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          r: Math.random() * 1.5 + 0.5
+        });
+      }
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0) p.x = canvas.width;
+          if (p.x > canvas.width) p.x = 0;
+          if (p.y < 0) p.y = canvas.height;
+          if (p.y > canvas.height) p.y = 0;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(56,189,248,0.5)';
+          ctx.fill();
+        });
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d < 100) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(56,189,248,${0.07 * (1 - d / 100)})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+  </script>
+
+  <!-- Đồng bộ điểm và gọi TopNav -->
+  <script type="module">
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { auth, db, claimDailyLogin } from './points.js';
+
+    // Cập nhật điểm trên top-nav và điểm-bar
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        // Nếu chưa đăng nhập, chuyển về trang chủ (hoặc giữ nguyên)
+        // window.location.href = 'index.html';
+        return;
+      }
+
+      const userRef = doc(db, 'users', user.uid);
+      onSnapshot(userRef, (snap) => {
+        if (snap.exists()) {
+          const pts = snap.data().points || 0;
+          // Cập nhật top-nav
+          if (window.TopNav && typeof window.TopNav.setPoints === 'function') {
+            window.TopNav.setPoints(pts);
+          }
+        }
+      });
+
+      // Nhận quà đăng nhập hàng ngày (nếu có)
+      try {
+        await claimDailyLogin();
+      } catch (e) {
+        console.warn('claimDailyLogin error:', e);
+      }
+    });
+  </script>
+</body>
+>>>>>>> 1ae4356d043252457a3a265e33cd6f8913c3e00d
 </html>
