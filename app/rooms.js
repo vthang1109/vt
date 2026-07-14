@@ -6,7 +6,7 @@ import {
   orderBy, limit
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { initProfileCard } from './profile-card.js';
+import { initProfileCard } from '../profile-card.js';
 
 const GAMES = {
   xidach:    { id: 'xidach',    name: 'Xì dách',     icon: '♣️', max: 5, min: 2, page: 'xidach-mp.html',    ready: true },
