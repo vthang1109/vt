@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Ai Là Triệu Phú</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../quests.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="altp.css"/>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+  <script type="module" src="../../quests.js"></script>
+</head>
+<body data-bottom-nav="games">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+
+  <div class="altp-wrap">
+
+    <!-- STATUS BAR đồng bộ hệ thống -->
+    <div class="bc-status" id="bc-status">
+      <span class="stat-bet" id="altp-level">Câu 0/15</span>
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="altp-score">0đ</span>
+        <span class="stat-score-sub" id="altp-score-sub">mốc an toàn</span>
+      </div>
+      <span class="stat-profit zero" id="altp-profit">+0</span>
+    </div>
+
+    <!-- CÂU HỎI -->
+    <div class="altp-qbox" id="altp-qbox" style="display:none">
+      <div class="altp-qtext" id="altp-qtext">...</div>
+    </div>
+
+    <!-- TRỢ GIÚP: khán giả -->
+    <div class="altp-audience" id="altp-audience" style="display:none"></div>
+    <div class="altp-phone-msg" id="altp-phone-msg" style="display:none"></div>
+
+    <!-- ĐÁP ÁN + TRỢ GIÚP -->
+    <div class="altp-play-row">
+      <div class="altp-options" id="altp-options" style="display:none"></div>
+
+      <!-- 3 QUYỀN TRỢ GIÚP + DỪNG CUỘC CHƠI -->
+      <div class="altp-lifelines" id="altp-lifelines" style="display:none">
+        <button class="altp-life-btn altp-life-btn-stop" id="btn-stop" onclick="window.altp.stopGame()" title="Dừng cuộc chơi">❌</button>
+        <button class="altp-life-btn" id="life-5050" onclick="window.altp.useFiftyFifty()" title="50:50">➗</button>
+        <button class="altp-life-btn" id="life-audience" onclick="window.altp.useAskAudience()" title="Hỏi khán giả">📊</button>
+        <button class="altp-life-btn" id="life-phone" onclick="window.altp.usePhoneFriend()" title="Gọi điện thoại">📞</button>
+      </div>
+    </div>
+
+    <!-- THANG ĐIỂM -->
+    <div class="altp-ladder" id="altp-ladder"></div>
+
+    <!-- HÀNH ĐỘNG -->
+    <div class="altp-actions">
+      <button class="altp-btn-start" id="btn-start" onclick="window.altp.startGame()">🎮 Bắt Đầu</button>
+    </div>
+  </div>
+
+  <!-- MODAL CÀI ĐẶT -->
+  <div class="altp-modal-overlay" id="altp-settings-modal">
+    <div class="altp-modal-box">
+      <div class="altp-modal-title">📜 Luật Chơi</div>
+      <div class="altp-rules-text">
+        15 câu hỏi tăng dần độ khó (dễ → vừa → khó). Mốc an toàn ở câu 5 và câu 10 — trả lời sai sẽ nhận thưởng theo mốc an toàn gần nhất đã đạt. Có thể bấm "Dừng cuộc chơi" bất cứ lúc nào để nhận thưởng theo câu đã trả lời đúng gần nhất. 3 quyền trợ giúp: 50:50, Hỏi khán giả, Gọi điện thoại — mỗi quyền dùng 1 lần/ván. Âm thanh & tốc độ chỉnh trong menu ☰ trên cùng.
+      </div>
+      <button class="altp-modal-close" style="background:linear-gradient(135deg,#64748b,#334155)" onclick="window.altp.closeSettings()">Đóng</button>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(52,211,153,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast = window.showToast || function(){};
+  </script>
+
+  <script type="module" src="altp.js"></script>
+</body>
+</html>

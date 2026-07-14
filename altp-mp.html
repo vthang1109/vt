@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Ai Là Triệu Phú Online</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="quests.css"/>
+  <link rel="stylesheet" href="altp-mp.css"/>
+  <script src="top-nav.js"></script>
+  <script src="bottom-nav.js"></script>
+  <script type="module" src="quests.js"></script>
+</head>
+<body data-bottom-nav="games">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+
+  <div class="altp-wrap">
+    <!-- STATUS BAR -->
+    <div class="bc-status" id="bc-status">
+      <span class="stat-bet" id="bc-left"></span>
+      <span class="stat-score-wrap">
+        <span class="stat-score" id="bc-mid"></span>
+      </span>
+      <span class="stat-profit zero" id="bc-right"></span>
+    </div>
+
+    <!-- CÂU HỎI -->
+    <div class="altp-qbox" id="altp-qbox" style="display:none">
+      <div class="altp-qtext" id="altp-qtext">...</div>
+    </div>
+
+    <!-- TRỢ GIÚP: khán giả -->
+    <div class="altp-audience" id="altp-audience" style="display:none"></div>
+    <div class="altp-phone-msg" id="altp-phone-msg" style="display:none"></div>
+
+    <!-- ĐÁP ÁN + TRỢ GIÚP -->
+    <div class="altp-play-row">
+      <div class="altp-options" id="altp-options" style="display:none"></div>
+      <div class="altp-lifelines" id="altp-lifelines" style="display:none">
+        <button class="altp-life-btn" id="life-5050" onclick="window.useFiftyFifty()" title="50:50">➗</button>
+        <button class="altp-life-btn" id="life-audience" onclick="window.useAskAudience()" title="Hỏi khán giả">📊</button>
+        <button class="altp-life-btn" id="life-phone" onclick="window.usePhoneFriend()" title="Gọi điện thoại">📞</button>
+      </div>
+    </div>
+
+    <!-- BẢNG XẾP HẠNG NGƯỜI CHƠI -->
+    <div class="altp-players" id="altp-players"></div>
+
+    <!-- BET ROW (ĐẶT CƯỢC CHO VÒNG) -->
+    <div class="altp-bet-row" id="altp-bet-row" style="display:none">
+      <label>Đặt cược:</label>
+      <input id="altp-bet-input" type="number" min="10" step="10" value="50"/>
+      <button onclick="placeBet()">✅ Đặt cược</button>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="altp-actions" id="altp-actions"></div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(52,211,153,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast = showToast;
+    let _toastTimer = null;
+    function showToast(msg, type) {
+      const container = document.getElementById('toastContainer') || (() => {
+        const el = document.createElement('div');
+        el.id = 'toastContainer';
+        el.style.cssText = 'position:fixed;top:70px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:300px';
+        document.body.appendChild(el);
+        return el;
+      })();
+      const toast = document.createElement('div');
+      const colors = { success: '#22c55e', error: '#ef4444', warn: '#f59e0b', info: '#38bdf8' };
+      const bg = colors[type] || '#38bdf8';
+      toast.style.cssText = `padding:12px 18px;background:${bg};color:#fff;border-radius:12px;font-weight:700;font-size:13px;font-family:"Science Gothic",sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.4);animation:slideIn 0.3s ease;word-break:break-word`;
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+    document.head.insertAdjacentHTML('beforeend', '<style>@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}</style>');
+  </script>
+
+  <script type="module" src="altp-mp.js"></script>
+</body>
+</html>

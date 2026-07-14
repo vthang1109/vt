@@ -1,0 +1,348 @@
+/* ===== DÒ MÌN (MINESWEEPER) — VTWorld Theme ===== */
+.ms-container {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 8px 80px;
+}
+
+/* Status bar */
+#bc-status {
+  max-width: 480px;
+  margin: 0 auto 10px;
+}
+
+/* Screens */
+.ms-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 520px;
+  animation: fadeUp 0.4s ease both;
+}
+.ms-screen.active { display: flex; }
+
+/* ===== MENU ===== */
+.ms-logo {
+  font-size: 64px;
+  text-align: center;
+  margin-bottom: 6px;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(239,68,68,0.3));
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.ms-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 30px;
+  font-weight: 900;
+  color: #e0f2fe;
+  text-align: center;
+  margin-bottom: 6px;
+  text-shadow: 0 0 30px rgba(56,189,248,0.5);
+}
+.ms-sub {
+  color: #7dd3fc;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.ms-diff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+.ms-diff-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(56,189,248,0.15);
+  transition: all 0.3s;
+}
+.ms-diff-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(56,189,248,0.4);
+  background: rgba(56,189,248,0.08);
+  box-shadow: 0 8px 30px rgba(56,189,248,0.12);
+}
+.ms-diff-icon { font-size: 28px; flex-shrink: 0; }
+.ms-diff-card div { flex: 1; min-width: 0; }
+.ms-diff-name {
+  font-weight: 800;
+  font-size: 15px;
+  color: #e0f2fe;
+  margin-bottom: 2px;
+}
+.ms-diff-desc {
+  font-size: 12px;
+  color: #4a7a9b;
+}
+.ms-diff-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  background: rgba(52,211,153,0.15);
+  color: #34d399;
+  border: 1px solid rgba(52,211,153,0.3);
+  white-space: nowrap;
+}
+
+.ms-rules {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.6;
+  text-align: center;
+  max-width: 360px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* ===== GAME BOARD ===== */
+.ms-board-wrap {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  border-radius: 12px;
+  border: 2px solid rgba(56,189,248,0.2);
+  background: rgba(0,0,0,0.25);
+  padding: 4px;
+  margin-bottom: 10px;
+  max-height: 70vh;
+}
+.ms-board {
+  display: inline-grid;
+  gap: 2px;
+  margin: 0 auto;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* ===== CELLS ===== */
+.ms-cell {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.1s, transform 0.1s;
+  user-select: none;
+  -webkit-user-select: none;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Hidden cell */
+.ms-cell.hidden {
+  background: linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.9));
+  border-color: rgba(56,189,248,0.08);
+}
+.ms-cell.hidden:hover {
+  background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(30,41,59,0.9));
+  border-color: rgba(56,189,248,0.25);
+  transform: scale(1.05);
+}
+.ms-cell.hidden:active {
+  transform: scale(0.95);
+}
+
+/* Revealed cell */
+.ms-cell.revealed {
+  background: rgba(15,23,42,0.6);
+  border-color: rgba(255,255,255,0.03);
+  cursor: default;
+}
+
+/* Flagged */
+.ms-cell.flagged {
+  background: linear-gradient(135deg, rgba(251,146,60,0.12), rgba(15,23,42,0.8));
+  border-color: rgba(251,146,60,0.25);
+}
+
+/* Suspect (question mark) */
+.ms-cell.suspect {
+  background: linear-gradient(135deg, rgba(167,139,250,0.12), rgba(15,23,42,0.8));
+  border-color: rgba(167,139,250,0.25);
+}
+.ms-cell.suspect:hover {
+  background: linear-gradient(135deg, rgba(167,139,250,0.22), rgba(30,41,59,0.9));
+  border-color: rgba(167,139,250,0.4);
+  transform: scale(1.05);
+}
+
+/* Mine */
+.ms-cell.mine {
+  background: rgba(239,68,68,0.15);
+  border-color: rgba(239,68,68,0.3);
+}
+.ms-cell.mine.exploded {
+  background: rgba(239,68,68,0.4);
+  border-color: #ef4444;
+  box-shadow: 0 0 12px rgba(239,68,68,0.5);
+  animation: explode 0.3s ease;
+}
+@keyframes explode {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+/* Wrong flag (game over) */
+.ms-cell.wrong-flag {
+  background: rgba(239,68,68,0.25);
+  border-color: rgba(239,68,68,0.4);
+}
+.ms-cell.wrong-flag::after {
+  content: '❌';
+  font-size: 12px;
+}
+
+/* Number colors */
+.ms-cell.n1 { color: #38bdf8; }
+.ms-cell.n2 { color: #4ade80; }
+.ms-cell.n3 { color: #f87171; }
+.ms-cell.n4 { color: #a78bfa; }
+.ms-cell.n5 { color: #fb923c; }
+.ms-cell.n6 { color: #22d3ee; }
+.ms-cell.n7 { color: #f472b6; }
+.ms-cell.n8 { color: #fbbf24; }
+
+/* Win animation */
+.ms-cell.win-reveal {
+  animation: winPop 0.3s ease both;
+}
+@keyframes winPop {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ===== STATUS ===== */
+.ms-status {
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 13px;
+  color: #7dd3fc;
+  margin-bottom: 8px;
+  font-weight: 600;
+  text-align: center;
+  min-height: 20px;
+}
+
+/* ===== CONTROLS ===== */
+.ms-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.ms-restart-btn, .ms-menu-btn {
+  padding: 8px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(56,189,248,0.2);
+  background: rgba(56,189,248,0.06);
+  color: #7dd3fc;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.ms-restart-btn:hover, .ms-menu-btn:hover {
+  background: rgba(56,189,248,0.12);
+  border-color: rgba(56,189,248,0.4);
+  transform: translateY(-2px);
+}
+
+/* ===== RESULT ===== */
+.ms-res-emoji {
+  font-size: 72px;
+  text-align: center;
+  margin-bottom: 8px;
+  animation: bounceIn 0.5s ease;
+}
+@keyframes bounceIn {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.ms-res-stats {
+  display: flex;
+  gap: 24px;
+  margin: 20px 0;
+}
+.ms-res-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.ms-res-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 28px;
+  font-weight: 900;
+  color: #38bdf8;
+}
+.ms-res-label {
+  font-size: 12px;
+  color: #4a7a9b;
+  font-weight: 600;
+}
+.ms-res-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  .ms-cell {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+  .ms-title { font-size: 24px; }
+}
+@media (max-width: 360px) {
+  .ms-cell {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+    gap: 1px;
+  }
+}
+
+/* Large board (hard 30x16) needs smaller cells */
+.ms-board.hard .ms-cell {
+  width: 26px;
+  height: 26px;
+  font-size: 11px;
+}
+@media (max-width: 480px) {
+  .ms-board.hard .ms-cell {
+    width: 20px;
+    height: 20px;
+    font-size: 9px;
+  }
+}

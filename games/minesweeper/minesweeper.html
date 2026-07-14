@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Dò Mìn</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="minesweeper.css"/>
+  <link rel="stylesheet" href="../../quests.css"/>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+  <script type="module" src="../../quests.js"></script>
+  <script src="../../fullscreen.js"></script>
+</head>
+<body data-bottom-nav="games">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+
+  <div class="ms-container">
+
+    <!-- STATUS BAR -->
+    <div class="bc-status" id="bc-status">
+      <span class="stat-bet" id="ms-mine-count">💣 0</span>
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="ms-timer">⏱ 0s</span>
+      </div>
+      <span class="stat-profit zero" id="ms-difficulty-label">Dễ</span>
+    </div>
+
+    <!-- MENU SCREEN -->
+    <div id="screen-menu" class="ms-screen active">
+      <div class="ms-logo">💣</div>
+      <h1 class="ms-title">Dò Mìn</h1>
+      <p class="ms-sub">Minesweeper — Giải đố kinh điển</p>
+
+      <div class="ms-diff-list">
+        <div class="ms-diff-card" onclick="MS.start('easy')">
+          <span class="ms-diff-icon">🟢</span>
+          <div>
+            <div class="ms-diff-name">Dễ</div>
+            <div class="ms-diff-desc">9×9 · 10 quả mìn</div>
+          </div>
+          <span class="ms-diff-badge">50đ</span>
+        </div>
+        <div class="ms-diff-card" onclick="MS.start('medium')">
+          <span class="ms-diff-icon">🟡</span>
+          <div>
+            <div class="ms-diff-name">Trung Bình</div>
+            <div class="ms-diff-desc">16×16 · 40 quả mìn</div>
+          </div>
+          <span class="ms-diff-badge">150đ</span>
+        </div>
+        <div class="ms-diff-card" onclick="MS.start('hard')">
+          <span class="ms-diff-icon">🔴</span>
+          <div>
+            <div class="ms-diff-name">Khó</div>
+            <div class="ms-diff-desc">30×16 · 99 quả mìn</div>
+          </div>
+          <span class="ms-diff-badge">500đ</span>
+        </div>
+      </div>
+
+      <div class="ms-rules">
+        <strong>📖 Luật chơi:</strong> Mở tất cả ô không có mìn để thắng.
+        Số hiển thị cho biết có bao nhiêu mìn ở 8 ô xung quanh.
+        🖱 <strong>Trái</strong> = Mở ô · 🖱 <strong>Phải</strong> = Cắm cờ 🚩
+      </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="screen-game" class="ms-screen">
+      <div class="ms-board-wrap" id="ms-board-wrap">
+        <div class="ms-board" id="ms-board"></div>
+      </div>
+
+      <div class="ms-status" id="ms-status">👆 Chọn ô để bắt đầu</div>
+
+      <div class="ms-controls">
+        <button class="ms-restart-btn" onclick="MS.restart()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Chơi lại</button>
+        <button class="ms-menu-btn" onclick="MS.showMenu()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Menu</button>
+      </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="screen-result" class="ms-screen">
+      <div class="ms-res-emoji" id="res-emoji">🏆</div>
+      <h2 class="ms-title" id="res-title">Bạn thắng!</h2>
+      <div class="ms-res-stats">
+        <div class="ms-res-stat">
+          <span class="ms-res-val" id="res-time">0s</span>
+          <span class="ms-res-label">Thời gian</span>
+        </div>
+        <div class="ms-res-stat">
+          <span class="ms-res-val" id="res-earned">+0</span>
+          <span class="ms-res-label">Thưởng</span>
+        </div>
+      </div>
+      <div class="ms-res-actions">
+        <button class="btn-primary" onclick="MS.restart()"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Chơi tiếp</button>
+        <button class="btn-secondary" onclick="MS.showMenu()"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Menu</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    // Background particles
+    const canvas = document.getElementById('bg-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+      for(let i=0;i<30;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+      (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(56,189,248,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    }
+    window.showToast = window.showToast || function(){};
+  </script>
+
+  <script type="module" src="minesweeper.js"></script>
+</body>
+</html>

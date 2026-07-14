@@ -1,0 +1,34 @@
+/* poker.css — Poker Texas Hold'em (chế độ cược) */
+.pk-wrap { min-height: 100vh; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 16px 80px; }
+#bc-status { max-width: 480px; margin: 0 auto 12px; }
+
+.pk-table { width: 100%; max-width: 420px; text-align: center; }
+.pk-seat { padding: 12px; border-radius: 12px; margin: 6px 0; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.06); }
+.pk-seat.dealer { border-color: rgba(239,68,68,0.2); }
+.pk-seat.me { border-color: rgba(34,197,94,0.2); }
+.pk-seat-head { font-size: 13px; font-weight: 700; color: #7dd3fc; margin-bottom: 6px; }
+.pk-cards-row { display: flex; gap: 6px; justify-content: center; min-height: 60px; align-items: center; }
+.pk-cards-row img { width: 70px !important; }
+.pk-card-back { font-size: 36px; letter-spacing: 4px; color: #64748b; }
+.pk-pot { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 900; color: #fbbf24; padding: 12px; text-align: center; }
+
+.pk-community { width: 100%; max-width: 420px; text-align: center; padding: 10px; margin: 8px 0; border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; }
+.pk-comm-label { font-size: 11px; color: #64748b; margin-bottom: 6px; font-weight: 600; }
+.pk-comm-cards { display: flex; gap: 4px; justify-content: center; }
+.pk-comm-cards img { width: 60px !important; }
+
+.pk-actions { display: flex; gap: 10px; margin: 10px 0; justify-content: center; flex-wrap: wrap; }
+.pk-actions button { padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; border: 1px solid rgba(56,189,248,0.2); transition: all 0.25s; }
+#pk-call { background: rgba(34,197,94,0.15); color: #22c55e; border-color: rgba(34,197,94,0.3); }
+#pk-call:hover { background: rgba(34,197,94,0.25); }
+#pk-fold { background: rgba(239,68,68,0.15); color: #f87171; border-color: rgba(239,68,68,0.3); }
+#pk-fold:hover { background: rgba(239,68,68,0.25); }
+#pk-allin { background: rgba(251,191,36,0.15); color: #fbbf24; border-color: rgba(251,191,36,0.3); }
+#pk-allin:hover { background: rgba(251,191,36,0.25); }
+
+.pk-info { text-align: center; font-size: 13px; color: #7dd3fc; margin: 8px 0; font-weight: 600; min-height: 40px; }
+
+/* Reuse xidach bet row styles */
+.xd-bet-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; justify-content: center; }
+.xd-bet-row input { width: 120px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.3); background: rgba(0,0,0,0.3); color: #e0f2fe; font-family: "Science Gothic", sans-serif; font-weight: 500; text-align: center; }
+.xd-bet-row button { padding: 8px 16px; border-radius: 10px; border: none; cursor: pointer; font-weight: 500; font-family: "Science Gothic", sans-serif; font-size: 13px; background: linear-gradient(135deg, #34d399, #059669); color: #fff; }

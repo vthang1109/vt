@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Pong</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="pong.css"/>
+  <link rel="stylesheet" href="../../quests.css"/>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+  <script type="module" src="../../quests.js"></script>
+  <script src="../../fullscreen.js"></script>
+</head>
+<body data-bottom-nav="games">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+
+  <div class="pong-container">
+    <!-- STATUS BAR -->
+    <div class="bc-status" id="bc-status">
+      <span class="stat-bet" id="pong-player-name">Bạn</span>
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="pong-status-text"><span class="sc-blue">0</span><span class="sc-sep"> - </span><span class="sc-red">0</span></span>
+      </div>
+      <span class="stat-profit zero" id="pong-opponent-name">Máy</span>
+    </div>
+
+    <!-- MENU SCREEN -->
+    <div id="screen-menu" class="pong-screen active">
+      <div class="pong-logo">🏓</div>
+      <h1 class="pong-title">Pong</h1>
+      <p class="pong-sub">Đối kháng bóng bàn cổ điển · First to 5</p>
+
+      <div class="pong-mode-list">
+        <!-- AI Difficulty -->
+        <div class="pong-diff-section" id="diff-section">
+          <span class="pong-diff-label">Độ khó AI:</span>
+          <div class="pong-diff-btns">
+            <button class="pong-diff-btn" data-diff="easy" onclick="Pong.setDifficulty('easy')">Dễ</button>
+            <button class="pong-diff-btn active" data-diff="medium" onclick="Pong.setDifficulty('medium')">Vừa</button>
+            <button class="pong-diff-btn" data-diff="hard" onclick="Pong.setDifficulty('hard')">Khó</button>
+          </div>
+        </div>
+
+        <div class="pong-mode-card" onclick="Pong.start('ai')">
+          <span class="pong-mode-icon">🤖</span>
+          <div>
+            <div class="pong-mode-name">VS Máy</div>
+            <div class="pong-mode-desc">1 người · Đấu với AI</div>
+          </div>
+          <span class="pong-mode-badge">Chơi ngay</span>
+        </div>
+
+        <div class="pong-mode-card" onclick="Pong.start('local')">
+          <span class="pong-mode-icon">👥</span>
+          <div>
+            <div class="pong-mode-name">2 Người</div>
+            <div class="pong-mode-desc">Cùng máy · ▲▼ vs A/D · Kéo nửa màn hình</div>
+          </div>
+          <span class="pong-mode-badge">Chơi ngay</span>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- GAME SCREEN -->
+    <div id="screen-game" class="pong-screen">
+      <div class="pong-canvas-wrap">
+        <div class="pong-canvas-border">
+          <canvas id="pong-canvas"></canvas>
+        </div>
+      </div>
+
+      <div class="pong-drag-hint">🖱 Kéo vợt để di chuyển</div>
+      <div class="pong-status" id="pong-status">—</div>
+
+      <button class="pong-pause-btn" id="pong-pause-btn" onclick="Pong.togglePause()" title="Tạm dừng">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <rect x="6" y="5" width="4" height="14" rx="1"></rect>
+          <rect x="14" y="5" width="4" height="14" rx="1"></rect>
+        </svg>
+      </button>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="screen-result" class="pong-screen">
+      <div class="pong-res-emoji" id="res-emoji">🏆</div>
+      <h2 class="pong-title" id="res-title">Bạn thắng!</h2>
+      <div class="pong-res-stats" id="pong-res-stats">
+        <div class="pong-res-stat">
+          <span class="pong-res-val" id="res-score">5 - 3</span>
+          <span class="pong-res-label">Tỉ số</span>
+        </div>
+        <div class="pong-res-stat">
+          <span class="pong-res-val" id="res-earned">+0</span>
+          <span class="pong-res-label">Thưởng</span>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="Pong.showMenu()" style="margin:8px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Chơi tiếp</button>
+    </div>
+  </div>
+
+
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    // Background particles
+    const canvas = document.getElementById('bg-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+      for(let i=0;i<30;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+      (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(56,189,248,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    }
+    window.showToast = window.showToast || function(){};
+  </script>
+
+  <script type="module" src="pong.js"></script>
+</body>
+</html>

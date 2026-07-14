@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Poker Texas Hold'em</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../cards.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="poker.css"/>
+  <link rel="stylesheet" href="../../quests.css"/>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+  <script src="../../fullscreen.js"></script>
+  <script type="module" src="../../quests.js"></script>
+</head>
+<body data-bottom-nav="games">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+  <div id="top-nav-root"></div>
+
+  <div class="pk-wrap">
+    <!-- STATUS BAR -->
+    <div class="bc-status" id="bc-status">
+      <span class="stat-bet" id="bc-bet-stat"></span>
+      <span class="stat-score-wrap"><span class="stat-score" id="bc-status-msg"></span></span>
+      <span class="stat-profit zero" id="bc-profit-stat"></span>
+    </div>
+
+    <!-- BET ROW -->
+    <div class="xd-bet-row" id="bc-bet-row">
+      <input id="bc-bet-input" type="number" min="50" step="50" value="100"/>
+      <button id="btn-place-bet">✅ Đặt cược</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div class="pk-table" id="pk-table">
+      <div class="pk-seat dealer">
+        <div class="pk-seat-head">🤖 Máy</div>
+        <div class="pk-cards-row"><div class="pk-card-back">🂠🂠</div></div>
+      </div>
+      <div class="pk-pot">💰 Pot: 0đ</div>
+      <div class="pk-seat me">
+        <div class="pk-seat-head">Bạn</div>
+        <div class="pk-cards-row"></div>
+      </div>
+    </div>
+    <div class="pk-community" id="pk-community">
+      <div class="pk-comm-label">Bài chung (0/5)</div>
+      <div class="pk-comm-cards"><div style="color:#64748b;font-size:12px">Chờ lật bài chung</div></div>
+    </div>
+    <div class="pk-info" id="pk-info">Đặt cược để bắt đầu!</div>
+    <div class="pk-actions" id="pk-actions" style="display:none">
+      <button class="btn-hit" id="pk-call">✅ Theo (Call)</button>
+      <button class="btn-stand" id="pk-fold">🏳️ Bỏ (Fold)</button>
+      <button class="pk-btn-raise" id="pk-allin">🔥 All-in</button>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999"></div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(34,197,94,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast=function(msg,type='info'){const c={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};const t=document.createElement('div');t.style.cssText=`pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]};color:#e0f2fe;font-size:13px;font-weight:400;font-family:\"Science Gothic\",sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px;margin-bottom:8px`;t.innerHTML=msg;toastContainer.appendChild(t);setTimeout(()=>t.remove(),3000)};
+  </script>
+  <script type="module" src="poker.js"></script>
+</body>
+</html>

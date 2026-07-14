@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Nổ Hũ</title>
+  <link rel="stylesheet" href="../../quests.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="slot.css"/>
+  <style>@import url('https://fonts.googleapis.com/css2?family=Science+Gothic:wght@100..900&display=swap');</style>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+  <script src="../../fullscreen.js"></script>
+  <script type="module" src="../../quests.js"></script>
+</head>
+<body data-bottom-nav="game">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+
+  <div class="slot-wrap">
+    <!-- STATUS BAR đồng bộ bầu cua / tài xỉu -->
+    <div class="bc-status" id="bc-status">
+      <span class="stat-bet" id="slot-bet-total">0</span>
+      <span class="stat-score" id="slot-result-mid">--</span>
+      <span class="stat-profit zero" id="slot-profit">+0</span>
+    </div>
+
+    <!-- KHUNG CHÍNH -->
+    <div class="slot-card">
+      <!-- JACKPOT -->
+      <div class="slot-jackpot" id="slot-jackpot-container">
+        <span class="jp-label jp-777"><span>7</span><span>7</span><span>7</span></span>
+        <span class="jp-value" id="slot-jackpot-value">1.000〄</span>
+      </div>
+
+      <!-- SLOT MACHINE -->
+      <div class="slot-machine">
+        <div class="slot-reels" id="slot-reels">
+          <div class="slot-reel" id="reel-0">🍊</div>
+          <div class="slot-reel" id="reel-1">🍊</div>
+          <div class="slot-reel" id="reel-2">🍊</div>
+        </div>
+      </div>
+
+      <!-- ĐẶT CƯỢC & QUAY -->
+      <div class="slot-bet-row">
+        <input id="slot-bet-input" type="number" min="50" step="50" value="50"/>
+        <button id="btn-spin" onclick="window.game.spin()">🎰 QUAY</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(52,211,153,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast=function(){};
+  </script>
+
+  <script type="module" src="slot.js"></script>
+</body>
+</html>

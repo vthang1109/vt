@@ -191,7 +191,7 @@ window.BottomNav = (() => {
       svg: `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
     },
     {
-      key: 'chat', label: 'Chat', href: 'chat.html',
+      key: 'chat', label: 'Chat', href: 'app/chat.html',
       svg: `<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`,
     },
     {
@@ -256,12 +256,12 @@ window.BottomNav = (() => {
         <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 4px"></div>
         <div style="font-family:'Science Gothic', sans-serif;font-size:12px;font-weight:500;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">🛒 Shop & Túi đồ</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 18px">
-          <a href="${resolveHref('shop.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <a href="${resolveHref('app/shop.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
             <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))">🛒</div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Shop</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Gacha · Mua vật phẩm</span>
           </a>
-          <a href="${resolveHref('bag.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <a href="${resolveHref('app/bag.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
             <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2))">🎒</div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Túi đồ</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Thú cưng · Vật phẩm</span>
@@ -274,7 +274,7 @@ window.BottomNav = (() => {
         <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 4px"></div>
         <div style="font-family:'Science Gothic', sans-serif;font-size:12px;font-weight:500;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">📱 Ứng dụng & Trò chơi</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 18px">
-          <a href="${resolveHref('applications.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <a href="${resolveHref('app/applications.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
             <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))">📱</div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Ứng dụng</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Offline · Không cần login</span>
@@ -293,9 +293,9 @@ window.BottomNav = (() => {
           <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 0"></div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px">
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;letter-spacing:.5px;color:#7dd3fc">👤 Hồ sơ</span>
-            <a href="${resolveHref('profile.html')}" style="font-size:12px;font-weight:400;color:#0288D1;text-decoration:none;font-family:'Science Gothic', sans-serif">Xem đầy đủ →</a>
+            <a href="${resolveHref('app/profile.html')}" style="font-size:12px;font-weight:400;color:#0288D1;text-decoration:none;font-family:'Science Gothic', sans-serif">Xem đầy đủ →</a>
           </div>
-          <a href="${resolveHref('profile.html')}" id="vtPpProfileCard" style="display:flex;align-items:center;gap:14px;margin:0 14px 14px;padding:14px 16px;background:rgba(2,136,209,0.07);border:1px solid rgba(2,136,209,0.18);border-radius:16px;text-decoration:none;cursor:pointer">
+          <a href="${resolveHref('app/profile.html')}" id="vtPpProfileCard" style="display:flex;align-items:center;gap:14px;margin:0 14px 14px;padding:14px 16px;background:rgba(2,136,209,0.07);border:1px solid rgba(2,136,209,0.18);border-radius:16px;text-decoration:none;cursor:pointer">
             <div id="vtPpAvatar" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0288d1,#38bdf8);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:22px;color:#fff;flex-shrink:0;border:2px solid rgba(2,136,209,0.4)">?</div>
             <div style="flex:1;min-width:0">
               <div id="vtPpUsername" style="font-weight:500;font-size:16px;color:#e0f2fe;font-family:'Science Gothic', sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Đang tải...</div>

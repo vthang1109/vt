@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VTWorld — Cài đặt</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* ===== SETTINGS PAGE ===== */
+    .settings-page { min-height: 100vh; position: relative; z-index: 1; padding: 30px 16px 40px; }
+    .settings-hero { text-align: center; padding: 20px 0 30px; }
+    .settings-hero h1 { font-family: 'Science Gothic', sans-serif; font-size: 28px; font-weight: 500; color: #e0f2fe; }
+    .settings-hero h1 span { color: #38bdf8; }
+
+    .settings-card {
+      max-width: 600px; margin: 0 auto 20px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(56,189,248,0.12);
+      border-radius: 16px; padding: 16px 20px;
+      transition: border-color 0.2s;
+    }
+    .settings-card:hover { border-color: rgba(56,189,248,0.3); }
+
+    .settings-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .settings-item:last-child { border-bottom: none; }
+    .settings-label { font-family: 'Science Gothic', sans-serif; font-weight: 400; color: #cbd5e1; font-size: 15px; }
+    .settings-label .icon { margin-right: 10px; }
+    .settings-value { font-family: 'Science Gothic', sans-serif; font-weight: 600; color: #94a3b8; font-size: 14px; }
+
+    .settings-toggle {
+      width: 44px; height: 24px; background: #1e293b; border-radius: 12px;
+      cursor: pointer; position: relative; transition: background 0.3s;
+      flex-shrink: 0; border: none;
+    }
+    .settings-toggle.on { background: #0288D1; }
+    .settings-toggle::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 20px; height: 20px; border-radius: 50%; background: #fff;
+      transition: transform 0.3s;
+    }
+    .settings-toggle.on::after { transform: translateX(20px); }
+
+    .settings-btn {
+      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25);
+      color: #f87171; padding: 8px 18px; border-radius: 10px;
+      font-weight: 500; font-size: 13px; cursor: pointer;
+      transition: all 0.2s; font-family: 'Science Gothic', sans-serif;
+    }
+    .settings-btn:hover { background: rgba(239,68,68,0.2); transform: scale(0.97); }
+    .settings-btn.primary { background: rgba(56,189,248,0.12); border-color: rgba(56,189,248,0.25); color: #38bdf8; }
+    .settings-btn.primary:hover { background: rgba(56,189,248,0.2); }
+
+    .settings-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 6px 0; }
+
+    .logout-btn { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+    .logout-btn:hover { background: rgba(239,68,68,0.25); }
+
+    /* Admin card - chỉ hiện khi là admin */
+    .admin-card {
+      max-width: 600px; margin: 0 auto 20px;
+      background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.03));
+      border: 2px solid rgba(251,191,36,0.3);
+      border-radius: 16px; padding: 16px 20px;
+      transition: all 0.3s;
+      cursor: pointer;
+      display: none; /* Ẩn mặc định, sẽ hiện khi admin */
+    }
+    .admin-card:hover {
+      border-color: rgba(251,191,36,0.6);
+      box-shadow: 0 0 30px rgba(251,191,36,0.1);
+      transform: translateY(-2px);
+    }
+    .admin-card .admin-header {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .admin-card .admin-icon {
+      font-size: 28px;
+    }
+    .admin-card .admin-title {
+      font-family: 'Science Gothic', sans-serif;
+      font-size: 16px; font-weight: 500; color: #fbbf24;
+    }
+    .admin-card .admin-desc {
+      color: #94a3b8; font-size: 13px; font-weight: 600;
+      margin-top: 4px;
+    }
+    .admin-card .admin-arrow {
+      margin-left: auto; color: #fbbf24; font-size: 20px;
+    }
+
+    /* Dark/Light theme */
+    body.light-mode .settings-card { background: rgba(255,255,255,0.06); border-color: rgba(0,0,0,0.1); }
+    body.light-mode .settings-label { color: #1e293b; }
+    body.light-mode .settings-value { color: #475569; }
+  </style>
+</head>
+<body data-bottom-nav="home">
+  <div id="top-nav-root"></div>
+
+  <div class="settings-page">
+    <div class="settings-hero">
+      <h1>⚙️ <span>Cài đặt</span></h1>
+      <p style="color:#7dd3fc;font-size:14px;font-weight:600;">Tùy chỉnh trải nghiệm của bạn</p>
+    </div>
+
+    <!-- ADMIN CARD (chỉ hiện nếu là admin) -->
+    <div class="admin-card" id="adminCard" onclick="location.href='admin.html'">
+      <div class="admin-header">
+        <span class="admin-icon">🛡️</span>
+        <div>
+          <div class="admin-title">👑 Quản trị viên</div>
+          <div class="admin-desc">Quản lý người dùng, điểm số, hệ thống</div>
+        </div>
+        <span class="admin-arrow">→</span>
+      </div>
+    </div>
+
+    <!-- Hồ sơ -->
+    <div class="settings-card">
+      <div class="settings-item">
+        <span class="settings-label"><span class="icon">👤</span>Tên hiển thị</span>
+        <span class="settings-value" id="displayName">Đang tải...</span>
+      </div>
+      <div class="settings-item">
+        <span class="settings-label"><span class="icon">📧</span>Email</span>
+        <span class="settings-value" id="userEmail">Đang tải...</span>
+      </div>
+      <div class="settings-item">
+        <span class="settings-label"><span class="icon">⭐</span>Điểm</span>
+        <span class="settings-value" id="userPoints">0</span>
+      </div>
+      <div class="settings-item">
+        <span class="settings-label"><span class="icon">🔥</span>Streak</span>
+        <span class="settings-value" id="userStreak">0 ngày</span>
+      </div>
+    </div>
+
+    <!-- Giao diện -->
+    <div class="settings-card">
+      <div class="settings-item">
+        <span class="settings-label"><span class="icon">🌓</span>Chế độ tối</span>
+        <button class="settings-toggle on" id="darkToggle" aria-label="Toggle dark mode"></button>
+      </div>
+      <div class="settings-item">
+        <span class="settings-label"><span class="icon">🔊</span>Âm thanh</span>
+        <button class="settings-toggle on" id="soundToggle" aria-label="Toggle sound"></button>
+      </div>
+      <div class="settings-item">
+        <span class="settings-label"><span class="icon">🔔</span>Thông báo</span>
+        <button class="settings-toggle" id="notifToggle" aria-label="Toggle notification"></button>
+      </div>
+    </div>
+
+    <!-- Bảo mật -->
+    <div class="settings-card">
+      <div class="settings-item">
+        <span class="settings-label"><span class="icon">🔑</span>Đổi mật khẩu</span>
+        <button class="settings-btn primary" onclick="alert('Chức năng đang phát triển')">Đổi</button>
+      </div>
+      <div class="settings-item">
+        <span class="settings-label"><span class="icon">🚪</span>Đăng xuất</span>
+        <button class="settings-btn logout-btn" id="logoutBtn">Đăng xuất</button>
+      </div>
+      <div class="settings-divider"></div>
+      <div class="settings-item" style="border-bottom:none;">
+        <span class="settings-label" style="color:#f87171;"><span class="icon">🗑️</span>Xóa tài khoản</span>
+        <button class="settings-btn" style="background:rgba(239,68,68,0.2);border-color:rgba(239,68,68,0.4);color:#ef4444;" onclick="confirmDelete()">Xóa</button>
+      </div>
+    </div>
+
+    <!-- Liên kết -->
+    <div class="settings-card">
+      <div class="settings-item">
+        <span class="settings-label"><span class="icon">📄</span>Điều khoản sử dụng</span>
+        <a href="#" style="color:#38bdf8;font-weight:700;text-decoration:none;font-size:14px;">Xem</a>
+      </div>
+      <div class="settings-item">
+        <span class="settings-label"><span class="icon">🔒</span>Chính sách bảo mật</span>
+        <a href="#" style="color:#38bdf8;font-weight:700;text-decoration:none;font-size:14px;">Xem</a>
+      </div>
+      <div class="settings-item" style="border-bottom:none;">
+        <span class="settings-label"><span class="icon">💬</span>Hỗ trợ</span>
+        <a href="#" style="color:#38bdf8;font-weight:700;text-decoration:none;font-size:14px;">Liên hệ</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../top-nav.js"></script>
+  <script src="../bottom-nav.js"></script>
+  <script type="module">
+    import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { auth, db } from './points.js';
+
+    const ADMIN_EMAIL = 'thang@game.com';
+
+    // Khởi tạo nav
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.TopNav) TopNav.init();
+      if (window.BottomNav) BottomNav.init({ active: 'home' });
+    });
+
+    // Lấy thông tin user và kiểm tra admin
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        document.getElementById('displayName').textContent = 'Chưa đăng nhập';
+        document.getElementById('userEmail').textContent = '—';
+        document.getElementById('userPoints').textContent = '0';
+        document.getElementById('userStreak').textContent = '0 ngày';
+        return;
+      }
+
+      const userEmail = (user.email || '').trim().toLowerCase();
+      const isAdmin = userEmail === ADMIN_EMAIL.trim().toLowerCase();
+
+      // Hiện/ẩn Admin card
+      const adminCard = document.getElementById('adminCard');
+      if (adminCard) {
+        adminCard.style.display = isAdmin ? 'block' : 'none';
+      }
+
+      document.getElementById('displayName').textContent = user.displayName || user.email?.split('@')[0] || 'Người dùng';
+      document.getElementById('userEmail').textContent = user.email || 'Không có email';
+
+      // Lấy điểm và streak từ Firestore
+      const userRef = doc(db, 'users', user.uid);
+      onSnapshot(userRef, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          document.getElementById('userPoints').textContent = (data.points || 0).toLocaleString('vi');
+          const streak = data.streak?.current || 0;
+          document.getElementById('userStreak').textContent = streak + ' ngày';
+          // Cập nhật top-nav nếu có
+          if (window.TopNav && typeof window.TopNav.setPoints === 'function') {
+            window.TopNav.setPoints(data.points || 0);
+          }
+        }
+      });
+    });
+
+    // Đăng xuất
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+      if (confirm('Bạn có chắc muốn đăng xuất?')) {
+        try {
+          await signOut(auth);
+          window.location.href = 'index.html';
+        } catch (e) {
+          alert('Đăng xuất thất bại: ' + e.message);
+        }
+      }
+    });
+
+    // Xóa tài khoản (có xác nhận)
+    window.confirmDelete = async () => {
+      if (!auth.currentUser) return;
+      const confirm = window.confirm('⚠️ Xóa tài khoản sẽ mất tất cả dữ liệu. Bạn chắc chắn?');
+      if (!confirm) return;
+      const confirm2 = window.prompt('Nhập "XÓA" để xác nhận:');
+      if (confirm2 !== 'XÓA') return alert('Hủy xóa tài khoản');
+      try {
+        await deleteUser(auth.currentUser);
+        alert('Tài khoản đã được xóa.');
+        window.location.href = 'index.html';
+      } catch (e) {
+        alert('Xóa tài khoản thất bại: ' + e.message);
+      }
+    };
+
+    // Toggle dark mode
+    const darkToggle = document.getElementById('darkToggle');
+    if (darkToggle) {
+      darkToggle.addEventListener('click', () => {
+        darkToggle.classList.toggle('on');
+        document.body.classList.toggle('light-mode');
+        // Lưu preference vào localStorage
+        const isDark = !document.body.classList.contains('light-mode');
+        localStorage.setItem('vt-theme', isDark ? 'dark' : 'light');
+      });
+      // Khôi phục theme
+      const savedTheme = localStorage.getItem('vt-theme');
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        darkToggle.classList.remove('on');
+      }
+    }
+
+    // Sound toggle (demo)
+    document.getElementById('soundToggle')?.addEventListener('click', function() {
+      this.classList.toggle('on');
+    });
+
+    // Notification toggle (demo)
+    document.getElementById('notifToggle')?.addEventListener('click', function() {
+      this.classList.toggle('on');
+    });
+  </script>
+</body>
+</html>

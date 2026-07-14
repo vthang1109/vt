@@ -1,0 +1,53 @@
+/* lieng.css — Liêng Game (chế độ cược) */
+
+/* Hand type colors */
+.hand-type {
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  font-size: 13px;
+}
+.hand-type.sap { color: #ffd700; }
+.hand-type.lieng { color: #a855f7; }
+.hand-type.anh { color: #3b82f6; }
+.hand-type.diem { color: #94a3b8; }
+
+/* Actions */
+.lieng-actions {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0;
+  justify-content: center;
+}
+.lieng-actions button {
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.25s;
+  border: 1px solid rgba(168,85,247,0.2);
+}
+#btn-check {
+  background: rgba(52,211,153,0.15);
+  color: #34d399;
+  border-color: rgba(52,211,153,0.3);
+}
+#btn-check:hover { background: rgba(52,211,153,0.25); }
+#btn-fold {
+  background: rgba(239,68,68,0.15);
+  color: #f87171;
+  border-color: rgba(239,68,68,0.3);
+}
+#btn-fold:hover { background: rgba(239,68,68,0.25); }
+
+/* Info */
+.lieng-info {
+  text-align: center;
+  font-size: 13px;
+  color: #7dd3fc;
+  margin: 10px 0;
+  font-weight: 600;
+  min-height: 40px;
+}
+.lieng-result-line { margin: 4px 0; }

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Cửa Hàng</title>
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="shop.css"/>
+  <link rel="stylesheet" href="titles.css">
+  <script src="../top-nav.js"></script>
+  <script src="../bottom-nav.js"></script>
+</head>
+<body data-bottom-nav="shop">
+
+  <div id="top-nav-root"></div>
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div class="shop-wrap">
+
+    <!-- TAB TRÊN CÙNG: SHOP / BAG -->
+    <div class="page-top-tabs">
+      <a class="page-top-tab active" href="shop.html">Shop</a>
+      <a class="page-top-tab" href="bag.html">Túi đồ</a>
+    </div>
+
+    <!-- HERO -->
+    <div class="shop-hero">
+      <div class="shop-hero-icon">🐾</div>
+      <h1>Gacha <span>Thú Cưng</span></h1>
+      <p>Triệu hồi đồng đội — thử vận may của bạn</p>
+    </div>
+
+    <!-- TAB: THƯỜNG / VIP / DANH HIỆU -->
+    <div class="shop-tabs" id="shopTabs">
+      <button class="shop-tab active" data-tab="normal">🐣 Thường</button>
+      <button class="shop-tab" data-tab="vip">🦄 VIP</button>
+      <button class="shop-tab" data-tab="title">🏅 Danh hiệu</button>
+    </div>
+
+    <!-- TAB CẤP DANH HIỆU (chỉ hiện khi chọn tab Danh hiệu) -->
+    <div class="title-tier-tabs" id="titleTierTabs" style="display:none"></div>
+
+    <!-- GRID GACHA / DANH HIỆU -->
+    <div class="shop-section-label" id="shopSectionLabel">Gacha Thường</div>
+    <div class="shop-grid" id="shopGrid"></div>
+
+  </div>
+
+  <!-- RESULT OVERLAY -->
+  <div class="result-overlay" id="resultOverlay">
+    <div class="result-box">
+      <div class="result-title" id="resultTitle">Kết quả Gacha</div>
+      <div class="result-grid" id="resultGrid"></div>
+      <button class="result-close" onclick="document.getElementById('resultOverlay').classList.remove('active')">✕ Đóng</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import './shop.js';
+  </script>
+
+  <script>
+    // Background particles
+    (function(){
+      const c=document.getElementById('bg-canvas');
+      if(!c)return;
+      const ctx=c.getContext('2d');let p=[];
+      function r(){c.width=innerWidth;c.height=innerHeight;}r();
+      window.addEventListener('resize',r);
+      for(let i=0;i<40;i++)p.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+      function d(){ctx.clearRect(0,0,c.width,c.height);p.forEach(q=>{q.x+=q.vx;q.y+=q.vy;if(q.x<0)q.x=c.width;if(q.x>c.width)q.x=0;if(q.y<0)q.y=c.height;if(q.y>c.height)q.y=0;ctx.beginPath();ctx.arc(q.x,q.y,q.r,0,Math.PI*2);ctx.fillStyle='rgba(56,189,248,0.5)';ctx.fill();});requestAnimationFrame(d);}d();
+    })();
+  </script>
+</body>
+</html>

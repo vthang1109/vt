@@ -1,0 +1,280 @@
+.tl-wrap {
+  min-height: 100vh;
+  padding: 14px 12px 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-profit.timer-color { color: #fbbf24; }
+.stat-profit.timer-color.negative { color: #ef4444; }
+
+/* ===================== SETUP BAR (compact) ===================== */
+.tl-setup-bar {
+  text-align: center;
+  margin-bottom: 14px;
+}
+.tl-setup-inner {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.tl-mode-chips {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.tl-mode-chip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #9fc7b8;
+  font-family: "Science Gothic", sans-serif;
+  transition: all 0.2s;
+}
+.tl-mode-chip:hover { background: rgba(255,255,255,0.1); }
+.tl-mode-chip.selected { background: rgba(251,191,36,0.15); border-color: #fbbf24; color: #fbbf24; }
+
+.tl-setup-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+.tl-setup-row input {
+  width: 120px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(56,189,248,0.3);
+  background: rgba(0,0,0,0.3);
+  color: #fbbf24;
+  font-weight: 700;
+  text-align: center;
+  font-family: "Science Gothic", sans-serif;
+  font-size: 15px;
+}
+.tl-start-btn {
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* ===================== BÀN CHƠI ===================== */
+.table-area {
+  position: relative;
+  background: radial-gradient(ellipse at 50% 25%, #1a6b48 0%, #0d3f2a 55%, #041b12 100%) padding-box,
+    linear-gradient(135deg, #0a0a0a, #d4af37 50%, #0a0a0a) border-box;
+  border: 4px solid transparent;
+  border-radius: 24px;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  padding: 40px 10px 54px;
+  box-shadow: inset 0 0 0 4px rgba(0,0,0,0.4), inset 0 0 50px rgba(0,0,0,0.5), 0 0 20px rgba(45,212,191,0.5), 0 0 40px rgba(217,70,239,0.3), 0 12px 28px rgba(0,0,0,0.5);
+}
+
+.seat { position: absolute; text-align: center; font-size: 12px; color: #eafff5; }
+.seat-name { font-weight: 700; }
+.seat-count { color: #cdeee0; }
+
+.seat-ring { position: relative; width: 48px; height: 48px; margin: 0 auto 2px; }
+.seat-timer { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); z-index: 2; }
+.seat-timer-bg { fill: none; stroke: rgba(255,255,255,0.15); stroke-width: 2; }
+.seat-timer-fg { fill: none; stroke: #93c5fd; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 113; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear, stroke 0.2s; opacity: 1; }
+.seat.active-turn .seat-timer-fg { stroke: #fbbf24; }
+.seat.active-turn .seat-timer-fg.timer-warn { stroke: #ef4444; }
+.seat.seat-passed .seat-timer-fg { stroke: #ef4444; stroke-dashoffset: 0 !important; }
+.seat.seat-played .seat-timer-fg { stroke: #22c55e; stroke-dashoffset: 0 !important; }
+
+.seat-badge {
+  position: absolute;
+  top: 3px; left: 3px; right: 3px; bottom: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #334155, #0f172a);
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.seat-badge .seat-name { font-size: 9px; line-height: 1.1; }
+.seat-badge .seat-count { font-size: 8px; }
+
+.seat-top { top: 8px; left: 50%; transform: translateX(-50%); }
+.seat-left { top: 33%; left: 8px; transform: translateY(-50%); }
+.seat-right { top: 33%; right: 8px; transform: translateY(-50%); }
+
+.center-board { text-align: center; width: 300px; align-self: flex-end; margin-bottom: 0; }
+.table-combo { position: relative; display: flex; justify-content: center; flex-wrap: wrap; min-height: 100px; align-items: center; }
+.table-play-group { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: center; flex-wrap: wrap; transition: transform 0.2s; }
+.table-play-inner { display: flex; flex-wrap: wrap; justify-content: center; }
+.table-play-inner.play-in { animation-duration: 0.4s; animation-timing-function: ease-out; animation-fill-mode: both; }
+.table-play-inner.play-in.from-0 { animation-name: deal-from-bottom; }
+.table-play-inner.play-in.from-1 { animation-name: deal-from-left; }
+.table-play-inner.play-in.from-2 { animation-name: deal-from-top; }
+.table-play-inner.play-in.from-3 { animation-name: deal-from-right; }
+@keyframes deal-from-bottom { from { opacity: 0; transform: translateY(70px) scale(0.6); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes deal-from-top { from { opacity: 0; transform: translateY(-70px) scale(0.6); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes deal-from-left { from { opacity: 0; transform: translateX(-70px) scale(0.6); } to { opacity: 1; transform: translateX(0) scale(1); } }
+@keyframes deal-from-right { from { opacity: 0; transform: translateX(70px) scale(0.6); } to { opacity: 1; transform: translateX(0) scale(1); } }
+.table-play-old { opacity: 0.6; }
+.table-empty { color: #4a3a08; font-size: 12px; }
+
+.result-box {
+  margin-top: 10px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13px;
+  color: #eafff5;
+}
+.result-box h3 { margin: 0 0 6px; font-size: 14px; color: #fbbf24; }
+.result-row { padding: 2px 0; }
+
+/* ===================== TAY BÀI NGƯỜI CHƠI ===================== */
+.my-area {
+  background: rgba(255,255,255,0.04);
+  border-radius: 16px;
+  padding: 12px;
+}
+.seat-me { display: none; }
+
+.hand-wrap { position: relative; }
+
+.my-hand {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  min-height: 90px;
+  padding: 20px 4px 10px;
+  justify-content: center;
+}
+
+.card-slot {
+  position: relative;
+  margin-left: -34px;
+  cursor: pointer;
+  transition: transform 0.12s;
+  flex-shrink: 0;
+}
+.card-slot:first-child { margin-left: 0; }
+.card-slot.selected { transform: translateY(-20px); filter: drop-shadow(0 0 6px #fbbf24); }
+.my-hand .card-slot img {
+  width: 58px !important;
+  height: auto !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+.table-combo .card-slot img {
+  width: 62px !important;
+  height: auto !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+.table-combo .card-slot { margin-left: -30px; }
+.table-combo .card-slot:first-child { margin-left: 0; }
+
+.my-area .xd-actions {
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+.my-area .xd-actions button {
+  flex: 1;
+  padding: 6px 4px;
+  font-size: 10px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+.my-area .xd-actions #pass-btn,
+.my-area .xd-actions #play-btn,
+.my-area .xd-actions #new-round-btn {
+  flex: 0 0 68px;
+  padding: 11px 4px;
+  border-radius: 18px;
+}
+.my-area .xd-actions #pass-btn {
+  background: linear-gradient(180deg, #ef4444, #991b1b);
+  border-color: #7f1d1d;
+  color: #fff;
+}
+.my-area .xd-actions #new-round-btn {
+  background: linear-gradient(180deg, #a855f7, #6b21a8);
+  border-color: #581c87;
+  color: #fff;
+}
+.xd-actions button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ===== Tách riêng khỏi xidach.css ===== */
+.xd-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.xd-actions button {
+  padding: 11px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-family: "Science Gothic", sans-serif;
+  font-size: 13px;
+}
+.xd-bet-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.xd-bet-row label {
+  color: #cbd5e1;
+  font-weight: 700;
+  font-size: 13px;
+}
+.xd-bet-row input {
+  width: 120px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: rgba(0, 0, 0, 0.3);
+  color: #e0f2fe;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  text-align: center;
+}
+.xd-bet-row button {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-family: "Science Gothic", sans-serif;
+  font-size: 13px;
+  background: linear-gradient(135deg, #34d399, #059669);
+  color: #fff;
+}
+.btn-hit  { background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #fff; }
+.btn-deal { background: linear-gradient(135deg, #34d399, #059669); color: #fff; }
+.pass-glow { animation: pass-pulse 0.9s ease-in-out infinite alternate; }
+@keyframes pass-pulse {
+  from { box-shadow: 0 0 4px #f87171; }
+  to { box-shadow: 0 0 14px #f87171, 0 0 22px #f87171; }
+}

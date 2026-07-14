@@ -208,7 +208,7 @@ window.TopNav = (() => {
   function buildHTML() {
     return `
       <div class="vt-top-nav" id="vtTopNav">
-        <a class="vt-nav-logo" href="index.html">
+        <a class="vt-nav-logo" href="${_basePath}index.html">
           <span class="vt-logo-content" id="vtLogoContent"><img src="${LOGO_SRC}" alt="logo"><span class="logo-vt">VT</span><span class="logo-world">World</span></span>
           <span class="vt-room-id" id="vtRoomId"></span>
         </a>
@@ -221,7 +221,7 @@ window.TopNav = (() => {
         <button class="vt-dd-action back-btn" onclick="history.back()">
           <span>←</span> Quay lại
         </button>
-        <button class="vt-dd-action settings-btn" onclick="window.location.href='settings.html'">
+        <button class="vt-dd-action settings-btn" onclick="window.location.href='${_basePath}app/settings.html'">
           <span>⚙️</span> Cài đặt
         </button>
         <button class="vt-dd-action leave-btn" id="vtDdLeave">
@@ -259,7 +259,7 @@ window.TopNav = (() => {
           dd.classList.remove('open');
           btn.classList.remove('open');
           if (confirm('Rời phòng và thoát game?')) {
-            window.location.href = 'games.html';
+            window.location.href = _basePath + 'games.html';
           }
         };
       }

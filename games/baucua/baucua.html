@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VTWorld — Bầu Cua</title>
+    <link rel="stylesheet" href="../../status-bar.css">
+    <link rel="stylesheet" href="baucua.css">
+    <link rel="stylesheet" href="../../quests.css">
+    <style>@import url('https://fonts.googleapis.com/css2?family=Science+Gothic:wght@100..900&display=swap');</style>
+    <script src="../../top-nav.js"></script>
+    <script src="../../bottom-nav.js"></script>
+    <script src="../../fullscreen.js"></script>
+    <script type="module" src="../../quests.js"></script>
+</head>
+<body data-bottom-nav="games">
+    <canvas id="bg-canvas"></canvas>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+
+    <div id="top-nav-root"></div>
+
+    <div class="game-container">
+        <!-- STATUS BAR -->
+        <div class="bc-status" id="bc-status">
+            <span class="stat-bet" id="bc-round">0</span>
+            <div class="stat-score-wrap">
+                <span class="stat-score" id="bc-status-msg"></span>
+            </div>
+            <span class="stat-profit zero" id="bc-profit">+0</span>
+        </div>
+
+        <!-- XÚC XẮC -->
+        <div class="bc-dice-container">
+            <div class="bc-dice" id="bc-dice">
+                <div class="bc-die" id="dice-0">?</div>
+                <div class="bc-die" id="dice-1">?</div>
+                <div class="bc-die" id="dice-2">?</div>
+            </div>
+        </div>
+
+        <!-- Board + Chips bên phải -->
+        <div class="bc-board-wrap">
+            <div class="bc-board" id="bc-board"></div>
+            <div class="bc-chips-side" id="bc-chips-side">
+                <button class="bc-chip" data-v="100">100</button>
+                <button class="bc-chip active" data-v="500">500</button>
+                <button class="bc-chip" data-v="1000">1K</button>
+                <button class="bc-chip" data-v="5000">5K</button>
+            </div>
+        </div>
+
+        <!-- Hàng nút (Xoá + Lắc / Ván mới) -->
+        <div class="bc-bottom-row">
+            <button class="btn-action btn-clear" id="btn-clear">🗑 Xoá</button>
+            <button class="btn-action btn-roll" id="btn-roll">🎲 Lắc</button>
+        </div>
+
+        <div class="bc-players" id="bc-players"></div>
+    </div>
+
+    <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+        function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+        for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+        (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(251,191,36,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+
+        window.showToast=function(msg,type='info'){};
+    </script>
+
+    <script type="module" src="baucua.js"></script>
+</body>
+</html>

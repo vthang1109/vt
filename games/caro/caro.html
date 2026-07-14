@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTWorld — Caro</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="caro.css"/>
+  <link rel="stylesheet" href="../../quests.css"/>
+  <script type="module" src="../../quests.js"></script>
+</head>
+<body data-bottom-nav="games">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+  <script src="../../top-nav.js"></script>
+
+  <div class="caro-wrap">
+
+    <!-- CHỌN KIỂU CHƠI (mặc định TicTacToe, có tab đổi chế độ) -->
+    <div id="screen-type" class="caro-screen">
+      <div class="mode-tabs">
+        <button class="mtab active" data-mode="tictactoe" onclick="selectGameMode('tictactoe')">⭕ TicTacToe</button>
+        <button class="mtab" data-mode="caro" onclick="selectGameMode('caro')">♟️ Caro</button>
+      </div>
+      <div class="caro-phase" id="type-title">⭕ TicTacToe — Chọn chế độ chơi</div>
+      <div class="mode-grid">
+        <div class="mode-card" onclick="startGame('easy')">
+          <span class="mode-emoji">😊</span>
+          <span class="mode-name">Dễ</span>
+          <span class="mode-desc">Máy đánh ngẫu nhiên</span>
+        </div>
+        <div class="mode-card" onclick="startGame('medium')">
+          <span class="mode-emoji">😤</span>
+          <span class="mode-name">Trung bình</span>
+          <span class="mode-desc">Máy biết chặn</span>
+        </div>
+        <div class="mode-card" onclick="startGame('hard')">
+          <span class="mode-emoji">😈</span>
+          <span class="mode-name">Khó</span>
+          <span class="mode-desc">AI thông minh</span>
+        </div>
+        <div class="mode-card" onclick="startGame('local')">
+          <span class="mode-emoji">👥</span>
+          <span class="mode-name">2 Người</span>
+          <span class="mode-desc">Cùng 1 màn hình</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME BOARD -->
+    <div id="screen-game" class="caro-screen hidden">
+
+      <!-- STATUS BAR (dùng chung: xì dách, bài cào, bầu cua, tài xỉu...) -->
+      <div class="bc-status" id="caro-status-bar">
+        <div class="stat-bet">
+          <div class="caro-player-tag" id="player1-tag">
+            <span id="player1-name">Bạn</span>
+            <span class="caro-player-score" id="score-p1">0</span>
+          </div>
+        </div>
+        <div class="stat-score-wrap">
+          <span class="stat-score" id="caro-status"></span>
+        </div>
+        <div class="stat-profit">
+          <span class="stat-profit zero" id="caro-profit"></span>
+          <div class="caro-player-tag right" id="player2-tag">
+            <span class="caro-player-score" id="score-p2">0</span>
+            <span id="player2-name">Máy</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOARD -->
+      <div class="caro-board-wrap">
+        <canvas id="caro-canvas"></canvas>
+      </div>
+
+      <!-- CONTROLS -->
+      <div class="caro-actions">
+        <button class="btn-restart" onclick="restartGame()">🔄 Ván mới</button>
+        <button class="btn-home"    onclick="goToModeSelect()">🏠 Đổi chế độ</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(52,211,153,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+  </script>
+
+  <script src="../../bottom-nav.js"></script>
+  <script src="../../fullscreen.js"></script>
+  <script type="module" src="caro.js"></script>
+</body>
+</html>

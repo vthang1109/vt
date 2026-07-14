@@ -1,0 +1,45 @@
+/* cards.css — Style chung cho bài (từ cards.js)
+   Đặt ở thư mục gốc, game trong games/ dùng ../../cards.css */
+
+/* ===== CARD BASE (ảnh bài từ renderCardUI) ===== */
+.card {
+  display: inline-block;
+  vertical-align: middle;
+  width: 80px;
+  aspect-ratio: 80 / 112;
+  height: auto;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: none !important;
+  background-color: transparent !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* ===== CHỒNG BÀI (dùng trong xd-cards, ct-cards, pk-cards-row...) ===== */
+.cards-overlap {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  overflow: hidden;
+  min-height: 80px;
+  padding: 2px 0;
+}
+.cards-overlap .card {
+  margin-left: -30px !important;
+}
+.cards-overlap .card:first-child {
+  margin-left: 0 !important;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes cardAppear {
+  0% { transform: translateY(-30px) rotate(-8deg) scale(0.8); opacity: 0; }
+  100% { transform: translateY(0) rotate(0) scale(1); opacity: 1; }
+}
+.card-new { animation: cardAppear 0.35s ease-out forwards; }
+
+@keyframes flipIn {
+  0% { transform: rotateY(90deg) scale(0.8); opacity: 0; }
+  100% { transform: rotateY(0deg) scale(1); opacity: 1; }
+}
+.card-flip-anim { animation: flipIn 0.4s ease; }
