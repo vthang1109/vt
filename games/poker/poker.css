@@ -1,34 +1,223 @@
-/* poker.css — Poker Texas Hold'em (chế độ cược) */
-.pk-wrap { min-height: 100vh; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 16px 80px; }
+/* poker.css — Poker Texas Hold'em (chế độ cược) — style đồng bộ xì dách */
+.pk-wrap {
+  min-height: 100vh;
+  padding: 12px 16px 80px;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  overflow-y: auto;
+}
 #bc-status { max-width: 480px; margin: 0 auto 12px; }
 
-.pk-table { width: 100%; max-width: 420px; text-align: center; }
-.pk-seat { padding: 12px; border-radius: 12px; margin: 6px 0; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.06); }
-.pk-seat.dealer { border-color: rgba(239,68,68,0.2); }
-.pk-seat.me { border-color: rgba(34,197,94,0.2); }
-.pk-seat-head { font-size: 13px; font-weight: 700; color: #7dd3fc; margin-bottom: 6px; }
-.pk-cards-row { display: flex; gap: 6px; justify-content: center; min-height: 60px; align-items: center; }
-.pk-cards-row img { width: 70px !important; }
-.pk-card-back { font-size: 36px; letter-spacing: 4px; color: #64748b; }
-.pk-pot { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 900; color: #fbbf24; padding: 12px; text-align: center; }
+/* ===== TABLE ===== */
+.pk-table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
 
-.pk-community { width: 100%; max-width: 420px; text-align: center; padding: 10px; margin: 8px 0; border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; }
-.pk-comm-label { font-size: 11px; color: #64748b; margin-bottom: 6px; font-weight: 600; }
-.pk-comm-cards { display: flex; gap: 4px; justify-content: center; }
-.pk-comm-cards img { width: 60px !important; }
+/* ===== SEAT (giống xidach) ===== */
+.pk-seat {
+  position: relative;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.25s;
+}
 
-.pk-actions { display: flex; gap: 10px; margin: 10px 0; justify-content: center; flex-wrap: wrap; }
-.pk-actions button { padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; border: 1px solid rgba(56,189,248,0.2); transition: all 0.25s; }
-#pk-call { background: rgba(34,197,94,0.15); color: #22c55e; border-color: rgba(34,197,94,0.3); }
-#pk-call:hover { background: rgba(34,197,94,0.25); }
-#pk-fold { background: rgba(239,68,68,0.15); color: #f87171; border-color: rgba(239,68,68,0.3); }
-#pk-fold:hover { background: rgba(239,68,68,0.25); }
-#pk-allin { background: rgba(251,191,36,0.15); color: #fbbf24; border-color: rgba(251,191,36,0.3); }
-#pk-allin:hover { background: rgba(251,191,36,0.25); }
+.pk-seat.dealer {
+  background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(124,58,237,0.1));
+  border: 2px solid #fbbf24;
+  box-shadow: 0 0 18px rgba(251,191,36,0.35);
+}
+.pk-seat.dealer .pk-seat-name { color: #fbbf24; text-shadow: 0 0 6px rgba(251,191,36,0.7); }
 
-.pk-info { text-align: center; font-size: 13px; color: #7dd3fc; margin: 8px 0; font-weight: 600; min-height: 40px; }
+.pk-seat.me {
+  background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06));
+  border: 1px solid rgba(251,191,36,0.4);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
 
-/* Reuse xidach bet row styles */
+.pk-seat-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.pk-seat-name {
+  font-weight: 800;
+  color: #e0f2fe;
+  font-size: 14px;
+}
+
+.pk-score-inline {
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: #fbbf24;
+  background: rgba(0,0,0,0.5);
+  padding: 1px 8px;
+  border-radius: 8px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* ===== CARDS – CHỒNG LÊN NHAU (giống xidach) ===== */
+.pk-cards-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  padding: 2px 0;
+  overflow: hidden;
+  min-height: 80px;
+}
+.pk-cards-row .card {
+  background: none !important;
+  background-color: transparent !important;
+  border-radius: 5px !important;
+  margin-left: -30px !important;
+  width: 80px;
+  aspect-ratio: 80 / 112;
+  height: auto;
+  flex-shrink: 0;
+}
+.pk-cards-row .card:first-child {
+  margin-left: 0 !important;
+}
+.pk-card-back {
+  font-size: 36px;
+  letter-spacing: 4px;
+  color: #64748b;
+  padding: 12px 0;
+}
+
+/* ===== BET BADGE (góc dưới phải mỗi seat, giống xidach) ===== */
+.pk-bet-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(251,191,36,0.5);
+  background: rgba(251,191,36,0.12);
+  color: #fbbf24;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+/* ===== COMMUNITY CARDS (giữa bàn) ===== */
+.pk-community {
+  padding: 10px 12px;
+  margin: 2px 0;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.02);
+  border: 1px dashed rgba(255,255,255,0.1);
+  text-align: center;
+}
+.pk-comm-label {
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.pk-comm-cards {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+  min-height: 60px;
+  align-items: center;
+}
+.pk-comm-cards .card {
+  margin-left: -22px !important;
+  width: 60px !important;
+  aspect-ratio: 60 / 84;
+  height: auto;
+  flex-shrink: 0;
+}
+.pk-comm-cards .card:first-child {
+  margin-left: 0 !important;
+}
+
+/* ===== INFO ===== */
+.pk-info {
+  text-align: center;
+  font-size: 13px;
+  color: #7dd3fc;
+  margin: 10px 0;
+  font-weight: 600;
+  min-height: 40px;
+}
+
+/* ===== ACTIONS ===== */
+.pk-actions {
+  display: flex;
+  gap: 10px;
+  margin: 16px 0 4px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 12px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.pk-actions button {
+  padding: 11px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-family: "Science Gothic", sans-serif;
+  font-size: 13px;
+  transition: all 0.25s;
+}
+#pk-call { background: linear-gradient(135deg, #34d399, #059669); color: #fff; }
+#pk-call:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(52,211,153,0.4); }
+#pk-fold { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+#pk-fold:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(239,68,68,0.4); }
+#pk-allin { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+#pk-allin:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(245,158,11,0.4); }
+
+/* ===== KẾT QUẢ OVERLAY (giống xidach) ===== */
+.pk-result-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 20;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  white-space: nowrap;
+  padding: 10px 20px;
+  border-radius: 12px;
+  pointer-events: none;
+  animation: popResult 0.45s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+  line-height: 1.3;
+  text-align: center;
+}
+@keyframes popResult {
+  0%   { transform: translate(-50%,-50%) scale(0.4); opacity: 0; }
+  100% { transform: translate(-50%,-50%) scale(1);   opacity: 1; }
+}
+.pk-result-win   { background: rgba(34,197,94,0.9); color: #fff; box-shadow: 0 0 30px #22c55e; text-shadow: 0 0 10px #fff; }
+.pk-result-lose  { background: rgba(239,68,68,0.9); color: #fff; box-shadow: 0 0 30px #ef4444; text-shadow: 0 0 10px #fff; }
+.pk-result-draw  { background: rgba(148,163,184,0.9); color: #fff; box-shadow: 0 0 30px #94a3b8; text-shadow: 0 0 10px #fff; }
+
+/* ===== REUSE xidach bet row ===== */
 .xd-bet-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; justify-content: center; }
 .xd-bet-row input { width: 120px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.3); background: rgba(0,0,0,0.3); color: #e0f2fe; font-family: "Science Gothic", sans-serif; font-weight: 500; text-align: center; }
 .xd-bet-row button { padding: 8px 16px; border-radius: 10px; border: none; cursor: pointer; font-weight: 500; font-family: "Science Gothic", sans-serif; font-size: 13px; background: linear-gradient(135deg, #34d399, #059669); color: #fff; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  .pk-cards-row .card { width: 64px; margin-left: -24px !important; }
+  .pk-comm-cards .card { width: 50px !important; margin-left: -16px !important; }
+  .pk-actions button { padding: 9px 14px; font-size: 12px; }
+}

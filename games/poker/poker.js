@@ -69,6 +69,7 @@ class Poker {
     this.community = [];
     this.stage = 'preflop';
     this.phase = 'playing';
+    this._cachedWinner = null;
 
     document.getElementById('bc-bet-row').style.display = 'none';
     document.getElementById('bc-status').className = 'bc-status';
@@ -80,7 +81,6 @@ class Poker {
     this.ai.cards = [this.deck.pop(), this.deck.pop()];
 
     this.renderTable();
-    this.renderCommunity();
     this.showActions();
     this.pkInfo('Lượt của bạn:');
   }
@@ -104,6 +104,7 @@ class Poker {
   async fold() {
     if (this.phase !== 'playing') return;
     this.phase = 'result';
+    this._cachedWinner = 'ai';
     document.getElementById('pk-actions').style.display = 'none';
     this.renderTable(true);
     await this.delay(800);
@@ -167,6 +168,7 @@ class Poker {
     if (ph.rank > ah.rank) winner = 'player';
     else if (ah.rank > ph.rank) winner = 'ai';
     else winner = 'draw';
+    this._cachedWinner = winner;
     
     this.pkInfo(`Bạn: <strong>${ph.name}</strong> | Máy: <strong>${ah.name}</strong>`);
     setTimeout(() => {
@@ -245,27 +247,94 @@ class Poker {
     return { rank: Math.max(...values), name: `🃏 Mậu thầu ${Math.max(...values)}` };
   }
 
+  getHandRankStr(cards) {
+    if (!cards || cards.length === 0) return '';
+    const h = this.evaluateHand(cards);
+    return h.name;
+  }
+
+  getResultOverlay(winnerSide) {
+    // winnerSide: 'player' | 'ai' | 'draw'
+    if (!winnerSide) return { dealer: '', player: '' };
+    if (winnerSide === 'player') {
+      return {
+        dealer: '<div class="pk-result-overlay pk-result-lose">THUA</div>',
+        player: '<div class="pk-result-overlay pk-result-win">THẮNG</div>'
+      };
+    } else if (winnerSide === 'ai') {
+      return {
+        dealer: '<div class="pk-result-overlay pk-result-win">THẮNG</div>',
+        player: '<div class="pk-result-overlay pk-result-lose">THUA</div>'
+      };
+    } else {
+      return {
+        dealer: '<div class="pk-result-overlay pk-result-draw">HÒA</div>',
+        player: '<div class="pk-result-overlay pk-result-draw">HÒA</div>'
+      };
+    }
+  }
+
   renderTable(showAI = false) {
-    const aiLabel = showAI ? this.ai.cards.map(c => renderCardUI(c)).join('') : '<div class="pk-card-back">🂠🂠</div>';
+    // Determine winner for overlay - only at result phase
+    let winnerOverlay = { dealer: '', player: '' };
+    if (this.phase === 'result' && this._cachedWinner) {
+      winnerOverlay = this.getResultOverlay(this._cachedWinner);
+    }
+
+    const aiScore = showAI 
+      ? this.getHandRankStr([...this.ai.cards, ...this.community]) 
+      : '? ';
+    const playerScore = this.phase === 'result' || this.community.length > 0 
+      ? this.getHandRankStr([...this.player.cards, ...this.community]) 
+      : 'Chờ bài';
+
+    const aiLabel = showAI 
+      ? this.ai.cards.map(c => renderCardUI(c)).join('') 
+      : '<div class="pk-card-back">🂠🂠</div>';
+
+    // Pot hiển thị trong label bài chung
+    const potLabel = this.pot > 0 ? ` · Pot ${this.pot.toLocaleString('vi-VN')}〄` : '';
+
+    const communityHTML = this.community.length
+      ? `<div class="pk-community">
+          <div class="pk-comm-label">Bài chung (${this.community.length}/5)${potLabel}</div>
+          <div class="pk-comm-cards">${this.community.map(c => renderCardUI(c)).join('')}</div>
+         </div>`
+      : `<div class="pk-community">
+          <div class="pk-comm-label">Bài chung (0/5)${potLabel}</div>
+          <div class="pk-comm-cards"><div style="color:#64748b;font-size:12px">Chờ lật bài chung</div></div>
+         </div>`;
+
+    // Bet badges cho mỗi seat (giống xidach)
+    const dealerBetBadge = this.currentBet > 0 ? `<div class="pk-bet-badge">${this.currentBet.toLocaleString('vi-VN')}〄</div>` : '';
+    const playerBetBadge = this.currentBet > 0 ? `<div class="pk-bet-badge">${this.currentBet.toLocaleString('vi-VN')}〄</div>` : '';
+
     document.getElementById('pk-table').innerHTML = `
       <div class="pk-seat dealer">
-        <div class="pk-seat-head">🤖 Máy</div>
+        ${winnerOverlay.dealer}
+        <div class="pk-seat-head">
+          <span class="pk-seat-name">🤖 Máy <span class="pk-score-inline">${aiScore}</span></span>
+        </div>
         <div class="pk-cards-row">${aiLabel}</div>
+        ${dealerBetBadge}
       </div>
-      <div class="pk-pot">💰 Pot: ${this.pot.toLocaleString('vi-VN')}đ</div>
+
+      ${communityHTML}
+
       <div class="pk-seat me">
-        <div class="pk-seat-head">Bạn</div>
+        ${winnerOverlay.player}
+        <div class="pk-seat-head">
+          <span class="pk-seat-name">Bạn <span class="pk-score-inline">${playerScore}</span></span>
+        </div>
         <div class="pk-cards-row">${this.player.cards.map(c => renderCardUI(c)).join('')}</div>
+        ${playerBetBadge}
       </div>`;
   }
 
   renderCommunity() {
-    const cards = this.community.length 
-      ? this.community.map(c => renderCardUI(c)).join('')
-      : '<div style="color:#64748b;font-size:12px">Chờ lật bài chung</div>';
-    document.getElementById('pk-community').innerHTML = `
-      <div class="pk-comm-label">Bài chung (${this.community.length}/5)</div>
-      <div class="pk-comm-cards">${cards}</div>`;
+    // Community is now rendered inside renderTable(), so this is a no-op
+    // Kept for compatibility but table is re-rendered on stage changes
+    this.renderTable(this.phase === 'result');
   }
 
   showActions() {
