@@ -34,11 +34,11 @@ export function createDeck() {
 export function renderCardUI(card, hidden = false) {
     // Mặt sau: dùng ảnh back.png thật, không tự vẽ background
     if (!card || hidden) {
-        return <img src="../../assets/cards/svg/back.png" class="card" alt="?" style="width:80px; height:auto; border-radius:6px; background:none;" />;
+        return `<img src="../../assets/cards/svg/back.png" class="card" alt="?" style="width:80px; height:auto; border-radius:6px; background:none;" />`;
     }
     const code = suitToCode(card.s);
     const value = card.v;
-    const imgPath = ../../assets/cards/svg/${code}${value}.svg;
+    const imgPath = `../../assets/cards/svg/${code}${value}.svg`;
     return `<img src="${imgPath}" class="card" alt="${value}${card.s}" style="width:80px; height:auto; border-radius:6px; background:none;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
             <span style="display:none; font-size:20px; font-weight:800;">${value}${card.s}</span>`;
 }
