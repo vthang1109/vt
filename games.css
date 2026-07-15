@@ -31,9 +31,10 @@
 .game-lobby-grid:not(.grid-2col) .glc-pts { font-size: 9px; }
 .game-lobby-grid:not(.grid-2col) .glc-badge { top: 6px; right: 6px; padding: 1px 6px; font-size: 9px; min-width: 14px; text-align: center; }
 
+.glc-wrap { position: relative; }
 .pin-btn { position: absolute; top: 6px; left: 6px; z-index: 2; background: rgba(15,23,42,0.6); border: none; color: #64748b; font-size: 13px; line-height: 1; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
 .pin-btn:hover { color: #fbbf24; background: rgba(251,191,36,0.15); }
-.game-lobby-card.pinned .pin-btn { color: #fbbf24; }
+.glc-wrap.pinned .pin-btn, .game-lobby-card.pinned .pin-btn { color: #fbbf24; }
 
 /* ===== FEATURE CARD - VÀNG TƯƠI (BXH) ===== */
 .game-lobby-card.card-feature-gold {
