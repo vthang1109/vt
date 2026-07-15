@@ -142,54 +142,108 @@
   margin-bottom: 10px;
 }
 
-/* ===================== BẢNG NGƯỜI CHƠI ===================== */
-.altp-players {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* ===================== GHẾ NGƯỜI CHƠI (kiểu baucua-mp) ===================== */
+.altp-players { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); 
+  gap: 12px; 
+  margin-top: 14px; 
   margin-bottom: 14px;
-  max-height: 200px;
-  overflow-y: auto;
 }
-.altp-player-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  transition: all 0.25s;
+
+.ap-pl { 
+  padding: 10px 12px 32px 12px;
+  border-radius: 12px; 
+  background: rgba(255,255,255,.03); 
+  border: 1px solid rgba(255,255,255,.06); 
+  transition: all .3s; 
+  position: relative; 
+  min-height: 70px;
 }
-.altp-player-row .altp-player-name {
-  flex: 1;
-  font-weight: 700;
-  color: #e0f2fe;
-  font-size: 13px;
+
+.ap-pl.win { 
+  border-color: rgba(52,211,153,.6); 
+  box-shadow: 0 0 20px rgba(52,211,153,.3); 
+  background: rgba(52,211,153,.08); 
 }
-.altp-player-row .altp-player-score {
-  font-family: "Science Gothic", sans-serif;
-  font-weight: 500;
-  color: #fbbf24;
-  font-size: 15px;
-  min-width: 50px;
-  text-align: right;
+.ap-pl.lose { 
+  border-color: rgba(248,113,113,.4); 
+  box-shadow: 0 0 20px rgba(248,113,113,.2); 
+  background: rgba(248,113,113,.06); 
 }
-.altp-player-row .altp-player-status {
-  font-size: 12px;
-  padding: 2px 10px;
-  border-radius: 6px;
-  font-weight: 700;
-  min-width: 40px;
-  text-align: center;
-}
-.altp-player-row .altp-player-status.waiting { background: rgba(148,163,184,0.15); color: #94a3b8; }
-.altp-player-row .altp-player-status.answered { background: rgba(251,191,36,0.15); color: #fbbf24; }
-.altp-player-row .altp-player-status.correct { background: rgba(34,197,94,0.15); color: #22c55e; }
-.altp-player-row .altp-player-status.wrong { background: rgba(239,68,68,0.15); color: #ef4444; }
-.altp-player-row.me {
+.ap-pl.me {
   background: rgba(251,191,36,0.08);
   border-color: rgba(251,191,36,0.3);
+}
+
+/* TÊN SÁT GÓC TRÊN BÊN TRÁI */
+.ap-pl-name { 
+  font-weight: 800; 
+  color: #e0f2fe; 
+  font-size: 14px; 
+  padding-right: 40px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* ICON TRẠNG THÁI GÓC TRÊN PHẢI */
+.ap-pl-status {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+/* ĐIỂM SỐ - GÓC DƯỚI BÊN TRÁI */
+.ap-pl-score {
+  position: absolute;
+  bottom: 6px;
+  left: 8px;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #fbbf24;
+  pointer-events: none;
+}
+
+/* BADGE TIỀN CƯỢC - GÓC DƯỚI BÊN PHẢI */
+.ap-pl-bet-badge {
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  padding: 3px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(251,191,36,0.4);
+  background: rgba(251,191,36,0.1);
+  color: #fbbf24;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+/* BADGE KẾT QUẢ (THẮNG/THUA) - GÓC DƯỚI BÊN TRÁI (dưới điểm) */
+.ap-pl-result-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 60px;
+  padding: 3px 12px;
+  border-radius: 6px;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  pointer-events: none;
+}
+.ap-pl-result-badge.win {
+  color: #34d399;
+  border: 1px solid rgba(52,211,153,0.4);
+  background: rgba(52,211,153,0.1);
+}
+.ap-pl-result-badge.lose {
+  color: #f87171;
+  border: 1px solid rgba(248,113,113,0.4);
+  background: rgba(248,113,113,0.1);
 }
 
 /* ===================== HÀNH ĐỘNG ===================== */
@@ -348,10 +402,6 @@
   display: inline-block;
   letter-spacing: 0.5px;
 }
-.vt-top-nav .vt-nav-logo .vt-room-id .room-icon {
-  margin-right: 4px;
-  font-size: 14px;
-}
 
 /* ===================== MODAL POPUP ===================== */
 .altp-modal-overlay {
@@ -394,3 +444,40 @@
 }
 .altp-modal-btn.accept { background: linear-gradient(135deg,#34d399,#059669); color: #fff; }
 .altp-modal-btn.decline { background: rgba(248,113,113,.15); color: #f87171; border: 1px solid rgba(248,113,113,.4); }
+
+/* ===================== THANG ĐIỂM 15 CÂU ===================== */
+.altp-ladder {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 4px;
+  margin-bottom: 14px;
+  max-height: 260px;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.25);
+}
+.altp-ladder-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #94a3b8;
+}
+.altp-ladder-row.safe { color: #38bdf8; font-weight: 700; }
+.altp-ladder-row.current { background: rgba(251, 191, 36, 0.2); color: #fbbf24; font-weight: 900; }
+.altp-ladder-row.passed { color: #34d399; }
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 480px) {
+  .altp-players { grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .ap-pl { min-height:60px; padding:8px 10px 28px 10px; }
+  .ap-pl-name { font-size:12px; }
+  .ap-pl-status { font-size:15px; }
+  .ap-pl-score { font-size:11px; }
+  .ap-pl-bet-badge { font-size:10px; padding:2px 8px; }
+  .ap-pl-result-badge { font-size:11px; padding:2px 8px; left: 50px; }
+}

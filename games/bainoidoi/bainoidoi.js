@@ -5,7 +5,9 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 import { addPoints, subscribeBalance } from '../../points.js';
 import { getActivePetInfo } from '../../pet.js';
 
-const valNames = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const suitNames = ['♠', '♣', '♦', '♥'];
+const suitRank = { '♠': 0, '♣': 1, '♦': 2, '♥': 3 };
+const suitEmojis = { '♠': '♠️', '♣': '♣️', '♦': '♦️', '♥': '♥️' };
 const valRank = { '2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14 };
 
 class BaiNoiDoi {
@@ -96,24 +98,24 @@ class BaiNoiDoi {
     }, 500);
   }
 
-  sortHand(hand) { hand.sort((a, b) => valRank[a.v] - valRank[b.v] || a.s.localeCompare(b.s)); }
+  sortHand(hand) { hand.sort((a, b) => suitRank[a.s] - suitRank[b.s] || valRank[a.v] - valRank[b.v]); }
 
   showDeclareOptions() {
     document.getElementById('bnd-actions').style.display = 'none';
     document.getElementById('bnd-declare').style.display = 'block';
     const container = document.getElementById('bnd-declare-options');
-    container.innerHTML = valNames.map(v => 
-      `<button class="bnd-declare-btn" data-val="${v}" onclick="window.game?.selectDeclare('${v}')">${v}</button>`
+    container.innerHTML = suitNames.map(s => 
+      `<button class="bnd-declare-btn" data-val="${s}" onclick="window.game?.selectDeclare('${s}')">${suitEmojis[s] || s}</button>`
     ).join('');
-    this.bndStatus('Chọn giá trị bạn muốn NÓI DỐI:');
+    this.bndStatus('Chọn <strong>chất bài</strong> bạn muốn NÓI DỐI:');
   }
 
   selectDeclare(val) {
     this.currentDeclare = val;
     document.getElementById('bnd-declare').style.display = 'none';
     document.getElementById('bnd-actions').style.display = 'flex';
-    const count = this.player.hand.filter(c => c.v === val).length;
-    this.bndStatus(`Bạn nói dối là đánh <strong>${val}</strong> (bạn có ${count} lá ${val} thật). Chọn bài để đánh (hoặc bấm Tố cáo nếu muốn):`);
+    const count = this.player.hand.filter(c => c.s === val).length;
+    this.bndStatus(`Bạn nói dối là đánh <strong>chất ${suitEmojis[val] || val}</strong> (bạn có ${count} lá chất này thật). Chọn bài để đánh (hoặc bấm Tố cáo nếu muốn):`);
   }
 
   toggleCard(idx) {
@@ -136,7 +138,7 @@ class BaiNoiDoi {
     document.getElementById('bnd-actions').style.display = 'none';
     this.renderTable();
     this.renderHand();
-    this.bndStatus(`Bạn đánh ${cards.length} lá (nói dối là ${this.currentDeclare})`);
+    this.bndStatus(`Bạn đánh ${cards.length} lá (nói dối là chất ${suitEmojis[this.currentDeclare] || this.currentDeclare})`);
 
     if (this.player.hand.length === 0) { await this.endGame('player'); return; }
     if (this.ai.hand.length === 0) { await this.endGame('ai'); return; }
@@ -171,15 +173,17 @@ class BaiNoiDoi {
   async checkBluff(caller, target) {
     this.phase = 'result';
     const last = this.pile[this.pile.length-1];
-    const actualVal = last.cards[0].v;
-    const isBluff = actualVal !== last.declare;
+    const actualSuit = last.cards[0].s;
+    const isBluff = actualSuit !== last.declare;
     
     let callerWon = (isBluff && caller === target) || (!isBluff && caller !== target);
     
     this.renderTable(true);
     await this.delay(1000);
     
-    this.bndStatus(`Lật bài: ${last.cards.map(c => c.v+c.s).join(', ')} — ${isBluff ? 'NÓI DỐI!' : 'NÓI THẬT!'}`);
+    const declaredLabel = suitEmojis[last.declare] || last.declare;
+    const actualLabel = last.cards.map(c => c.v + c.s).join(', ');
+    this.bndStatus(`Lật bài: ${actualLabel} — ${isBluff ? `NÓI DỐI! (không phải chất ${declaredLabel})` : `NÓI THẬT! (đúng chất ${declaredLabel})`}`);
 
     const winner = callerWon ? caller : target;
     const loser = callerWon ? target : caller;
@@ -215,22 +219,22 @@ class BaiNoiDoi {
 
   async aiTurn() {
     if (this.phase !== 'playing') return;
-    const declareVal = valNames[Math.floor(Math.random() * valNames.length)];
-    const actualCards = this.ai.hand.filter(c => c.v === declareVal);
+    const declareSuit = suitNames[Math.floor(Math.random() * suitNames.length)];
+    const actualCards = this.ai.hand.filter(c => c.s === declareSuit);
     const cardsToPlay = actualCards.length > 0 ? actualCards.slice(0, Math.min(actualCards.length, Math.floor(Math.random() * 3) + 1)) : [];
     
     if (cardsToPlay.length === 0) {
       const randomCard = this.ai.hand[Math.floor(Math.random() * this.ai.hand.length)];
       this.ai.hand = this.ai.hand.filter(c => c !== randomCard);
-      this.pile.push({ by: 'ai', cards: [randomCard], declare: declareVal });
+      this.pile.push({ by: 'ai', cards: [randomCard], declare: declareSuit });
     } else {
       cardsToPlay.forEach(c => { this.ai.hand = this.ai.hand.filter(h => h !== c); });
-      this.pile.push({ by: 'ai', cards: cardsToPlay, declare: declareVal });
+      this.pile.push({ by: 'ai', cards: cardsToPlay, declare: declareSuit });
     }
 
     this.turn = 'player';
     this.renderTable();
-    this.bndStatus(`🤖 Máy đánh ${cardsToPlay.length || 1} lá (nói là ${declareVal})`);
+    this.bndStatus(`🤖 Máy đánh ${cardsToPlay.length || 1} lá (nói là chất ${suitEmojis[declareSuit] || declareSuit})`);
 
     if (this.ai.hand.length === 0) { await this.endGame('ai'); return; }
     if (this.player.hand.length === 0) { await this.endGame('player'); return; }

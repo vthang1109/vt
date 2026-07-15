@@ -32,6 +32,7 @@ window.addEventListener('beforeunload', () => window.quitGame?.());
 
 // ========== BẢNG THƯỞNG ==========
 const PRIZE_TABLE = [10, 20, 40, 70, 100, 150, 300, 600, 1200, 2000, 3000, 4000, 5500, 7500, 10000];
+const SAFE_IDX = [4, 9];
 const TIER_BY_RANGE = (idx) => idx < 5 ? 'de' : idx < 10 ? 'vua' : 'kho';
 
 if (!ROOM_ID) document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">⚠️ Thiếu mã phòng.</div>';
@@ -73,6 +74,26 @@ function pickQuestionFromBank(bank, usedSet, idx) {
 
 function fmt(n) { return (n || 0).toLocaleString('vi-VN') + 'đ'; }
 
+function renderLadder(gs) {
+  const el = document.getElementById('altp-ladder');
+  if (!el) return;
+  const roundIdx = gs.roundIdx || 0;
+  el.innerHTML = PRIZE_TABLE.map((amt, i) => {
+    let cls = 'altp-ladder-row';
+    if (SAFE_IDX.includes(i)) cls += ' safe';
+    if (i + 1 < roundIdx) cls += ' passed';
+    else if (i + 1 === roundIdx && (gs.phase === 'playing' || gs.phase === 'revealed')) cls += ' current';
+    return `<div class="${cls}">
+      <span>Câu ${i + 1}${SAFE_IDX.includes(i) ? ' 🔒' : ''}</span>
+      <span>${fmt(amt)}</span>
+    </div>`;
+  }).join('');
+  const current = el.querySelector('.altp-ladder-row.current');
+  if (current) {
+    el.scrollTop = current.offsetTop - el.clientHeight / 2 + current.clientHeight / 2;
+  }
+}
+
 // ========== AUTH ==========
 onAuthStateChanged(auth, async (u) => {
   if (!u) { location.href = 'index.html'; return; }
@@ -109,7 +130,7 @@ function updateNavRoom(roomCode) {
     logo.innerHTML = '';
     logo.appendChild(roomEl);
   }
-  roomEl.innerHTML = `<span class="room-icon">💰</span> #${roomCode}`;
+  roomEl.textContent = `#${roomCode}`;
 }
 
 // ========== FIREBASE LISTENER ==========
@@ -150,9 +171,9 @@ function render(r) {
 
   // STATUS BAR
   if (gs.phase === 'betting') {
-    midEl.textContent = '🎯 Đặt cược';
+    midEl.textContent = gs.roundIdx > 0 ? `🎯 Vòng ${gs.roundIdx}/15` : '🎯 Đặt cược';
   } else if (gs.phase === 'playing') {
-    midEl.textContent = `Câu ${gs.roundIdx + 1}`;
+    midEl.textContent = `Câu ${gs.roundIdx}/15`;
   } else if (gs.phase === 'revealed') {
     const correct = gs.currentQ?.c;
     const myAnswer = gs.answers?.[_user.uid];
@@ -248,35 +269,74 @@ function render(r) {
     phoneEl.style.display = 'none';
   }
 
-  // ===== BẢNG NGƯỜI CHƠI =====
+  // ===== THANG ĐIỂM 15 CÂU =====
+  renderLadder(gs);
+
+  // ===== BẢNG NGƯỜI CHƠI (kiểu baucua-mp) =====
   const playersEl = document.getElementById('altp-players');
   const memberList = (r.members || []).filter(uid => uid !== r.hostUid);
   const hostId = r.hostUid;
 
-  let allPlayers = [];
+  playersEl.innerHTML = '';
   if (r.memberInfo) {
-    allPlayers = [hostId, ...memberList].map(uid => {
+    [hostId, ...memberList].forEach(uid => {
       const info = r.memberInfo?.[uid] || {};
       const score = gs.scores?.[uid] || 0;
       const answered = gs.answers?.[uid] !== undefined && gs.answers?.[uid] !== null;
       const correct = gs.phase === 'revealed' && gs.answers?.[uid] === gs.currentQ?.c;
       const wrong = gs.phase === 'revealed' && answered && !correct;
-      return { uid, name: info.name || '?', score, answered, correct, wrong, isMe: uid === _user.uid, isHost: uid === hostId };
+      const isMe = uid === _user.uid;
+      const isHost = uid === hostId;
+
+      let statusIcon = '';
+      let resultCls = '';
+      let betBadge = '';
+      let resultBadge = '';
+
+      if (isHost) {
+        statusIcon = '👑';
+      } else if (wrong) {
+        statusIcon = '❌';
+        resultCls = 'lose';
+      } else if (correct) {
+        statusIcon = '✅';
+        resultCls = 'win';
+      } else if (answered) {
+        statusIcon = '📝';
+      } else if (gs.phase === 'playing' || gs.phase === 'revealed') {
+        statusIcon = '⏳';
+      }
+
+      const bet = gs.bets?.[uid] || 0;
+      if (bet > 0) {
+        betBadge = `<div class="ap-pl-bet-badge">${bet.toLocaleString('vi-VN')}</div>`;
+      }
+
+      if (gs.phase === 'revealed' && !isHost) {
+        if (correct) {
+          resultBadge = `<div class="ap-pl-result-badge win">+${bet.toLocaleString('vi-VN')}</div>`;
+        } else if (wrong) {
+          resultBadge = `<div class="ap-pl-result-badge lose">-${bet.toLocaleString('vi-VN')}</div>`;
+        }
+      }
+
+      const div = document.createElement('div');
+      div.className = 'ap-pl';
+      if (resultCls) div.classList.add(resultCls);
+      if (isMe) div.classList.add('me');
+
+      div.innerHTML = `
+        <div class="ap-pl-name">
+          ${esc(info.name || '?')} ${isMe ? '<span style="color:#fbbf24">(bạn)</span>' : ''}
+        </div>
+        ${statusIcon ? `<div class="ap-pl-status">${statusIcon}</div>` : ''}
+        <div class="ap-pl-score">${fmt(score)}</div>
+        ${betBadge}
+        ${resultBadge}
+      `;
+      playersEl.appendChild(div);
     });
   }
-
-  playersEl.innerHTML = allPlayers.map(p => {
-    let statusClass = 'waiting', statusText = '⏳';
-    if (p.isHost) { statusText = '👑'; statusClass = ''; }
-    else if (p.correct) { statusText = '✅'; statusClass = 'correct'; }
-    else if (p.wrong) { statusText = '❌'; statusClass = 'wrong'; }
-    else if (p.answered) { statusText = '📝'; statusClass = 'answered'; }
-    return `<div class="altp-player-row ${p.isMe ? 'me' : ''}">
-      <span class="altp-player-name">${esc(p.name)}${p.isMe ? ' <span style="color:#fbbf24">(bạn)</span>' : ''}</span>
-      <span class="altp-player-score">${fmt(p.score)}</span>
-      <span class="altp-player-status ${statusClass}">${statusText}</span>
-    </div>`;
-  }).join('');
 
   // ===== BET ROW =====
   const betRow = document.getElementById('altp-bet-row');
@@ -380,10 +440,16 @@ window.hostInitGame = async function() {
 window.hostNextQuestion = async function() {
   const r = _room;
   if (!r || r.hostUid !== _user.uid) return;
-  const bank = await loadBank();
   const gs = r.gameState;
   const roundIdx = (gs.roundIdx || 0);
 
+  // Check if all 15 questions have been asked
+  if (roundIdx >= 15) {
+    showToast('🏁 Đã hết 15 câu! Bấm Vòng mới để chơi lại!', 'warn');
+    return;
+  }
+
+  const bank = await loadBank();
   // Pick a question
   const used = new Set(gs.usedQuestions || []);
   const q = pickQuestionFromBank(bank, used, roundIdx);
@@ -394,14 +460,13 @@ window.hostNextQuestion = async function() {
   const pick = (gs.usedQuestions?.length || 0);
   newUsed.push(tier + pick);
 
-  let questionIndex = roundIdx;
-  if (roundIdx >= 15) questionIndex = roundIdx % 15;
+  const nextRoundIdx = roundIdx + 1;
   
   try {
     await updateDoc(doc(db, 'rooms', ROOM_ID), {
       'gameState.phase': 'playing',
       'gameState.currentQ': q,
-      'gameState.roundIdx': questionIndex,
+      'gameState.roundIdx': nextRoundIdx,
       'gameState.answers': {},
       'gameState.answerCounts': {},
       'gameState.usedQuestions': newUsed,
@@ -410,7 +475,7 @@ window.hostNextQuestion = async function() {
       'gameState.phoneMsg': null,
       'gameState.lifelines': { fifty: false, audience: false, phone: false }
     });
-    showToast('📝 Câu hỏi đã được chọn!', 'success');
+    showToast(`📝 Câu ${nextRoundIdx}/15 đã được chọn!`, 'success');
   } catch (e) {
     showToast('Lỗi: ' + e.message, 'error');
   }
@@ -464,6 +529,9 @@ window.hostNextRound = async function() {
     }
   }
 
+  // Nếu đã qua 15 câu, reset để chơi lại
+  const newRoundIdx = (gs.roundIdx || 0) >= 15 ? 1 : (gs.roundIdx || 1);
+
   try {
     await updateDoc(doc(db, 'rooms', ROOM_ID), {
       'gameState.phase': 'betting',
@@ -476,7 +544,8 @@ window.hostNextRound = async function() {
       'gameState.lifelines': { fifty: false, audience: false, phone: false },
       'gameState.scores': newScores,
       'gameState.round': (gs.round || 1) + 1,
-      'gameState.bets': {}
+      'gameState.bets': {},
+      'gameState.roundIdx': newRoundIdx
     });
   } catch (e) {
     showToast('Lỗi: ' + e.message, 'error');
