@@ -11,9 +11,11 @@
 .category-label .cat-icon { font-size: 18px; }
 .category-label .cat-name { font-family: 'Science Gothic', sans-serif; font-size: 13px; font-weight: 400; color: #7dd3fc; letter-spacing: 2px; text-transform: uppercase; }
 .category-label .cat-line { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(56,189,248,0.3), transparent); }
-.game-lobby-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.game-lobby-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.game-lobby-grid.grid-2col { grid-template-columns: repeat(2, 1fr); }
 .game-lobby-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px 12px 18px; border-radius: 20px; cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid rgba(56,189,248,0.12); transition: all 0.3s; overflow: hidden; text-decoration: none; }
 .game-lobby-card:hover { transform: translateY(-6px); border-color: rgba(56,189,248,0.4); box-shadow: 0 16px 40px rgba(56,189,248,0.15); }
+.game-lobby-card.pinned { border-color: rgba(251,191,36,0.5); box-shadow: 0 0 16px rgba(251,191,36,0.15); }
 .glc-emoji { font-size: 40px; line-height: 1; }
 .glc-name { font-weight: 800; font-size: 14px; color: #e0f2fe; text-align: center; }
 .glc-pts { font-size: 11px; font-weight: 700; color: #38bdf8; opacity: 0.8; }
@@ -22,6 +24,16 @@
 .glc-badge.gold  { background: rgba(251,191,36,0.18); color: #fbbf24; border: 1px solid rgba(251,191,36,0.4); }
 .glc-badge.new  { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
 .glc-badge.hot  { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
+
+.game-lobby-grid:not(.grid-2col) .game-lobby-card { aspect-ratio: 1 / 1; justify-content: center; padding: 10px 6px; }
+.game-lobby-grid:not(.grid-2col) .glc-emoji { font-size: 26px; }
+.game-lobby-grid:not(.grid-2col) .glc-name { font-size: 11px; }
+.game-lobby-grid:not(.grid-2col) .glc-pts { font-size: 9px; }
+.game-lobby-grid:not(.grid-2col) .glc-badge { top: 6px; right: 6px; padding: 1px 6px; font-size: 9px; min-width: 14px; text-align: center; }
+
+.pin-btn { position: absolute; top: 6px; left: 6px; z-index: 2; background: rgba(15,23,42,0.6); border: none; color: #64748b; font-size: 13px; line-height: 1; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.pin-btn:hover { color: #fbbf24; background: rgba(251,191,36,0.15); }
+.game-lobby-card.pinned .pin-btn { color: #fbbf24; }
 
 /* ===== FEATURE CARD - VÀNG TƯƠI (BXH) ===== */
 .game-lobby-card.card-feature-gold {

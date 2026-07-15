@@ -37,10 +37,11 @@
       <a class="nav-tab" href="app/applications.html">📱 ỨNG DỤNG</a>
     </div>
 
+    <div id="main-games">
     <!-- Bảng xếp hạng & Phòng chơi -->
     <div class="category-section">
       <div class="category-label"><span class="cat-icon">🏆</span><span class="cat-name">Bảng Xếp Hạng & Online</span><div class="cat-line"></div></div>
-      <div class="game-lobby-grid">
+      <div class="game-lobby-grid grid-2col">
         <a class="game-lobby-card card-feature-gold" href="app/leaderboard.html">
           <span class="glc-badge gold">#1</span>
           <span class="glc-emoji">🏆</span>
@@ -56,20 +57,26 @@
       </div>
     </div>
 
+    <!-- Yêu thích (ghim) -->
+    <div class="category-section" id="favorites-section" style="display:none;">
+      <div class="category-label"><span class="cat-icon">⭐</span><span class="cat-name">Yêu Thích</span><div class="cat-line"></div></div>
+      <div class="game-lobby-grid" id="favorites-grid"></div>
+    </div>
+
     <!-- Casino -->
     <div class="category-section">
       <div class="category-label"><span class="cat-icon">🃏</span><span class="cat-name">CASINO</span><div class="cat-line"></div></div>
       <div class="game-lobby-grid">
-        <a class="game-lobby-card" href="games/slot/slot.html"><span class="glc-badge hot">Hot</span><span class="glc-emoji">🎇</span><span class="glc-name">Nổ Hũ</span><span class="glc-pts">777</span></a>
-        <a class="game-lobby-card" href="games/baucua/baucua.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🦞</span><span class="glc-name">Bầu Cua</span><span class="glc-pts">Thử vận may</span></a>
-        <a class="game-lobby-card" href="games/tienlen/tienlen.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">♥️</span><span class="glc-name">Tiến Lên</span><span class="glc-pts">Cược & Tố</span></a>
-        <a class="game-lobby-card" href="games/xidach/xidach.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">♣️</span><span class="glc-name">Xì Dách</span><span class="glc-pts">Cược & Thắng</span></a>
-        <a class="game-lobby-card" href="games/baicao/baicao.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">♦️</span><span class="glc-name">Bài Cào</span><span class="glc-pts">Sáp - Liêng</span></a>
-        <a class="game-lobby-card" href="games/taixiu/taixiu.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🎲</span><span class="glc-name">Tài Xỉu</span><span class="glc-pts">Cược & Thắng</span></a>
-        <a class="game-lobby-card" href="games/lieng/lieng.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🃏</span><span class="glc-name">Liêng</span><span class="glc-pts">Cào Tố 3 lá</span></a>
-        <a class="game-lobby-card" href="games/poker/poker.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">♠️</span><span class="glc-name">Poker</span><span class="glc-pts">Texas Hold'em</span></a>
-        <a class="game-lobby-card" href="games/catte/catte.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🎴</span><span class="glc-name">Cát Tê</span><span class="glc-pts">6 lá</span></a>
-        <a class="game-lobby-card" href="games/bainoidoi/bainoidoi.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🤥</span><span class="glc-name">Bài Nói Dối</span><span class="glc-pts">Bluff & Call</span></a>
+        <a class="game-lobby-card" href="games/slot/slot.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge hot">H</span><span class="glc-emoji">🎇</span><span class="glc-name">Nổ Hũ</span><span class="glc-pts">777</span></a>
+        <a class="game-lobby-card" href="games/baucua/baucua.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">🦞</span><span class="glc-name">Bầu Cua</span><span class="glc-pts">Thử vận may</span></a>
+        <a class="game-lobby-card" href="games/tienlen/tienlen.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">♥️</span><span class="glc-name">Tiến Lên</span><span class="glc-pts">Cược & Tố</span></a>
+        <a class="game-lobby-card" href="games/xidach/xidach.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">♣️</span><span class="glc-name">Xì Dách</span><span class="glc-pts">Cược & Thắng</span></a>
+        <a class="game-lobby-card" href="games/baicao/baicao.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">♦️</span><span class="glc-name">Bài Cào</span><span class="glc-pts">Sáp - Liêng</span></a>
+        <a class="game-lobby-card" href="games/taixiu/taixiu.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">🎲</span><span class="glc-name">Tài Xỉu</span><span class="glc-pts">Cược & Thắng</span></a>
+        <a class="game-lobby-card" href="games/lieng/lieng.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🃏</span><span class="glc-name">Liêng</span><span class="glc-pts">Cào Tố 3 lá</span></a>
+        <a class="game-lobby-card" href="games/poker/poker.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">♠️</span><span class="glc-name">Poker</span><span class="glc-pts">Texas Hold'em</span></a>
+        <a class="game-lobby-card" href="games/catte/catte.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🎴</span><span class="glc-name">Cát Tê</span><span class="glc-pts">6 lá</span></a>
+        <a class="game-lobby-card" href="games/bainoidoi/bainoidoi.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🤥</span><span class="glc-name">Bài Nói Dối</span><span class="glc-pts">Bluff & Call</span></a>
       </div>
     </div>
 
@@ -77,18 +84,18 @@
     <div class="category-section">
       <div class="category-label"><span class="cat-icon">🧠</span><span class="cat-name">Trí Tuệ</span><div class="cat-line"></div></div>
       <div class="game-lobby-grid">
-        <a class="game-lobby-card" href="games/chess/chess.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">♟️</span><span class="glc-name">Chess</span><span class="glc-pts">500~5000</span></a>
-        <a class="game-lobby-card" href="games/xiangqi/xiangqi.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🐘</span><span class="glc-name">Cờ Tướng</span><span class="glc-pts">500~5000</span></a>
-        <a class="game-lobby-card" href="games/caro/caro.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">⭕</span><span class="glc-name">Caro</span><span class="glc-pts">50~150</span></a>
-        <a class="game-lobby-card" href="games/quiz/quiz.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">❓</span><span class="glc-name">Quiz</span><span class="glc-pts">+40đ / thắng</span></a>
-        <a class="game-lobby-card" href="games/altp/altp.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">💰</span><span class="glc-name">Ai Là Triệu Phú</span><span class="glc-pts">10~30.000đ</span></a>
-        <a class="game-lobby-card" href="games/timso/timso.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🔟</span><span class="glc-name">100 Number</span><span class="glc-pts">100~800</span></a>
-        <a class="game-lobby-card" href="games/sudoku/sudoku.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🔢</span><span class="glc-name">Sudoku</span><span class="glc-pts">60~150đ</span></a>
-        <a class="game-lobby-card" href="games/2048/2048.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🎲</span><span class="glc-name">2048</span><span class="glc-pts">Ghép số</span></a>
-        <a class="game-lobby-card" href="games/minesweeper/minesweeper.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">💣</span><span class="glc-name">Dò Mìn</span><span class="glc-pts">50~500đ</span></a>
-        <a class="game-lobby-card" href="games/oanquan/oanquan.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🏺</span><span class="glc-name">Ô Ăn Quan</span><span class="glc-pts">Dân gian</span></a>
-        <a class="game-lobby-card" href="games/guess/guess.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🔢</span><span class="glc-name">Đoán Số</span><span class="glc-pts">1~100</span></a>
-        <a class="game-lobby-card" href="games/memory/memory.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🧠</span><span class="glc-name">Memory Card</span><span class="glc-pts">Lật thẻ</span></a>
+        <a class="game-lobby-card" href="games/chess/chess.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">♟️</span><span class="glc-name">Chess</span><span class="glc-pts">500~5000</span></a>
+        <a class="game-lobby-card" href="games/xiangqi/xiangqi.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">🐘</span><span class="glc-name">Cờ Tướng</span><span class="glc-pts">500~5000</span></a>
+        <a class="game-lobby-card" href="games/caro/caro.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">⭕</span><span class="glc-name">Caro</span><span class="glc-pts">50~150</span></a>
+        <a class="game-lobby-card" href="games/quiz/quiz.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">❓</span><span class="glc-name">Quiz</span><span class="glc-pts">+40đ / thắng</span></a>
+        <a class="game-lobby-card" href="games/altp/altp.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">💰</span><span class="glc-name">Ai Là Triệu Phú</span><span class="glc-pts">10~30.000đ</span></a>
+        <a class="game-lobby-card" href="games/timso/timso.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">🔟</span><span class="glc-name">100 Number</span><span class="glc-pts">100~800</span></a>
+        <a class="game-lobby-card" href="games/sudoku/sudoku.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🔢</span><span class="glc-name">Sudoku</span><span class="glc-pts">60~150đ</span></a>
+        <a class="game-lobby-card" href="games/2048/2048.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🎲</span><span class="glc-name">2048</span><span class="glc-pts">Ghép số</span></a>
+        <a class="game-lobby-card" href="games/minesweeper/minesweeper.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">💣</span><span class="glc-name">Dò Mìn</span><span class="glc-pts">50~500đ</span></a>
+        <a class="game-lobby-card" href="games/oanquan/oanquan.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🏺</span><span class="glc-name">Ô Ăn Quan</span><span class="glc-pts">Dân gian</span></a>
+        <a class="game-lobby-card" href="games/guess/guess.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🔢</span><span class="glc-name">Đoán Số</span><span class="glc-pts">1~100</span></a>
+        <a class="game-lobby-card" href="games/memory/memory.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🧠</span><span class="glc-name">Memory Card</span><span class="glc-pts">Lật thẻ</span></a>
         </div>
     </div>
 
@@ -96,14 +103,14 @@
     <div class="category-section">
       <div class="category-label"><span class="cat-icon">🕹️</span><span class="cat-name">Hành Động</span><div class="cat-line"></div></div>
       <div class="game-lobby-grid">
-        <a class="game-lobby-card" href="games/snake/snake.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🐍</span><span class="glc-name">Rắn săn mồi</span><span class="glc-pts">+10~80đ</span></a>
-        <a class="game-lobby-card" href="games/bird/bird.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🐦</span><span class="glc-name">Flappy Bird</span><span class="glc-pts">+10~20đ</span></a>
-        <a class="game-lobby-card" href="games/dino/dino.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">🦕</span><span class="glc-name">Dinosaur</span><span class="glc-pts">+20~80đ</span></a>
-        <a class="game-lobby-card" href="games/football/football.html"><span class="glc-badge ready">Chơi ngay</span><span class="glc-emoji">⚽</span><span class="glc-name">Bóng Đá</span><span class="glc-pts">+5~50đ</span></a>
-        <a class="game-lobby-card" href="games/pong/pong.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🏓</span><span class="glc-name">Pong</span><span class="glc-pts">+50~150đ</span></a>
-        <a class="game-lobby-card" href="games/fruitslash/fruitslash.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🍉</span><span class="glc-name">Chém Hoa Quả</span><span class="glc-pts">+10~200đ</span></a>
-        <a class="game-lobby-card" href="games/blockblast/blockblast.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🧊</span><span class="glc-name">Block Blast</span><span class="glc-pts">Xếp khối</span></a>
-        <a class="game-lobby-card" href="games/warrior/warrior.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">⚔️</span><span class="glc-name">Forgotten Warrior</span><span class="glc-pts">Phiêu lưu</span></a>
+        <a class="game-lobby-card" href="games/snake/snake.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">🐍</span><span class="glc-name">Rắn săn mồi</span><span class="glc-pts">+10~80đ</span></a>
+        <a class="game-lobby-card" href="games/bird/bird.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">🐦</span><span class="glc-name">Flappy Bird</span><span class="glc-pts">+10~20đ</span></a>
+        <a class="game-lobby-card" href="games/dino/dino.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">🦕</span><span class="glc-name">Dinosaur</span><span class="glc-pts">+20~80đ</span></a>
+        <a class="game-lobby-card" href="games/football/football.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge ready">P</span><span class="glc-emoji">⚽</span><span class="glc-name">Bóng Đá</span><span class="glc-pts">+5~50đ</span></a>
+        <a class="game-lobby-card" href="games/pong/pong.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🏓</span><span class="glc-name">Pong</span><span class="glc-pts">+50~150đ</span></a>
+        <a class="game-lobby-card" href="games/fruitslash/fruitslash.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🍉</span><span class="glc-name">Chém Hoa Quả</span><span class="glc-pts">+10~200đ</span></a>
+        <a class="game-lobby-card" href="games/blockblast/blockblast.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🧊</span><span class="glc-name">Block Blast</span><span class="glc-pts">Xếp khối</span></a>
+        <a class="game-lobby-card" href="games/warrior/warrior.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">⚔️</span><span class="glc-name">Forgotten Warrior</span><span class="glc-pts">Phiêu lưu</span></a>
       </div>
     </div>
 
@@ -111,9 +118,10 @@
     <div class="category-section">
       <div class="category-label"><span class="cat-icon">🎉</span><span class="cat-name">Giải Trí</span><div class="cat-line"></div></div>
       <div class="game-lobby-grid">
-        <a class="game-lobby-card" href="games/thathaythach/thathaythach.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🎭</span><span class="glc-name">Thật Hay Thách</span><span class="glc-pts">Truth or Dare</span></a>
-        <a class="game-lobby-card" href="games/uongdi/uongdi.html"><span class="glc-badge new">Mới!</span><span class="glc-emoji">🍻</span><span class="glc-name">Uống Đi</span><span class="glc-pts">Thử thách</span></a>
+        <a class="game-lobby-card" href="games/thathaythach/thathaythach.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🎭</span><span class="glc-name">Thật Hay Thách</span><span class="glc-pts">Truth or Dare</span></a>
+        <a class="game-lobby-card" href="games/uongdi/uongdi.html"><button class="pin-btn" onclick="toggleFavorite(event,this)">☆</button><span class="glc-badge new">N</span><span class="glc-emoji">🍻</span><span class="glc-name">Uống Đi</span><span class="glc-pts">Thử thách</span></a>
       </div>
+    </div>
     </div>
   </div>
 
@@ -168,6 +176,68 @@
         requestAnimationFrame(draw);
       }
       draw();
+    })();
+  </script>
+
+  <!-- Ghim game yêu thích -->
+  <script>
+    (function () {
+      const STORAGE_KEY = 'vtworld_pinned_games';
+
+      function getPinned() {
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+        catch (e) { return []; }
+      }
+      function savePinned(arr) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+      }
+
+      window.toggleFavorite = function (event, btn) {
+        event.preventDefault();
+        event.stopPropagation();
+        const card = btn.closest('.game-lobby-card');
+        const href = card.getAttribute('href');
+        let pinned = getPinned();
+        if (pinned.includes(href)) {
+          pinned = pinned.filter(h => h !== href);
+        } else {
+          pinned.push(href);
+        }
+        savePinned(pinned);
+        applyPinnedState();
+        renderFavorites();
+      };
+
+      function applyPinnedState() {
+        const pinned = getPinned();
+        document.querySelectorAll('#main-games .game-lobby-card').forEach(card => {
+          const href = card.getAttribute('href');
+          const isPinned = pinned.includes(href);
+          card.classList.toggle('pinned', isPinned);
+          const star = card.querySelector('.pin-btn');
+          if (star) star.textContent = isPinned ? '★' : '☆';
+        });
+      }
+
+      function renderFavorites() {
+        const pinned = getPinned();
+        const grid = document.getElementById('favorites-grid');
+        const section = document.getElementById('favorites-section');
+        grid.innerHTML = '';
+        pinned.forEach(href => {
+          const original = document.querySelector('#main-games .game-lobby-card[href="' + href + '"]');
+          if (!original) return;
+          const clone = original.cloneNode(true);
+          clone.classList.add('pinned');
+          const star = clone.querySelector('.pin-btn');
+          if (star) star.textContent = '★';
+          grid.appendChild(clone);
+        });
+        section.style.display = pinned.length ? '' : 'none';
+      }
+
+      applyPinnedState();
+      renderFavorites();
     })();
   </script>
 
