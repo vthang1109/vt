@@ -6,7 +6,7 @@
 
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { addPoints, updateMission, getPoints } from '../../points.js';
+import { addPoints, updateMission } from '../../points.js';
 import {
   getFirestore, doc, getDoc, updateDoc, increment, setDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -36,47 +36,6 @@ const DIFF_CONFIG = {
 };
 const HINTS_MAX = 3;
 const LIVES_MAX = 3;
-
-// ============================================================
-//  PARTICLE CANVAS
-// ============================================================
-const bgCanvas = document.getElementById('bg-canvas');
-const bgCtx    = bgCanvas.getContext('2d');
-let parts = [];
-function resizeBg() { bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight; }
-resizeBg();
-window.addEventListener('resize', resizeBg);
-for (let i = 0; i < 40; i++) {
-  parts.push({
-    x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height,
-    vx: (Math.random() - 0.5) * 0.4,  vy: (Math.random() - 0.5) * 0.4,
-    r: Math.random() * 1.5 + 0.5
-  });
-}
-(function drawBg() {
-  bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-  parts.forEach(p => {
-    p.x += p.vx; p.y += p.vy;
-    if (p.x < 0) p.x = bgCanvas.width;  if (p.x > bgCanvas.width)  p.x = 0;
-    if (p.y < 0) p.y = bgCanvas.height; if (p.y > bgCanvas.height) p.y = 0;
-    bgCtx.beginPath(); bgCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    bgCtx.fillStyle = 'rgba(56,189,248,0.5)'; bgCtx.fill();
-  });
-  for (let i = 0; i < parts.length; i++) {
-    for (let j = i + 1; j < parts.length; j++) {
-      const dx = parts[i].x - parts[j].x, dy = parts[i].y - parts[j].y;
-      const d = Math.sqrt(dx * dx + dy * dy);
-      if (d < 100) {
-        bgCtx.beginPath();
-        bgCtx.moveTo(parts[i].x, parts[i].y);
-        bgCtx.lineTo(parts[j].x, parts[j].y);
-        bgCtx.strokeStyle = `rgba(56,189,248,${0.07 * (1 - d / 100)})`;
-        bgCtx.lineWidth = 0.5; bgCtx.stroke();
-      }
-    }
-  }
-  requestAnimationFrame(drawBg);
-})();
 
 // ============================================================
 //  GAME STATE
@@ -516,7 +475,6 @@ async function handleWin() {
     await updateMission('win5');
     await updateMission('play3');
     await saveSudokuStats(true);
-    refreshNavBar();
   } catch(e) { console.error(e); }
 
   const m = String(Math.floor(timerSec / 60)).padStart(2, '0');
@@ -554,13 +512,6 @@ async function addCoins(amount) {
   catch(e) { await setDoc(ref, { coins: amount }, { merge: true }); }
 }
 
-async function getCoins() {
-  const user = auth.currentUser;
-  if (!user) return 0;
-  const snap = await getDoc(doc(db, 'users', user.uid));
-  return snap.exists() ? (snap.data().coins || 0) : 0;
-}
-
 async function saveSudokuStats(won) {
   const user = auth.currentUser;
   if (!user) return;
@@ -585,16 +536,33 @@ async function loadStats() {
   } catch(e) {}
 }
 
-async function refreshNavBar() {
-  try {
-    const pts   = await getPoints();
-    const coins = await getCoins();
-    const navPts   = document.getElementById('nav-pts');
-    const navCoins = document.getElementById('nav-coins');
-    if (navPts)   navPts.textContent   = '⭐ ' + pts.toLocaleString();
-    if (navCoins) navCoins.textContent = '🪙 ' + coins.toLocaleString();
-  } catch(e) {}
-}
+
+
+// ============================================================
+//  COIN POP
+// ============================================================
+// ============================================================
+//  TOAST FUNCTIONS
+// ============================================================
+window.showToast = function(msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'caro-toast';
+  el.classList.add('show');
+  clearTimeout(el._hide);
+  el._hide = setTimeout(() => el.classList.remove('show'), 2500);
+};
+
+window.showToastError = function(msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'caro-toast error-toast';
+  el.classList.add('show');
+  clearTimeout(el._hide);
+  el._hide = setTimeout(() => el.classList.remove('show'), 2500);
+};
 
 // ============================================================
 //  COIN POP
@@ -605,4 +573,16 @@ function spawnCoinPop(text) {
   el.textContent = text;
   el.style.cssText = 'position:fixed;left:50%;top:40%;transform:translateX(-50%);' +
     'font-family:Orbitron,monospace;font-size:20px;font-weight:900;color:#fbbf24;' +
-    'pointer-events:non
+    'pointer-events:none;z-index:9999;text-shadow:0 0 12px rgba(251,191,36,0.8)';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
+// ============================================================
+//  AUTH INIT — Load stats khi đăng nhập
+// ============================================================
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loadStats();
+  }
+});

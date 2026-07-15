@@ -3,7 +3,7 @@
 .sudoku-container {
   max-width: 520px;
   margin: 0 auto;
-  padding: 20px 16px 80px;
+  padding: 12px 16px 80px;
   position: relative; z-index: 1;
 }
 

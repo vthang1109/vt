@@ -6,26 +6,20 @@
   <title>VTWorld — Sudoku</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
   <link rel="stylesheet" href="sudoku.css"/>
   <link rel="stylesheet" href="../../quests.css"/>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
   <script type="module" src="../../quests.js"></script>
   <script src="../../fullscreen.js"></script>
 </head>
-<body>
+<body data-bottom-nav="games">
   <canvas id="bg-canvas"></canvas>
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
-  <nav>
-    <div class="logo" onclick="window.location.href='../../games.html'" style="cursor:pointer">
-      <span class="logo-vt">VT</span><span class="logo-world">World</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <span id="nav-pts" style="font-family:'Orbitron',monospace;font-size:13px;color:#38bdf8;font-weight:700"></span>
-      <span id="nav-coins" style="font-family:'Orbitron',monospace;font-size:13px;color:#fbbf24;font-weight:700"></span>
-      <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="window.location.href='../../games.html'">← Games</button>
-    </div>
-  </nav>
+  <div id="top-nav-root"></div>
 
   <div class="sudoku-container">
 
@@ -141,6 +135,21 @@
 
   <!-- TOAST -->
   <div id="toast" class="caro-toast"></div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    // Particle background
+    const canvas = document.getElementById('bg-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+      for(let i=0;i<30;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+      (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(56,189,248,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    }
+    window.showToast = window.showToast || function(){};
+  </script>
 
   <script type="module" src="sudoku.js"></script>
 </body>
