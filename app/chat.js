@@ -96,6 +96,7 @@ if (!document.getElementById('vtToastKeyframes')) {
 
 // ===== CHAT STATE =====
 let currentConvoId   = 'server';
+const _notifiedAnnouncements = new Set();
 let currentConvoName = '🌐 Chat toàn server';
 let currentConvoUid  = null;
 let _chatUnsubscribe = null;
@@ -343,6 +344,7 @@ async function getFriendStatus(myUid, otherUid, callback) {
 onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = '../index.html'; return; }
   _currentUser = user;
+  _checkAdminForAnnounce();
   await _initChat();
 });
 
@@ -409,6 +411,38 @@ function renderMessages(messages) {
   }
   box.innerHTML = '';
   messages.forEach(m => {
+    // Kiểm tra tin nhắn đã bị xoá mềm
+    const isDeleted = m.isDeleted === true;
+
+    // === ANNOUNCEMENT: hiển thị đặc biệt ===
+    if (m.isAnnouncement) {
+      const div = document.createElement('div');
+      div.className = 'cwm-msg announce-msg';
+      div.innerHTML = `<div class="announce-bubble">
+        <div class="announce-badge"><span class="icon">📢</span> THÔNG BÁO</div>
+        <div class="announce-text">${escHtml(m.text)}</div>
+        <div class="announce-footer">${escHtml(m.senderName || 'Admin')} · ${m.time}</div>
+      </div>`;
+      box.appendChild(div);
+
+      // Toast notification for new announcements only
+      if (m.id && !_notifiedAnnouncements.has(m.id)) {
+        _notifiedAnnouncements.add(m.id);
+        // Chỉ toast nếu là tin mới nhất (vừa được gửi)
+        if (_lastMessages.length > 0 && m === _lastMessages[_lastMessages.length - 1]) {
+          window.showToast('📢 <strong>Thông báo mới:</strong> ' + escHtml((m.text||'').slice(0,60)), 'warn');
+          // Rung badge trên sidebar
+          const badge = document.getElementById('vt-badge-chat');
+          if (badge) {
+            badge.textContent = '📢';
+            badge.classList.add('visible');
+            setTimeout(() => { badge.textContent = ''; badge.classList.remove('visible'); }, 10000);
+          }
+        }
+      }
+      return;
+    }
+
     const isMe = _currentUser && m.senderUid === _currentUser.uid;
     const div = document.createElement('div');
     div.className = 'cwm-msg ' + (isMe ? 'mine-msg' : 'other-msg');
@@ -420,21 +454,15 @@ function renderMessages(messages) {
 
     const msgId = m.id || '';
     const deleteBtn = msgId ? `<button class="cwm-del" onclick="window.deleteMessage('${msgId}')" title="Xoá tin nhắn">🗑</button>` : '';
-
-    // Kiểm tra tin nhắn đã bị xoá mềm
-    const isDeleted = m.isDeleted === true;
     
-    // === SỬA: Hiển thị HTML nếu tin nhắn chứa thẻ HTML (gửi điểm) ===
     let displayText;
     let deletedStyle = isDeleted ? 'opacity:0.5;font-style:italic;color:#4a7a9b;' : '';
     
     if (isDeleted) {
       displayText = '🗑️ Tin nhắn đã bị xoá';
     } else if (m.text && (m.text.includes('<b') || m.text.includes('<span') || m.text.includes('style=') || m.text.includes('🟡'))) {
-      // Nếu tin nhắn chứa HTML hoặc biểu tượng đặc biệt -> hiển thị trực tiếp
       displayText = m.text;
     } else {
-      // Tin nhắn thường -> escape để an toàn
       displayText = escHtml(m.text);
     }
 
@@ -700,6 +728,160 @@ window._renderMyFriendsList = function renderMyFriendsList() {
     });
   });
 }
+// ===== ADMIN SEND ANNOUNCEMENT =====
+window._sendAdminAnnouncement = async function() {
+  const text = document.getElementById('announceAdminText')?.value.trim();
+  const status = document.getElementById('announceAdminStatus');
+  const btn = document.getElementById('announceAdminBtn');
+  if (!text) {
+    status.className = 'announce-admin-status error';
+    status.textContent = '❌ Vui lòng nhập nội dung thông báo';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = '⏳ Đang gửi...';
+  status.className = 'announce-admin-status';
+  status.textContent = '';
+  try {
+    const adminName = _currentUser?.displayName || _currentUser?.email?.split('@')[0] || 'Admin';
+    // Chỉ ghi vào chats/server/messages — announcements collection bị chặn bởi security rules
+    await addDoc(collection(db, 'chats', 'server', 'messages'), {
+      text,
+      senderUid: _currentUser.uid,
+      senderName: '📢 ' + adminName,
+      createdAt: serverTimestamp(),
+      isAnnouncement: true,
+      hiddenFor: []
+    });
+    status.className = 'announce-admin-status success';
+    status.textContent = '✅ Đã gửi thông báo!';
+    document.getElementById('announceAdminText').value = '';
+    document.getElementById('announceAdminPreview').classList.remove('visible');
+    setTimeout(() => { status.className = 'announce-admin-status'; status.textContent = ''; }, 3000);
+  } catch (e) {
+    console.error('Announce error:', e);
+    status.className = 'announce-admin-status error';
+    status.textContent = '❌ Lỗi: ' + (e.message || 'Không xác định');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📢 Gửi thông báo';
+  }
+};
+
+window.previewChatAnnounce = function() {
+  const text = document.getElementById('announceAdminText')?.value.trim();
+  const preview = document.getElementById('announceAdminPreview');
+  const previewText = document.getElementById('announceAdminPreviewText');
+  if (text && preview && previewText) {
+    preview.classList.add('visible');
+    previewText.textContent = text;
+  } else if (preview) {
+    preview.classList.remove('visible');
+  }
+};
+
+let _announceBtnBound = false;
+
+// Check admin and show form
+function _checkAdminForAnnounce() {
+  if (!_currentUser) return;
+  const email = (_currentUser.email || '').trim().toLowerCase();
+  const form = document.getElementById('announceAdminForm');
+  if (form) {
+    form.style.display = (email === 'thang@game.com') ? 'block' : 'none';
+  }
+  // Bind button only once
+  if (!_announceBtnBound) {
+    document.getElementById('announceAdminBtn')?.addEventListener('click', window._sendAdminAnnouncement);
+    _announceBtnBound = true;
+  }
+}
+
+// ===== ANNOUNCEMENT LISTENER (sidebar tab) =====
+let _announceUnsubscribe = null;
+let _announceListened = false;
+
+window._renderAnnouncements = function() {
+  const list = document.getElementById('announceList');
+  if (!list) return;
+  if (!_announceListened) {
+    _listenAnnouncements();
+  }
+};
+
+function _cleanupAnnounceListener() {
+  if (_announceUnsubscribe) {
+    _announceUnsubscribe();
+    _announceUnsubscribe = null;
+  }
+  _announceListened = false;
+}
+
+function _listenAnnouncements() {
+  _cleanupAnnounceListener();
+  
+  const list = document.getElementById('announceList');
+  if (!list) return;
+  list.innerHTML = '<div class="announce-empty">Đang tải thông báo...</div>';
+  
+  try {
+    // Đọc từ chats/server/messages thay vì announcements collection (bị chặn security rules)
+    const q = query(
+      collection(db, 'chats', 'server', 'messages'),
+      orderBy('createdAt'),
+      limit(200)
+    );
+    _announceUnsubscribe = onSnapshot(q, (snap) => {
+      _announceListened = true;
+      const list = document.getElementById('announceList');
+      if (!list) return;
+      
+      const announces = [];
+      snap.forEach(d => {
+        const data = d.data();
+        // Chỉ lấy tin nhắn là announcement
+        if (!data.isAnnouncement) return;
+        const ts = data.createdAt?.toDate();
+        announces.push({
+          id: d.id,
+          text: data.text || '',
+          adminName: (data.senderName || 'Admin').replace('📢 ', ''),
+          time: ts
+            ? ts.getHours().toString().padStart(2,'0') + ':' + ts.getMinutes().toString().padStart(2,'0') + ' ' + ts.getDate() + '/' + (ts.getMonth()+1) + '/' + ts.getFullYear()
+            : ''
+        });
+      });
+      
+      if (!announces.length) {
+        list.innerHTML = '<div class="announce-empty">📭 Chưa có thông báo nào từ Admin</div>';
+        return;
+      }
+      
+      // Đảo ngược để hiển thị mới nhất lên đầu (ascending order, limit 100 gần nhất)
+      announces.reverse();
+      list.innerHTML = announces.map((a, i) => `
+        <div class="announce-card" style="animation-delay:${i * 0.05}s">
+          <div class="announce-card-badge"><span class="icon">📢</span> THÔNG BÁO</div>
+          <div class="announce-card-text">${escHtml(a.text)}</div>
+          <div class="announce-card-footer">
+            <span class="announce-card-admin">✏️ ${escHtml(a.adminName)}</span>
+            <span>🕐 ${a.time}</span>
+          </div>
+        </div>
+      `).join('');
+    }, (err) => {
+      console.warn('Announce listener error:', err);
+      _announceListened = false;
+      const listEl = document.getElementById('announceList');
+      if (listEl) listEl.innerHTML = '<div class="announce-empty">❌ Lỗi tải thông báo. Vui lòng thử lại sau.</div>';
+    });
+  } catch(e) {
+    console.warn('Announce query error:', e);
+    const listEl = document.getElementById('announceList');
+    if (listEl) listEl.innerHTML = '<div class="announce-empty">❌ Lỗi tải thông báo</div>';
+  }
+}
+
 // ===== chat.js – Phần 3 =====
 
 // ===== VIEW PROFILE (dùng chung profile-card.js) =====

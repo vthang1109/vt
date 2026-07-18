@@ -351,12 +351,11 @@ function showTitlePickerModal(uid) {
   }
   attachOpts();
 
-  modal.querySelector('#vtTitleSaveBtn')?.addEventListener('click', async () => {
-    const arr = [...selected];
+  modal.querySelector('#vtTitleSaveBtn')?.addEventListener('click', async () => {      const arr = [...selected];
     try {
+      const jsonArr = [arr[0], arr[1]].filter(Boolean);
       await updateDoc(doc(db, 'users', uid), {
-        activeTitle:  arr[0] || null,
-        activeTitle2: arr[1] || null,
+        activeTitle: jsonArr.length ? JSON.stringify(jsonArr) : null
       });
       modal.remove();
     } catch (e) { alert('Lỗi: ' + e.message); }
@@ -365,7 +364,7 @@ function showTitlePickerModal(uid) {
   modal.querySelector('#vtTitleClearBtn')?.addEventListener('click', async () => {
     try {
       selected.clear();
-      await updateDoc(doc(db, 'users', uid), { activeTitle: null, activeTitle2: null });
+      await updateDoc(doc(db, 'users', uid), { activeTitle: null });
       modal.remove();
     } catch (e) { alert('Lỗi: ' + e.message); }
   });
@@ -451,15 +450,24 @@ function listenProfile(uid) {
     const stats = { points, friends: friends.length };
     const ownedShopIds = d.ownedTitles || [];
     const ownedTitles = getOwnedTitles(stats, ownedShopIds);
-    const activeTitle = (d.activeTitle && getTitleById(d.activeTitle) &&
-                          ownedTitles.some(t => t.id === d.activeTitle))
-      ? getTitleById(d.activeTitle)
+    function parseActiveTitles(val) {
+      if (!val) return [null, null];
+      if (typeof val === 'string') {
+        try { const p = JSON.parse(val); if (Array.isArray(p)) return [p[0]||null, p[1]||null]; } catch {}
+        return [val, null];
+      }
+      return [null, null];
+    }
+    const [activeId1, activeId2] = parseActiveTitles(d.activeTitle);
+
+    const activeTitle = (activeId1 && getTitleById(activeId1) &&
+                          ownedTitles.some(t => t.id === activeId1))
+      ? getTitleById(activeId1)
       : getDefaultTitle(stats, ownedShopIds);
 
-    const activeTitle2Id = d.activeTitle2 || null;
-    const activeTitle2 = (activeTitle2Id && getTitleById(activeTitle2Id) &&
-                          ownedTitles.some(t => t.id === activeTitle2Id))
-      ? getTitleById(activeTitle2Id) : null;
+    const activeTitle2 = (activeId2 && getTitleById(activeId2) &&
+                          ownedTitles.some(t => t.id === activeId2))
+      ? getTitleById(activeId2) : null;
 
     const tEl = document.getElementById('pro-titles-list');
     if (tEl) {
@@ -469,7 +477,7 @@ function listenProfile(uid) {
     }
 
     // Lưu lại để dùng khi mở popup chọn danh hiệu
-    window._vtTitleState = { uid, ownedTitles, activeId: activeTitle?.id || null, activeId2: activeTitle2?.id || null };
+    window._vtTitleState = { uid, ownedTitles, activeId: activeId1, activeId2: activeId2 };
 
     // Ảnh cá nhân — chỉ render khi có data
     if (d.photoUrl) renderPhoto(d.photoUrl);

@@ -14,180 +14,224 @@
   margin-bottom: 24px;
 }
 
-/* ===== TABS ===== */
-.bag-tabs {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-}
-
-.bag-tab {
-  padding: 10px 20px;
-  border-radius: 50px;
-  border: 2px solid rgba(56,189,248,0.25);
-  background: rgba(15,23,42,0.8);
-  color: #94a3b8;
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 700;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.bag-tab:hover {
-  border-color: #38bdf8;
-  color: #e2e8f0;
-}
-
-.bag-tab.active {
-  background: rgba(14,165,233,0.2);
-  border-color: #38bdf8;
-  color: #38bdf8;
-  box-shadow: 0 0 20px rgba(56,189,248,0.2);
-}
-
-/* ===== PANELS ===== */
-.bag-panel {
-  display: none;
-}
-
-.bag-panel.active-panel {
-  display: block;
-}
-
-/* ===== SHARD BARS ===== */
-#bag-shard-bar,
-#outfit-shard-bar {
-  margin-bottom: 18px;
-}
-
-/* ===== GRID ===== */
-.bag-grid {
+/* ===== PET GRID ===== */
+.pet-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
-/* ===== PET CARD ===== */
-.bag-pet-card {
-  background: rgba(8,18,36,0.75);
+/* ===== PET CARD (y hệt profile) ===== */
+.pet-card {
+  background: rgba(15,23,42,0.7);
   backdrop-filter: blur(8px);
-  border-radius: 16px;
-  padding: 14px 10px;
-  text-align: center;
-  border: 2px solid rgba(255,255,255,0.08);
-  transition: all 0.25s;
+  border: 1.5px solid rgba(56,189,248,0.12);
+  border-radius: 18px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  transition: border-color 0.4s, box-shadow 0.4s, transform 0.25s;
+  position: relative;
+  overflow: visible;
+  cursor: pointer;
 }
 
-.bag-pet-card:hover {
+.pet-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-  border-color: rgba(56,189,248,0.3);
 }
 
-.pet-emoji {
-  font-size: 42px;
+.pet-card:active {
+  transform: scale(0.97);
+}
+
+/* ── Tier ring (frame tròn nhỏ như profile) ── */
+.pet-card-img-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(15,23,42,0.5);
+  border: 2px solid rgba(56,189,248,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+
+.pet-card-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.pet-card:hover .pet-card-img {
+  transform: scale(1.1);
+}
+
+.pet-card-emoji,
+.pet-card-emoji-fb {
+  font-size: 36px;
   line-height: 1;
 }
 
-.pet-name {
-  font-weight: 800;
-  font-size: 13px;
-  color: #e0f2fe;
-}
-
-.pet-qty {
-  font-size: 22px;
+/* ── Tier badge (góc trên phải card vuông) ── */
+.pet-card-tier {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 2px 7px;
+  font-size: 7px;
   font-weight: 900;
-  color: #fbbf24;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  border-radius: 5px;
+  border: 1px solid;
+  text-transform: uppercase;
+  z-index: 5;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
 }
 
-.bag-actions {
-  display: flex;
-  gap: 6px;
-  margin-top: 6px;
-  flex-wrap: wrap;
-  justify-content: center;
-  width: 100%;
-}
-
-/* ===== ITEM CARD ===== */
-.bag-item-card {
-  background: rgba(8,18,36,0.75);
-  backdrop-filter: blur(8px);
-  border-radius: 16px;
-  padding: 14px 10px;
+.pet-card-name {
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #e0f2fe;
   text-align: center;
-  border: 1px solid rgba(255,255,255,0.08);
-  transition: all 0.2s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  line-height: 1.2;
+  margin-top: 2px;
 }
 
-.bag-item-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(56,189,248,0.25);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-}
-
-.item-icon {
-  font-size: 38px;
-}
-
-.item-name {
+/* ── Qty badge ── */
+.pet-card-qty {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 15px;
   font-weight: 800;
-  font-size: 13px;
-  color: #e0f2fe;
-}
-
-.item-qty {
-  font-size: 20px;
-  font-weight: 900;
   color: #fbbf24;
+  line-height: 1;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(15,23,42,0.8);
+  border: 1px solid rgba(251,191,36,0.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  z-index: 3;
+  pointer-events: none;
 }
 
-.item-desc {
-  font-size: 10px;
-  color: #7dd3fc;
-}
-
-/* ===== BUTTONS ===== */
-.bag-btn {
-  padding: 7px 14px;
+/* ── Disassemble button ── */
+.pet-card-btn {
+  padding: 6px 16px;
   border-radius: 10px;
-  border: none;
-  font-weight: 700;
+  border: 1px solid rgba(244,63,94,0.3);
+  background: rgba(244,63,94,0.12);
+  color: #f87171;
+  font-family: 'Science Gothic', sans-serif;
   font-size: 11px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Nunito', sans-serif;
-  color: #fff;
+  z-index: 2;
+  position: relative;
 }
 
-.bag-btn:hover {
+.pet-card-btn:hover {
+  background: rgba(244,63,94,0.25);
   transform: scale(1.05);
 }
 
-.bag-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+/* ===== TIER COLORS (y hệt profile) ===== */
+
+/* Tier 1 — Gà mờ (xám) */
+.pet-card.tier-1 {
+  border-color: #94a3b8;
+  box-shadow: 0 0 8px #94a3b866, 0 0 20px #94a3b833;
+}
+.pet-card.tier-1 .pet-card-img-wrap {
+  border-color: #94a3b8;
+  box-shadow: inset 0 0 10px #94a3b844;
+}
+.pet-card.tier-1 .pet-card-tier {
+  color: #cbd5e1;
+  background: rgba(148,163,184,0.18);
+  border-color: #94a3b8;
 }
 
-.bag-btn.disassemble {
-  background: rgba(244,63,94,0.2);
-  color: #f87171;
-  border: 1px solid rgba(244,63,94,0.3);
+/* Tier 2 — Tinh anh (xanh lá) */
+.pet-card.tier-2 {
+  border-color: #34d399;
+  box-shadow: 0 0 10px #34d39988, 0 0 24px #34d39944;
+}
+.pet-card.tier-2 .pet-card-img-wrap {
+  border-color: #34d399;
+  box-shadow: inset 0 0 10px #34d39944;
+}
+.pet-card.tier-2 .pet-card-tier {
+  color: #6ee7b7;
+  background: rgba(52,211,153,0.15);
+  border-color: #34d399;
 }
 
-/* ===== MODAL ===== */
+/* Tier 3 — Bá sàn (xanh dương) */
+.pet-card.tier-3 {
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px #38bdf888, 0 0 24px #38bdf844;
+}
+.pet-card.tier-3 .pet-card-img-wrap {
+  border-color: #38bdf8;
+  box-shadow: inset 0 0 10px #38bdf844;
+}
+.pet-card.tier-3 .pet-card-tier {
+  color: #7dd3fc;
+  background: rgba(56,189,248,0.15);
+  border-color: #38bdf8;
+}
+
+/* Tier 4 — Kiệt tác (đỏ) */
+.pet-card.tier-4 {
+  border-color: #f43f5e;
+  box-shadow: 0 0 10px #f43f5e88, 0 0 24px #f43f5e44;
+}
+.pet-card.tier-4 .pet-card-img-wrap {
+  border-color: #f43f5e;
+  box-shadow: inset 0 0 10px #f43f5e44;
+}
+.pet-card.tier-4 .pet-card-tier {
+  color: #fda4af;
+  background: rgba(244,63,94,0.15);
+  border-color: #f43f5e;
+}
+
+/* Tier 5 — Huyền thoại (vàng) */
+.pet-card.tier-5 {
+  border-color: #fbbf24;
+  box-shadow: 0 0 12px #fbbf2488, 0 0 28px #fbbf2444;
+}
+.pet-card.tier-5 .pet-card-img-wrap {
+  border-color: #fbbf24;
+  box-shadow: inset 0 0 14px #fbbf2444;
+}
+.pet-card.tier-5 .pet-card-tier {
+  color: #fde68a;
+  background: rgba(251,191,36,0.15);
+  border-color: #fbbf24;
+}
+
+/* ===== SHARD BAR ===== */
+#bag-shard-bar {
+  margin-bottom: 18px;
+  animation: fadeUp 0.5s 0.15s both;
+}
+
+/* ===== MODAL (dùng chung) ===== */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -244,117 +288,7 @@
   color: #e0f2fe;
 }
 
-/* ===== WARDROBE (trong bag) ===== */
-.wardrobe-tabs {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-
-.wardrobe-tab {
-  flex: 1;
-  min-width: 50px;
-  padding: 8px 6px;
-  border-radius: 10px;
-  border: 1px solid rgba(56,189,248,0.15);
-  background: transparent;
-  color: #94a3b8;
-  font-size: 11px;
-  font-weight: 800;
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.2s;
-  font-family: 'Nunito', sans-serif;
-}
-
-.wardrobe-tab.active {
-  background: rgba(56,189,248,0.15);
-  border-color: rgba(56,189,248,0.4);
-  color: #38bdf8;
-}
-
-.wardrobe-items {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
-  max-height: 280px;
-  overflow-y: auto;
-}
-
-.wardrobe-item {
-  aspect-ratio: 1;
-  background: rgba(15,23,42,0.7);
-  border: 2px solid rgba(56,189,248,0.1);
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  cursor: pointer;
-  position: relative;
-  padding: 6px;
-}
-
-.wardrobe-item:hover {
-  border-color: rgba(56,189,248,0.4);
-  transform: translateY(-2px);
-}
-
-.wardrobe-item.equipped {
-  border-color: #38bdf8;
-  background: rgba(56,189,248,0.12);
-  box-shadow: 0 0 12px rgba(56,189,248,0.25);
-}
-
-.wardrobe-item .emoji {
-  font-size: 30px;
-  line-height: 1;
-}
-
-.wardrobe-item .name {
-  font-size: 10px;
-  color: #94a3b8;
-  text-align: center;
-  font-weight: 700;
-}
-
-.wardrobe-item .check {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  font-size: 12px;
-  color: #38bdf8;
-}
-
-.wardrobe-preview {
-  width: 100%;
-  height: 260px;
-  background: rgba(56,189,248,0.05);
-  border: 2px solid rgba(56,189,248,0.25);
-  border-radius: 16px;
-  margin-bottom: 16px;
-  position: relative;
-  overflow: hidden;
-}
-
-.save-outfit-btn {
-  width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  border: none;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  color: #fff;
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 900;
-  font-size: 13px;
-  cursor: pointer;
-  letter-spacing: 1px;
-}
-
-.save-outfit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(34,197,94,0.4);
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

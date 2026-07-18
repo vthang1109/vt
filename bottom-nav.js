@@ -41,13 +41,15 @@ window.BottomNav = (() => {
       position: relative;
     }
     .vt-bn-tab:active { background: rgba(2,136,209,0.08); }
+    .vt-bn-tab:active .vt-bn-icon { transform: scale(0.88); }
+    .vt-bn-tab.active:active .vt-bn-icon { transform: scale(0.92); }
     .vt-bn-icon {
       width: 28px; height: 28px;
       display: flex; align-items: center; justify-content: center;
       position: relative;
+      transition: transform 0.12s cubic-bezier(0.4,0,0.2,1);
     }
     .vt-bn-icon svg {
-      width: 26px; height: 26px;
       stroke-width: 1.8; fill: none;
       stroke: rgba(148,163,184,0.7);
       transition: stroke 0.15s, fill 0.15s;
@@ -59,6 +61,18 @@ window.BottomNav = (() => {
     .vt-bn-tab.active .vt-bn-icon svg { stroke: #0288D1; }
     .vt-bn-tab.active .vt-bn-icon svg.vt-bn-fill { fill: #0288D1; stroke: none; }
     .vt-bn-tab.active .vt-bn-icon svg.fill-active { fill: #0288D1; stroke: #0288D1; }
+    .vt-bn-tab.active .vt-bn-icon::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 6px;
+      background: rgba(2,136,209,0.08);
+      animation: vtBnPulse 2s ease-in-out infinite;
+    }
+    @keyframes vtBnPulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.12); }
+    }
     .vt-bn-label { display: none; }
     .vt-bn-badge {
       position: absolute; top: -4px; right: -6px;
@@ -171,12 +185,12 @@ window.BottomNav = (() => {
     }
   `;
 
-  // BASE = thư mục chứa chính file bottom-nav.js (vd: vt-main/ hoặc vt-main/js/).
-  // Dùng document.currentScript (không phải import.meta.url) để KHÔNG bắt buộc
-  // các trang phải khai báo <script type="module">. import.meta.url chỉ hợp lệ
-  // trong module script -> nếu có 1 trang quên type="module" thì cả file lỗi cú
-  // pháp ngay lúc parse, không chạy được dòng nào (nav biến mất hoàn toàn).
-  // document.currentScript hoạt động bình thường với <script src="..."> thường.
+  // BASE = thu muc chua chinh file bottom-nav.js (vd: vt-main/ hoac vt-main/js/).
+  // Dung document.currentScript (khong phai import.meta.url) de KHONG bat buoc
+  // cac trang phai khai bao <script type="module">. import.meta.url chi hop le
+  // trong module script -> neu co 1 trang quen type="module" thi ca file loi cu
+  // phap ngay luc parse, khong chay duoc dong nao (nav bien mat hoan toan).
+  // document.currentScript hoat dong binh thuong voi <script src="..."> thuong.
   const BASE = (() => {
     const script = document.currentScript ||
       document.querySelector('script[src*="bottom-nav.js"]');
@@ -261,13 +275,13 @@ window.BottomNav = (() => {
         <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 4px"></div>
         <div style="font-family:'Science Gothic', sans-serif;font-size:12px;font-weight:500;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">🛒 Shop & Túi đồ</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 18px">
-          <a href="${resolveHref('app/shop.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
-            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f6d2.png" width="30" height="30" alt="Shop"></div>
+          <a href="${resolveHref('app/shop.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(34,197,94,0.25);background:rgba(34,197,94,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <div style="width:72px;height:72px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:#bbf7d0;box-shadow:0 2px 8px rgba(0,0,0,0.12)"><img src="https://img.icons8.com/?size=100&id=Ypj9RsvB5YHH&format=png&color=000000" width="44" height="44" alt="Shop" style="object-fit:contain"></div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Shop</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Gacha · Mua vật phẩm</span>
           </a>
-          <a href="${resolveHref('app/bag.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
-            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2))"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f392.png" width="30" height="30" alt="Túi đồ"></div>
+          <a href="${resolveHref('app/bag.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(239,68,68,0.20);background:rgba(239,68,68,0.06);cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <div style="width:72px;height:72px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:#fecaca;box-shadow:0 2px 8px rgba(0,0,0,0.12)"><img src="https://img.icons8.com/?size=100&id=BwkSLLBADf4F&format=png&color=000000" width="44" height="44" alt="Túi đồ" style="object-fit:contain"></div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Túi đồ</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Thú cưng · Vật phẩm</span>
           </a>
@@ -279,18 +293,13 @@ window.BottomNav = (() => {
         <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 4px"></div>
         <div style="font-family:'Science Gothic', sans-serif;font-size:12px;font-weight:500;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">📱 Ứng dụng & Trò chơi</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 18px">
-          <a href="${resolveHref('apps/expense/expense.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(20,184,166,0.18);background:rgba(20,184,166,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
-            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(20,184,166,0.3),rgba(13,148,136,0.2))"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f4b0.png" width="30" height="30" alt="Chi tiêu"></div>
-            <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Chi Tiêu</span>
-            <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Quản lý thu chi cá nhân</span>
-          </a>
-          <a href="${resolveHref('app/applications.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
-            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f4f1.png" width="30" height="30" alt="Ứng dụng"></div>
+          <a href="${resolveHref('app/applications.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(251,146,60,0.25);background:rgba(251,146,60,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <div style="width:72px;height:72px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:#fed7aa;box-shadow:0 2px 8px rgba(0,0,0,0.12)"><img width="44" height="44" src="https://img.icons8.com/?size=100&id=aofWp8x2uWHs&format=png&color=000000" alt="Ứng dụng" style="object-fit:contain"/></div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Ứng dụng</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Offline · Không cần login</span>
           </a>
-          <a href="${resolveHref('games.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(124,58,237,0.18);background:rgba(124,58,237,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
-            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(167,139,250,0.2))"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f3ae.png" width="30" height="30" alt="Game"></div>
+          <a href="${resolveHref('games.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(6,182,212,0.25);background:rgba(6,182,212,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <div style="width:72px;height:72px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:#a5f3fc;box-shadow:0 2px 8px rgba(0,0,0,0.12)"><img width="44" height="44" src="https://img.icons8.com/?size=100&id=cdTzm4ndoVu4&format=png&color=000000" alt="Game" style="object-fit:contain"/></div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Game</span>
             <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Mini games · Xếp hạng</span>
           </a>
@@ -335,19 +344,19 @@ window.BottomNav = (() => {
       <div class="vt-bottom-nav" id="vtBottomNav" data-active-key="${activeKey}">${tabsHTML}</div>`;
   }
 
-  // ── helpers ──────────────────────────────────────────────
+  // -- helpers ------------------------------------------------------------
   function _backdrop(show) {
     document.getElementById('vtPanelBackdrop').classList.toggle('open', show);
   }
   function _anyOpen() { return _profileOpen || _appsOpen || _shopOpen; }
-  // Gỡ 'active' khỏi cả 3 tab toggle (apps/shop/profile) trước khi bật 1 tab —
+  // Gỡ 'active' khỏi cả 3 tab toggle (apps/shop/profile) trước khi bật 1 tab --
   // tránh trường hợp tab của trang hiện tại (vd 'shop' trên shop.html) và tab
   // vừa bấm cùng sáng 1 lúc.
   function _clearToggleActive() {
     ['apps', 'shop', 'profile'].forEach(k => document.getElementById(`vt-${k}-tab`)?.classList.remove('active'));
   }
 
-  // ── profile ──────────────────────────────────────────────
+  // -- profile ------------------------------------------------------------
   function openPanel() {
     _closeAll();
     _profileOpen = true;
@@ -366,7 +375,7 @@ window.BottomNav = (() => {
   }
   function togglePanel() { _profileOpen ? closePanel() : openPanel(); }
 
-  // ── shop ─────────────────────────────────────────────────
+  // -- shop ---------------------------------------------------------------
   function openShopPanel() {
     _closeAll();
     _shopOpen = true;
@@ -383,7 +392,7 @@ window.BottomNav = (() => {
   }
   function toggleShopPanel() { _shopOpen ? closeShopPanel() : openShopPanel(); }
 
-  // ── apps ─────────────────────────────────────────────────
+  // -- apps ---------------------------------------------------------------
   function openAppsPanel() {
     _closeAll();
     _appsOpen = true;
@@ -417,7 +426,7 @@ window.BottomNav = (() => {
     }
   }
 
-  // ── bind ─────────────────────────────────────────────────
+  // -- bind ---------------------------------------------------------------
   function bindEvents() {
     document.getElementById('vt-apps-tab')?.addEventListener('click', e => { e.preventDefault(); toggleAppsPanel(); });
     document.getElementById('vt-shop-tab')?.addEventListener('click', e => { e.preventDefault(); toggleShopPanel(); });
@@ -425,7 +434,7 @@ window.BottomNav = (() => {
     document.getElementById('vtPanelBackdrop')?.addEventListener('click', _closeAll);
   }
 
-  // ── init
+  // -- init
   function init(opts = {}) {
     if (document.getElementById('vtBottomNav')) return;
     const activeKey = opts.active || 'home';

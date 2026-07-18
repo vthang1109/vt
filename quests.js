@@ -200,7 +200,11 @@ async function renderPanelStreak() {
         btnEl.disabled = true; btnEl.textContent = '...';
         const res = await processStreakLogin(user.uid);
         toast(res.todayClaimed ? 'Bạn đã nhận hôm nay rồi!' : `🔥 Chuỗi ${res.current} ngày · +${res.reward}đ!`, res.todayClaimed ? 'info' : 'success');
-        renderPanelStreak();
+        // Update UI trực tiếp từ kết quả — không đọc lại Firestore (tránh cache cũ)
+        if (numEl) numEl.textContent = String(res.current || 0);
+        if (lblEl) lblEl.textContent = `Quay lại ngày mai để +${STREAK_REWARDS[(res.current||0)+1] || 50}đ`;
+        btnEl.disabled = true;
+        btnEl.textContent = '✓ Đã nhận';
         updateBadge();
       };
     }

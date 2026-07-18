@@ -27,9 +27,10 @@
   <div class="chat-sidebar" id="chatSidebar">
     <!-- Tab bar -->
     <div class="sidebar-tabs">
-      <button class="stab active" data-tab="chat" onclick="sidebarTab('chat')">💬 Chat</button>
-      <button class="stab" data-tab="friends" onclick="sidebarTab('friends')">👥 Bạn bè</button>
-      <button class="stab" data-tab="explore" onclick="sidebarTab('explore')">🔍 Khám phá</button>
+      <button class="stab active" data-tab="chat" onclick="sidebarTab('chat')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="18" height="18" fill="currentColor"><path d="M0 240c0 54.4 19.3 104.6 51.9 144.9L3.1 474.3c-2 3.7-3.1 7.9-3.1 12.2 0 14.1 11.4 25.5 25.5 25.5 4 0 7.8-.6 11.5-2.1L153.4 460c31.4 12.9 66.1 20 102.6 20 141.4 0 256-107.5 256-240S397.4 0 256 0 0 107.5 0 240zM94 407.9c9.3-17.1 7.4-38.1-4.8-53.2-26.1-32.3-41.2-71.9-41.2-114.7 0-103.2 90.2-192 208-192s208 88.8 208 192-90.2 192-208 192c-30.2 0-58.7-5.9-84.3-16.4-11.9-4.9-25.3-4.8-37.1 .3L76 440.9 94 407.9zM144 272a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm144-32a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm80 32a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/></svg> Chat</button>
+      <button class="stab" data-tab="friends" onclick="sidebarTab('friends')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="18" height="18" fill="currentColor"><path d="M64 128a112 112 0 1 1 224 0 112 112 0 1 1 -224 0zM0 464c0-97.2 78.8-176 176-176s176 78.8 176 176l0 6c0 23.2-18.8 42-42 42L42 512c-23.2 0-42-18.8-42-42l0-6zM432 64a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 240c79.5 0 144 64.5 144 144l0 22.4c0 23-18.6 41.6-41.6 41.6l-144.8 0c6.6-12.5 10.4-26.8 10.4-42l0-6c0-51.5-17.4-98.9-46.5-136.7 22.6-14.7 49.6-23.3 78.5-23.3z"/></svg> Bạn bè</button>
+      <button class="stab" data-tab="explore" onclick="sidebarTab('explore')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="18" height="18" fill="currentColor"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376C296.3 401.1 253.9 416 208 416 93.1 416 0 322.9 0 208S93.1 0 208 0 416 93.1 416 208zM208 112c-13.3 0-24 10.7-24 24l0 48-48 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l48 0 0 48c0 13.3 10.7 24 24 24s24-10.7 24-24l0-48 48 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-48 0 0-48c0-13.3-10.7-24-24-24z"/></svg> Khám phá</button>
+      <button class="stab" data-tab="announce" onclick="sidebarTab('announce')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="18" height="18" fill="currentColor"><path d="M224 0c-13.3 0-24 10.7-24 24l0 9.7C118.6 45.3 56 115.4 56 200l0 14.5c0 37.7-10 74.7-29 107.3L5.1 359.2C1.8 365 0 371.5 0 378.2 0 399.1 16.9 416 37.8 416l372.4 0c20.9 0 37.8-16.9 37.8-37.8 0-6.7-1.8-13.3-5.1-19L421 321.7c-19-32.6-29-69.6-29-107.3l0-14.5c0-84.6-62.6-154.7-144-166.3l0-9.7c0-13.3-10.7-24-24-24zM392.4 368l-336.9 0 12.9-22.1C91.7 306 104 260.6 104 214.5l0-14.5c0-66.3 53.7-120 120-120s120 53.7 120 120l0 14.5c0 46.2 12.3 91.5 35.5 131.4L392.4 368zM156.1 464c9.9 28 36.6 48 67.9 48s58-20 67.9-48l-135.8 0z"/></svg> Thông báo</button>
     </div>
 
     <!-- Panel: Chat -->
@@ -63,6 +64,26 @@
         <input class="search-input" id="exploreInput" placeholder="🔍 Tìm người mới..." oninput="filterExplore()"/>
       </div>
       <div class="contact-list" id="allUsersInChat"></div>
+    </div>
+
+    <!-- Panel: Thông báo -->
+    <div class="sidebar-panel" id="panel-announce">
+      <div class="announce-panel-header">
+        <span class="announce-panel-title">📢 Thông báo từ Admin</span>
+      </div>
+      <!-- Admin send announcement form (chỉ hiện nếu là admin) -->
+      <div id="announceAdminForm" class="announce-admin-form" style="display:none">
+        <textarea class="announce-admin-textarea" id="announceAdminText" placeholder="Nhập nội dung thông báo..." maxlength="500" oninput="previewChatAnnounce()"></textarea>
+        <div class="announce-admin-preview" id="announceAdminPreview">
+          <div class="announce-card-badge">📢 XEM TRƯỚC</div>
+          <div class="announce-admin-preview-text" id="announceAdminPreviewText"></div>
+        </div>
+        <button class="announce-admin-btn" id="announceAdminBtn">📢 Gửi thông báo</button>
+        <div class="announce-admin-status" id="announceAdminStatus"></div>
+      </div>
+      <div class="announce-list" id="announceList">
+        <div class="announce-empty">Đang tải thông báo...</div>
+      </div>
     </div>
   </div>
 
@@ -109,6 +130,9 @@
     if (tab === 'friends') {
       window._renderFriendRequestsList && window._renderFriendRequestsList();
       window._renderMyFriendsList && window._renderMyFriendsList();
+    }
+    if (tab === 'announce') {
+      window._renderAnnouncements && window._renderAnnouncements();
     }
   };
 

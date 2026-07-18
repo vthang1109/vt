@@ -46,6 +46,7 @@ body { overflow: hidden; height: 100dvh; }
   font-family: "Science Gothic", sans-serif; font-size: 11px; font-weight: 500;
   cursor: pointer; transition: color 0.15s, text-shadow 0.15s;
   border-bottom: 2px solid transparent;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
 }
 .stab.active {
   color: #5ec9f0;
@@ -247,6 +248,200 @@ body { overflow: hidden; height: 100dvh; }
 }
 .cw-send:hover { transform: scale(1.08); box-shadow: 0 0 20px rgba(0,200,255,0.65); }
 .cw-send:active { transform: scale(0.94); }
+
+/* ===== ANNOUNCEMENT PANEL (sidebar tab) ===== */
+.announce-panel-header {
+  padding: 14px 16px 8px;
+  border-bottom: 1px solid rgba(251,191,36,0.12);
+  flex-shrink: 0;
+}
+.announce-panel-title {
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fbbf24;
+  letter-spacing: 0.3px;
+}
+
+/* Admin send announcement form */
+.announce-admin-form {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(251,191,36,0.12);
+  flex-shrink: 0;
+}
+.announce-admin-textarea {
+  width: 100%; padding: 10px 14px; border-radius: 12px;
+  border: 1px solid rgba(251,191,36,0.2);
+  background: rgba(0,0,0,0.3); color: #e0f2fe;
+  font-size: 13px; outline: none; font-family: 'Science Gothic', sans-serif;
+  box-sizing: border-box; resize: vertical; min-height: 60px;
+  transition: border-color 0.2s;
+}
+.announce-admin-textarea:focus { border-color: rgba(251,191,36,0.5); }
+.announce-admin-textarea::placeholder { color: #4a7a9b; }
+.announce-admin-preview {
+  margin-top: 8px; padding: 10px; border-radius: 10px;
+  background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.15);
+  display: none;
+}
+.announce-admin-preview.visible { display: block; }
+.announce-admin-preview-text {
+  color: #fde68a; font-size: 13px; line-height: 1.5; margin-top: 4px;
+}
+.announce-admin-btn {
+  width: 100%; margin-top: 8px; padding: 10px 24px; border-radius: 12px; border: none;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #1a0a00; font-weight: 800; font-size: 13px;
+  cursor: pointer; font-family: 'Science Gothic', sans-serif;
+  transition: all 0.2s;
+}
+.announce-admin-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(251,191,36,0.25); }
+.announce-admin-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.announce-admin-status {
+  font-size: 12px; color: #94a3b8; min-height: 18px; margin-top: 6px;
+  text-align: center;
+}
+.announce-admin-status.success { color: #34d399; }
+.announce-admin-status.error { color: #f87171; }
+
+.announce-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251,191,36,0.15) transparent;
+}
+.announce-list::-webkit-scrollbar { width: 3px; }
+.announce-list::-webkit-scrollbar-thumb { background: rgba(251,191,36,0.2); border-radius: 3px; }
+
+.announce-empty {
+  text-align: center;
+  color: #4a7a9b;
+  font-size: 13px;
+  padding: 30px 10px;
+  font-weight: 600;
+}
+
+.announce-card {
+  background: linear-gradient(135deg, rgba(251,191,36,0.06), rgba(245,158,11,0.02));
+  border: 1px solid rgba(251,191,36,0.18);
+  border-radius: 14px;
+  padding: 14px 16px;
+  animation: announceCardIn 0.35s ease both;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.announce-card:hover {
+  border-color: rgba(251,191,36,0.35);
+  box-shadow: 0 0 16px rgba(251,191,36,0.06);
+}
+.announce-card:first-child {
+  border-color: rgba(251,191,36,0.4);
+  background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.04));
+  box-shadow: 0 0 20px rgba(251,191,36,0.08);
+}
+
+@keyframes announceCardIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.announce-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: rgba(251,191,36,0.12);
+  border: 1px solid rgba(251,191,36,0.2);
+  color: #fbbf24;
+  font-size: 10px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+.announce-card-badge .icon { font-size: 12px; }
+
+.announce-card-text {
+  color: #fde68a;
+  font-size: 13px;
+  line-height: 1.6;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.announce-card-footer {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(251,191,36,0.45);
+  font-weight: 600;
+}
+.announce-card-admin {
+  color: rgba(251,191,36,0.6);
+}
+
+/* ===== ANNOUNCEMENT BUBBLE (trong chat window) ===== */
+.cwm-msg.announce-msg {
+  max-width: 100%;
+  align-self: center;
+  margin: 6px 0;
+  animation: announceSlideIn 0.4s ease;
+}
+@keyframes announceSlideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.announce-bubble {
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.05));
+  border: 1.5px solid rgba(251,191,36,0.35);
+  box-shadow: 0 0 20px rgba(251,191,36,0.1), inset 0 0 30px rgba(251,191,36,0.03);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.announce-bubble::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+}
+.announce-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 12px;
+  border-radius: 20px;
+  background: rgba(251,191,36,0.15);
+  border: 1px solid rgba(251,191,36,0.3);
+  color: #fbbf24;
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+.announce-badge .icon {
+  font-size: 14px;
+}
+.announce-text {
+  color: #fde68a;
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 500;
+}
+.announce-footer {
+  margin-top: 8px;
+  font-size: 10px;
+  color: rgba(251,191,36,0.5);
+  font-weight: 600;
+}
 
 /* ===== MOBILE ===== */
 @media (max-width: 640px) {

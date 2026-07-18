@@ -26,28 +26,25 @@
       <a class="page-top-tab active" href="bag.html">Túi đồ</a>
     </div>
 
-    <!-- TAB: THÚ CƯNG / VẬT PHẨM / DANH HIỆU -->
-    <div class="shop-tabs" id="bagTabs">
-      <button class="shop-tab active" data-tab="pet">🐾 Thú cưng</button>
-      <button class="shop-tab" data-tab="item">📦 Vật phẩm</button>
-      <button class="shop-tab" data-tab="title">🏅 Danh hiệu</button>
+    <!-- TAB BAR: Pet | Danh hiệu -->
+    <div class="shop-tab-bar">
+      <button class="shop-tab-btn active" data-tab="pet">
+        <span class="tab-icon">🐾</span>
+        <span class="tab-label">Thú Cưng</span>
+      </button>
+      <button class="shop-tab-btn" data-tab="title">
+        <span class="tab-icon">🏅</span>
+        <span class="tab-label">Danh Hiệu</span>
+      </button>
     </div>
 
-    <!-- PANEL PET -->
-    <div id="pet-panel" class="bag-panel active-panel">
+    <!-- CONTENT PANELS -->
+    <div class="shop-panel active" data-panel="pet">
       <div id="bag-shard-bar"></div>
-      <div class="shop-grid" id="bag-grid"></div>
+      <div class="pet-grid" id="bag-grid"></div>
     </div>
 
-    <!-- PANEL VẬT PHẨM -->
-    <div id="item-panel" class="bag-panel">
-      <div id="outfit-shard-bar"></div>
-      <div class="bag-stats" id="item-stats"></div>
-      <div class="shop-grid" id="item-grid"></div>
-    </div>
-
-    <!-- PANEL DANH HIỆU -->
-    <div id="title-panel" class="bag-panel">
+    <div class="shop-panel" data-panel="title">
       <div class="shop-grid" id="title-grid"></div>
     </div>
 
@@ -65,39 +62,21 @@
     </div>
   </div>
 
-  <!-- POPUP ĐỔI OUTFIT -->
-  <div id="outfitRedeemModal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
-    <div class="modal-box">
-      <div class="modal-header">
-        <span>🧩 Đổi mảnh nhân vật lấy trang bị</span>
-        <button class="modal-close" onclick="document.getElementById('outfitRedeemModal').classList.remove('open')">✕</button>
-      </div>
-      <div id="outfitRedeemSystemSwitch" style="display:flex;gap:8px;margin-bottom:12px;"></div>
-      <div id="outfitRedeemSlotTabs" class="shop-tabs" style="margin-bottom:12px;"></div>
-      <div id="outfitRedeemItems" class="shop-grid" style="max-height:240px;overflow-y:auto;"></div>
-      <button class="bag-btn" style="width:100%;margin-top:12px;background:rgba(56,189,248,0.15);padding:10px;font-size:13px;" onclick="document.getElementById('outfitRedeemModal').classList.remove('open')">Đóng</button>
-    </div>
-  </div>
+
 
   <script>
-    // Tab Thú cưng / Vật phẩm — bind sau DOM ready, scope trong #bagTabs
-    document.getElementById('bagTabs').addEventListener('click', e => {
-      const btn = e.target.closest('.shop-tab');
+    // Tab Pet / Danh hiệu
+    document.querySelector('.shop-tab-bar')?.addEventListener('click', e => {
+      const btn = e.target.closest('.shop-tab-btn');
       if (!btn) return;
-      document.querySelectorAll('#bagTabs .shop-tab').forEach(t => t.classList.remove('active'));
+      const tab = btn.dataset.tab;
+      document.querySelectorAll('.shop-tab-btn').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
-      const target = btn.dataset.tab;
-      document.querySelectorAll('.bag-panel').forEach(p => p.classList.remove('active-panel'));
-      if (target === 'pet') {
-        document.getElementById('pet-panel').classList.add('active-panel');
-        if (window._bagRenderBag) window._bagRenderBag();
-      } else if (target === 'item') {
-        document.getElementById('item-panel').classList.add('active-panel');
-        if (window._bagRenderItems) window._bagRenderItems();
-      } else if (target === 'title') {
-        document.getElementById('title-panel').classList.add('active-panel');
-        if (window._bagRenderTitles) window._bagRenderTitles();
-      }
+      document.querySelectorAll('.shop-panel').forEach(p => p.classList.remove('active'));
+      const panel = document.querySelector('.shop-panel[data-panel="' + tab + '"]');
+      if (panel) panel.classList.add('active');
+      if (tab === 'pet' && window._bagRenderBag) window._bagRenderBag();
+      else if (tab === 'title' && window._bagRenderTitles) window._bagRenderTitles();
     });
 
     // Background particles

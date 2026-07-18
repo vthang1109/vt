@@ -90,6 +90,82 @@
       margin-left: auto; color: #fbbf24; font-size: 20px;
     }
 
+    /* Change Password Modal */
+    .pw-modal-overlay {
+      position: fixed; inset: 0; z-index: 99999;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center;
+      animation: fadeIn 0.25s ease;
+    }
+    .pw-modal-overlay.open { display: flex; }
+    .pw-modal-box {
+      background: linear-gradient(145deg, #1a2744, #0f172a);
+      border: 1px solid rgba(56,189,248,0.2);
+      border-radius: 24px; padding: 30px;
+      max-width: 420px; width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    }
+    .pw-modal-box h3 {
+      color: #e0f2fe; font-size: 20px; margin-bottom: 8px;
+      font-family: 'Nunito', sans-serif;
+    }
+    .pw-modal-box p {
+      color: #7dd3fc; font-size: 13px; margin-bottom: 20px;
+    }
+    .pw-input {
+      width: 100%; padding: 12px 16px; border-radius: 12px;
+      border: 1px solid rgba(56,189,248,0.25);
+      background: rgba(0,0,0,0.3); color: #e0f2fe;
+      font-size: 15px; outline: none; font-family: 'Nunito', sans-serif;
+      box-sizing: border-box; margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+    .pw-input:focus { border-color: #38bdf8; }
+    .pw-input::placeholder { color: #475569; }
+    .pw-error {
+      color: #f87171; font-size: 13px; min-height: 20px;
+      margin-bottom: 8px;
+    }
+    .pw-success {
+      color: #34d399; font-size: 13px; min-height: 20px;
+      margin-bottom: 8px;
+    }
+    .pw-btn-row {
+      display: flex; gap: 10px;
+    }
+    .pw-btn {
+      flex: 1; padding: 12px; border-radius: 12px;
+      font-weight: 700; cursor: pointer;
+      font-family: 'Nunito', sans-serif; font-size: 14px;
+      transition: all 0.2s; border: none;
+    }
+    .pw-btn:hover { transform: scale(0.97); }
+    .pw-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .pw-btn-cancel {
+      border: 1px solid rgba(255,255,255,0.1);
+      background: none; color: #94a3b8;
+    }
+    .pw-btn-cancel:hover { background: rgba(255,255,255,0.05); }
+    .pw-btn-submit {
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #fff;
+    }
+    .pw-btn-submit:hover { box-shadow: 0 4px 20px rgba(56,189,248,0.4); }
+
+    .pw-strength {
+      height: 4px; border-radius: 2px;
+      margin: -6px 0 14px; transition: all 0.3s;
+      background: #1e293b;
+    }
+    .pw-strength.weak { background: #ef4444; width: 33%; }
+    .pw-strength.medium { background: #fbbf24; width: 66%; }
+    .pw-strength.strong { background: #34d399; width: 100%; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     /* Dark/Light theme */
     body.light-mode .settings-card { background: rgba(255,255,255,0.06); border-color: rgba(0,0,0,0.1); }
     body.light-mode .settings-label { color: #1e293b; }
@@ -157,7 +233,7 @@
     <div class="settings-card">
       <div class="settings-item">
         <span class="settings-label"><span class="icon">🔑</span>Đổi mật khẩu</span>
-        <button class="settings-btn primary" onclick="alert('Chức năng đang phát triển')">Đổi</button>
+        <button class="settings-btn primary" onclick="showChangePasswordModal()">Đổi</button>
       </div>
       <div class="settings-item">
         <span class="settings-label"><span class="icon">🚪</span>Đăng xuất</span>
@@ -187,13 +263,34 @@
     </div>
   </div>
 
+  <!-- Change Password Modal -->
+  <div class="pw-modal-overlay" id="pwModal">
+    <div class="pw-modal-box" onclick="event.stopPropagation()">
+      <h3>🔑 Đổi mật khẩu</h3>
+      <p>Nhập mật khẩu hiện tại và mật khẩu mới</p>
+
+      <input class="pw-input" id="pwCurrent" type="password" placeholder="Mật khẩu hiện tại" autocomplete="current-password" />
+      <input class="pw-input" id="pwNew" type="password" placeholder="Mật khẩu mới (tối thiểu 6 ký tự)" autocomplete="new-password" />
+      <div class="pw-strength" id="pwStrength"></div>
+      <input class="pw-input" id="pwConfirm" type="password" placeholder="Xác nhận mật khẩu mới" autocomplete="new-password" />
+
+      <div class="pw-error" id="pwError"></div>
+      <div class="pw-success" id="pwSuccess"></div>
+
+      <div class="pw-btn-row">
+        <button class="pw-btn pw-btn-cancel" id="pwCancel">Hủy</button>
+        <button class="pw-btn pw-btn-submit" id="pwSubmit">Đổi mật khẩu</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="../top-nav.js"></script>
   <script src="../bottom-nav.js"></script>
   <script type="module">
-    import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { auth, db } from './points.js';
+    import { auth, db } from '../points.js';
 
     const ADMIN_EMAIL = 'thang@game.com';
 
@@ -246,7 +343,7 @@
       if (confirm('Bạn có chắc muốn đăng xuất?')) {
         try {
           await signOut(auth);
-          window.location.href = 'index.html';
+          window.location.href = '../index.html';
         } catch (e) {
           alert('Đăng xuất thất bại: ' + e.message);
         }
@@ -263,7 +360,7 @@
       try {
         await deleteUser(auth.currentUser);
         alert('Tài khoản đã được xóa.');
-        window.location.href = 'index.html';
+        window.location.href = '../index.html';
       } catch (e) {
         alert('Xóa tài khoản thất bại: ' + e.message);
       }
@@ -296,6 +393,136 @@
     document.getElementById('notifToggle')?.addEventListener('click', function() {
       this.classList.toggle('on');
     });
+
+    // ===== ĐỔI MẬT KHẨU =====
+    window.showChangePasswordModal = function() {
+      const modal = document.getElementById('pwModal');
+      if (!modal) return;
+      modal.classList.add('open');
+
+      const currentInput = document.getElementById('pwCurrent');
+      const newInput = document.getElementById('pwNew');
+      const confirmInput = document.getElementById('pwConfirm');
+      const errorEl = document.getElementById('pwError');
+      const successEl = document.getElementById('pwSuccess');
+      const strengthBar = document.getElementById('pwStrength');
+      const submitBtn = document.getElementById('pwSubmit');
+
+      // Reset
+      currentInput.value = '';
+      newInput.value = '';
+      confirmInput.value = '';
+      errorEl.textContent = '';
+      successEl.textContent = '';
+      strengthBar.className = 'pw-strength';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Đổi mật khẩu';
+      currentInput.focus();
+
+      // Strength indicator
+      newInput.oninput = function() {
+        const val = this.value;
+        strengthBar.className = 'pw-strength';
+        if (val.length >= 6) {
+          const hasUpper = /[A-Z]/.test(val);
+          const hasLower = /[a-z]/.test(val);
+          const hasDigit = /[0-9]/.test(val);
+          const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(val);
+          const score = [hasUpper, hasLower, hasDigit, hasSpecial].filter(Boolean).length;
+          if (val.length >= 10 && score >= 3) strengthBar.className = 'pw-strength strong';
+          else if (val.length >= 7 && score >= 2) strengthBar.className = 'pw-strength medium';
+          else strengthBar.className = 'pw-strength weak';
+        }
+      };
+
+      // Enter key handler
+      function onKeydown(e) {
+        if (e.key === 'Enter') submitBtn.click();
+        if (e.key === 'Escape') closeModal();
+      }
+      document.addEventListener('keydown', onKeydown);
+
+      function closeModal() {
+        modal.classList.remove('open');
+        document.removeEventListener('keydown', onKeydown);
+      }
+
+      // Cancel
+      document.getElementById('pwCancel').onclick = closeModal;
+      modal.onclick = function(e) { if (e.target === modal) closeModal(); };
+
+      // Submit
+      submitBtn.onclick = async function() {
+        errorEl.textContent = '';
+        successEl.textContent = '';
+
+        const currentPw = currentInput.value;
+        const newPw = newInput.value;
+        const confirmPw = confirmInput.value;
+
+        // Validation
+        if (!currentPw) {
+          errorEl.textContent = '❌ Vui lòng nhập mật khẩu hiện tại';
+          currentInput.focus();
+          return;
+        }
+        if (!newPw || newPw.length < 6) {
+          errorEl.textContent = '❌ Mật khẩu mới phải có ít nhất 6 ký tự';
+          newInput.focus();
+          return;
+        }
+        if (newPw !== confirmPw) {
+          errorEl.textContent = '❌ Mật khẩu xác nhận không khớp';
+          confirmInput.focus();
+          return;
+        }
+        if (newPw === currentPw) {
+          errorEl.textContent = '❌ Mật khẩu mới không được giống mật khẩu hiện tại';
+          newInput.focus();
+          return;
+        }
+
+        // Disable button
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Đang xử lý...';
+
+        try {
+          const user = auth.currentUser;
+          if (!user) throw new Error('Bạn chưa đăng nhập');
+
+          if (!user.email) throw new Error('Tài khoản không có email (có thể đăng nhập bằng Google)');
+
+          // Bước 1: Re-authenticate
+          const credential = EmailAuthProvider.credential(user.email, currentPw);
+          await reauthenticateWithCredential(user, credential);
+
+          // Bước 2: Update password
+          await updatePassword(user, newPw);
+
+          successEl.textContent = '✅ Đổi mật khẩu thành công!';
+          submitBtn.textContent = '✓ Hoàn tất';
+
+          setTimeout(closeModal, 2000);
+        } catch (e) {
+          console.error('Change password error:', e);
+
+          if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+            errorEl.textContent = '❌ Mật khẩu hiện tại không đúng';
+          } else if (e.code === 'auth/requires-recent-login') {
+            errorEl.textContent = '❌ Vui lòng đăng nhập lại trước khi đổi mật khẩu (phiên đã cũ)';
+          } else if (e.code === 'auth/weak-password') {
+            errorEl.textContent = '❌ Mật khẩu mới quá yếu, cần ít nhất 6 ký tự';
+          } else if (e.code === 'auth/too-many-requests') {
+            errorEl.textContent = '❌ Quá nhiều yêu cầu. Vui lòng thử lại sau.';
+          } else {
+            errorEl.textContent = '❌ Lỗi: ' + (e.message || 'Không xác định');
+          }
+
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Đổi mật khẩu';
+        }
+      };
+    };
   </script>
 </body>
 </html>

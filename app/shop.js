@@ -8,18 +8,14 @@ import { TIER_META, getShopTitlesByTier, getTitleById } from '../titles.js';
 const TIER_COLOR = { 1:'#94a3b8', 2:'#34d399', 3:'#fbbf24', 4:'#f43f5e', 5:'#a78bfa' };
 const TIER_NAME  = { 1:'Ga mo', 2:'Tinh anh', 3:'Ba san', 4:'Kiet tac', 5:'Huyen thoai' };
 
-const GACHA_DATA = {
-  normal: [
-    { id:'pg_x1',  name:'Gacha Thuong x1',  icon:'🐣', qty:1,  price:500,  desc:'1 lan trieu hoi' },
-    { id:'pg_x10', name:'Gacha Thuong x10', icon:'🐣', qty:10, price:4500, desc:'10 lan · Tiet kiem 10%', badge:'best' },
-  ],
-  vip: [
-    { id:'pg_vip_x1',  name:'Gacha VIP x1',  icon:'🦄', qty:1,  price:4000,  desc:'1 lan trieu hoi VIP' },
-    { id:'pg_vip_x10', name:'Gacha VIP x10', icon:'🦄', qty:10, price:36000, desc:'10 lan · Tiet kiem 10%', badge:'best' },
-  ],
-};
+const GACHA_ITEMS = [
+  { id:'pg_x1',     name:'Gacha Thuong x1',  image:'/assets/pet/t1_1_1.png', qty:1,  price:500,   desc:'1 lan trieu hoi' },
+  { id:'pg_x10',    name:'Gacha Thuong x10', image:'/assets/pet/t1_3_1.png', qty:10, price:4500,  desc:'10 lan · Tiet kiem 10%', badge:'best' },
+  { id:'pg_vip_x1',  name:'Gacha VIP x1',     image:'/assets/pet/t4_1_1.png', qty:1,  price:4000,  desc:'1 lan trieu hoi VIP', vip: true },
+  { id:'pg_vip_x10', name:'Gacha VIP x10',    image:'/assets/pet/t4_3_1.png', qty:10, price:36000, desc:'10 lan · Tiet kiem 10%', badge:'best', vip: true },
+];
 
-let activeTab = 'normal';
+let shopActiveTab = 'gacha';
 let activeTitleTier = 'A';
 let myPoints = 0;
 let myOwnedTitleIds = [];
@@ -121,7 +117,31 @@ async function buyTitle(id, price) {
   });
 }
 
-// RENDER TIER TABS
+// ── SWITCH TAB (Gacha | Danh hiệu) ──────────────────────
+function switchTab(tab) {
+  if (tab === shopActiveTab) return;
+  shopActiveTab = tab;
+
+  // Cập nhật nút tab
+  document.querySelectorAll('.shop-tab-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+
+  // Cập nhật panel
+  document.querySelectorAll('.shop-panel').forEach(function(panel) {
+    panel.classList.toggle('active', panel.dataset.panel === tab);
+  });
+
+  // Render nếu cần
+  if (tab === 'title') {
+    renderTitleTierTabs();
+    renderTitleGrid();
+  } else {
+    renderGacha();
+  }
+};
+
+// ── RENDER TIER TABS ────────────────────────────────────
 function renderTitleTierTabs() {
   const wrap = document.getElementById('titleTierTabs');
   if (!wrap) return;
@@ -139,18 +159,14 @@ function renderTitleTierTabs() {
   });
 }
 
-// RENDER TITLE GRID
+// ── RENDER TITLE GRID ────────────────────────────────────
 function renderTitleGrid() {
-  const grid  = document.getElementById('shopGrid');
-  const label = document.getElementById('shopSectionLabel');
+  const grid  = document.getElementById('titleGrid');
   if (!grid) return;
 
   const meta  = TIER_META[activeTitleTier];
   const items = getShopTitlesByTier(activeTitleTier);
 
-  if (label) label.textContent = 'Danh hieu — ' + meta.name;
-
-  // Lọc: user thường không thấy item bị khoá
   const visibleItems = isAdmin ? items : items.filter(function(t) { return !lockedItems.includes(t.id); });
 
   grid.innerHTML = visibleItems.map(function(t) {
@@ -180,7 +196,6 @@ function renderTitleGrid() {
     '</div>';
   }).join('');
 
-  // Admin lock buttons
   if (isAdmin) {
     grid.querySelectorAll('.admin-lock-btn').forEach(function(btn) {
       btn.addEventListener('click', function(e) {
@@ -192,7 +207,6 @@ function renderTitleGrid() {
     });
   }
 
-  // Buy buttons
   grid.querySelectorAll('.title-buy-btn:not([disabled])').forEach(function(btn) {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
@@ -229,7 +243,7 @@ function renderTitleGrid() {
   });
 }
 
-// SHOW GACHA RESULT
+// ── SHOW GACHA RESULT ────────────────────────────────────
 function showResult(results, type) {
   const grid = document.getElementById('resultGrid');
   const title = document.getElementById('resultTitle');
@@ -252,29 +266,19 @@ function showResult(results, type) {
   document.getElementById('resultOverlay').classList.add('active');
 }
 
-// RENDER GRID
-function render() {
-  const tierTabsEl = document.getElementById('titleTierTabs');
-
-  if (activeTab === 'title') {
-    if (tierTabsEl) tierTabsEl.style.display = 'flex';
-    renderTitleTierTabs();
-    renderTitleGrid();
-    return;
-  }
-  if (tierTabsEl) tierTabsEl.style.display = 'none';
-
+// ── RENDER GACHA GRID ────────────────────────────────────
+function renderGacha() {
   const grid  = document.getElementById('shopGrid');
-  const label = document.getElementById('shopSectionLabel');
-  const items = GACHA_DATA[activeTab];
   if (!grid) return;
 
-  if (label) label.textContent = activeTab === 'vip' ? 'Gacha VIP · Ti le cao hon' : 'Gacha Thuong';
-
-  grid.innerHTML = items.map(function(item) {
+  grid.innerHTML = GACHA_ITEMS.map(function(item) {
     const locked = lockedItems.includes(item.id);
-    return '<div class="shop-card' + (activeTab === 'vip' ? ' vip' : '') + (locked ? ' locked' : '') + '" data-qty="' + item.qty + '" data-price="' + item.price + '" data-type="' + activeTab + '" data-id="' + item.id + '" style="cursor:' + (locked ? 'not-allowed' : 'pointer') + ';' + (locked ? 'opacity:0.45;' : '') + '">' +
-      '<div class="shop-card-icon">' + item.icon + '</div>' +
+    const type   = item.vip ? 'vip' : 'normal';
+    return '<div class="shop-card' + (item.vip ? ' vip' : '') + (locked ? ' locked' : '') + '" data-qty="' + item.qty + '" data-price="' + item.price + '" data-type="' + type + '" data-id="' + item.id + '" style="cursor:' + (locked ? 'not-allowed' : 'pointer') + ';' + (locked ? 'opacity:0.45;' : '') + '">' +
+      '<div class="shop-card-icon">' +
+        '<img src="' + item.image + '" alt="" class="shop-card-img" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"/>' +
+        '<span class="shop-card-icon-fallback" style="display:none;font-size:28px">' + (item.vip ? '🦄' : '🐣') + '</span>' +
+      '</div>' +
       '<div class="shop-card-info">' +
         '<div class="shop-card-name">' + item.name + (locked ? ' <span style="font-size:11px;color:#ef4444;">🔒 Đã khoá</span>' : '') + '</div>' +
         '<div class="shop-card-desc">' + item.desc + '</div>' +
@@ -282,7 +286,7 @@ function render() {
       '<div class="shop-card-right">' +
         '<div class="shop-card-price">' + item.price.toLocaleString('vi-VN') + ' 〄</div>' +
         (item.badge === 'best' ? '<span class="shop-card-badge badge-best">GIA TOT</span>' : '') +
-        (activeTab === 'vip' ? '<span class="shop-card-badge badge-vip">VIP</span>' : '') +
+        (item.vip ? '<span class="shop-card-badge badge-vip">VIP</span>' : '') +
         (isAdmin ? '<button class="admin-lock-btn" data-id="' + item.id + '" style="margin-top:4px;padding:3px 8px;border-radius:6px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:' + (locked ? 'rgba(34,197,94,0.2);color:#4ade80' : 'rgba(239,68,68,0.2);color:#f87171') + ';">' + (locked ? '🔓 Mở' : '🔒 Khoá') + '</button>' : '') +
       '</div>' +
     '</div>';
@@ -292,7 +296,6 @@ function render() {
     const newCard = card.cloneNode(true);
     card.parentNode.replaceChild(newCard, card);
 
-    // Admin toggle lock
     if (isAdmin) {
       newCard.querySelector('.admin-lock-btn')?.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -324,17 +327,15 @@ function render() {
 
 // INIT
 document.addEventListener('DOMContentLoaded', function() {
-  render();
-
-  document.getElementById('shopTabs').addEventListener('click', function(e) {
-    const btn = e.target.closest('.shop-tab');
-    if (!btn) return;
-    document.querySelectorAll('.shop-tab').forEach(function(t) { t.classList.remove('active', 'vip-tab'); });
-    btn.classList.add('active');
-    if (btn.dataset.tab === 'vip') btn.classList.add('vip-tab');
-    activeTab = btn.dataset.tab;
-    render();
+  // Click tab buttons
+  document.querySelectorAll('.shop-tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      switchTab(this.dataset.tab);
+    });
   });
+
+  // Mặc định mở Gacha ngay
+  renderGacha();
 
   onAuthStateChanged(auth, function(user) {
     if (!user) { location.href = 'index.html'; return; }
@@ -342,7 +343,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Listen shopConfig
     onSnapshot(doc(db, 'system', 'shopConfig'), function(snap) {
       lockedItems = snap.exists() ? (snap.data().locked || []) : [];
-      render();
+      renderGacha();
+      if (shopActiveTab === 'title') renderTitleGrid();
     });
 
     onSnapshot(doc(db, 'users', user.uid), function(snap) {
@@ -350,15 +352,24 @@ document.addEventListener('DOMContentLoaded', function() {
       const d = snap.data();
       myPoints        = d.points      || 0;
       myOwnedTitleIds = d.ownedTitles || [];
-      myActiveTitleId = d.activeTitle || null;
+      // activeTitle giờ là JSON array [id1, id2] hoặc string cũ
+      function parseAT(v) {
+        if (!v) return null;
+        if (typeof v === 'string') {
+          try { const p = JSON.parse(v); if (Array.isArray(p)) return p[0]||null; } catch {}
+          return v;
+        }
+        return null;
+      }
+      myActiveTitleId = parseAT(d.activeTitle);
       isAdmin         = (user.email || '').trim().toLowerCase() === 'thang@game.com';
 
       const el = document.getElementById('shopPoints');
       if (el) el.textContent = myPoints.toLocaleString('vi-VN');
       if (window.TopNav) TopNav.setPoints(myPoints);
 
-      render();
-      if (activeTab === 'title') renderTitleGrid();
+      renderGacha();
+      if (shopActiveTab === 'title') renderTitleGrid();
     });
   });
 });

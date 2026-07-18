@@ -21,18 +21,27 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 
 let currentUser = null;
-let allPets = [], filteredPets = [];
-let shardsTotal = 0, characterShards = 0;
+let allPets = [];
+let shardsTotal = 0;
 
-const ITEMS_DB = {
-  'mystery_box': { name: 'Hộp bí ẩn',    emoji: '📦', desc: 'Mở ngẫu nhiên',    convertShard: 2 },
-  'charm_buff':  { name: 'Bùa may mắn',   emoji: '🍀', desc: 'Tăng tỷ lệ hiếm', convertShard: 1 }
-};
+const RARITY_COLOR = {1:'#94a3b8',2:'#34d399',3:'#38bdf8',4:'#f43f5e',5:'#fbbf24'};
+const TIER_NAME  = {1:'Gà mờ',2:'Tinh anh',3:'Bá sàn',4:'Kiệt tác',5:'Huyền thoại'};
 
-const RARITY_COLOR = {1:'#94a3b8',2:'#34d399',3:'#fbbf24',4:'#f43f5e',5:'#a78bfa'};
+let myOwnedTitles = [], myActiveTitleIds = [], myPoints = 0, myFriendsCount = 0;
 
-let allItems = [], filteredItems = [];
-let myOwnedTitles = [], myActiveTitleId = null, myPoints = 0, myFriendsCount = 0;
+// ── HELPERS cho activeTitle (JSON array trong 1 field) ──
+function parseActiveTitles(val) {
+  if (!val) return [null, null];
+  if (typeof val === 'string') {
+    try { const p = JSON.parse(val); if (Array.isArray(p)) return [p[0]||null, p[1]||null]; } catch {}
+    return [val, null]; // legacy: single string
+  }
+  return [null, null];
+}
+function makeActiveTitlesStr(id1, id2) {
+  const arr = [id1, id2].filter(Boolean);
+  return arr.length ? JSON.stringify(arr) : null;
+}
 
 // ── AUTH + SYNC ──────────────────────────────────────────
 onAuthStateChanged(auth, user => {
@@ -46,11 +55,8 @@ onAuthStateChanged(auth, user => {
     // Điểm top-nav
     if (window.TopNav?.setPoints) TopNav.setPoints(d.points || 0);
 
-    shardsTotal    = d.shards || 0;
-    characterShards = d.characterShards || 0;
-
+    shardsTotal = d.shards || 0;
     renderShardBar();
-    renderOutfitShardBar();
 
     // Pet
     const col = d.petCollection || {};
@@ -58,26 +64,15 @@ onAuthStateChanged(auth, user => {
       const pet = getPetById(id);
       if (!pet || qty <= 0) return null;
       return { id, qty, name: pet.name, emoji: pet.emoji || '🐾', images: pet.images || [], tier: pet.tier, color: RARITY_COLOR[pet.tier] };
-    }).filter(Boolean);
-    filteredPets = [...allPets];
+    }).filter(Boolean).sort((a, b) => b.tier - a.tier);
     renderBag();
-
-    // Item
-    const itemCol = d.itemCollection || {};
-    allItems = Object.entries(itemCol).map(([id, qty]) => {
-      const info = ITEMS_DB[id];
-      if (!info || qty <= 0) return null;
-      return { id, qty, ...info };
-    }).filter(Boolean);
-    filteredItems = [...allItems];
-    renderItems();
-    updateItemStats();
 
     // Danh hiệu
     myPoints = d.points || 0;
     myFriendsCount = (d.friends || []).length;
     myOwnedTitles = getOwnedTitles({ points: myPoints, friends: myFriendsCount }, d.ownedTitles || []);
-    myActiveTitleId = d.activeTitle || null;
+    const [t1, t2] = parseActiveTitles(d.activeTitle);
+    myActiveTitleIds = [t1, t2];
     renderTitles();
   });
 });
@@ -97,24 +92,23 @@ function renderShardBar() {
 function renderBag() {
   const grid = document.getElementById('bag-grid');
   if (!grid) return;
-  if (!filteredPets.length) {
+  if (!allPets.length) {
     grid.innerHTML = '<div style="grid-column:1/-1;color:#4a7a9b;text-align:center;padding:40px">Túi trống. Hãy gacha!</div>';
     return;
   }
-  grid.innerHTML = filteredPets.map(p => {
+  grid.innerHTML = allPets.map(p => {
     const thumb = p.images?.[0] || '';
     return `
-    <div class="shop-card" style="border-color:${p.color}55">
-      <div class="shop-card-icon">
+    <div class="pet-card tier-${p.tier}">
+      <div class="pet-card-tier">${TIER_NAME[p.tier] || ''}</div>
+      <div class="pet-card-img-wrap">
         ${thumb
-          ? `<img src="${thumb}" alt="${p.name}" style="width:48px;height:48px;object-fit:contain;border-radius:8px" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span style="font-size:28px;display:none">${p.emoji}</span>`
-          : `<span style="font-size:28px">${p.emoji}</span>`}
+          ? `<img src="${thumb}" alt="${p.name}" class="pet-card-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><span class="pet-card-emoji-fb" style="display:none;font-size:36px;line-height:1">${p.emoji}</span>`
+          : `<span class="pet-card-emoji">${p.emoji}</span>`}
       </div>
-      <div class="shop-card-name">${p.name}</div>
-      <div class="shop-card-rarity" style="color:${p.color}">x${p.qty}</div>
-      <div class="bag-actions" style="margin-top:8px">
-        ${p.qty > 1 ? `<button class="shop-btn disassemble" onclick="window.doDisassemble('${p.id}')">Phân rã</button>` : ''}
-      </div>
+      <div class="pet-card-name">${p.name}</div>
+      <div class="pet-card-qty">×${p.qty}</div>
+      ${p.qty > 1 ? `<button class="pet-card-btn" onclick="window.doDisassemble('${p.id}')">Phân rã</button>` : ''}
     </div>`;
   }).join('');
 }
@@ -168,62 +162,7 @@ window.doRedeemPet = async (petId) => {
   } catch(e) { alert('❌ ' + e.message); }
 };
 
-// ── OUTFIT SHARD BAR ─────────────────────────────────────
-function renderOutfitShardBar() {
-  const bar = document.getElementById('outfit-shard-bar');
-  if (!bar) return;
-  bar.innerHTML = `
-    <div onclick="window.openOutfitShardSheet()" style="cursor:pointer;text-align:center;padding:12px 20px;border-radius:12px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);margin-bottom:12px;">
-      <div style="color:#fbbf24;font-size:12px;font-weight:700;">🧩 Mảnh Nhân Vật</div>
-      <div style="color:#e0f2fe;font-size:26px;font-weight:900;">${characterShards}</div>
-      <div style="color:#fbbf24;font-size:11px;">Nhấn để đổi trang bị ✨</div>
-    </div>`;
-}
 
-window.openOutfitShardSheet = () => {
-  document.getElementById('outfitRedeemModal')?.classList.add('open');
-};
-
-// ── ITEM ─────────────────────────────────────────────────
-function renderItems() {
-  const grid = document.getElementById('item-grid');
-  if (!grid) return;
-  if (!filteredItems.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#4a7a9b;">📭 Chưa có vật phẩm</div>';
-    return;
-  }
-  grid.innerHTML = filteredItems.map(item => `
-    <div class="shop-card">
-      <div class="shop-card-icon">${item.emoji}</div>
-      <div class="shop-card-name">${item.name}</div>
-      <div class="shop-card-rarity">x${item.qty}</div>
-      <div class="shop-card-desc">${item.desc}</div>
-      <div class="bag-actions" style="margin-top:8px">
-        ${item.convertShard ? `<button class="shop-btn" onclick="window.convertToCharShard('${item.id}')" style="background:#a78bfa">🔄 Đổi ${item.convertShard} mảnh NV</button>` : ''}
-      </div>
-    </div>`).join('');
-}
-window._bagRenderItems = renderItems;
-
-function updateItemStats() {
-  const total = allItems.reduce((s, i) => s + i.qty, 0);
-  const el = document.getElementById('item-stats');
-  if (el) el.innerHTML = `<span>📦 Tổng: ${total}</span>`;
-}
-
-window.convertToCharShard = async (itemId) => {
-  const item = allItems.find(i => i.id === itemId);
-  if (!item || item.qty < 1) return alert('Không có vật phẩm!');
-  const qty = parseInt(prompt(`Nhập số lượng ${item.name} muốn đổi (mỗi cái +${item.convertShard} mảnh NV):`, '1'));
-  if (isNaN(qty) || qty < 1 || qty > item.qty) return;
-  const gain = qty * item.convertShard;
-  if (!confirm(`Đổi ${qty} ${item.name} lấy ${gain} 🧩 mảnh nhân vật?`)) return;
-  await updateDoc(doc(db, 'users', currentUser.uid), {
-    [`itemCollection.${itemId}`]: item.qty - qty > 0 ? item.qty - qty : 0,
-    characterShards: characterShards + gain
-  });
-  alert(`✅ Nhận ${gain} mảnh nhân vật!`);
-};
 
 // ── DANH HIỆU ────────────────────────────────────────────
 function renderTitles() {
@@ -233,8 +172,24 @@ function renderTitles() {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#4a7a9b;">🏅 Bạn chưa có danh hiệu nào.<br>Hãy ra Shop mua hoặc đạt điểm/bạn bè!</div>';
     return;
   }
-  grid.innerHTML = myOwnedTitles.map(t => {
-    const isActive = t.id === myActiveTitleId;
+  const [a1, a2] = myActiveTitleIds;
+  const hasAny = a1 || a2;
+  grid.innerHTML = (hasAny ? `
+    <div style="grid-column:1/-1;display:flex;gap:8px;margin-bottom:4px">
+      <div style="flex:1;display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.15)">
+        <span style="width:20px;height:20px;border-radius:6px;background:#38bdf8;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:900;flex-shrink:0">1</span>
+        <span style="color:${a1 ? '#e0f2fe' : '#64748b'};font-size:13px;font-weight:700">${a1 ? 'Đã chọn' : 'Trống'}</span>
+      </div>
+      <div style="flex:1;display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.15)">
+        <span style="width:20px;height:20px;border-radius:6px;background:#a78bfa;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:900;flex-shrink:0">2</span>
+        <span style="color:${a2 ? '#e0f2fe' : '#64748b'};font-size:13px;font-weight:700">${a2 ? 'Đã chọn' : 'Trống'}</span>
+      </div>
+    </div>
+  ` : '') + myOwnedTitles.map(t => {
+    const isSlot1 = t.id === a1;
+    const isSlot2 = t.id === a2;
+    const slot = isSlot1 ? 1 : (isSlot2 ? 2 : 0);
+    const slotColor = slot === 1 ? '#38bdf8' : slot === 2 ? '#a78bfa' : null;
     return `
       <div class="shop-card" style="cursor:default">
         <div class="shop-card-info" style="flex:1">
@@ -242,9 +197,22 @@ function renderTitles() {
           <div class="shop-card-desc" style="margin-top:6px">${t.desc || ''}</div>
         </div>
         <div class="title-card-right">
-          <button class="title-buy-btn ${isActive ? 'active-now' : ''}" onclick="window.setActiveTitle('${t.id}')" ${isActive ? 'disabled' : ''}>
-            ${isActive ? '✓ Đang dùng' : 'Dùng danh hiệu này'}
-          </button>
+          ${slot > 0
+            ? `<button class="title-buy-btn active-now" onclick="window.clearTitleSlot(${slot})" style="color:${slotColor};">
+                 <span style="display:inline-flex;align-items:center;gap:4px">
+                   <span style="width:18px;height:18px;border-radius:5px;background:${slotColor};display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:900">${slot}</span>
+                   ✓ Đang dùng
+                 </span>
+               </button>`
+            : `<button class="title-buy-btn" onclick="window.setActiveTitle('${t.id}')">
+                 <span style="display:inline-flex;align-items:center;gap:4px">
+                   ${!a1
+                     ? '<span style="width:18px;height:18px;border-radius:5px;border:1.5px solid #38bdf8;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#38bdf8;font-weight:900">1</span> Dùng'
+                     : !a2
+                       ? '<span style="width:18px;height:18px;border-radius:5px;border:1.5px solid #a78bfa;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#a78bfa;font-weight:900">2</span> Dùng'
+                       : '🔄 Thay thế'}
+                 </span>
+               </button>`}
         </div>
       </div>`;
   }).join('');
@@ -253,7 +221,25 @@ window._bagRenderTitles = renderTitles;
 
 window.setActiveTitle = async (id) => {
   try {
-    await updateDoc(doc(db, 'users', currentUser.uid), { activeTitle: id });
+    const [a1, a2] = myActiveTitleIds;
+    let n1 = a1, n2 = a2;
+    if (!a1)      { n1 = id; }
+    else if (!a2) { n2 = id; }
+    else          { n1 = id; } // thay slot 1
+    await updateDoc(doc(db, 'users', currentUser.uid), {
+      activeTitle: makeActiveTitlesStr(n1, n2)
+    });
+  } catch (e) { alert('❌ ' + e.message); }
+};
+
+window.clearTitleSlot = async (slot) => {
+  try {
+    const [a1, a2] = myActiveTitleIds;
+    const n1 = slot === 1 ? null : a1;
+    const n2 = slot === 2 ? null : a2;
+    await updateDoc(doc(db, 'users', currentUser.uid), {
+      activeTitle: makeActiveTitlesStr(n1, n2)
+    });
   } catch (e) { alert('❌ ' + e.message); }
 };
 

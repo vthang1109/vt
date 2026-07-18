@@ -427,7 +427,7 @@
   <script type="module">
     import { initializeApp } from "firebase/app";
     import { getAuth, onAuthStateChanged } from "firebase/auth";
-    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc, serverTimestamp, addDoc } from "firebase/firestore";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -449,13 +449,13 @@
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        window.location.href = 'index.html';
+        window.location.href = '../index.html';
         return;
       }
       const userEmail = (user.email || '').trim().toLowerCase();
       if (userEmail !== ADMIN_EMAIL.trim().toLowerCase()) {
         alert('⚠️ Bạn không có quyền truy cập Admin!');
-        window.location.href = 'index.html';
+        window.location.href = '../index.html';
         return;
       }
       await loadUserList();
@@ -633,6 +633,7 @@
     };
 
     window.closeModal = closeModal;
+
   </script>
 </body>
 </html>

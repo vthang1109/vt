@@ -27,24 +27,31 @@
 
     <!-- HERO -->
     <div class="shop-hero">
-      <div class="shop-hero-icon">🐾</div>
-      <h1>Gacha <span>Thú Cưng</span></h1>
-      <p>Triệu hồi đồng đội — thử vận may của bạn</p>
+      <div class="shop-hero-icon">🏪</div>
+      <h1>VTWorld <span>Cửa Hàng</span></h1>
     </div>
 
-    <!-- TAB: THƯỜNG / VIP / DANH HIỆU -->
-    <div class="shop-tabs" id="shopTabs">
-      <button class="shop-tab active" data-tab="normal">🐣 Thường</button>
-      <button class="shop-tab" data-tab="vip">🦄 VIP</button>
-      <button class="shop-tab" data-tab="title">🏅 Danh hiệu</button>
+    <!-- TAB BAR: Gacha | Danh hiệu -->
+    <div class="shop-tab-bar">
+      <button class="shop-tab-btn active" data-tab="gacha" id="tabGacha">
+        <span class="tab-icon">🐾</span>
+        <span class="tab-label">Gacha</span>
+      </button>
+      <button class="shop-tab-btn" data-tab="title" id="tabTitle">
+        <span class="tab-icon">🏅</span>
+        <span class="tab-label">Danh Hiệu</span>
+      </button>
     </div>
 
-    <!-- TAB CẤP DANH HIỆU (chỉ hiện khi chọn tab Danh hiệu) -->
-    <div class="title-tier-tabs" id="titleTierTabs" style="display:none"></div>
+    <!-- CONTENT PANELS -->
+    <div class="shop-panel active" data-panel="gacha">
+      <div class="shop-grid" id="shopGrid"></div>
+    </div>
 
-    <!-- GRID GACHA / DANH HIỆU -->
-    <div class="shop-section-label" id="shopSectionLabel">Gacha Thường</div>
-    <div class="shop-grid" id="shopGrid"></div>
+    <div class="shop-panel" data-panel="title">
+      <div class="title-tier-tabs" id="titleTierTabs"></div>
+      <div class="shop-grid" id="titleGrid"></div>
+    </div>
 
   </div>
 

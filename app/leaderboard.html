@@ -282,7 +282,7 @@
 
     let myUid = null;
     onAuthStateChanged(auth, async (u) => {
-      if (!u) { window.location.href = 'index.html'; return; }
+      if (!u) { window.location.href = '../index.html'; return; }
       myUid = u.uid;
       
       // Cập nhật điểm cho top-nav
