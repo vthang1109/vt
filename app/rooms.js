@@ -377,7 +377,24 @@ window.startGame = async function(){
   } else if (data.gameType === 'xiangqi'){
     gameState = { phase: 'betting', round: 1, bets: {}, betAmount: null, betDeclinedBy: null, colors: {}, boardStr: null, turn: 'r', lastMove: null, moveCount: 0, players: data.members.slice(0, 2), result: null, winnerUid: null, drawOffer: null };
   } else if (data.gameType === 'altp'){
-    gameState = { phase: 'betting', round: 1, scores: {}, bets: {}, answers: {}, answerCounts: {}, currentQ: null, roundIdx: 0, usedQuestions: [], hiddenOptions: [], lifelines: { fifty: false, audience: false, phone: false }, audienceResult: null, phoneMsg: null, lastPaid: {} };
+    gameState = {
+      phase: 'waiting',
+      timeLimit: 30,
+      round: 1,
+      scores: {},
+      answers: {},
+      answerOrder: [],
+      answerCounts: {},
+      currentQ: null,
+      roundIdx: 0,
+      usedQuestions: [],
+      hiddenOptions: [],
+      lifelines: { fifty: false, audience: false, phone: false },
+      audienceResult: null,
+      phoneMsg: null,
+      streaks: {},
+      timerEndAt: null
+    };
   }
   await updateDoc(doc(db,'rooms',_currentRoomId), {
     status: 'playing',

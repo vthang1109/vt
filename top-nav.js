@@ -26,14 +26,34 @@ window.TopNav = (() => {
 
   async function listenBalance() {
     try {
-      const { auth, subscribeBalance, onAuthStateChanged } = await import('./points.js');
+      // Dùng _basePath (thư mục chứa top-nav.js) để import đúng từ mọi thư mục con
+      const baseUrl = new URL('points.js', _basePath).href;
+      const { auth, subscribeBalance, onAuthStateChanged } = await import(baseUrl);
       onAuthStateChanged(auth, (user) => {
         if (_unsubBalance) { _unsubBalance(); _unsubBalance = null; }
-        if (!user) return;
-        _unsubBalance = subscribeBalance(pts => {
-          _currentBalance = pts || 0;
-          setPoints(_currentBalance);
-        });
+        
+        const loginBtn = document.getElementById('vtDdLogin');
+        const logoutBtn = document.getElementById('vtDdLogout');
+        const profileBtn = document.getElementById('vtDdProfile');
+        const ptsEl = document.getElementById('vtNavPts');
+        
+        if (user) {
+          // Đã đăng nhập: ẩn login, hiện logout + profile
+          if (loginBtn) loginBtn.classList.add('hidden');
+          if (logoutBtn) logoutBtn.classList.add('visible');
+          if (profileBtn) profileBtn.classList.add('visible');
+          
+          _unsubBalance = subscribeBalance(pts => {
+            _currentBalance = pts || 0;
+            setPoints(_currentBalance);
+          });
+        } else {
+          // Chưa đăng nhập: hiện login, ẩn logout + profile, ẩn điểm
+          if (loginBtn) loginBtn.classList.remove('hidden');
+          if (logoutBtn) logoutBtn.classList.remove('visible');
+          if (profileBtn) profileBtn.classList.remove('visible');
+          if (ptsEl) ptsEl.classList.remove('visible');
+        }
       });
     } catch (e) { console.error('TopNav balance listen failed', e); }
   }
@@ -194,7 +214,12 @@ window.TopNav = (() => {
     .vt-dd-action.settings-btn { color: #94a3b8; }
     .vt-dd-action.leave-btn { color: #f87171; display: none; }
     .vt-dd-action.leave-btn.visible { display: flex; }
-
+    .vt-dd-action.login-btn { color: #34d399; display: flex; }
+    .vt-dd-action.logout-btn { color: #f87171; display: none; }
+    .vt-dd-action.profile-btn { color: #38bdf8; display: none; }
+    .vt-dd-action.logout-btn.visible,
+    .vt-dd-action.profile-btn.visible { display: flex; }
+    .vt-dd-action.login-btn.hidden { display: none; }
   `;
 
   function injectStyles() {
@@ -214,7 +239,9 @@ window.TopNav = (() => {
         </a>
         <div class="vt-nav-right">
           <span class="vt-nav-pts" id="vtNavPts">0 <span class="vt-coin">〄</span></span>
-          <button class="vt-hamburger" id="vtHamburger" aria-label="Menu">☰</button>
+          <button class="vt-hamburger" id="vtHamburger" aria-label="Menu">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+          </button>
         </div>
       </div>
       <div class="vt-nav-dropdown" id="vtNavDropdown">
@@ -226,6 +253,16 @@ window.TopNav = (() => {
         </button>
         <button class="vt-dd-action leave-btn" id="vtDdLeave">
           <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" fill="currentColor"><path d="M192-32a56 56 0 1 1 0 112 56 56 0 1 1 0-112zM128 173.6c0-34 27.6-61.6 61.6-61.6 20.3 0 39.7 8.1 54 22.4l48.2 48.2c6 6 14.1 9.4 22.6 9.4l37.5 0c5.8 0 11.3 1.6 16 4.3l0-76.3c0-13.3 10.7-24 24-24s24 10.7 24 24l0 400c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-268.3c-4.7 2.7-10.2 4.3-16 4.3l-37.5 0c-25.5 0-49.9-10.1-67.9-28.1l-6.6-6.6 0 109.2 34.5 29.6c17.7 15.2 29.3 36.2 32.6 59.3l12.6 88.1c2.5 17.5-9.7 33.7-27.2 36.2s-33.7-9.7-36.2-27.2l-12.6-88.1c-1.1-7.7-5-14.7-10.9-19.8l-71.4-61.2c-21.3-18.2-33.5-44.9-33.5-72.9l0-101zm-4.8 203.7c2.3 2.3 4.7 4.4 7.1 6.5l44.9 38.5c-3.6 8.4-8.5 16.3-14.4 23.4L88.6 532.5c-11.3 13.6-31.5 15.4-45.1 4.1s-15.4-31.5-4.1-45.1l72.3-86.7c2.6-3.1 4.5-6.6 5.8-10.4l5.7-17.1zM0 160c0-35.3 28.7-64 64-64 17.7 0 32 14.3 32 32l0 128c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-96z"/></svg></span> Rời phòng
+        </button>
+        <div class="dd-divider"></div>
+        <button class="vt-dd-action login-btn" id="vtDdLogin">
+          <span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11 7 9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></svg></span> Đăng nhập
+        </button>
+        <button class="vt-dd-action profile-btn" id="vtDdProfile">
+          <span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span> Hồ sơ
+        </button>
+        <button class="vt-dd-action logout-btn" id="vtDdLogout">
+          <span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></span> Đăng xuất
         </button>
         <div class="dd-divider" id="vtDdDividerCustom" style="display:none"></div>
         <div id="vtNavCustom"></div>
@@ -247,6 +284,60 @@ window.TopNav = (() => {
         btn.classList.remove('open');
       }
     });
+
+    // Auth buttons
+    const loginBtn = document.getElementById('vtDdLogin');
+    const logoutBtn = document.getElementById('vtDdLogout');
+    const profileBtn = document.getElementById('vtDdProfile');
+    
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        dd.classList.remove('open');
+        btn.classList.remove('open');
+        // Nếu đang ở index.html, dùng showPage. Ngược lại, chuyển hướng về index.
+        if (typeof window.showPage === 'function') {
+          window.showPage('login');
+        } else {
+          window.location.href = 'index.html';
+        }
+      });
+    }
+    
+    if (profileBtn) {
+      profileBtn.addEventListener('click', () => {
+        dd.classList.remove('open');
+        btn.classList.remove('open');
+        window.location.href = 'app/profile.html';
+      });
+    }
+    
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        dd.classList.remove('open');
+        btn.classList.remove('open');
+        try {
+          const { signOut } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
+          const baseUrl = new URL('points.js', _basePath).href;
+          const { auth } = await import(baseUrl);
+          // Cập nhật trạng thái offline
+          try {
+            const { doc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+            const { db } = await import(baseUrl);
+            if (auth.currentUser) {
+              await updateDoc(doc(db, 'users', auth.currentUser.uid), {
+                status: 'offline',
+                lastSeen: serverTimestamp()
+              });
+            }
+          } catch(e) {}
+          await signOut(auth);
+          window.location.reload();
+        } catch(e) {
+          console.error('Logout failed:', e);
+          alert('Đăng xuất thất bại!');
+        }
+      });
+    }
 
     // Tự động hiện nút "Rời phòng" cho mọi trang có ?room= trên URL,
     // kể cả khi game không gọi setLeaveAction riêng.

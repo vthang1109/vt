@@ -5,22 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VTWorld — Forgotten Warrior</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="warrior.css">
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="warrior.css">
   <link rel="stylesheet" href="../../quests.css"/>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
   <script type="module" src="../../quests.js"></script>
   <script src="../../fullscreen.js"></script>
 </head>
-<body>
-  <div id="game-wrapper">
-    <nav id="top-bar">
-      <div class="logo" onclick="location.href='../../games.html'"><span>VT</span>World</div>
-      <div id="nav-pts">⭐ 0</div>
-      <div class="bar-right">
-        <button class="nav-btn" onclick="location.href='../../games.html'">SẢNH</button>
-        <button class="nav-btn fullscreen-btn" id="btnFullscreen" title="Toàn màn hình">⛶</button>
-      </div>
-    </nav>
+<body data-bottom-nav="games">
+  <div id="top-nav-root"></div>
 
+  <div id="game-wrapper">
     <canvas id="gameCanvas"></canvas>
 
     <div id="hud">

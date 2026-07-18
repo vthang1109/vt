@@ -6,7 +6,7 @@ import {
   getPetById, disassemblePet, redeemShard,
   PET_POOL, SHARD_COST
 } from '../pet.js';
-import { getOwnedTitles, getTitleById } from './titles.js';
+import { getOwnedTitles, getTitleById } from '../titles.js';
 
 const firebaseConfig = {
   apiKey:"AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -57,7 +57,7 @@ onAuthStateChanged(auth, user => {
     allPets = Object.entries(col).map(([id, qty]) => {
       const pet = getPetById(id);
       if (!pet || qty <= 0) return null;
-      return { id, qty, name: pet.name, emoji: pet.emoji || '🐾', tier: pet.tier, color: RARITY_COLOR[pet.tier] };
+      return { id, qty, name: pet.name, emoji: pet.emoji || '🐾', images: pet.images || [], tier: pet.tier, color: RARITY_COLOR[pet.tier] };
     }).filter(Boolean);
     filteredPets = [...allPets];
     renderBag();
@@ -101,15 +101,22 @@ function renderBag() {
     grid.innerHTML = '<div style="grid-column:1/-1;color:#4a7a9b;text-align:center;padding:40px">Túi trống. Hãy gacha!</div>';
     return;
   }
-  grid.innerHTML = filteredPets.map(p => `
+  grid.innerHTML = filteredPets.map(p => {
+    const thumb = p.images?.[0] || '';
+    return `
     <div class="shop-card" style="border-color:${p.color}55">
-      <div class="shop-card-icon">${p.emoji}</div>
+      <div class="shop-card-icon">
+        ${thumb
+          ? `<img src="${thumb}" alt="${p.name}" style="width:48px;height:48px;object-fit:contain;border-radius:8px" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span style="font-size:28px;display:none">${p.emoji}</span>`
+          : `<span style="font-size:28px">${p.emoji}</span>`}
+      </div>
       <div class="shop-card-name">${p.name}</div>
       <div class="shop-card-rarity" style="color:${p.color}">x${p.qty}</div>
       <div class="bag-actions" style="margin-top:8px">
         ${p.qty > 1 ? `<button class="shop-btn disassemble" onclick="window.doDisassemble('${p.id}')">Phân rã</button>` : ''}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 // expose để HTML tab switch gọi
 window._bagRenderBag = renderBag;
@@ -138,9 +145,14 @@ function renderPetRedeemList() {
   list.innerHTML = PET_POOL.map(pet => {
     const cost = SHARD_COST[pet.tier] || 1;
     const has  = owned[pet.id] || 0;
+    const thumb = pet.images?.[0] || '';
     return `
       <div class="shop-card" style="border-color:${RARITY_COLOR[pet.tier]}55">
-        <div class="shop-card-icon">${pet.emoji || '🐾'}</div>
+        <div class="shop-card-icon">
+          ${thumb
+            ? `<img src="${thumb}" alt="${pet.name}" style="width:48px;height:48px;object-fit:contain;border-radius:8px" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span style="font-size:28px;display:none">${pet.emoji||'🐾'}</span>`
+            : `<span style="font-size:28px">${pet.emoji||'🐾'}</span>`}
+        </div>
         <div class="shop-card-name">${pet.name}</div>
         <div style="color:#fbbf24;font-weight:700;">🧩 ${cost}</div>
         <button class="shop-btn" style="background:#a78bfa;margin-top:4px;" ${has ? 'disabled' : ''} onclick="window.doRedeemPet('${pet.id}')">${has ? 'Đã có' : 'Đổi'}</button>

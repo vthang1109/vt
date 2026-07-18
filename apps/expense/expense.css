@@ -1,0 +1,843 @@
+/* expense.css — VTWorld Quản Lý Chi Tiêu */
+
+/* ===== WRAPPER ===== */
+.exp-wrap {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 16px 100px;
+  min-height: 100vh;
+}
+
+/* ===== STATUS BAR ===== */
+#exp-status {
+  margin-bottom: 4px;
+}
+#exp-status.cat-expense {
+  --bc-right: rgba(4, 47, 46, 0.7);
+  --bc-right-border: #14b8a6;
+  box-shadow: 0 0 20px rgba(20, 184, 166, 0.4);
+}
+#exp-status.cat-expense .stat-score {
+  color: #5eead4;
+  text-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
+}
+#exp-sub {
+  display: block !important;
+  font-size: 10px;
+  color: #5eead4;
+  margin-top: 1px;
+}
+#exp-left, #exp-right {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+/* ===== MONTH SELECTOR ===== */
+.exp-month-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 6px 0 14px;
+}
+.exp-month-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #94a3b8;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'Science Gothic', sans-serif;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.exp-month-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #e0f2fe;
+}
+.exp-month-label {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: #e0f2fe;
+  min-width: 140px;
+  text-align: center;
+}
+
+/* ===== SUMMARY CARDS ===== */
+.exp-summary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.exp-summary-card {
+  padding: 14px 16px;
+  border-radius: 14px;
+  text-align: center;
+  animation: fadeUp 0.5s both;
+}
+.exp-summary-card:nth-child(1) { animation-delay: 0.05s; }
+.exp-summary-card:nth-child(2) { animation-delay: 0.1s; }
+.exp-income-bg {
+  background: linear-gradient(135deg, rgba(52,211,153,0.12), rgba(5,150,105,0.05));
+  border: 1px solid rgba(52,211,153,0.25);
+}
+.exp-expense-bg {
+  background: linear-gradient(135deg, rgba(248,113,113,0.12), rgba(220,38,38,0.05));
+  border: 1px solid rgba(248,113,113,0.25);
+}
+.exp-summary-icon { font-size: 22px; margin-bottom: 4px; }
+.exp-summary-val {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+.exp-income-bg .exp-summary-val { color: #34d399; }
+.exp-expense-bg .exp-summary-val { color: #f87171; }
+.exp-summary-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+/* ===== TABS ===== */
+.exp-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 14px;
+  padding: 4px;
+}
+.exp-tab {
+  flex: 1;
+  padding: 10px 8px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #94a3b8;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.exp-tab.active {
+  background: rgba(56,189,248,0.12);
+  color: #38bdf8;
+}
+.exp-tab:hover:not(.active) {
+  color: #cbd5e1;
+}
+
+.exp-tab-content {
+  display: none;
+  animation: fadeUp 0.4s both;
+}
+.exp-tab-content.active {
+  display: block;
+}
+
+/* ===== SECTION LABEL ===== */
+.exp-section-label {
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #64748b;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.exp-section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.exp-section-row .exp-section-label {
+  margin-bottom: 0;
+}
+
+/* ===== WALLETS ===== */
+.exp-wallet-section {
+  margin-bottom: 20px;
+  animation: fadeUp 0.4s both;
+}
+.exp-add-wallet-btn {
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px dashed rgba(20,184,166,0.4);
+  background: rgba(20,184,166,0.06);
+  color: #14b8a6;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.exp-add-wallet-btn:hover {
+  background: rgba(20,184,166,0.12);
+}
+.exp-wallet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+.exp-wallet-card {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: all 0.25s;
+  text-align: center;
+  position: relative;
+}
+.exp-wallet-card:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(20,184,166,0.3);
+  transform: translateY(-2px);
+}
+.exp-wallet-card-icon {
+  font-size: 26px;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+.exp-wallet-card-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e0f2fe;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.exp-wallet-card-balance {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #5eead4;
+}
+.exp-wallet-card-balance.negative {
+  color: #f87171;
+}
+
+/* ===== WALLET SELECTOR (add form) ===== */
+.exp-wallet-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.exp-wallet-sel-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+.exp-wallet-sel-btn:hover {
+  border-color: rgba(255,255,255,0.15);
+  color: #cbd5e1;
+}
+.exp-wallet-sel-btn.active {
+  border-color: #14b8a6;
+  background: rgba(20,184,166,0.1);
+  color: #5eead4;
+}
+.exp-wallet-sel-icon {
+  font-size: 18px;
+}
+
+/* ===== WALLET BADGE ON TRANSACTION ITEMS ===== */
+.exp-item-wallet {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  font-size: 9px;
+  color: #4a7a9b;
+  font-weight: 600;
+  margin-top: 3px;
+}
+
+/* ===== WALLET ICON PICKER MODAL ===== */
+.exp-wallet-icon-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.exp-wallet-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.exp-wallet-icon-btn:hover {
+  border-color: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+}
+.exp-wallet-icon-btn.active {
+  border-color: #14b8a6;
+  background: rgba(20,184,166,0.15);
+}
+
+/* ===== TRANSACTION LIST ===== */
+.exp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.exp-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #4a7a9b;
+  font-size: 13px;
+  font-weight: 600;
+}
+.exp-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: all 0.2s;
+  animation: fadeUp 0.4s both;
+}
+.exp-item:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+}
+.exp-item-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.exp-item-icon.income { background: rgba(52,211,153,0.12); }
+.exp-item-icon.expense { background: rgba(248,113,113,0.12); }
+.exp-item-info { flex: 1; min-width: 0; }
+.exp-item-category {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e0f2fe;
+}
+.exp-item-note {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.exp-item-right { text-align: right; flex-shrink: 0; }
+.exp-item-amount {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+}
+.exp-item-amount.income { color: #34d399; }
+.exp-item-amount.expense { color: #f87171; }
+.exp-item-date {
+  font-size: 10px;
+  color: #475569;
+  margin-top: 2px;
+}
+
+/* ===== FILTERS ===== */
+.exp-filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.exp-filter-select {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(56,189,248,0.2);
+  background: rgba(56,189,248,0.05);
+  color: #e0f2fe;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+.exp-filter-select option { background: #0a1020; color: #e0f2fe; }
+.exp-filter-date {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(56,189,248,0.2);
+  background: rgba(56,189,248,0.05);
+  color: #e0f2fe;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  color-scheme: dark;
+}
+.exp-filter-clear {
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(248,113,113,0.3);
+  background: rgba(248,113,113,0.08);
+  color: #f87171;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.exp-filter-clear:hover {
+  background: rgba(248,113,113,0.15);
+}
+
+/* ===== ADD FORM ===== */
+.exp-form {
+  background: rgba(255,255,255,0.02);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 20px;
+}
+.exp-form-type-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.exp-type-btn {
+  flex: 1;
+  padding: 11px;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  color: #94a3b8;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.exp-type-btn.active.income {
+  border-color: #34d399;
+  background: rgba(52,211,153,0.1);
+  color: #34d399;
+}
+.exp-type-btn.active.expense {
+  border-color: #f87171;
+  background: rgba(248,113,113,0.1);
+  color: #f87171;
+}
+.exp-type-btn:hover:not(.active) {
+  border-color: rgba(255,255,255,0.15);
+  color: #cbd5e1;
+}
+
+.exp-form-group {
+  margin-bottom: 16px;
+}
+.exp-form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.exp-amount-input-wrap {
+  display: flex;
+  align-items: center;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 0 14px;
+  transition: border-color 0.2s;
+}
+.exp-amount-input-wrap:focus-within {
+  border-color: rgba(56,189,248,0.4);
+}
+.exp-currency {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: #fbbf24;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.exp-amount-input {
+  flex: 1;
+  padding: 14px 0;
+  background: transparent;
+  border: none;
+  color: #e0f2fe;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.exp-amount-input::-webkit-outer-spin-button,
+.exp-amount-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.exp-amount-input::placeholder { color: #334155; }
+
+.exp-input {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.2);
+  color: #e0f2fe;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.exp-input:focus {
+  border-color: rgba(56,189,248,0.4);
+}
+.exp-input::placeholder { color: #334155; }
+input[type="date"].exp-input {
+  color-scheme: dark;
+}
+
+/* ===== QUICK DATE BUTTONS ===== */
+.exp-quick-dates {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.exp-qd-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(56,189,248,0.15);
+  background: rgba(56,189,248,0.05);
+  color: #7dd3fc;
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.exp-qd-btn:hover {
+  background: rgba(56,189,248,0.12);
+  border-color: rgba(56,189,248,0.3);
+}
+.exp-qd-btn:active {
+  transform: scale(0.96);
+}
+
+/* ===== CLICKABLE DATE LABEL IN HISTORY ===== */
+.exp-date-label-click {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.exp-date-label-click:hover {
+  color: #38bdf8 !important;
+}
+
+/* ===== CATEGORY GRID ===== */
+.exp-category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.exp-cat-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Science Gothic', sans-serif;
+}
+.exp-cat-btn:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+}
+.exp-cat-btn.active {
+  background: rgba(56,189,248,0.1);
+  border-color: #38bdf8;
+}
+.exp-cat-icon { font-size: 22px; line-height: 1; }
+.exp-cat-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-align: center;
+  line-height: 1.2;
+}
+.exp-cat-btn.active .exp-cat-label { color: #38bdf8; }
+
+/* ===== SUBMIT BUTTON ===== */
+.exp-submit-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+  color: #fff;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 4px;
+}
+.exp-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(20,184,166,0.3);
+}
+.exp-submit-btn:active {
+  transform: translateY(0);
+}
+
+/* ===== MODAL ===== */
+.exp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.exp-modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.exp-modal-box {
+  background: rgba(4,20,40,0.97);
+  border: 1px solid rgba(56,189,248,0.2);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.35s ease both;
+}
+.exp-modal-sm { max-width: 340px; }
+.exp-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: #e0f2fe;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.exp-modal-close {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+}
+.exp-modal-body {
+  padding: 18px 20px;
+}
+
+/* ===== BUTTONS ===== */
+.exp-btn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.exp-btn.danger {
+  background: linear-gradient(135deg, #f87171, #dc2626);
+  color: #fff;
+}
+.exp-btn.secondary {
+  background: rgba(255,255,255,0.08);
+  color: #94a3b8;
+}
+.exp-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* ===== TOTAL SECTION (all-time) ===== */
+.exp-total-section {
+  margin-bottom: 20px;
+  animation: fadeUp 0.4s both;
+}
+.exp-total-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.exp-total-card {
+  padding: 12px 10px;
+  border-radius: 12px;
+  text-align: center;
+}
+.exp-total-asset {
+  background: linear-gradient(135deg, rgba(20,184,166,0.12), rgba(13,148,136,0.05));
+  border: 1px solid rgba(20,184,166,0.25);
+}
+.exp-total-income {
+  background: linear-gradient(135deg, rgba(52,211,153,0.12), rgba(5,150,105,0.05));
+  border: 1px solid rgba(52,211,153,0.25);
+}
+.exp-total-expense {
+  background: linear-gradient(135deg, rgba(248,113,113,0.12), rgba(220,38,38,0.05));
+  border: 1px solid rgba(248,113,113,0.25);
+}
+.exp-total-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.exp-total-val {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+}
+.exp-total-asset .exp-total-val { color: #5eead4; }
+.exp-total-income .exp-total-val { color: #34d399; }
+.exp-total-expense .exp-total-val { color: #f87171; }
+
+/* ===== CHART ===== */
+.exp-chart-section {
+  margin-bottom: 20px;
+  animation: fadeUp 0.4s both;
+}
+.exp-chart-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.exp-chart-canvas {
+  max-width: 220px;
+  max-height: 220px;
+}
+.exp-chart-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+.exp-chart-center-val {
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: #e0f2fe;
+  line-height: 1.2;
+}
+.exp-chart-center-label {
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.exp-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+.exp-chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.03);
+}
+.exp-chart-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  .exp-total-row {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+  }
+  .exp-total-val { font-size: 13px; }
+  .exp-chart-canvas { max-width: 180px; max-height: 180px; }
+  .exp-chart-center-val { font-size: 15px; }
+}
+@media (max-width: 480px) {
+  .exp-category-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .exp-cat-btn {
+    padding: 8px 2px;
+  }
+  .exp-cat-icon { font-size: 18px; }
+  .exp-cat-label { font-size: 8px; }
+  .exp-tab { font-size: 11px; padding: 8px 4px; }
+  .exp-summary-val { font-size: 16px; }
+  .exp-amount-input { font-size: 20px; }
+}

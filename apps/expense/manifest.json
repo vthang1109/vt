@@ -1,0 +1,32 @@
+{
+  "name": "Quản Lý Chi Tiêu",
+  "short_name": "Chi Tiêu",
+  "description": "App quản lý thu chi cá nhân - theo dõi ví, danh mục, biểu đồ chi tiêu",
+  "start_url": "expense.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a1020",
+  "theme_color": "#14b8a6",
+  "scope": ".",
+  "icons": [
+    {
+      "src": "icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["finance", "productivity", "utilities"],
+  "lang": "vi",
+  "dir": "ltr"
+}

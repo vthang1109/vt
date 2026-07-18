@@ -29,12 +29,13 @@ export const PET_TIERS = [
 
 // ID theo tier: t{tier}_{số thứ tự trong tier}
 // Thêm pet mới chỉ cần append vào đúng nhóm tier, tăng số thứ tự
-// Ảnh: pic/pet/{id}_1.png, pic/pet/{id}_2.png, pic/pet/{id}_3.png
+// Ảnh: /assets/pet/{id}_1.png, /assets/pet/{id}_2.png, /assets/pet/{id}_3.png
+// Dùng đường dẫn tuyệt đối (có / đầu) để hoạt động từ mọi thư mục
 function makePet(id, name, emoji, tier) {
   return { id, name, emoji, tier, images: [
-    `pic/pet/${id}_1.png`,
-    `pic/pet/${id}_2.png`,
-    `pic/pet/${id}_3.png`,
+    `/assets/pet/${id}_1.png`,
+    `/assets/pet/${id}_2.png`,
+    `/assets/pet/${id}_3.png`,
   ]};
 }
 

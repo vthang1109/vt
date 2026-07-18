@@ -1,1 +1,10002 @@
-[{"q":"Thủ đô của Việt Nam là gì?","o":["Hà Nội","Đà Nẵng","TP.HCM","Huế"],"c":0},{"q":"Nước nào có dân số đông nhất thế giới?","o":["Việt Nam","Ấn Độ","Mỹ","Trung Quốc"],"c":1},{"q":"Một năm có bao nhiêu tháng?","o":["10","11","12","13"],"c":2},{"q":"Quốc kỳ Việt Nam có nền màu gì?","o":["Xanh","Vàng","Đỏ","Trắng"],"c":2},{"q":"Con vật nào được mệnh danh là 'chúa sơn lâm'?","o":["Voi","Hổ","Sư tử","Gấu"],"c":1},{"q":"Bộ phận nào trong cơ thể người có chức năng bơm máu?","o":["Phổi","Gan","Tim","Thận"],"c":2},{"q":"Một tuần có bao nhiêu ngày?","o":["5","6","7","8"],"c":2},{"q":"Tác giả của truyện Kiều là ai?","o":["Hồ Xuân Hương","Nguyễn Du","Nguyễn Trãi","Nguyễn Đình Chiểu"],"c":1},{"q":"Hành tinh nào chúng ta đang sống?","o":["Sao Hỏa","Sao Kim","Trái Đất","Sao Thủy"],"c":2},{"q":"Dụng cụ nào dùng để viết lên giấy?","o":["Thước","Bút","Kéo","Tẩy"],"c":1},{"q":"Nước Việt Nam nằm ở châu lục nào?","o":["Châu Âu","Châu Mỹ","Châu Á","Châu Phi"],"c":2},{"q":"Con gì kêu 'gâu gâu'?","o":["Mèo","Chó","Gà","Vịt"],"c":1},{"q":"Đơn vị tiền tệ của Việt Nam là gì?","o":["Đô la","Yên","Đồng","Bảng"],"c":2},{"q":"Màu sắc của bầu trời vào ban ngày thường là màu gì?","o":["Đỏ","Xanh dương","Tím","Đen"],"c":1},{"q":"Phương tiện nào chạy trên đường ray?","o":["Ô tô","Xe máy","Tàu hỏa","Máy bay"],"c":2}]
+[
+  {
+    "q": "Việt Nam nằm ở châu lục nào?",
+    "o": [
+      "châu Đại Dương",
+      "châu Nam Cực",
+      "châu Mỹ",
+      "châu Á"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Pháp nằm ở châu lục nào?",
+    "o": [
+      "châu Âu",
+      "châu Đại Dương",
+      "châu Mỹ",
+      "châu Nam Cực"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Nhật Bản nằm ở châu lục nào?",
+    "o": [
+      "châu Á",
+      "châu Âu",
+      "châu Đại Dương",
+      "châu Mỹ"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Úc nằm ở châu lục nào?",
+    "o": [
+      "châu Phi",
+      "châu Á",
+      "châu Đại Dương",
+      "châu Nam Cực"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Brazil nằm ở châu lục nào?",
+    "o": [
+      "châu Á",
+      "châu Mỹ",
+      "châu Nam Cực",
+      "châu Đại Dương"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ai Cập nằm ở châu lục nào?",
+    "o": [
+      "châu Á",
+      "châu Âu",
+      "châu Phi",
+      "châu Nam Cực"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nga nằm ở châu lục nào?",
+    "o": [
+      "châu Phi",
+      "châu Âu",
+      "châu Mỹ",
+      "châu Á"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hàn Quốc nằm ở châu lục nào?",
+    "o": [
+      "châu Phi",
+      "châu Âu",
+      "châu Á",
+      "châu Nam Cực"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Việt Nam là gì?",
+    "o": [
+      "TP. Hồ Chí Minh",
+      "Đà Nẵng",
+      "Hà Nội",
+      "Huế"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Nhật Bản là gì?",
+    "o": [
+      "Osaka",
+      "Kyoto",
+      "Tokyo",
+      "Yokohama"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Pháp là gì?",
+    "o": [
+      "Lyon",
+      "Paris",
+      "Marseille",
+      "Nice"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thủ đô của Anh là gì?",
+    "o": [
+      "Manchester",
+      "Birmingham",
+      "Liverpool",
+      "London"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Thủ đô của Hàn Quốc là gì?",
+    "o": [
+      "Busan",
+      "Incheon",
+      "Seoul",
+      "Daegu"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Trung Quốc là gì?",
+    "o": [
+      "Thượng Hải",
+      "Bắc Kinh",
+      "Quảng Châu",
+      "Thâm Quyến"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thủ đô của Mỹ là gì?",
+    "o": [
+      "New York",
+      "Los Angeles",
+      "Chicago",
+      "Washington DC"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Thủ đô của Úc là gì?",
+    "o": [
+      "Sydney",
+      "Melbourne",
+      "Canberra",
+      "Brisbane"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Thái Lan là gì?",
+    "o": [
+      "Chiang Mai",
+      "Phuket",
+      "Bangkok",
+      "Pattaya"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Sông nào dài nhất thế giới?",
+    "o": [
+      "Sông Amazon",
+      "Sông Nile",
+      "Sông Mississippi",
+      "Sông Hằng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sông nào dài nhất Việt Nam?",
+    "o": [
+      "Sông Hồng",
+      "Sông Mekong",
+      "Sông Đà",
+      "Sông Cửu Long"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Núi nào cao nhất thế giới?",
+    "o": [
+      "K2",
+      "Everest",
+      "Kangchenjunga",
+      "Lhotse"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Biển nào lớn nhất thế giới?",
+    "o": [
+      "Biển Đông",
+      "Biển Địa Trung Hải",
+      "Biển Caribe",
+      "Biển Nam Trung Quốc"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Đại dương nào lớn nhất thế giới?",
+    "o": [
+      "Đại Tây Dương",
+      "Ấn Độ Dương",
+      "Thái Bình Dương",
+      "Bắc Băng Dương"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Sa mạc nào lớn nhất thế giới?",
+    "o": [
+      "Sahara",
+      "Gobi",
+      "Kalahari",
+      "Atacama"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Đức nằm ở châu lục nào?",
+    "o": [
+      "châu Phi",
+      "châu Mỹ",
+      "châu Á",
+      "châu Âu"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Ý nằm ở châu lục nào?",
+    "o": [
+      "châu Nam Cực",
+      "châu Âu",
+      "châu Mỹ",
+      "châu Đại Dương"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tây Ban Nha nằm ở châu lục nào?",
+    "o": [
+      "châu Âu",
+      "châu Á",
+      "châu Mỹ",
+      "châu Đại Dương"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ấn Độ nằm ở châu lục nào?",
+    "o": [
+      "châu Á",
+      "châu Nam Cực",
+      "châu Âu",
+      "châu Phi"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Indonesia nằm ở châu lục nào?",
+    "o": [
+      "châu Đại Dương",
+      "châu Mỹ",
+      "châu Phi",
+      "châu Á"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Thủ đô của Đức là gì?",
+    "o": [
+      "Munich",
+      "Frankfurt",
+      "Berlin",
+      "Hamburg"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Ý là gì?",
+    "o": [
+      "Milan",
+      "Venice",
+      "Rome",
+      "Naples"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Tây Ban Nha là gì?",
+    "o": [
+      "Barcelona",
+      "Madrid",
+      "Seville",
+      "Valencia"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thủ đô của Nga là gì?",
+    "o": [
+      "St. Petersburg",
+      "Novosibirsk",
+      "Moscow",
+      "Vladivostok"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Canada là gì?",
+    "o": [
+      "Toronto",
+      "Vancouver",
+      "Montreal",
+      "Ottawa"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Thủ đô của Brazil là gì?",
+    "o": [
+      "Rio de Janeiro",
+      "São Paulo",
+      "Brasília",
+      "Salvador"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Ấn Độ là gì?",
+    "o": [
+      "Mumbai",
+      "Delhi",
+      "Bangalore",
+      "Kolkata"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thủ đô của Indonesia là gì?",
+    "o": [
+      "Surabaya",
+      "Bandung",
+      "Jakarta",
+      "Bali"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Philippines là gì?",
+    "o": [
+      "Cebu",
+      "Davao",
+      "Manila",
+      "Quezon"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Malaysia là gì?",
+    "o": [
+      "Penang",
+      "Johor Bahru",
+      "Kuala Lumpur",
+      "Malacca"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Singapore là gì?",
+    "o": [
+      "Singapore",
+      "Jurong",
+      "Changi",
+      "Sentosa"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Châu lục nào có diện tích lớn nhất?",
+    "o": [
+      "châu Phi",
+      "châu Á",
+      "châu Mỹ",
+      "châu Âu"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Châu lục nào có dân số đông nhất?",
+    "o": [
+      "châu Âu",
+      "châu Mỹ",
+      "châu Á",
+      "châu Phi"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Quốc gia nào có diện tích lớn nhất thế giới?",
+    "o": [
+      "Canada",
+      "Trung Quốc",
+      "Mỹ",
+      "Nga"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Quốc gia nào có dân số đông nhất thế giới?",
+    "o": [
+      "Ấn Độ",
+      "Trung Quốc",
+      "Mỹ",
+      "Indonesia"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hồ nào sâu nhất thế giới?",
+    "o": [
+      "Hồ Victoria",
+      "Hồ Baikal",
+      "Hồ Superior",
+      "Hồ Michigan"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sông Mekong chảy qua mấy nước?",
+    "o": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Biển Chết nằm giữa hai nước nào?",
+    "o": [
+      "Israel - Ai Cập",
+      "Israel - Jordan",
+      "Jordan - Syria",
+      "Israel - Lebanon"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Dãy núi nào dài nhất thế giới?",
+    "o": [
+      "Himalaya",
+      "Andes",
+      "Alps",
+      "Rocky"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Vịnh nào lớn nhất thế giới?",
+    "o": [
+      "Vịnh Bengal",
+      "Vịnh Mexico",
+      "Vịnh Ba Tư",
+      "Vịnh Hudson"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Châu Nam Cực có người sinh sống không?",
+    "o": [
+      "Có, rất đông",
+      "Chỉ có nhà khoa học",
+      "Không ai cả",
+      "Chỉ có du khách"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Quốc gia nào có nhiều đồng hồ nhất thế giới?",
+    "o": [
+      "Nhật Bản",
+      "Đức",
+      "Thụy Sĩ",
+      "Pháp"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Canada nằm ở châu lục nào?",
+    "o": [
+      "châu Âu",
+      "châu Mỹ",
+      "châu Á",
+      "châu Đại Dương"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Mexico nằm ở châu lục nào?",
+    "o": [
+      "châu Á",
+      "châu Mỹ",
+      "châu Đại Dương",
+      "châu Nam Cực"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Argentina nằm ở châu lục nào?",
+    "o": [
+      "châu Á",
+      "châu Âu",
+      "châu Mỹ",
+      "châu Đại Dương"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nam Phi nằm ở châu lục nào?",
+    "o": [
+      "châu Phi",
+      "châu Á",
+      "châu Mỹ",
+      "châu Nam Cực"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Thủ đô của Ai Cập là gì?",
+    "o": [
+      "Alexandria",
+      "Cairo",
+      "Luxor",
+      "Aswan"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thủ đô của Thổ Nhĩ Kỳ là gì?",
+    "o": [
+      "Istanbul",
+      "Ankara",
+      "Izmir",
+      "Antalya"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thủ đô của Thụy Sĩ là gì?",
+    "o": [
+      "Zurich",
+      "Geneva",
+      "Bern",
+      "Basel"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Hà Lan là gì?",
+    "o": [
+      "Rotterdam",
+      "Amsterdam",
+      "The Hague",
+      "Utrecht"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thủ đô của Bỉ là gì?",
+    "o": [
+      "Antwerp",
+      "Bruges",
+      "Brussels",
+      "Ghent"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Thụy Điển là gì?",
+    "o": [
+      "Gothenburg",
+      "Malmo",
+      "Stockholm",
+      "Uppsala"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Na Uy là gì?",
+    "o": [
+      "Bergen",
+      "Oslo",
+      "Trondheim",
+      "Stavanger"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thủ đô của Đan Mạch là gì?",
+    "o": [
+      "Aarhus",
+      "Odense",
+      "Copenhagen",
+      "Aalborg"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Phần Lan là gì?",
+    "o": [
+      "Tampere",
+      "Turku",
+      "Helsinki",
+      "Oulu"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Ba Lan là gì?",
+    "o": [
+      "Krakow",
+      "Gdansk",
+      "Warsaw",
+      "Wroclaw"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Bồ Đào Nha là gì?",
+    "o": [
+      "Porto",
+      "Lisbon",
+      "Braga",
+      "Faro"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thủ đô của Hy Lạp là gì?",
+    "o": [
+      "Thessaloniki",
+      "Athens",
+      "Patras",
+      "Heraklion"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thủ đô của Hungary là gì?",
+    "o": [
+      "Debrecen",
+      "Szeged",
+      "Miskolc",
+      "Budapest"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Thủ đô của Séc là gì?",
+    "o": [
+      "Brno",
+      "Ostrava",
+      "Prague",
+      "Plzen"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủ đô của Áo là gì?",
+    "o": [
+      "Salzburg",
+      "Graz",
+      "Innsbruck",
+      "Vienna"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Thủ đô của Ukraine là gì?",
+    "o": [
+      "Lviv",
+      "Odessa",
+      "Kharkiv",
+      "Kyiv"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Thủ đô của Romania là gì?",
+    "o": [
+      "Cluj-Napoca",
+      "Timisoara",
+      "Bucharest",
+      "Constanta"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Voi thuộc lớp động vật nào?",
+    "o": [
+      "giáp xác",
+      "chim",
+      "bò sát",
+      "thú có vú"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Cá voi xanh là động vật lớn nhất thế giới, nó thuộc lớp nào?",
+    "o": [
+      "chim",
+      "thú có vú",
+      "côn trùng",
+      "lưỡng cư"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Đại bàng thuộc lớp động vật nào?",
+    "o": [
+      "côn trùng",
+      "chim",
+      "bò sát",
+      "lưỡng cư"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Rùa thuộc lớp động vật nào?",
+    "o": [
+      "thân mềm",
+      "chim",
+      "bò sát",
+      "cá"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cá sấu thuộc lớp động vật nào?",
+    "o": [
+      "bò sát",
+      "thân mềm",
+      "thú có vú",
+      "chim"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ếch thuộc lớp động vật nào?",
+    "o": [
+      "bò sát",
+      "lưỡng cư",
+      "chim",
+      "côn trùng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cá heo thuộc lớp động vật nào?",
+    "o": [
+      "thú có vú",
+      "côn trùng",
+      "thân mềm",
+      "giáp xác"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Dơi là loài động vật có vú biết bay, đúng hay sai?",
+    "o": [
+      "Sai, dơi là chim",
+      "Đúng",
+      "Sai, dơi là côn trùng",
+      "Sai, dơi không bay"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chim cánh cụt có biết bay không?",
+    "o": [
+      "Có, bay rất cao",
+      "Không",
+      "Có, nhưng thấp",
+      "Chỉ bay dưới nước"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Gấu trúc ăn gì là chính?",
+    "o": [
+      "thịt",
+      "tre",
+      "cá",
+      "trái cây"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con vật nào chạy nhanh nhất thế giới?",
+    "o": [
+      "sư tử",
+      "ngựa",
+      "báo gêpa",
+      "hổ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Con vật nào sống lâu nhất?",
+    "o": [
+      "voi",
+      "rùa khổng lồ",
+      "cá voi",
+      "vẹt"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhện có bao nhiêu chân?",
+    "o": [
+      "6",
+      "8",
+      "10",
+      "12"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Côn trùng có bao nhiêu chân?",
+    "o": [
+      "4",
+      "6",
+      "8",
+      "10"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con vật nào được mệnh danh là \"vua của rừng xanh\"?",
+    "o": [
+      "hổ",
+      "sư tử",
+      "báo",
+      "gấu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cá mập thuộc lớp động vật nào?",
+    "o": [
+      "lưỡng cư",
+      "bò sát",
+      "chim",
+      "cá"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Bạch tuộc có bao nhiêu chân?",
+    "o": [
+      "6",
+      "8",
+      "10",
+      "12"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con vật nào có cổ dài nhất?",
+    "o": [
+      "voi",
+      "hươu cao cổ",
+      "lạc đà",
+      "đà điểu"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Gấu Bắc Cực sống ở đâu?",
+    "o": [
+      "rừng",
+      "thảo nguyên",
+      "Bắc Cực",
+      "Nam Cực"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Chuột túi là biểu tượng của nước nào?",
+    "o": [
+      "New Zealand",
+      "Úc",
+      "Nam Phi",
+      "Brazil"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con vật nào có thể đổi màu để ngụy trang?",
+    "o": [
+      "rắn",
+      "tắc kè hoa",
+      "thằn lằn",
+      "kỳ nhông"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Loài chim nào lớn nhất thế giới?",
+    "o": [
+      "đại bàng",
+      "đà điểu",
+      "công",
+      "hồng hạc"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hổ sống chủ yếu ở đâu?",
+    "o": [
+      "sa mạc",
+      "núi cao",
+      "rừng",
+      "đồng cỏ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cá sấu sống ở đâu?",
+    "o": [
+      "sông hồ",
+      "đầm lầy",
+      "Bắc Cực",
+      "thảo nguyên"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Loài cá nào có thể phát điện?",
+    "o": [
+      "cá vàng",
+      "cá mập",
+      "cá đuối điện",
+      "cá hồi"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Con vật nào có vòi dài?",
+    "o": [
+      "tê giác",
+      "hà mã",
+      "voi",
+      "lợn rừng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Sư tử sống chủ yếu ở đâu?",
+    "o": [
+      "đầm lầy",
+      "thảo nguyên",
+      "đại dương",
+      "Bắc Cực"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ngựa vằn có sọc màu gì?",
+    "o": [
+      "nâu và trắng",
+      "đen và trắng",
+      "xám và trắng",
+      "đỏ và trắng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hươu cao cổ sống ở đâu?",
+    "o": [
+      "thảo nguyên châu Phi",
+      "rừng châu Á",
+      "sa mạc Úc",
+      "núi châu Âu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Con gì biết \"hát\" dưới nước?",
+    "o": [
+      "cá mập",
+      "cá heo",
+      "cá voi",
+      "cá hồi"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Rắn hổ mang chúa có nọc độc không?",
+    "o": [
+      "không có nọc",
+      "có, rất độc",
+      "có nhưng nhẹ",
+      "chỉ có răng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con vật nào thường được gọi là \"bạn thân của con người\"?",
+    "o": [
+      "mèo",
+      "chim",
+      "chó",
+      "cá"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Loài chim nào có thể nói tiếng người?",
+    "o": [
+      "đại bàng",
+      "vẹt",
+      "cú",
+      "chim sẻ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con gì có mai để bảo vệ?",
+    "o": [
+      "ốc sên",
+      "tôm hùm",
+      "rùa",
+      "cua"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ong thuộc lớp động vật nào?",
+    "o": [
+      "bò sát",
+      "côn trùng",
+      "chim",
+      "thân mềm"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bướm thuộc lớp động vật nào?",
+    "o": [
+      "giáp xác",
+      "cá",
+      "côn trùng",
+      "thú có vú"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Kiến thuộc lớp động vật nào?",
+    "o": [
+      "lưỡng cư",
+      "bò sát",
+      "giáp xác",
+      "côn trùng"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Con vật nào ngủ đông vào mùa đông?",
+    "o": [
+      "thỏ",
+      "gấu",
+      "sóc",
+      "hươu"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con gì có túi để chứa con?",
+    "o": [
+      "gấu túi",
+      "chuột túi",
+      "thú mỏ vịt",
+      "nhím"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con mèo thường kêu như thế nào?",
+    "o": [
+      "gâu gâu",
+      "meo meo",
+      "chiếp chiếp",
+      "cạc cạc"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con gà trống gáy như thế nào?",
+    "o": [
+      "chiếp chiếp",
+      "cạc cạc",
+      "ò ó o",
+      "quạc quạc"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Mèo thường thích ăn gì?",
+    "o": [
+      "rau",
+      "cá",
+      "cỏ",
+      "gạo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chó thường thích ăn gì?",
+    "o": [
+      "cỏ",
+      "xương",
+      "trái cây",
+      "gạo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Loài chim nào là biểu tượng của hòa bình?",
+    "o": [
+      "đại bàng",
+      "quạ",
+      "bồ câu",
+      "chim sẻ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Con vật nào có sừng trên đầu?",
+    "o": [
+      "hổ",
+      "bò",
+      "gấu",
+      "chó sói"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con vật nào được gọi là \"chúa tể bầu trời\"?",
+    "o": [
+      "vẹt",
+      "đại bàng",
+      "chim ruồi",
+      "cú"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cá voi sát thủ còn có tên gọi khác là gì?",
+    "o": [
+      "cá voi xanh",
+      "cá heo",
+      "orca",
+      "hải cẩu"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Tinh tinh thuộc họ nào?",
+    "o": [
+      "khỉ",
+      "vượn",
+      "gấu",
+      "chó"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Con vật nào thường mang tín hiệu mùa xuân ở Việt Nam?",
+    "o": [
+      "chim én",
+      "vẹt",
+      "công",
+      "sáo"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Con vật nào có ngà dài?",
+    "o": [
+      "hà mã",
+      "voi",
+      "tê giác",
+      "lợn rừng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cá vàng thường được nuôi ở đâu?",
+    "o": [
+      "ao",
+      "bể cá",
+      "sông",
+      "biển"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con vật nào được coi là biểu tượng của sự thông minh?",
+    "o": [
+      "lợn",
+      "cá heo",
+      "gấu",
+      "hổ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con vật nào có bướu trên lưng?",
+    "o": [
+      "ngựa",
+      "bò",
+      "lạc đà",
+      "hươu"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Loài chim nào không biết bay?",
+    "o": [
+      "đại bàng",
+      "đà điểu",
+      "vẹt",
+      "chim ruồi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con vật nào được gọi là \"dũng sĩ diệt muỗi\"?",
+    "o": [
+      "ếch",
+      "cá",
+      "chim",
+      "thằn lằn"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Con vật nào nhai lại?",
+    "o": [
+      "chó",
+      "bò",
+      "hổ",
+      "gấu"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Rùa biển có thể sống bao nhiêu năm?",
+    "o": [
+      "10-20 năm",
+      "20-30 năm",
+      "50-100 năm",
+      "hơn 100 năm"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cá hề thường sống cùng loài vật nào?",
+    "o": [
+      "cá mập",
+      "hải quỳ",
+      "san hô",
+      "sao biển"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con gì có thể chạy trên mặt nước?",
+    "o": [
+      "thằn lằn",
+      "nhện nước",
+      "rắn",
+      "ếch"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cú mèo thường hoạt động khi nào?",
+    "o": [
+      "ban ngày",
+      "ban đêm",
+      "cả ngày lẫn đêm",
+      "chiều tối"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Voi châu Phi khác voi châu Á ở điểm gì?",
+    "o": [
+      "không khác",
+      "voi châu Phi to hơn",
+      "voi châu Á to hơn",
+      "voi châu Phi có 2 ngà"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ốc sên di chuyển bằng gì?",
+    "o": [
+      "chân",
+      "bụng",
+      "vây",
+      "cánh"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Giun đất sống ở đâu?",
+    "o": [
+      "đất",
+      "nước",
+      "trên cây",
+      "trong nhà"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Bọ cạp có bao nhiêu chân?",
+    "o": [
+      "6",
+      "8",
+      "10",
+      "12"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tôm thuộc lớp động vật nào?",
+    "o": [
+      "thú có vú",
+      "cá",
+      "chim",
+      "giáp xác"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Cua thuộc lớp động vật nào?",
+    "o": [
+      "thú có vú",
+      "giáp xác",
+      "lưỡng cư",
+      "cá"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sao biển có bao nhiêu cánh thông thường?",
+    "o": [
+      "4",
+      "5",
+      "6",
+      "8"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thú mỏ vịt là động vật đặc hữu của nước nào?",
+    "o": [
+      "Mỹ",
+      "Úc",
+      "Brazil",
+      "Trung Quốc"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con vật nào có mùi hôi để tự vệ?",
+    "o": [
+      "chồn hôi",
+      "nhím",
+      "thỏ",
+      "sóc"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hải cẩu thuộc lớp động vật nào?",
+    "o": [
+      "côn trùng",
+      "thú có vú",
+      "thân mềm",
+      "giáp xác"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con vật nào được gọi là \"kỹ sư xây dựng\" của rừng?",
+    "o": [
+      "sóc",
+      "hải ly",
+      "thỏ",
+      "nhím"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con gà mái kêu như thế nào?",
+    "o": [
+      "cục cục tác",
+      "ò ó o",
+      "chiếp chiếp",
+      "quạc quạc"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Con vịt kêu như thế nào?",
+    "o": [
+      "chiếp chiếp",
+      "cạc cạc",
+      "quạc quạc",
+      "cục cục"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Con lợn kêu như thế nào?",
+    "o": [
+      "be be",
+      "ụt ụt",
+      "bò bò",
+      "moo moo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con trâu kêu như thế nào?",
+    "o": [
+      "be be",
+      "ụt ụt",
+      "nghé ọ",
+      "moo moo"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Con dê kêu như thế nào?",
+    "o": [
+      "be be",
+      "ụt ụt",
+      "nghé ọ",
+      "moo moo"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Con ngựa kêu như thế nào?",
+    "o": [
+      "be be",
+      "hí hí",
+      "nghé ọ",
+      "moo moo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con mèo có bao nhiêu tuổi thọ trung bình?",
+    "o": [
+      "5-7 năm",
+      "12-15 năm",
+      "20-25 năm",
+      "30 năm"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Loài chó nào được gọi là \"chó thông minh nhất\"?",
+    "o": [
+      "chó pug",
+      "chó border collie",
+      "chó poodle",
+      "chó husky"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con gì có hai cái càng to?",
+    "o": [
+      "tôm",
+      "cua",
+      "bọ cạp",
+      "nhện"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cá heo thở bằng gì?",
+    "o": [
+      "mang",
+      "da",
+      "phổi",
+      "vây"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Con vật nào có thể sống cả trên cạn và dưới nước?",
+    "o": [
+      "cá sấu",
+      "cá heo",
+      "cá voi",
+      "hải cẩu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ký hiệu hóa học của nước là gì?",
+    "o": [
+      "NaCl",
+      "CO2",
+      "H2O",
+      "O2"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ký hiệu hóa học của Hydro là gì?",
+    "o": [
+      "Na",
+      "H",
+      "Mg",
+      "Zn"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ký hiệu hóa học của Heli là gì?",
+    "o": [
+      "Hg",
+      "He",
+      "Ag",
+      "S"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ký hiệu hóa học của Oxy là gì?",
+    "o": [
+      "I",
+      "Si",
+      "Pt",
+      "O"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Ký hiệu hóa học của Cacbon là gì?",
+    "o": [
+      "C",
+      "Mg",
+      "Ba",
+      "Li"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ký hiệu hóa học của Sắt là gì?",
+    "o": [
+      "Ne",
+      "Xe",
+      "Al",
+      "Fe"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Ký hiệu hóa học của Vàng là gì?",
+    "o": [
+      "Fe",
+      "Ba",
+      "F",
+      "Au"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Ký hiệu hóa học của Bạc là gì?",
+    "o": [
+      "Ag",
+      "Au",
+      "H",
+      "I"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ký hiệu hóa học của Đồng là gì?",
+    "o": [
+      "P",
+      "Na",
+      "K",
+      "Cu"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Ký hiệu hóa học của Natri là gì?",
+    "o": [
+      "Au",
+      "Hg",
+      "Mn",
+      "Na"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Ký hiệu hóa học của Canxi là gì?",
+    "o": [
+      "Ca",
+      "Mn",
+      "Au",
+      "B"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ký hiệu hóa học của Kali là gì?",
+    "o": [
+      "Hg",
+      "Si",
+      "K",
+      "Mn"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ký hiệu hóa học của Clo là gì?",
+    "o": [
+      "Cl",
+      "He",
+      "I",
+      "Si"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ký hiệu hóa học của Lưu huỳnh là gì?",
+    "o": [
+      "Al",
+      "Ca",
+      "Li",
+      "S"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Ký hiệu hóa học của Nitơ là gì?",
+    "o": [
+      "Si",
+      "H",
+      "N",
+      "Fe"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ký hiệu hóa học của Silic là gì?",
+    "o": [
+      "Ag",
+      "Pb",
+      "Si",
+      "Ca"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ký hiệu hóa học của Nhôm là gì?",
+    "o": [
+      "P",
+      "Pt",
+      "Mn",
+      "Al"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Ký hiệu hóa học của Magie là gì?",
+    "o": [
+      "P",
+      "Mg",
+      "As",
+      "U"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ký hiệu hóa học của Kẽm là gì?",
+    "o": [
+      "Ag",
+      "Li",
+      "F",
+      "Zn"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Ký hiệu hóa học của Chì là gì?",
+    "o": [
+      "Pb",
+      "Ca",
+      "K",
+      "N"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ký hiệu hóa học của Thủy ngân là gì?",
+    "o": [
+      "Zn",
+      "C",
+      "Hg",
+      "Xe"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Chất lỏng đông đặc ở 0 độ C là gì?",
+    "o": [
+      "dầu",
+      "rượu",
+      "nước",
+      "sữa"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nước sôi ở nhiệt độ bao nhiêu độ C?",
+    "o": [
+      "50",
+      "80",
+      "100",
+      "120"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Trái đất quay quanh gì?",
+    "o": [
+      "Mặt trăng",
+      "Mặt trời",
+      "Sao Hỏa",
+      "Sao Kim"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Mặt trăng quay quanh gì?",
+    "o": [
+      "Mặt trời",
+      "Sao Hỏa",
+      "Trái đất",
+      "Sao Kim"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Hành tinh nào gần Mặt trời nhất?",
+    "o": [
+      "Sao Kim",
+      "Trái đất",
+      "Sao Hỏa",
+      "Sao Thủy"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Hành tinh nào lớn nhất trong hệ Mặt trời?",
+    "o": [
+      "Sao Thổ",
+      "Sao Mộc",
+      "Sao Thiên Vương",
+      "Sao Hải Vương"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hành tinh nào có vành đai?",
+    "o": [
+      "Sao Hỏa",
+      "Sao Kim",
+      "Sao Thổ",
+      "Sao Thủy"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Trái đất có bao nhiêu vệ tinh tự nhiên?",
+    "o": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Mặt trời có phải là một ngôi sao không?",
+    "o": [
+      "Không",
+      "Có",
+      "Là hành tinh",
+      "Là thiên thạch"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cơ quan nào bơm máu đi khắp cơ thể?",
+    "o": [
+      "gan",
+      "tim",
+      "phổi",
+      "thận"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cơ quan nào giúp chúng ta thở?",
+    "o": [
+      "gan",
+      "tim",
+      "phổi",
+      "thận"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bộ phận nào của cơ thể giúp chúng ta nhìn?",
+    "o": [
+      "tai",
+      "mắt",
+      "mũi",
+      "miệng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bộ phận nào của cơ thể giúp chúng ta nghe?",
+    "o": [
+      "mắt",
+      "mũi",
+      "tai",
+      "miệng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bộ phận nào của cơ thể giúp chúng ta ngửi?",
+    "o": [
+      "tai",
+      "mắt",
+      "mũi",
+      "miệng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Con người có bao nhiêu chiếc răng vĩnh viễn?",
+    "o": [
+      "28",
+      "30",
+      "32",
+      "34"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Xương nào lớn nhất trong cơ thể người?",
+    "o": [
+      "xương sọ",
+      "xương đùi",
+      "xương cột sống",
+      "xương chậu"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Da có chức năng gì?",
+    "o": [
+      "tiêu hóa",
+      "bảo vệ cơ thể",
+      "hô hấp",
+      "tuần hoàn"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Máu có màu gì?",
+    "o": [
+      "xanh",
+      "đỏ",
+      "vàng",
+      "trắng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhóm máu hiếm nhất là gì?",
+    "o": [
+      "A",
+      "B",
+      "AB",
+      "O"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Chất nào trong cơ thể giúp tiêu hóa thức ăn?",
+    "o": [
+      "máu",
+      "dịch vị",
+      "mồ hôi",
+      "nước bọt"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Trọng lực là gì?",
+    "o": [
+      "lực đẩy",
+      "lực hút của Trái đất",
+      "lực ma sát",
+      "lực đàn hồi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tốc độ ánh sáng là bao nhiêu?",
+    "o": [
+      "300 km/s",
+      "300 km/h",
+      "300.000 km/s",
+      "3.000 km/s"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Âm thanh có thể truyền qua môi trường nào?",
+    "o": [
+      "chỉ qua không khí",
+      "chỉ qua nước",
+      "chất rắn, lỏng, khí",
+      "chỉ qua chân không"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Điện tích cùng dấu thì thế nào?",
+    "o": [
+      "hút nhau",
+      "đẩy nhau",
+      "không tác dụng",
+      "triệt tiêu"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Trái đất tự quay quanh trục mất bao lâu?",
+    "o": [
+      "12 giờ",
+      "24 giờ",
+      "365 ngày",
+      "30 ngày"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Trái đất quay quanh Mặt trời mất bao lâu?",
+    "o": [
+      "1 tháng",
+      "6 tháng",
+      "1 năm",
+      "2 năm"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thủy triều là hiện tượng gì?",
+    "o": [
+      "sóng thần",
+      "nước biển dâng",
+      "nước biển lên xuống",
+      "bão biển"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Pin mặt trời chuyển gì thành điện?",
+    "o": [
+      "nhiệt",
+      "gió",
+      "ánh sáng",
+      "nước"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nam châm hút được chất liệu nào?",
+    "o": [
+      "nhôm",
+      "đồng",
+      "sắt",
+      "vàng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bầu trời có màu xanh là do hiện tượng gì?",
+    "o": [
+      "khúc xạ",
+      "tán xạ ánh sáng",
+      "phản xạ",
+      "nhiễu xạ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhiệt kế dùng để đo gì?",
+    "o": [
+      "cân nặng",
+      "nhiệt độ",
+      "chiều cao",
+      "áp suất"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cầu vồng có mấy màu chính?",
+    "o": [
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Băng tan ở nhiệt độ nào?",
+    "o": [
+      "-10 độ C",
+      "0 độ C",
+      "10 độ C",
+      "25 độ C"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cân nặng của một vật được đo bằng đơn vị gì?",
+    "o": [
+      "lít",
+      "mét",
+      "kg",
+      "giây"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Chiều dài được đo bằng đơn vị gì?",
+    "o": [
+      "kg",
+      "lít",
+      "mét",
+      "giờ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thể tích chất lỏng được đo bằng đơn vị gì?",
+    "o": [
+      "kg",
+      "mét",
+      "lít",
+      "giây"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thời gian được đo bằng đơn vị gì?",
+    "o": [
+      "mét",
+      "kg",
+      "lít",
+      "giây"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Nhiệt độ cơ thể người bình thường là bao nhiêu?",
+    "o": [
+      "35 độ C",
+      "37 độ C",
+      "39 độ C",
+      "40 độ C"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con người cần ngủ trung bình bao nhiêu tiếng mỗi ngày?",
+    "o": [
+      "4-5 tiếng",
+      "7-8 tiếng",
+      "10-12 tiếng",
+      "14 tiếng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Vitamin C có nhiều trong loại quả nào?",
+    "o": [
+      "chuối",
+      "cam",
+      "dưa hấu",
+      "nho"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chất đạm có nhiều trong thực phẩm nào?",
+    "o": [
+      "rau",
+      "thịt",
+      "gạo",
+      "hoa quả"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Năng lượng mặt trời có thể tái tạo được không?",
+    "o": [
+      "không",
+      "có",
+      "chỉ một phần",
+      "sắp hết"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sét là hiện tượng gì?",
+    "o": [
+      "ánh sáng",
+      "phóng điện",
+      "nhiệt",
+      "gió"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Giông bão thường đi kèm với hiện tượng gì?",
+    "o": [
+      "nắng",
+      "mưa",
+      "tuyết",
+      "sương mù"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chất khí nào chiếm nhiều nhất trong không khí?",
+    "o": [
+      "Oxy",
+      "Nitơ",
+      "CO2",
+      "Hydro"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Con người thở ra khí gì?",
+    "o": [
+      "Oxy",
+      "CO2",
+      "Nitơ",
+      "Hydro"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây xanh hấp thụ khí gì?",
+    "o": [
+      "CO2",
+      "Oxy",
+      "Nitơ",
+      "Hydro"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cây xanh thải ra khí gì vào ban ngày?",
+    "o": [
+      "CO2",
+      "Oxy",
+      "Nitơ",
+      "Hydro"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ai là vị vua đầu tiên của Việt Nam?",
+    "o": [
+      "Lê Lợi",
+      "Hùng Vương",
+      "Trần Hưng Đạo",
+      "Nguyễn Huệ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chiến thắng Điện Biên Phủ diễn ra vào năm nào?",
+    "o": [
+      "1945",
+      "1954",
+      "1968",
+      "1975"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ngày Giải phóng miền Nam thống nhất đất nước là ngày nào?",
+    "o": [
+      "30/4/1975",
+      "2/9/1945",
+      "7/5/1954",
+      "19/5/1890"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Bác Hồ sinh ngày tháng năm nào?",
+    "o": [
+      "19/5/1890",
+      "2/9/1890",
+      "19/5/1891",
+      "2/9/1945"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ai là người đọc bản Tuyên ngôn Độc lập khai sinh nước Việt Nam Dân chủ Cộng hòa?",
+    "o": [
+      "Võ Nguyên Giáp",
+      "Hồ Chí Minh",
+      "Phạm Văn Đồng",
+      "Tôn Đức Thắng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhà Trần nổi tiếng với chiến thắng nào?",
+    "o": [
+      "Bạch Đằng",
+      "Điện Biên Phủ",
+      "Ngọc Hồi",
+      "Chi Lăng"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ai là tác giả của \"Bình Ngô đại cáo\"?",
+    "o": [
+      "Nguyễn Trãi",
+      "Lê Lợi",
+      "Trần Hưng Đạo",
+      "Nguyễn Du"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Văn Miếu Quốc Tử Giám được xây dựng dưới triều đại nào?",
+    "o": [
+      "Lý",
+      "Trần",
+      "Lê",
+      "Nguyễn"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Quốc hiệu đầu tiên của Việt Nam là gì?",
+    "o": [
+      "Đại Việt",
+      "Văn Lang",
+      "Đại Nam",
+      "An Nam"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ai là vị vua cuối cùng của triều Nguyễn?",
+    "o": [
+      "Minh Mạng",
+      "Tự Đức",
+      "Bảo Đại",
+      "Khải Định"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Chiến thắng Bạch Đằng năm 938 do ai lãnh đạo?",
+    "o": [
+      "Trần Hưng Đạo",
+      "Ngô Quyền",
+      "Lê Hoàn",
+      "Lý Thường Kiệt"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Phong trào Cần Vương do ai lãnh đạo?",
+    "o": [
+      "Phan Đình Phùng",
+      "Hoàng Hoa Thám",
+      "Tôn Thất Thuyết",
+      "Nguyễn Trung Trực"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Tàu không số là tên gọi của lực lượng nào?",
+    "o": [
+      "hải quân",
+      "đường Hồ Chí Minh trên biển",
+      "không quân",
+      "bộ đội biên phòng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Địa đạo Củ Chi thuộc tỉnh nào?",
+    "o": [
+      "Bình Dương",
+      "Tây Ninh",
+      "TP. Hồ Chí Minh",
+      "Long An"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thành nhà Hồ thuộc tỉnh nào?",
+    "o": [
+      "Nghệ An",
+      "Hà Tĩnh",
+      "Thanh Hóa",
+      "Quảng Bình"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Lăng Bác nằm ở đâu?",
+    "o": [
+      "Hà Nội",
+      "TP. Hồ Chí Minh",
+      "Nghệ An",
+      "Huế"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ai là tổng bí thư đầu tiên của Đảng Cộng sản Việt Nam?",
+    "o": [
+      "Hồ Chí Minh",
+      "Trần Phú",
+      "Lê Hồng Phong",
+      "Nguyễn Văn Cừ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chiến dịch Hồ Chí Minh diễn ra năm nào?",
+    "o": [
+      "1973",
+      "1974",
+      "1975",
+      "1976"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Đền Hùng thuộc tỉnh nào?",
+    "o": [
+      "Hà Nội",
+      "Phú Thọ",
+      "Vĩnh Phúc",
+      "Bắc Giang"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bà Trưng, Bà Triệu là những nữ anh hùng chống giặc nào?",
+    "o": [
+      "Tống",
+      "Nguyên Mông",
+      "Phương Bắc",
+      "Minh"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Liên Xô tan rã vào năm nào?",
+    "o": [
+      "1989",
+      "1990",
+      "1991",
+      "1992"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Chiến tranh thế giới thứ hai kết thúc năm nào?",
+    "o": [
+      "1943",
+      "1944",
+      "1945",
+      "1946"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ai là người đầu tiên đặt chân lên Mặt trăng?",
+    "o": [
+      "Neil Armstrong",
+      "Yuri Gagarin",
+      "Buzz Aldrin",
+      "John Glenn"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Người đầu tiên bay vào vũ trụ là ai?",
+    "o": [
+      "Neil Armstrong",
+      "Yuri Gagarin",
+      "Buzz Aldrin",
+      "John Glenn"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Vạn Lý Trường Thành thuộc nước nào?",
+    "o": [
+      "Ấn Độ",
+      "Nhật Bản",
+      "Mông Cổ",
+      "Trung Quốc"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Kim Tự Tháp thuộc nước nào?",
+    "o": [
+      "Hy Lạp",
+      "Ai Cập",
+      "Ấn Độ",
+      "Mexico"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Đế chế La Mã sụp đổ năm bao nhiêu?",
+    "o": [
+      "376",
+      "476",
+      "576",
+      "676"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Christopher Columbus phát hiện ra châu Mỹ năm nào?",
+    "o": [
+      "1492",
+      "1498",
+      "1500",
+      "1502"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cách mạng Pháp diễn ra năm nào?",
+    "o": [
+      "1776",
+      "1789",
+      "1799",
+      "1804"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tác phẩm \"Tuyên ngôn của Đảng Cộng sản\" do ai viết?",
+    "o": [
+      "Lenin",
+      "Marx và Engels",
+      "Stalin",
+      "Mao Trạch Đông"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Vụ nổ bom nguyên tử đầu tiên diễn ra ở đâu?",
+    "o": [
+      "Nhật Bản",
+      "Mỹ",
+      "Nga",
+      "Đức"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Chiến tranh lạnh là cuộc đối đầu giữa hai phe nào?",
+    "o": [
+      "Mỹ - Anh",
+      "Mỹ - Liên Xô",
+      "Mỹ - Trung Quốc",
+      "Liên Xô - Trung Quốc"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ngày lễ Quốc khánh của Việt Nam là ngày nào?",
+    "o": [
+      "30/4",
+      "1/5",
+      "2/9",
+      "19/5"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ngày lễ Quốc tế Lao động là ngày nào?",
+    "o": [
+      "30/4",
+      "1/5",
+      "2/9",
+      "19/5"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ngày Nhà giáo Việt Nam là ngày nào?",
+    "o": [
+      "20/10",
+      "20/11",
+      "22/12",
+      "8/3"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ngày thành lập Quân đội Nhân dân Việt Nam là ngày nào?",
+    "o": [
+      "20/10",
+      "20/11",
+      "22/12",
+      "8/3"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ngày Quốc tế Phụ nữ là ngày nào?",
+    "o": [
+      "20/10",
+      "20/11",
+      "22/12",
+      "8/3"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Ngày Phụ nữ Việt Nam là ngày nào?",
+    "o": [
+      "8/3",
+      "20/10",
+      "20/11",
+      "22/12"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hà Nội được giải phóng vào năm nào?",
+    "o": [
+      "1954",
+      "1955",
+      "1956",
+      "1957"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Sự kiện nào đánh dấu kết thúc chiến tranh Việt Nam?",
+    "o": [
+      "Hiệp định Paris",
+      "30/4/1975",
+      "Điện Biên Phủ",
+      "Chiến dịch Hồ Chí Minh"
+    ],
+    "c": 1
+  },
+  {
+    "q": "CHDCND Triều Tiên được thành lập năm nào?",
+    "o": [
+      "1945",
+      "1948",
+      "1950",
+      "1953"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chiến tranh Triều Tiên diễn ra từ năm nào?",
+    "o": [
+      "1945-1948",
+      "1950-1953",
+      "1955-1960",
+      "1960-1965"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Khmer Đỏ cai trị Campuchia từ năm nào?",
+    "o": [
+      "1970-1975",
+      "1975-1979",
+      "1979-1985",
+      "1985-1990"
+    ],
+    "c": 1
+  },
+  {
+    "q": "APEC là tổ chức gì?",
+    "o": [
+      "quân sự",
+      "kinh tế châu Á - Thái Bình Dương",
+      "văn hóa",
+      "thể thao"
+    ],
+    "c": 1
+  },
+  {
+    "q": "ASEAN được thành lập năm nào?",
+    "o": [
+      "1965",
+      "1967",
+      "1970",
+      "1975"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Việt Nam gia nhập ASEAN năm nào?",
+    "o": [
+      "1993",
+      "1995",
+      "1997",
+      "2000"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Việt Nam gia nhập WTO năm nào?",
+    "o": [
+      "2005",
+      "2006",
+      "2007",
+      "2008"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Liên Hợp Quốc được thành lập năm nào?",
+    "o": [
+      "1943",
+      "1944",
+      "1945",
+      "1946"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Sân bay quốc tế Nội Bài nằm ở thành phố nào?",
+    "o": [
+      "TP. Hồ Chí Minh",
+      "Đà Nẵng",
+      "Hà Nội",
+      "Hải Phòng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Sân bay quốc tế Tân Sơn Nhất nằm ở thành phố nào?",
+    "o": [
+      "Hà Nội",
+      "Đà Nẵng",
+      "TP. Hồ Chí Minh",
+      "Cần Thơ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "1 + 1 bằng mấy?",
+    "o": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "c": 1
+  },
+  {
+    "q": "2 + 3 bằng mấy?",
+    "o": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "c": 1
+  },
+  {
+    "q": "5 x 5 bằng mấy?",
+    "o": [
+      "20",
+      "25",
+      "30",
+      "35"
+    ],
+    "c": 1
+  },
+  {
+    "q": "10 x 10 bằng mấy?",
+    "o": [
+      "50",
+      "100",
+      "150",
+      "200"
+    ],
+    "c": 1
+  },
+  {
+    "q": "100 chia cho 2 bằng mấy?",
+    "o": [
+      "25",
+      "40",
+      "50",
+      "60"
+    ],
+    "c": 2
+  },
+  {
+    "q": "50 + 50 bằng mấy?",
+    "o": [
+      "70",
+      "80",
+      "90",
+      "100"
+    ],
+    "c": 3
+  },
+  {
+    "q": "25 x 4 bằng mấy?",
+    "o": [
+      "80",
+      "90",
+      "100",
+      "110"
+    ],
+    "c": 2
+  },
+  {
+    "q": "144 chia cho 12 bằng mấy?",
+    "o": [
+      "10",
+      "11",
+      "12",
+      "13"
+    ],
+    "c": 2
+  },
+  {
+    "q": "3 mũ 2 bằng mấy?",
+    "o": [
+      "6",
+      "9",
+      "12",
+      "15"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Căn bậc hai của 81 là bao nhiêu?",
+    "o": [
+      "7",
+      "8",
+      "9",
+      "10"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Số nguyên tố là gì?",
+    "o": [
+      "số chẵn",
+      "số chia hết cho 1 và chính nó",
+      "số lẻ",
+      "số có 2 chữ số"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Số Pi xấp xỉ bằng bao nhiêu?",
+    "o": [
+      "3.12",
+      "3.14",
+      "3.16",
+      "3.18"
+    ],
+    "c": 1
+  },
+  {
+    "q": "1 km bằng bao nhiêu mét?",
+    "o": [
+      "100",
+      "500",
+      "1000",
+      "10000"
+    ],
+    "c": 2
+  },
+  {
+    "q": "1 giờ bằng bao nhiêu phút?",
+    "o": [
+      "30",
+      "45",
+      "60",
+      "90"
+    ],
+    "c": 2
+  },
+  {
+    "q": "1 ngày có bao nhiêu giờ?",
+    "o": [
+      "12",
+      "24",
+      "36",
+      "48"
+    ],
+    "c": 1
+  },
+  {
+    "q": "1 tuần có bao nhiêu ngày?",
+    "o": [
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "c": 2
+  },
+  {
+    "q": "1 năm có bao nhiêu tháng?",
+    "o": [
+      "10",
+      "11",
+      "12",
+      "13"
+    ],
+    "c": 2
+  },
+  {
+    "q": "1 thế kỷ bằng bao nhiêu năm?",
+    "o": [
+      "10",
+      "50",
+      "100",
+      "1000"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Hình vuông có mấy cạnh?",
+    "o": [
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hình tam giác có mấy góc?",
+    "o": [
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hình tròn có bao nhiêu cạnh?",
+    "o": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hình lục giác có mấy cạnh?",
+    "o": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Tổng các góc trong một tam giác là bao nhiêu độ?",
+    "o": [
+      "90",
+      "180",
+      "270",
+      "360"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tổng các góc trong một hình vuông là bao nhiêu độ?",
+    "o": [
+      "180",
+      "270",
+      "360",
+      "450"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Số âm nhỏ hơn số dương, đúng hay sai?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Tùy trường hợp",
+      "Bằng nhau"
+    ],
+    "c": 1
+  },
+  {
+    "q": "0 có phải là số nguyên không?",
+    "o": [
+      "Không",
+      "Có",
+      "Chỉ là số tự nhiên",
+      "Chỉ là số thực"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Số chẵn là số chia hết cho mấy?",
+    "o": [
+      "3",
+      "4",
+      "2",
+      "5"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Số lẻ là số không chia hết cho mấy?",
+    "o": [
+      "3",
+      "4",
+      "2",
+      "5"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Phân số 1/2 bằng số thập phân nào?",
+    "o": [
+      "0.25",
+      "0.5",
+      "0.75",
+      "0.8"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Phân số 3/4 bằng số thập phân nào?",
+    "o": [
+      "0.25",
+      "0.5",
+      "0.75",
+      "0.8"
+    ],
+    "c": 2
+  },
+  {
+    "q": "25% bằng phân số nào?",
+    "o": [
+      "1/5",
+      "1/4",
+      "1/3",
+      "1/2"
+    ],
+    "c": 1
+  },
+  {
+    "q": "50% bằng phân số nào?",
+    "o": [
+      "1/5",
+      "1/4",
+      "1/3",
+      "1/2"
+    ],
+    "c": 3
+  },
+  {
+    "q": "75% bằng phân số nào?",
+    "o": [
+      "1/4",
+      "1/3",
+      "3/4",
+      "2/3"
+    ],
+    "c": 2
+  },
+  {
+    "q": "12 giờ trưa còn gọi là gì?",
+    "o": [
+      "AM",
+      "PM",
+      "Noon",
+      "Midnight"
+    ],
+    "c": 2
+  },
+  {
+    "q": "12 giờ đêm còn gọi là gì?",
+    "o": [
+      "AM",
+      "PM",
+      "Noon",
+      "Midnight"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Số La Mã X bằng bao nhiêu?",
+    "o": [
+      "5",
+      "10",
+      "50",
+      "100"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Số La Mã L bằng bao nhiêu?",
+    "o": [
+      "10",
+      "50",
+      "100",
+      "500"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Số La Mã C bằng bao nhiêu?",
+    "o": [
+      "10",
+      "50",
+      "100",
+      "1000"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Số La Mã D bằng bao nhiêu?",
+    "o": [
+      "100",
+      "500",
+      "1000",
+      "10000"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Số La Mã M bằng bao nhiêu?",
+    "o": [
+      "500",
+      "1000",
+      "5000",
+      "10000"
+    ],
+    "c": 1
+  },
+  {
+    "q": "1 lít bằng bao nhiêu ml?",
+    "o": [
+      "100",
+      "500",
+      "1000",
+      "2000"
+    ],
+    "c": 2
+  },
+  {
+    "q": "1 kg bằng bao nhiêu gram?",
+    "o": [
+      "100",
+      "500",
+      "1000",
+      "10000"
+    ],
+    "c": 2
+  },
+  {
+    "q": "2 giờ bằng bao nhiêu phút?",
+    "o": [
+      "60",
+      "90",
+      "120",
+      "150"
+    ],
+    "c": 2
+  },
+  {
+    "q": "1 tá bằng bao nhiêu cái?",
+    "o": [
+      "10",
+      "12",
+      "14",
+      "20"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Số 7 trong số 75 có giá trị là bao nhiêu?",
+    "o": [
+      "7",
+      "70",
+      "700",
+      "7000"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Số 1000 có bao nhiêu số 0?",
+    "o": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "c": 2
+  },
+  {
+    "q": "20% của 100 là bao nhiêu?",
+    "o": [
+      "10",
+      "20",
+      "30",
+      "40"
+    ],
+    "c": 1
+  },
+  {
+    "q": "45 + 55 bằng mấy?",
+    "o": [
+      "90",
+      "95",
+      "100",
+      "105"
+    ],
+    "c": 2
+  },
+  {
+    "q": "99 + 1 bằng mấy?",
+    "o": [
+      "90",
+      "99",
+      "100",
+      "101"
+    ],
+    "c": 2
+  },
+  {
+    "q": "0 x 1000 bằng mấy?",
+    "o": [
+      "0",
+      "100",
+      "1000",
+      "1"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Truyện Kiều của tác giả nào?",
+    "o": [
+      "Nguyễn Trãi",
+      "Nguyễn Du",
+      "Hồ Xuân Hương",
+      "Nguyễn Khuyến"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tác phẩm \"Số đỏ\" của nhà văn nào?",
+    "o": [
+      "Nam Cao",
+      "Nguyễn Công Hoan",
+      "Vũ Trọng Phụng",
+      "Thạch Lam"
+    ],
+    "c": 2
+  },
+  {
+    "q": "\"Lão Hạc\" là tác phẩm của ai?",
+    "o": [
+      "Nam Cao",
+      "Ngô Tất Tố",
+      "Vũ Trọng Phụng",
+      "Nguyễn Công Hoan"
+    ],
+    "c": 0
+  },
+  {
+    "q": "\"Tắt đèn\" là tác phẩm của ai?",
+    "o": [
+      "Nam Cao",
+      "Ngô Tất Tố",
+      "Vũ Trọng Phụng",
+      "Nguyễn Công Hoan"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chị Dậu là nhân vật trong tác phẩm nào?",
+    "o": [
+      "Lão Hạc",
+      "Tắt đèn",
+      "Số đỏ",
+      "Chí Phèo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chí Phèo là nhân vật của nhà văn nào?",
+    "o": [
+      "Nam Cao",
+      "Ngô Tất Tố",
+      "Vũ Trọng Phụng",
+      "Nguyễn Công Hoan"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Truyện \"Dế Mèn phiêu lưu ký\" của ai?",
+    "o": [
+      "Tô Hoài",
+      "Nam Cao",
+      "Nguyễn Nhật Ánh",
+      "Ma Văn Kháng"
+    ],
+    "c": 0
+  },
+  {
+    "q": "\"Nhật ký trong tù\" của ai?",
+    "o": [
+      "Phạm Văn Đồng",
+      "Võ Nguyên Giáp",
+      "Hồ Chí Minh",
+      "Tố Hữu"
+    ],
+    "c": 2
+  },
+  {
+    "q": "\"Đất nước\" của nhà thơ nào?",
+    "o": [
+      "Nguyễn Đình Thi",
+      "Tố Hữu",
+      "Huy Cận",
+      "Chế Lan Viên"
+    ],
+    "c": 0
+  },
+  {
+    "q": "\"Việt Bắc\" là tác phẩm của ai?",
+    "o": [
+      "Tố Hữu",
+      "Hồ Chí Minh",
+      "Xuân Diệu",
+      "Huy Cận"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Tác giả của \"Đoàn thuyền đánh cá\" là ai?",
+    "o": [
+      "Huy Cận",
+      "Tố Hữu",
+      "Xuân Diệu",
+      "Chế Lan Viên"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Nhà thơ Xuân Diệu được mệnh danh là gì?",
+    "o": [
+      "Ông hoàng thơ tình",
+      "Thi sĩ cách mạng",
+      "Nhà thơ của thiếu nhi",
+      "Nhà thơ quê hương"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Truyện cổ tích Tấm Cám nói về điều gì?",
+    "o": [
+      "tình bạn",
+      "tình yêu",
+      "cái thiện thắng cái ác",
+      "lòng dũng cảm"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thầy bói xem voi là truyện ngụ ngôn khuyên chúng ta điều gì?",
+    "o": [
+      "đừng xem bói",
+      "phải xem xét toàn diện",
+      "đừng tin voi",
+      "học cách xem voi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ếch ngồi đáy giếng khuyên chúng ta điều gì?",
+    "o": [
+      "đừng làm ếch",
+      "đừng huênh hoang",
+      "đừng ngồi giếng",
+      "đừng kiêu ngạo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Truyện \"Cây khế\" dạy bài học gì?",
+    "o": [
+      "siêng năng",
+      "trung thực",
+      "tham thì thâm",
+      "hiếu thảo"
+    ],
+    "c": 2
+  },
+  {
+    "q": "\"Thạch Sanh\" là truyện cổ tích về ai?",
+    "o": [
+      "người tốt bụng",
+      "người anh hùng",
+      "người thông minh",
+      "người giàu có"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Sọ Dừa là truyện cổ tích về gì?",
+    "o": [
+      "lòng hiếu thảo",
+      "tình yêu đẹp",
+      "sự thông minh",
+      "lòng dũng cảm"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Truyện \"Con Rồng cháu Tiên\" nói về nguồn gốc của ai?",
+    "o": [
+      "người Trung Quốc",
+      "người Việt Nam",
+      "người Lào",
+      "người Campuchia"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sơn Tinh Thủy Tinh là truyện về hiện tượng gì?",
+    "o": [
+      "núi lửa",
+      "lũ lụt",
+      "động đất",
+      "hạn hán"
+    ],
+    "c": 1
+  },
+  {
+    "q": "\"Ai ơi bưng bát cơm đầy, dẻo thơm một hạt đắng cay muôn phần\" nói về ai?",
+    "o": [
+      "người mẹ",
+      "người nông dân",
+      "người lính",
+      "người thợ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "\"Thương người như thể thương thân\" khuyên điều gì?",
+    "o": [
+      "yêu bản thân",
+      "yêu thương người khác",
+      "thương mình trước",
+      "ích kỷ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "\"Uống nước nhớ nguồn\" khuyên điều gì?",
+    "o": [
+      "nhớ uống nước",
+      "biết ơn",
+      "uống nhiều nước",
+      "giữ nước sạch"
+    ],
+    "c": 1
+  },
+  {
+    "q": "\"Có công mài sắt có ngày nên kim\" khuyên điều gì?",
+    "o": [
+      "kiên trì",
+      "mài sắt",
+      "làm kim",
+      "tiết kiệm"
+    ],
+    "c": 0
+  },
+  {
+    "q": "\"Học, học nữa, học mãi\" là câu nói của ai?",
+    "o": [
+      "Hồ Chí Minh",
+      "Lênin",
+      "Lê Quý Đôn",
+      "Nguyễn Trãi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "\"Tiên học lễ, hậu học văn\" là câu nói về điều gì?",
+    "o": [
+      "học trước",
+      "lễ phép trước",
+      "văn chương trước",
+      "học muộn"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Văn miếu Quốc Tử Giám được coi là trường đại học đầu tiên của Việt Nam, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Chưa chắc",
+      "Không phải"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bác Hồ có bao nhiêu tên gọi?",
+    "o": [
+      "một",
+      "hai",
+      "nhiều",
+      "không rõ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Truyện \"Bức tranh của em gái tôi\" của tác giả nào?",
+    "o": [
+      "Tạ Duy Anh",
+      "Nguyễn Nhật Ánh",
+      "Nguyễn Ngọc Thuần",
+      "Trần Hoài Dương"
+    ],
+    "c": 0
+  },
+  {
+    "q": "\"Kính vạn hoa\" là bộ truyện của ai?",
+    "o": [
+      "Tô Hoài",
+      "Nguyễn Nhật Ánh",
+      "Ma Văn Kháng",
+      "Nguyễn Ngọc Tư"
+    ],
+    "c": 1
+  },
+  {
+    "q": "\"Mắt biếc\" là tác phẩm của ai?",
+    "o": [
+      "Tô Hoài",
+      "Nguyễn Nhật Ánh",
+      "Nguyễn Ngọc Tư",
+      "Nguyễn Du"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tác phẩm \"Đất rừng phương Nam\" của ai?",
+    "o": [
+      "Đoàn Giỏi",
+      "Nguyễn Đình Thi",
+      "Anh Đức",
+      "Nguyễn Ngọc Tư"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Thơ \"Trăng ơi từ đâu đến\" của nhà thơ nào?",
+    "o": [
+      "Phạm Đình Ân",
+      "Trần Đăng Khoa",
+      "Nguyễn Duy",
+      "Xuân Quỳnh"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhà thơ Trần Đăng Khoa nổi tiếng từ khi nào?",
+    "o": [
+      "lớn tuổi",
+      "còn nhỏ",
+      "trung niên",
+      "sau khi mất"
+    ],
+    "c": 1
+  },
+  {
+    "q": "\"Ông đồ\" là bài thơ của ai?",
+    "o": [
+      "Vũ Đình Liên",
+      "Tố Hữu",
+      "Huy Cận",
+      "Xuân Diệu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Thơ \"Quê hương\" của Tế Hanh nói về điều gì?",
+    "o": [
+      "tình yêu quê hương",
+      "tình yêu đôi lứa",
+      "tình mẹ con",
+      "tình bạn"
+    ],
+    "c": 0
+  },
+  {
+    "q": "\"Bánh trôi nước\" là bài thơ của ai?",
+    "o": [
+      "Nguyễn Du",
+      "Hồ Xuân Hương",
+      "Bà Huyện Thanh Quan",
+      "Đoàn Thị Điểm"
+    ],
+    "c": 1
+  },
+  {
+    "q": "\"Qua đèo Ngang\" là bài thơ của ai?",
+    "o": [
+      "Hồ Xuân Hương",
+      "Bà Huyện Thanh Quan",
+      "Nguyễn Du",
+      "Nguyễn Trãi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "\"Bạn đến chơi nhà\" của Nguyễn Khuyến nói về gì?",
+    "o": [
+      "tình yêu",
+      "tình bạn",
+      "tình thân",
+      "tình thầy trò"
+    ],
+    "c": 1
+  },
+  {
+    "q": "\"Chinh phụ ngâm\" do ai sáng tác?",
+    "o": [
+      "Đoàn Thị Điểm",
+      "Hồ Xuân Hương",
+      "Nguyễn Du",
+      "Bà Huyện Thanh Quan"
+    ],
+    "c": 0
+  },
+  {
+    "q": "\"Cung oán ngân khúc\" của Nguyễn Gia Thiều thuộc thể loại gì?",
+    "o": [
+      "thơ",
+      "truyện thơ",
+      "ngâm khúc",
+      "văn xuôi"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thể thơ lục bát có đặc điểm gì?",
+    "o": [
+      "5 chữ",
+      "7 chữ",
+      "6-8 chữ",
+      "4 chữ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thể thơ thất ngôn bát cú có mấy câu?",
+    "o": [
+      "4",
+      "6",
+      "8",
+      "10"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ca dao Việt Nam thường viết theo thể thơ nào?",
+    "o": [
+      "lục bát",
+      "thất ngôn",
+      "ngũ ngôn",
+      "tự do"
+    ],
+    "c": 0
+  },
+  {
+    "q": "\"Truyện Kiều\" có bao nhiêu câu?",
+    "o": [
+      "254 câu",
+      "3254 câu",
+      "4254 câu",
+      "5254 câu"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tên thật của nhà thơ Tố Hữu là gì?",
+    "o": [
+      "Nguyễn Kim Thành",
+      "Nguyễn Duy",
+      "Nguyễn Đình Thi",
+      "Hoàng Minh Châu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Nhà thơ Huy Cận tên thật là gì?",
+    "o": [
+      "Cù Huy Cận",
+      "Nguyễn Huy Cận",
+      "Trần Huy Cận",
+      "Lê Huy Cận"
+    ],
+    "c": 0
+  },
+  {
+    "q": "\"Người lái đò sông Đà\" của tác giả nào?",
+    "o": [
+      "Nguyễn Đình Thi",
+      "Nguyễn Tuân",
+      "Tô Hoài",
+      "Nam Cao"
+    ],
+    "c": 1
+  },
+  {
+    "q": "\"Chữ người tử tù\" của Nguyễn Tuân nói về ai?",
+    "o": [
+      "người tử tù",
+      "người nghệ sĩ",
+      "người lính",
+      "người nông dân"
+    ],
+    "c": 1
+  },
+  {
+    "q": "\"Hai đứa trẻ\" của Thạch Lam nói về điều gì?",
+    "o": [
+      "niềm vui",
+      "nỗi buồn",
+      "ước mơ",
+      "tình yêu"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Phở là món ăn nổi tiếng của nước nào?",
+    "o": [
+      "Trung Quốc",
+      "Việt Nam",
+      "Thái Lan",
+      "Nhật Bản"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bánh mì là món ăn đường phố nổi tiếng của nước nào?",
+    "o": [
+      "Pháp",
+      "Việt Nam",
+      "Ý",
+      "Thái Lan"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sushi là món ăn nổi tiếng của nước nào?",
+    "o": [
+      "Trung Quốc",
+      "Hàn Quốc",
+      "Nhật Bản",
+      "Việt Nam"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Kim chi là món ăn đặc trưng của nước nào?",
+    "o": [
+      "Nhật Bản",
+      "Triều Tiên/Hàn Quốc",
+      "Trung Quốc",
+      "Thái Lan"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Pad Thái là món ăn nổi tiếng của nước nào?",
+    "o": [
+      "Việt Nam",
+      "Lào",
+      "Thái Lan",
+      "Myanmar"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Pizza có nguồn gốc từ nước nào?",
+    "o": [
+      "Pháp",
+      "Tây Ban Nha",
+      "Ý",
+      "Mỹ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Hamburger có nguồn gốc từ nước nào?",
+    "o": [
+      "Đức",
+      "Mỹ",
+      "Pháp",
+      "Anh"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tương ớt Sriracha có nguồn gốc từ nước nào?",
+    "o": [
+      "Trung Quốc",
+      "Thái Lan",
+      "Việt Nam",
+      "Hàn Quốc"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bún bò Huế đặc sản của vùng nào?",
+    "o": [
+      "Hà Nội",
+      "Sài Gòn",
+      "Huế",
+      "Đà Nẵng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bánh xèo là đặc sản của vùng nào Việt Nam?",
+    "o": [
+      "miền Bắc",
+      "miền Trung",
+      "miền Nam",
+      "cả nước"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Cà phê sữa đá là thức uống phổ biến ở đâu?",
+    "o": [
+      "Pháp",
+      "Việt Nam",
+      "Ý",
+      "Mỹ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Trà sữa trân châu có nguồn gốc từ đâu?",
+    "o": [
+      "Trung Quốc",
+      "Đài Loan",
+      "Nhật Bản",
+      "Việt Nam"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Kem có nguồn gốc từ nước nào?",
+    "o": [
+      "Pháp",
+      "Ý",
+      "Trung Quốc",
+      "Ai Cập"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Socola được làm từ cây gì?",
+    "o": [
+      "cà phê",
+      "ca cao",
+      "chè",
+      "dừa"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bia có nguồn gốc từ quốc gia nào cổ đại?",
+    "o": [
+      "Hy Lạp",
+      "Ai Cập",
+      "Lưỡng Hà",
+      "La Mã"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Rượu vang được làm từ gì?",
+    "o": [
+      "gạo",
+      "nho",
+      "táo",
+      "lúa mạch"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cơm là lương thực chính của nước nào?",
+    "o": [
+      "Mỹ",
+      "Việt Nam",
+      "Nga",
+      "Đức"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Mì ramen là món ăn nổi tiếng của nước nào?",
+    "o": [
+      "Trung Quốc",
+      "Hàn Quốc",
+      "Nhật Bản",
+      "Việt Nam"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Lẩu là món ăn phổ biến ở nước nào?",
+    "o": [
+      "Nhật Bản",
+      "Trung Quốc",
+      "Việt Nam",
+      "tất cả các nước trên"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Bánh tráng trộn là đặc sản của vùng nào?",
+    "o": [
+      "Hà Nội",
+      "Sài Gòn",
+      "Đà Lạt",
+      "Đà Nẵng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bánh cuốn đặc sản của vùng nào?",
+    "o": [
+      "Nam Định",
+      "Hà Nội",
+      "Huế",
+      "Sài Gòn"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Chả giò còn gọi là gì?",
+    "o": [
+      "bánh phồng",
+      "nem rán",
+      "bánh ướt",
+      "bánh bò"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nước mắm được làm từ gì?",
+    "o": [
+      "tôm",
+      "cá",
+      "mực",
+      "cua"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bánh chưng được làm từ gạo gì?",
+    "o": [
+      "gạo tẻ",
+      "gạo nếp",
+      "gạo lứt",
+      "gạo ST25"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bánh chưng thường được ăn vào dịp nào?",
+    "o": [
+      "Trung thu",
+      "Tết Nguyên Đán",
+      "Quốc khánh",
+      "Giỗ tổ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thực phẩm nào giàu canxi nhất?",
+    "o": [
+      "thịt",
+      "sữa",
+      "rau",
+      "hoa quả"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cà phê đen không đường vị như thế nào?",
+    "o": [
+      "ngọt",
+      "chua",
+      "đắng",
+      "mặn"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bánh mì được làm từ bột gì?",
+    "o": [
+      "bột gạo",
+      "bột mì",
+      "bột ngô",
+      "bột sắn"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Mật ong được tạo ra bởi con gì?",
+    "o": [
+      "kiến",
+      "ong",
+      "bướm",
+      "ruồi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Dầu ăn thường được làm từ gì?",
+    "o": [
+      "động vật",
+      "thực vật",
+      "khoáng sản",
+      "hóa chất"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chanh có vị gì?",
+    "o": [
+      "ngọt",
+      "mặn",
+      "chua",
+      "đắng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Đường có vị gì?",
+    "o": [
+      "chua",
+      "mặn",
+      "đắng",
+      "ngọt"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Muối có vị gì?",
+    "o": [
+      "ngọt",
+      "chua",
+      "mặn",
+      "đắng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ớt có vị gì?",
+    "o": [
+      "ngọt",
+      "mặn",
+      "chua",
+      "cay"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Bánh tráng thường ăn kèm với gì?",
+    "o": [
+      "cơm",
+      "phở",
+      "nước mắm",
+      "bún"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cơm tấm là đặc sản của vùng nào?",
+    "o": [
+      "miền Bắc",
+      "miền Trung",
+      "miền Nam",
+      "Tây Nguyên"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Gỏi cuốn còn được gọi là gì?",
+    "o": [
+      "nem rán",
+      "chả giò",
+      "spring roll",
+      "bánh hỏi"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bún riêu được nấu từ con gì?",
+    "o": [
+      "tôm",
+      "cua",
+      "cá",
+      "ốc"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Món bún ốc nấu với gì?",
+    "o": [
+      "thịt bò",
+      "ốc",
+      "cua",
+      "cá"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bánh bèo là đặc sản của vùng nào?",
+    "o": [
+      "Hà Nội",
+      "Huế",
+      "Sài Gòn",
+      "Đà Nẵng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chè được làm từ nguyên liệu chính là gì?",
+    "o": [
+      "đường",
+      "bột",
+      "đậu",
+      "sữa"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Bánh flan có nguồn gốc từ đâu?",
+    "o": [
+      "Pháp",
+      "Ý",
+      "Bồ Đào Nha",
+      "Tây Ban Nha"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Thịt kho tàu thường ăn kèm với gì?",
+    "o": [
+      "cơm trắng",
+      "bún",
+      "phở",
+      "bánh mì"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Canh chua thường được nấu với gì?",
+    "o": [
+      "thịt bò",
+      "tôm hoặc cá",
+      "thịt lợn",
+      "thịt gà"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Dưa hấu có vị gì?",
+    "o": [
+      "chua",
+      "ngọt",
+      "mặn",
+      "đắng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sầu riêng có mùi như thế nào?",
+    "o": [
+      "thơm nhẹ",
+      "rất hăng mạnh",
+      "không mùi",
+      "thơm như hoa hồng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Xoài chín có vị gì?",
+    "o": [
+      "chua",
+      "ngọt",
+      "mặn",
+      "đắng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cóc là loại trái cây có vị gì?",
+    "o": [
+      "ngọt",
+      "chua",
+      "đắng",
+      "cay"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bánh pía là đặc sản của vùng nào?",
+    "o": [
+      "Hà Nội",
+      "Sài Gòn",
+      "Sóc Trăng",
+      "Đà Lạt"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Hủ tiếu là món ăn đường phố nổi tiếng của vùng nào?",
+    "o": [
+      "Hà Nội",
+      "Huế",
+      "Sài Gòn",
+      "Đà Nẵng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Môn thể thao nào được gọi là \"môn thể thao vua\"?",
+    "o": [
+      "bóng rổ",
+      "bóng đá",
+      "bóng chuyền",
+      "cầu lông"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bóng đá có bao nhiêu cầu thủ trong một đội?",
+    "o": [
+      "9",
+      "10",
+      "11",
+      "12"
+    ],
+    "c": 2
+  },
+  {
+    "q": "World Cup tổ chức mấy năm một lần?",
+    "o": [
+      "2 năm",
+      "3 năm",
+      "4 năm",
+      "5 năm"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Môn bóng rổ có bao nhiêu cầu thủ trong một đội?",
+    "o": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bóng chuyền có bao nhiêu cầu thủ trong một đội?",
+    "o": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Võ sư Lý Tiểu Long là huyền thoại của môn võ nào?",
+    "o": [
+      "Karate",
+      "Taekwondo",
+      "Kung Fu",
+      "Judo"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Olympic tổ chức mấy năm một lần?",
+    "o": [
+      "2 năm",
+      "3 năm",
+      "4 năm",
+      "5 năm"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Môn thể thao nào sử dụng vợt và cầu lông?",
+    "o": [
+      "tennis",
+      "cầu lông",
+      "bóng bàn",
+      "bóng chuyền"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bóng bàn còn gọi là gì?",
+    "o": [
+      "ping pong",
+      "badminton",
+      "volleyball",
+      "handball"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Trong bóng đá, thủ môn là người làm gì?",
+    "o": [
+      "ghi bàn",
+      "bắt bóng",
+      "chạy nhanh nhất",
+      "đá phạt"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Môn thể thao nào được gọi là \"F1\"?",
+    "o": [
+      "đua xe máy",
+      "đua xe đạp",
+      "đua xe ô tô",
+      "đua thuyền"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Môn golf dùng gì để đánh bóng?",
+    "o": [
+      "vợt",
+      "gậy",
+      "chân",
+      "tay"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Môn quần vợt (tennis) có bao nhiêu người chơi trong trận đơn?",
+    "o": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Môn bơi lội thi đấu ở đâu?",
+    "o": [
+      "sân",
+      "hồ",
+      "bể bơi",
+      "biển"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Môn võ Taekwondo có nguồn gốc từ nước nào?",
+    "o": [
+      "Nhật Bản",
+      "Trung Quốc",
+      "Hàn Quốc",
+      "Việt Nam"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Môn võ Karate có nguồn gốc từ nước nào?",
+    "o": [
+      "Nhật Bản",
+      "Trung Quốc",
+      "Hàn Quốc",
+      "Việt Nam"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Môn võ Judo có nguồn gốc từ nước nào?",
+    "o": [
+      "Nhật Bản",
+      "Trung Quốc",
+      "Hàn Quốc",
+      "Việt Nam"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Vovinam là võ thuật của nước nào?",
+    "o": [
+      "Trung Quốc",
+      "Việt Nam",
+      "Nhật Bản",
+      "Hàn Quốc"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Đội tuyển bóng đá quốc gia Việt Nam vô địch AFF Cup năm nào gần đây?",
+    "o": [
+      "2016",
+      "2018",
+      "2020",
+      "2022"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cristiano Ronaldo là cầu thủ bóng đá nước nào?",
+    "o": [
+      "Tây Ban Nha",
+      "Brazil",
+      "Bồ Đào Nha",
+      "Argentina"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Lionel Messi là cầu thủ bóng đá nước nào?",
+    "o": [
+      "Tây Ban Nha",
+      "Brazil",
+      "Bồ Đào Nha",
+      "Argentina"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Nguyễn Quang Hải là cầu thủ bóng đá của đội tuyển nào?",
+    "o": [
+      "Hàn Quốc",
+      "Nhật Bản",
+      "Việt Nam",
+      "Thái Lan"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Giải bóng đá Ngoại hạng Anh có bao nhiêu đội tham dự?",
+    "o": [
+      "18",
+      "20",
+      "22",
+      "24"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Vận động viên điền kinh chạy 100m thế giới, kỷ lục hiện tại khoảng bao nhiêu giây?",
+    "o": [
+      "dưới 9.6 giây",
+      "dưới 12 giây",
+      "dưới 10 giây",
+      "dưới 11 giây"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Đua xe đạp Tour de France tổ chức ở nước nào?",
+    "o": [
+      "Ý",
+      "Tây Ban Nha",
+      "Pháp",
+      "Đức"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Môn thể thao nào sử dụng súng?",
+    "o": [
+      "bắn cung",
+      "bắn súng",
+      "phóng lao",
+      "ném đĩa"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Môn đấu kiếm sử dụng vũ khí gì?",
+    "o": [
+      "gậy",
+      "kiếm",
+      "súng",
+      "cung"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Trong bóng rổ, một cú ném phạt được bao nhiêu điểm?",
+    "o": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Trong bóng rổ, ném trong vòng được bao nhiêu điểm?",
+    "o": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Trong bóng rổ, ném ngoài vòng 3 điểm được bao nhiêu điểm?",
+    "o": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Môn thể thao vượt chướng ngại vật gọi là gì?",
+    "o": [
+      "parkour",
+      "crossfit",
+      "steeplechase",
+      "triathlon"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ba môn phối hợp (triathlon) gồm những môn nào?",
+    "o": [
+      "bơi, chạy, đạp xe",
+      "bơi, chạy, nhảy",
+      "chạy, nhảy, ném",
+      "chạy, bơi, leo núi"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Vận động viên thể dục dụng cụ thi đấu trên thiết bị gọi là gì?",
+    "o": [
+      "sân",
+      "thảm",
+      "vòng",
+      "cầu"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Môn bóng nước thi đấu ở đâu?",
+    "o": [
+      "trên sân",
+      "dưới nước",
+      "trên băng",
+      "trên cát"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Giải quần vợt Wimbledon được tổ chức ở nước nào?",
+    "o": [
+      "Pháp",
+      "Mỹ",
+      "Anh",
+      "Úc"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Usain Bolt là vận động viên môn gì?",
+    "o": [
+      "bơi lội",
+      "điền kinh",
+      "cử tạ",
+      "bóng đá"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Michael Phelps là vận động viên môn gì?",
+    "o": [
+      "điền kinh",
+      "bơi lội",
+      "cử tạ",
+      "thể dục dụng cụ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tiger Woods là vận động viên môn gì?",
+    "o": [
+      "quần vợt",
+      "golf",
+      "bóng rổ",
+      "bóng đá"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Môn cờ vua có bao nhiêu quân mỗi bên?",
+    "o": [
+      "12",
+      "14",
+      "16",
+      "18"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Quân nào trong cờ vua có thể đi theo đường chéo?",
+    "o": [
+      "Xe",
+      "Mã",
+      "Tượng",
+      "Tốt"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Môn cờ tướng có nguồn gốc từ nước nào?",
+    "o": [
+      "Việt Nam",
+      "Nhật Bản",
+      "Hàn Quốc",
+      "Trung Quốc"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Võ sư Nguyễn Văn Lộc là người sáng lập môn võ gì?",
+    "o": [
+      "Karate",
+      "Taekwondo",
+      "Vovinam",
+      "Aikido"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Giải vô địch bóng đá châu Âu (Euro) tổ chức mấy năm một lần?",
+    "o": [
+      "2 năm",
+      "3 năm",
+      "4 năm",
+      "5 năm"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Đội tuyển bóng đá nữ Việt Nam có tham dự World Cup nữ 2023 không?",
+    "o": [
+      "Có",
+      "Không",
+      "Chưa",
+      "Sẽ tham dự 2027"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Môn thể thao cricket phổ biến ở nước nào?",
+    "o": [
+      "Mỹ",
+      "Anh, Ấn Độ, Úc",
+      "Pháp",
+      "Brazil"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Võ sư nào là huyền thoại võ thuật người Việt Nam?",
+    "o": [
+      "Nguyễn Văn Lộc",
+      "Trần Văn Công",
+      "Lý Tiểu Long",
+      "Văn Nguyễn"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Bóng đá Việt Nam vô địch AFF Cup 2022 sau bao nhiêu năm?",
+    "o": [
+      "2 năm",
+      "4 năm",
+      "6 năm",
+      "10 năm"
+    ],
+    "c": 1
+  },
+  {
+    "q": "SEA Games là đại hội thể thao của khu vực nào?",
+    "o": [
+      "châu Á",
+      "Đông Nam Á",
+      "châu Âu",
+      "thế giới"
+    ],
+    "c": 1
+  },
+  {
+    "q": "SEA Games tổ chức mấy năm một lần?",
+    "o": [
+      "1 năm",
+      "2 năm",
+      "3 năm",
+      "4 năm"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Huy chương Vàng là thứ hạng cao nhất trong thể thao, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Có cả Bạch kim",
+      "Không rõ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tết Nguyên Đán là ngày lễ quan trọng nhất của người Việt, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Chưa chắc",
+      "Không rõ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Người Việt thường ăn gì vào dịp Tết?",
+    "o": [
+      "bánh mì",
+      "bánh chưng",
+      "pizza",
+      "sushi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Mùng 1 Tết người Việt thường làm gì?",
+    "o": [
+      "đi làm",
+      "xông đất, chúc Tết",
+      "đi học",
+      "ngủ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Lì xì là phong tục gì?",
+    "o": [
+      "cho tiền may mắn đầu năm",
+      "biếu quà cưới",
+      "tiền thưởng",
+      "tiền tip"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Tết Trung Thu là ngày lễ dành cho ai?",
+    "o": [
+      "người già",
+      "trẻ em",
+      "người lao động",
+      "phụ nữ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tết Trung Thu có món ăn đặc trưng nào?",
+    "o": [
+      "bánh chưng",
+      "bánh trung thu",
+      "bánh mì",
+      "bánh bèo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Lễ hội Đền Hùng tổ chức vào tháng mấy âm lịch?",
+    "o": [
+      "tháng Giêng",
+      "tháng Ba",
+      "tháng Bảy",
+      "tháng Mười"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Áo dài là trang phục truyền thống của nước nào?",
+    "o": [
+      "Trung Quốc",
+      "Nhật Bản",
+      "Việt Nam",
+      "Hàn Quốc"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Kimono là trang phục truyền thống của nước nào?",
+    "o": [
+      "Hàn Quốc",
+      "Trung Quốc",
+      "Việt Nam",
+      "Nhật Bản"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Hanbok là trang phục truyền thống của nước nào?",
+    "o": [
+      "Nhật Bản",
+      "Hàn Quốc",
+      "Trung Quốc",
+      "Việt Nam"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nón lá là biểu tượng của nước nào?",
+    "o": [
+      "Trung Quốc",
+      "Nhật Bản",
+      "Việt Nam",
+      "Thái Lan"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Tục ăn trầu cau của người Việt có từ thời vua nào?",
+    "o": [
+      "Vua Hùng",
+      "Vua Lý",
+      "Vua Trần",
+      "Vua Nguyễn"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cây đàn bầu là nhạc cụ truyền thống của nước nào?",
+    "o": [
+      "Trung Quốc",
+      "Việt Nam",
+      "Lào",
+      "Campuchia"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Múa rối nước là loại hình nghệ thuật của nước nào?",
+    "o": [
+      "Trung Quốc",
+      "Nhật Bản",
+      "Việt Nam",
+      "Indonesia"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nhã nhạc cung đình Huế được UNESCO công nhận là di sản gì?",
+    "o": [
+      "di sản thiên nhiên",
+      "di sản văn hóa phi vật thể",
+      "di sản tư liệu",
+      "di sản hỗn hợp"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ca trù là loại hình nghệ thuật truyền thống của nước nào?",
+    "o": [
+      "Trung Quốc",
+      "Việt Nam",
+      "Nhật Bản",
+      "Lào"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Quan họ Bắc Ninh là loại hình dân ca của vùng nào?",
+    "o": [
+      "miền Nam",
+      "miền Trung",
+      "miền Bắc",
+      "Tây Nguyên"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cồng chiêng Tây Nguyên là di sản văn hóa của vùng nào?",
+    "o": [
+      "miền Bắc",
+      "miền Trung",
+      "Tây Nguyên",
+      "miền Nam"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Hát xẩm là loại hình nghệ thuật của tầng lớp nào?",
+    "o": [
+      "quý tộc",
+      "người mù",
+      "nông dân",
+      "trẻ em"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cải lương là loại hình sân khấu truyền thống của vùng nào?",
+    "o": [
+      "Bắc Bộ",
+      "Trung Bộ",
+      "Nam Bộ",
+      "Tây Nguyên"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Chèo là loại hình sân khấu truyền thống của vùng nào?",
+    "o": [
+      "Bắc Bộ",
+      "Trung Bộ",
+      "Nam Bộ",
+      "Tây Nguyên"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Vịnh Hạ Long là di sản thiên nhiên của tỉnh nào?",
+    "o": [
+      "Hải Phòng",
+      "Thái Bình",
+      "Quảng Ninh",
+      "Nam Định"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Phố cổ Hội An thuộc tỉnh nào?",
+    "o": [
+      "Đà Nẵng",
+      "Quảng Nam",
+      "Thừa Thiên Huế",
+      "Quảng Ngãi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Văn Miếu Quốc Tử Giám nằm ở đâu?",
+    "o": [
+      "Hà Nội",
+      "Huế",
+      "Sài Gòn",
+      "Đà Nẵng"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Chùa Một Cột nằm ở đâu?",
+    "o": [
+      "Hà Nội",
+      "Huế",
+      "Sài Gòn",
+      "Đà Nẵng"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Chùa Bái Đính thuộc tỉnh nào?",
+    "o": [
+      "Hà Nam",
+      "Nam Định",
+      "Ninh Bình",
+      "Thanh Hóa"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Địa đạo Củ Chi thuộc thành phố nào?",
+    "o": [
+      "Hà Nội",
+      "Đà Nẵng",
+      "Cần Thơ",
+      "TP. Hồ Chí Minh"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Dân tộc Kinh chiếm bao nhiêu phần trăm dân số Việt Nam?",
+    "o": [
+      "khoảng 50%",
+      "khoảng 70%",
+      "khoảng 86%",
+      "khoảng 95%"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Việt Nam có bao nhiêu dân tộc anh em?",
+    "o": [
+      "45",
+      "54",
+      "64",
+      "74"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ngôn ngữ phổ biến thứ hai ở Việt Nam là gì?",
+    "o": [
+      "Pháp",
+      "Trung Quốc",
+      "Anh",
+      "Nga"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Đạo Phật đến Việt Nam từ nước nào?",
+    "o": [
+      "Ấn Độ",
+      "Trung Quốc",
+      "Nhật Bản",
+      "Thái Lan"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Chùa là nơi thờ phụng của tôn giáo nào?",
+    "o": [
+      "Kitô giáo",
+      "Phật giáo",
+      "Hồi giáo",
+      "Ấn Độ giáo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhà thờ là nơi thờ phụng của tôn giáo nào?",
+    "o": [
+      "Phật giáo",
+      "Kitô giáo",
+      "Hồi giáo",
+      "Ấn Độ giáo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thánh đường Hồi giáo gọi là gì?",
+    "o": [
+      "chùa",
+      "nhà thờ",
+      "mosque",
+      "đền"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Lễ Giáng sinh là ngày lễ của tôn giáo nào?",
+    "o": [
+      "Phật giáo",
+      "Ấn Độ giáo",
+      "Kitô giáo",
+      "Hồi giáo"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Phật giáo có vị lãnh tụ tối cao không?",
+    "o": [
+      "có, là Giáo hoàng",
+      "không",
+      "có, là Đức Phật",
+      "có, là Lạt ma"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tín ngưỡng thờ cúng tổ tiên có phải là tôn giáo không?",
+    "o": [
+      "có",
+      "không",
+      "là tín ngưỡng dân gian",
+      "là tôn giáo chính thức"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thánh Gióng là nhân vật trong truyền thuyết nào?",
+    "o": [
+      "chống giặc Ân",
+      "chống giặc Tần",
+      "chống giặc Mông",
+      "chống giặc Minh"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Sự tích trầu cau nói về tình cảm gì?",
+    "o": [
+      "tình yêu đôi lứa",
+      "tình anh em",
+      "tình mẫu tử",
+      "tình thầy trò"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sự tích bánh chưng bánh dày nói về ai?",
+    "o": [
+      "vua Hùng",
+      "vua Lý",
+      "vua Trần",
+      "vua Nguyễn"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Trang phục cưới truyền thống của cô dâu Việt Nam là gì?",
+    "o": [
+      "váy trắng",
+      "áo dài đỏ",
+      "áo tứ thân",
+      "áo bà ba"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Rước dâu là phong tục trong lễ gì?",
+    "o": [
+      "lễ sinh nhật",
+      "lễ cưới",
+      "lễ Tết",
+      "lễ hội"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Trà đạo là nét văn hóa nổi tiếng của nước nào?",
+    "o": [
+      "Việt Nam",
+      "Nhật Bản",
+      "Hàn Quốc",
+      "Trung Quốc"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Môn cờ vây có nguồn gốc từ nước nào?",
+    "o": [
+      "Ấn Độ",
+      "Nhật Bản",
+      "Hàn Quốc",
+      "Trung Quốc"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Thư pháp là nghệ thuật viết chữ đẹp của nước nào?",
+    "o": [
+      "Việt Nam",
+      "Trung Quốc",
+      "Nhật Bản",
+      "tất cả các nước trên"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Lễ hội Halloween có nguồn gốc từ văn hóa nào?",
+    "o": [
+      "châu Á",
+      "châu Phi",
+      "châu Âu cổ đại",
+      "Mỹ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Valentine là ngày lễ gì?",
+    "o": [
+      "tình yêu",
+      "Giáng sinh",
+      "năm mới",
+      "gia đình"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Năm mới của người Trung Quốc gọi là gì?",
+    "o": [
+      "Tết âm lịch",
+      "Tết dương lịch",
+      "Lễ hội mùa xuân",
+      "Tết Nguyên đán"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Songkran là lễ hội năm mới của nước nào?",
+    "o": [
+      "Ấn Độ",
+      "Thái Lan",
+      "Lào",
+      "Campuchia"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Lễ hội té nước Songkran tượng trưng cho điều gì?",
+    "o": [
+      "may mắn",
+      "rửa tội",
+      "giải nhiệt",
+      "tẩy uế"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Đèn lồng là biểu tượng của lễ hội nào?",
+    "o": [
+      "Trung thu",
+      "Halloween",
+      "Giáng sinh",
+      "Tết dương lịch"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Rằm tháng Giêng còn gọi là gì?",
+    "o": [
+      "Tết Trung thu",
+      "Tết Nguyên tiêu",
+      "Tết Hàn thực",
+      "Tết Đoan ngọ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tết Đoan ngọ diễn ra vào ngày mùng mấy tháng 5 âm lịch?",
+    "o": [
+      "mùng 3",
+      "mùng 5",
+      "mùng 7",
+      "mùng 9"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tục giết sâu bọ trong Tết Đoan ngọ nhằm mục đích gì?",
+    "o": [
+      "diệt sâu bọ",
+      "ăn uống",
+      "cầu may",
+      "giải trí"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Văn hóa Óc Eo là nền văn hóa cổ ở vùng nào?",
+    "o": [
+      "Bắc Bộ",
+      "Trung Bộ",
+      "Nam Bộ",
+      "Tây Nguyên"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ai là người phát minh ra bóng đèn điện?",
+    "o": [
+      "Edison",
+      "Einstein",
+      "Newton",
+      "Tesla"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Máy tính đầu tiên có tên là gì?",
+    "o": [
+      "ENIAC",
+      "Apple I",
+      "IBM PC",
+      "Windows"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Internet được phát minh bởi ai?",
+    "o": [
+      "Bill Gates",
+      "Tim Berners-Lee",
+      "Steve Jobs",
+      "Mark Zuckerberg"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Google được thành lập bởi ai?",
+    "o": [
+      "Mark Zuckerberg",
+      "Larry Page và Sergey Brin",
+      "Bill Gates",
+      "Steve Jobs"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Facebook được thành lập bởi ai?",
+    "o": [
+      "Mark Zuckerberg",
+      "Larry Page",
+      "Bill Gates",
+      "Steve Jobs"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Apple được thành lập bởi ai?",
+    "o": [
+      "Bill Gates",
+      "Steve Jobs, Steve Wozniak",
+      "Mark Zuckerberg",
+      "Jeff Bezos"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Microsoft được thành lập bởi ai?",
+    "o": [
+      "Steve Jobs",
+      "Bill Gates",
+      "Mark Zuckerberg",
+      "Larry Page"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Amazon được thành lập bởi ai?",
+    "o": [
+      "Bill Gates",
+      "Mark Zuckerberg",
+      "Jeff Bezos",
+      "Elon Musk"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Tesla là công ty sản xuất gì?",
+    "o": [
+      "phần mềm",
+      "xe ô tô điện",
+      "điện thoại",
+      "máy tính"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Windows là hệ điều hành của hãng nào?",
+    "o": [
+      "Apple",
+      "Microsoft",
+      "Google",
+      "Linux"
+    ],
+    "c": 1
+  },
+  {
+    "q": "iOS là hệ điều hành của hãng nào?",
+    "o": [
+      "Samsung",
+      "Google",
+      "Apple",
+      "Microsoft"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Android là hệ điều hành của hãng nào?",
+    "o": [
+      "Apple",
+      "Microsoft",
+      "Google",
+      "Samsung"
+    ],
+    "c": 2
+  },
+  {
+    "q": "MacBook là sản phẩm của hãng nào?",
+    "o": [
+      "Microsoft",
+      "IBM",
+      "Apple",
+      "Dell"
+    ],
+    "c": 2
+  },
+  {
+    "q": "iPhone là sản phẩm của hãng nào?",
+    "o": [
+      "Samsung",
+      "Apple",
+      "Google",
+      "Xiaomi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Samsung là công ty của nước nào?",
+    "o": [
+      "Nhật Bản",
+      "Trung Quốc",
+      "Hàn Quốc",
+      "Đài Loan"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Máy bay được phát minh bởi ai?",
+    "o": [
+      "Edison",
+      "Anh em nhà Wright",
+      "Einstein",
+      "Darwin"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Điện thoại được phát minh bởi ai?",
+    "o": [
+      "Edison",
+      "Bell",
+      "Einstein",
+      "Tesla"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tivi được phát minh bởi ai?",
+    "o": [
+      "Edison",
+      "Bell",
+      "Baird",
+      "Tesla"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Radio được phát minh bởi ai?",
+    "o": [
+      "Marconi",
+      "Edison",
+      "Bell",
+      "Einstein"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Máy chụp X-quang được phát minh bởi ai?",
+    "o": [
+      "Einstein",
+      "Röntgen",
+      "Newton",
+      "Darwin"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Vắc xin đậu mùa được phát minh bởi ai?",
+    "o": [
+      "Pasteur",
+      "Jenner",
+      "Fleming",
+      "Koch"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Penicillin được phát hiện bởi ai?",
+    "o": [
+      "Pasteur",
+      "Jenner",
+      "Fleming",
+      "Koch"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Elon Musk là CEO của công ty nào?",
+    "o": [
+      "Apple",
+      "Google",
+      "Tesla, SpaceX",
+      "Microsoft"
+    ],
+    "c": 2
+  },
+  {
+    "q": "WiFi là viết tắt của từ gì?",
+    "o": [
+      "Wireless Fidelity",
+      "Wireless Finder",
+      "Wide Fidelity",
+      "Wireless File"
+    ],
+    "c": 0
+  },
+  {
+    "q": "AI là viết tắt của từ gì?",
+    "o": [
+      "Artificial Intelligence",
+      "Automatic Input",
+      "Advanced Internet",
+      "Apple Intelligence"
+    ],
+    "c": 0
+  },
+  {
+    "q": "CPU là viết tắt của gì?",
+    "o": [
+      "Central Processing Unit",
+      "Computer Personal Unit",
+      "Core Processing Unit",
+      "Central Program Unit"
+    ],
+    "c": 0
+  },
+  {
+    "q": "RAM là viết tắt của gì?",
+    "o": [
+      "Read Access Memory",
+      "Random Access Memory",
+      "Run Application Memory",
+      "Rapid Access Memory"
+    ],
+    "c": 1
+  },
+  {
+    "q": "USB là viết tắt của gì?",
+    "o": [
+      "Universal Serial Bus",
+      "Universal System Bus",
+      "United Serial Bus",
+      "Universal Standard Bus"
+    ],
+    "c": 0
+  },
+  {
+    "q": "HTML là viết tắt của gì?",
+    "o": [
+      "Hyper Text Markup Language",
+      "High Tech Modern Language",
+      "Home Tool Markup Language",
+      "Hyper Text Modern Link"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Mạng xã hội nào có nhiều người dùng nhất thế giới?",
+    "o": [
+      "Twitter",
+      "Instagram",
+      "Facebook/Meta",
+      "TikTok"
+    ],
+    "c": 2
+  },
+  {
+    "q": "YouTube được thành lập năm nào?",
+    "o": [
+      "2003",
+      "2005",
+      "2007",
+      "2009"
+    ],
+    "c": 1
+  },
+  {
+    "q": "WhatsApp thuộc sở hữu của công ty nào?",
+    "o": [
+      "Google",
+      "Apple",
+      "Meta (Facebook)",
+      "Microsoft"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Pixel là sản phẩm của hãng nào?",
+    "o": [
+      "Apple",
+      "Samsung",
+      "Google",
+      "OnePlus"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Trí tuệ nhân tạo (AI) có thể học không?",
+    "o": [
+      "Không",
+      "Có, thông qua machine learning",
+      "Chỉ làm theo lệnh",
+      "Chưa rõ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Blockchain là công nghệ nền tảng của đồng tiền nào?",
+    "o": [
+      "USD",
+      "Euro",
+      "Bitcoin",
+      "VND"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bitcoin là loại tiền gì?",
+    "o": [
+      "tiền giấy",
+      "tiền điện tử (cryptocurrency)",
+      "tiền xu",
+      "thẻ tín dụng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Máy ATM dùng để làm gì?",
+    "o": [
+      "bán vé",
+      "rút tiền",
+      "gửi thư",
+      "mua sắm"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thẻ tín dụng cho phép làm gì?",
+    "o": [
+      "vay tiền ngân hàng",
+      "chi tiêu trước trả sau",
+      "tiết kiệm",
+      "đầu tư"
+    ],
+    "c": 1
+  },
+  {
+    "q": "E-commerce là gì?",
+    "o": [
+      "thương mại điện tử",
+      "email",
+      "mạng xã hội",
+      "ngân hàng số"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Smartphone đầu tiên được ra mắt bởi hãng nào?",
+    "o": [
+      "Apple",
+      "IBM",
+      "Nokia",
+      "Samsung"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Rửa tay thường xuyên giúp ngăn ngừa bệnh gì?",
+    "o": [
+      "cảm cúm",
+      "tiểu đường",
+      "tim mạch",
+      "ung thư"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ăn nhiều rau xanh có lợi cho sức khỏe, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Không ảnh hưởng",
+      "Có hại"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tập thể dục hàng ngày giúp gì?",
+    "o": [
+      "yếu hơn",
+      "khỏe mạnh hơn",
+      "mệt mỏi",
+      "ốm đau"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ngủ đủ giấc rất quan trọng cho sức khỏe, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Không quan trọng",
+      "Có hại"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Uống đủ nước mỗi ngày là bao nhiêu lít?",
+    "o": [
+      "0.5 lít",
+      "1 lít",
+      "khoảng 2 lít",
+      "5 lít"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thuốc lá có hại cho sức khỏe, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Có lợi",
+      "Không ảnh hưởng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Rượu bia có hại cho gan, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Tốt cho gan",
+      "Không ảnh hưởng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bệnh tiểu đường liên quan đến cơ quan nào?",
+    "o": [
+      "tim",
+      "phổi",
+      "tụy",
+      "thận"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bệnh sốt xuất huyết do con gì gây ra?",
+    "o": [
+      "ruồi",
+      "gián",
+      "muỗi",
+      "kiến"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bệnh sốt rét do con gì gây ra?",
+    "o": [
+      "ruồi",
+      "muỗi",
+      "gián",
+      "bọ chét"
+    ],
+    "c": 1
+  },
+  {
+    "q": "COVID-19 là bệnh gì?",
+    "o": [
+      "cảm thường",
+      "bệnh đường hô hấp do virus",
+      "dị ứng",
+      "ngộ độc thực phẩm"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Đeo khẩu trang giúp ngăn ngừa lây nhiễm bệnh gì?",
+    "o": [
+      "tiểu đường",
+      "bệnh đường hô hấp",
+      "ung thư",
+      "tim mạch"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Vắc xin có tác dụng gì?",
+    "o": [
+      "chữa bệnh",
+      "phòng bệnh",
+      "gây bệnh",
+      "làm đẹp"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cảm cúm thông thường kéo dài bao lâu?",
+    "o": [
+      "1-2 ngày",
+      "3-7 ngày",
+      "2 tuần",
+      "1 tháng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Huyết áp bình thường là bao nhiêu?",
+    "o": [
+      "90/60",
+      "120/80",
+      "140/90",
+      "160/100"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhịp tim bình thường của người lớn là bao nhiêu?",
+    "o": [
+      "40-50 lần/phút",
+      "60-100 lần/phút",
+      "120-150 lần/phút",
+      "150-200 lần/phút"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chất béo có hại cho tim mạch nếu ăn nhiều, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Ăn nhiều tốt",
+      "Không liên quan"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tác hại của ánh nắng mặt trời quá nhiều là gì?",
+    "o": [
+      "cảm lạnh",
+      "ung thư da",
+      "bệnh tim",
+      "tiểu đường"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Kem chống nắng dùng để bảo vệ gì?",
+    "o": [
+      "mắt",
+      "da",
+      "tóc",
+      "móng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bệnh nào thường gặp ở người hút thuốc lá?",
+    "o": [
+      "tiểu đường",
+      "ung thư phổi",
+      "viêm gan",
+      "sốt xuất huyết"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ăn chín uống sôi giúp ngăn ngừa bệnh gì?",
+    "o": [
+      "tim mạch",
+      "tiểu đường",
+      "bệnh đường tiêu hóa",
+      "ung thư"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Các bác sĩ khuyên nên ăn bao nhiêu bữa một ngày?",
+    "o": [
+      "1 bữa",
+      "2 bữa",
+      "3 bữa",
+      "5 bữa"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Sữa chua tốt cho hệ gì?",
+    "o": [
+      "hô hấp",
+      "tiêu hóa",
+      "tuần hoàn",
+      "thần kinh"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Caffeine có nhiều trong thức uống nào?",
+    "o": [
+      "sữa tươi",
+      "cà phê",
+      "nước lọc",
+      "sinh tố"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chất xơ có nhiều trong loại thực phẩm nào?",
+    "o": [
+      "thịt",
+      "cá",
+      "rau củ quả",
+      "trứng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bệnh loãng xương do thiếu chất gì?",
+    "o": [
+      "sắt",
+      "canxi",
+      "vitamin C",
+      "đạm"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thiếu máu do thiếu chất gì?",
+    "o": [
+      "canxi",
+      "sắt",
+      "vitamin D",
+      "chất béo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Quáng gà là do thiếu vitamin gì?",
+    "o": [
+      "vitamin A",
+      "vitamin B",
+      "vitamin C",
+      "vitamin D"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Bệnh scurvy (scorbut) do thiếu vitamin gì?",
+    "o": [
+      "vitamin A",
+      "vitamin B",
+      "vitamin C",
+      "vitamin D"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Trẻ em cần vitamin D để phát triển gì?",
+    "o": [
+      "chiều cao/xương",
+      "trí não",
+      "cơ bắp",
+      "mắt"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Tập yoga có lợi ích gì?",
+    "o": [
+      "chỉ giảm cân",
+      "tăng cường sức khỏe thể chất và tinh thần",
+      "chỉ tăng chiều cao",
+      "chỉ chữa bệnh"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Đi bộ 30 phút mỗi ngày có lợi gì?",
+    "o": [
+      "tốt cho tim mạch",
+      "hại khớp",
+      "mệt mỏi",
+      "lãng phí thời gian"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cười nhiều có lợi cho sức khỏe không?",
+    "o": [
+      "Có",
+      "Không",
+      "Có hại",
+      "Không liên quan"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Căng thẳng kéo dài có hại cho sức khỏe, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Tốt cho sức khỏe",
+      "Không ảnh hưởng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thiền có tác dụng gì?",
+    "o": [
+      "giảm căng thẳng",
+      "tăng cân",
+      "gây mất ngủ",
+      "tăng huyết áp"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Bệnh tay chân miệng thường gặp ở ai?",
+    "o": [
+      "người già",
+      "trẻ em",
+      "thanh niên",
+      "người trung niên"
+    ],
+    "c": 1
+  },
+  {
+    "q": "HIV có thể lây qua đường nào?",
+    "o": [
+      "ăn chung",
+      "máu, tình dục",
+      "nói chuyện",
+      "bắt tay"
+    ],
+    "c": 1
+  },
+  {
+    "q": "HIV/AIDS có thể chữa khỏi hoàn toàn không?",
+    "o": [
+      "Có",
+      "Chưa có thuốc chữa khỏi",
+      "Có thuốc đặc trị",
+      "Đã có vắc xin"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bệnh lao do vi khuẩn gây ra, đúng không?",
+    "o": [
+      "Sai, do virus",
+      "Đúng, do vi khuẩn",
+      "Do nấm",
+      "Do ký sinh trùng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sốt là dấu hiệu cho thấy cơ thể đang làm gì?",
+    "o": [
+      "khỏe mạnh",
+      "chống lại nhiễm trùng",
+      "yếu đi",
+      "già đi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Mùa xuân là mùa gì?",
+    "o": [
+      "rụng lá",
+      "đâm chồi nảy lộc",
+      "ngủ đông",
+      "thu hoạch"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Mùa hè thời tiết như thế nào?",
+    "o": [
+      "lạnh",
+      "mát mẻ",
+      "nóng bức",
+      "se lạnh"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Mùa đông thời tiết như thế nào?",
+    "o": [
+      "nóng bức",
+      "mát mẻ",
+      "lạnh giá",
+      "ấm áp"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Mưa là hiện tượng gì?",
+    "o": [
+      "nước bốc hơi",
+      "nước rơi từ mây",
+      "tuyết rơi",
+      "sương mù"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tuyết hình thành khi nhiệt độ dưới bao nhiêu độ C?",
+    "o": [
+      "5 độ",
+      "0 độ",
+      "dưới 0 độ",
+      "10 độ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cầu vồng thường xuất hiện sau gì?",
+    "o": [
+      "nắng gắt",
+      "mưa",
+      "bão",
+      "sương mù"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Gió là hiện tượng gì?",
+    "o": [
+      "không khí chuyển động",
+      "nước chảy",
+      "đất rung",
+      "lửa cháy"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Bão là hiện tượng gì?",
+    "o": [
+      "gió mạnh kèm mưa lớn",
+      "nắng nóng",
+      "tuyết rơi",
+      "sương mù dày"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Động đất là hiện tượng gì?",
+    "o": [
+      "đất rung chuyển",
+      "nước dâng cao",
+      "núi lửa phun",
+      "gió mạnh"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Sóng thần là gì?",
+    "o": [
+      "sóng lớn do động đất dưới biển",
+      "thủy triều",
+      "gió mạnh trên biển",
+      "mưa lớn"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hạn hán là hiện tượng gì?",
+    "o": [
+      "mưa nhiều",
+      "thiếu nước kéo dài",
+      "ngập lụt",
+      "bão lớn"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Lũ lụt là hiện tượng gì?",
+    "o": [
+      "nước dâng cao ngập lụt",
+      "hạn hán",
+      "núi lửa",
+      "động đất"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Núi lửa phun trào thải ra gì?",
+    "o": [
+      "nước",
+      "dung nham",
+      "băng",
+      "cát"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Băng hà là gì?",
+    "o": [
+      "nước đá khổng lồ di chuyển",
+      "núi cao",
+      "sông lớn",
+      "sa mạc rộng"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Rạn san hô là môi trường sống của loài gì?",
+    "o": [
+      "động vật trên cạn",
+      "sinh vật biển",
+      "chim",
+      "côn trùng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Rừng mưa nhiệt đới có đặc điểm gì?",
+    "o": [
+      "khô hạn",
+      "mưa nhiều và nóng ẩm",
+      "lạnh giá",
+      "nhiều tuyết"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sa mạc là nơi như thế nào?",
+    "o": [
+      "mưa nhiều",
+      "khô hạn, ít mưa",
+      "lạnh giá",
+      "nhiều cây cối"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thảo nguyên là nơi có đặc điểm gì?",
+    "o": [
+      "nhiều cây cối",
+      "đồng cỏ rộng lớn",
+      "nhiều núi đá",
+      "toàn cát"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Đồi núi có độ cao bao nhiêu so với đồng bằng?",
+    "o": [
+      "thấp hơn",
+      "cao hơn",
+      "bằng nhau",
+      "không so sánh được"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Biển đóng vai trò gì trong hệ sinh thái?",
+    "o": [
+      "cung cấp nước",
+      "điều hòa khí hậu",
+      "thải khí độc",
+      "hấp thụ khí độc"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây xanh có tác dụng gì?",
+    "o": [
+      "thải khí Oxy",
+      "hấp thụ CO2",
+      "cả hai đều đúng",
+      "không có tác dụng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Khí nhà kính là gì?",
+    "o": [
+      "khí làm nóng Trái đất",
+      "khí làm lạnh Trái đất",
+      "khí vô hại",
+      "khí tạo mưa"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hiệu ứng nhà kính gây ra hiện tượng gì?",
+    "o": [
+      "băng tan",
+      "Trái đất nóng lên",
+      "mực nước biển dâng",
+      "tất cả đều đúng"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Rác thải nhựa phân hủy trong bao lâu?",
+    "o": [
+      "vài tháng",
+      "vài năm",
+      "hàng trăm năm",
+      "vài ngày"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Tái chế là gì?",
+    "o": [
+      "vứt rác",
+      "biến rác thành sản phẩm mới",
+      "đốt rác",
+      "chôn rác"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Năng lượng tái tạo là gì?",
+    "o": [
+      "năng lượng không thể cạn kiệt",
+      "năng lượng hóa thạch",
+      "năng lượng hạt nhân",
+      "năng lượng than đá"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Nguồn năng lượng tái tạo nào sau đây?",
+    "o": [
+      "dầu mỏ",
+      "than đá",
+      "năng lượng mặt trời",
+      "khí đốt"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Ô nhiễm không khí do nguyên nhân gì?",
+    "o": [
+      "khói bụi từ nhà máy, xe cộ",
+      "cây xanh",
+      "mưa",
+      "gió"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Mưa axit là hiện tượng gì?",
+    "o": [
+      "mưa có tính axit do ô nhiễm",
+      "mưa lớn",
+      "mưa đá",
+      "mưa phùn"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Tầng ozone bảo vệ Trái đất khỏi gì?",
+    "o": [
+      "nhiệt",
+      "tia UV",
+      "mưa",
+      "gió"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Môi trường sống bị phá hủy ảnh hưởng đến gì?",
+    "o": [
+      "chỉ động vật",
+      "chỉ thực vật",
+      "đa dạng sinh học",
+      "chỉ con người"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Rừng ngập mặn có tác dụng gì?",
+    "o": [
+      "chống xói lở bờ biển",
+      "cung cấp gỗ",
+      "trồng lúa",
+      "xây nhà"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cá voi xanh có nguy cơ tuyệt chủng, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Còn nhiều",
+      "Không rõ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ngày Trái đất là ngày nào?",
+    "o": [
+      "22/3",
+      "22/4",
+      "22/5",
+      "22/6"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ngày Môi trường thế giới là ngày nào?",
+    "o": [
+      "1/6",
+      "5/6",
+      "10/6",
+      "15/6"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Biến đổi khí hậu do nguyên nhân chính nào?",
+    "o": [
+      "hoạt động của con người",
+      "tự nhiên",
+      "núi lửa",
+      "mặt trời"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Đa dạng sinh học là gì?",
+    "o": [
+      "sự phong phú của các loài sinh vật",
+      "nhiều cây cối",
+      "nhiều động vật",
+      "nhiều vi sinh vật"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Sông băng tan chảy là hậu quả của hiện tượng gì?",
+    "o": [
+      "Trái đất lạnh đi",
+      "Trái đất nóng lên",
+      "mưa nhiều",
+      "động đất"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Loài cây nào có thể sống hàng nghìn năm?",
+    "o": [
+      "cỏ",
+      "cây tùng",
+      "rau",
+      "lúa"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Khu bảo tồn thiên nhiên có mục đích gì?",
+    "o": [
+      "phát triển đô thị",
+      "bảo vệ hệ sinh thái",
+      "khai thác gỗ",
+      "xây dựng nhà máy"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bảng chữ cái tiếng Việt có bao nhiêu chữ cái?",
+    "o": [
+      "24",
+      "26",
+      "29",
+      "30"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Tiếng Việt thuộc nhóm ngôn ngữ nào?",
+    "o": [
+      "Hán - Tạng",
+      "Nam Á",
+      "Thái - Kadai",
+      "Mông - Miền"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Dấu sắc trong tiếng Việt thuộc loại dấu gì?",
+    "o": [
+      "dấu ngang",
+      "dấu huyền",
+      "dấu hỏi",
+      "dấu sắc"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Có bao nhiêu thanh điệu trong tiếng Việt?",
+    "o": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Từ \"cảm ơn\" có nghĩa là gì?",
+    "o": [
+      "xin lỗi",
+      "thank you",
+      "xin chào",
+      "tạm biệt"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"xin chào\" trong tiếng Anh là gì?",
+    "o": [
+      "goodbye",
+      "thank you",
+      "hello",
+      "sorry"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Từ \"tạm biệt\" trong tiếng Anh là gì?",
+    "o": [
+      "hello",
+      "goodbye",
+      "sorry",
+      "please"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"cảm ơn\" trong tiếng Anh là gì?",
+    "o": [
+      "goodbye",
+      "thank you",
+      "hello",
+      "yes"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"xin lỗi\" trong tiếng Anh là gì?",
+    "o": [
+      "hello",
+      "goodbye",
+      "thank you",
+      "sorry"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Từ \"vâng\" trong tiếng Anh là gì?",
+    "o": [
+      "no",
+      "yes",
+      "maybe",
+      "ok"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"không\" trong tiếng Anh là gì?",
+    "o": [
+      "yes",
+      "no",
+      "not",
+      "none"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Số 1 trong tiếng Anh đọc là gì?",
+    "o": [
+      "one",
+      "two",
+      "three",
+      "won"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Số 2 trong tiếng Anh đọc là gì?",
+    "o": [
+      "one",
+      "two",
+      "three",
+      "four"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Số 10 trong tiếng Anh đọc là gì?",
+    "o": [
+      "ten",
+      "teen",
+      "tin",
+      "tan"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Từ \"con chó\" trong tiếng Anh là gì?",
+    "o": [
+      "cat",
+      "dog",
+      "bird",
+      "fish"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"con mèo\" trong tiếng Anh là gì?",
+    "o": [
+      "dog",
+      "cat",
+      "bird",
+      "mouse"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"màu đỏ\" trong tiếng Anh là gì?",
+    "o": [
+      "blue",
+      "red",
+      "green",
+      "yellow"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"màu xanh dương\" trong tiếng Anh là gì?",
+    "o": [
+      "red",
+      "blue",
+      "green",
+      "yellow"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"màu vàng\" trong tiếng Anh là gì?",
+    "o": [
+      "red",
+      "blue",
+      "green",
+      "yellow"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Từ \"màu xanh lá\" trong tiếng Anh là gì?",
+    "o": [
+      "blue",
+      "red",
+      "green",
+      "yellow"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Từ \"màu đen\" trong tiếng Anh là gì?",
+    "o": [
+      "white",
+      "black",
+      "brown",
+      "gray"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"màu trắng\" trong tiếng Anh là gì?",
+    "o": [
+      "white",
+      "black",
+      "gray",
+      "pink"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Thứ Hai trong tiếng Anh là gì?",
+    "o": [
+      "Tuesday",
+      "Monday",
+      "Sunday",
+      "Friday"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thứ Ba trong tiếng Anh là gì?",
+    "o": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thứ Bảy trong tiếng Anh là gì?",
+    "o": [
+      "Sunday",
+      "Saturday",
+      "Friday",
+      "Monday"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chủ Nhật trong tiếng Anh là gì?",
+    "o": [
+      "Saturday",
+      "Sunday",
+      "Monday",
+      "Friday"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tháng Một trong tiếng Anh là gì?",
+    "o": [
+      "February",
+      "March",
+      "January",
+      "June"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Tháng Mười Hai trong tiếng Anh là gì?",
+    "o": [
+      "November",
+      "December",
+      "October",
+      "September"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"nước\" trong tiếng Anh là gì?",
+    "o": [
+      "fire",
+      "water",
+      "earth",
+      "air"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"mặt trời\" trong tiếng Anh là gì?",
+    "o": [
+      "moon",
+      "sun",
+      "star",
+      "sky"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"mặt trăng\" trong tiếng Anh là gì?",
+    "o": [
+      "sun",
+      "moon",
+      "star",
+      "cloud"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"ngôi sao\" trong tiếng Anh là gì?",
+    "o": [
+      "sun",
+      "moon",
+      "star",
+      "cloud"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Từ \"trường học\" trong tiếng Anh là gì?",
+    "o": [
+      "church",
+      "school",
+      "hospital",
+      "market"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"bệnh viện\" trong tiếng Anh là gì?",
+    "o": [
+      "school",
+      "hospital",
+      "clinic",
+      "pharmacy"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"nhà hàng\" trong tiếng Anh là gì?",
+    "o": [
+      "shop",
+      "restaurant",
+      "hotel",
+      "store"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"thư viện\" trong tiếng Anh là gì?",
+    "o": [
+      "bookstore",
+      "library",
+      "museum",
+      "gallery"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"máy tính\" trong tiếng Anh là gì?",
+    "o": [
+      "phone",
+      "computer",
+      "tablet",
+      "laptop"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"điện thoại\" trong tiếng Anh là gì?",
+    "o": [
+      "computer",
+      "television",
+      "telephone",
+      "radio"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Từ \"bánh mì\" trong tiếng Anh là gì?",
+    "o": [
+      "rice",
+      "bread",
+      "cake",
+      "noodle"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Từ \"trái cây\" trong tiếng Anh là gì?",
+    "o": [
+      "vegetable",
+      "fruit",
+      "meat",
+      "drink"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Mona Lisa là bức tranh nổi tiếng của họa sĩ nào?",
+    "o": [
+      "Van Gogh",
+      "Leonardo da Vinci",
+      "Picasso",
+      "Monet"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Van Gogh là họa sĩ của nước nào?",
+    "o": [
+      "Pháp",
+      "Tây Ban Nha",
+      "Hà Lan",
+      "Ý"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Đêm đầy sao là bức tranh nổi tiếng của ai?",
+    "o": [
+      "Leonardo da Vinci",
+      "Van Gogh",
+      "Picasso",
+      "Monet"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Pablo Picasso là họa sĩ nước nào?",
+    "o": [
+      "Pháp",
+      "Ý",
+      "Tây Ban Nha",
+      "Hà Lan"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Beethoven là nhà soạn nhạc nước nào?",
+    "o": [
+      "Áo",
+      "Đức",
+      "Pháp",
+      "Ý"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Mozart là nhà soạn nhạc nước nào?",
+    "o": [
+      "Đức",
+      "Pháp",
+      "Áo",
+      "Ý"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nhà hát lớn Hà Nội được xây dựng theo phong cách gì?",
+    "o": [
+      "cổ điển Pháp",
+      "hiện đại",
+      "tân cổ điển",
+      "Baroque"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Đờn ca tài tử là loại hình nghệ thuật của vùng nào?",
+    "o": [
+      "Bắc Bộ",
+      "Nam Bộ",
+      "Trung Bộ",
+      "Tây Nguyên"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hát chèo thường có nhạc cụ gì đặc trưng?",
+    "o": [
+      "đàn bầu",
+      "đàn tranh",
+      "trống chèo",
+      "sáo"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Tranh Đông Hồ là dòng tranh dân gian của vùng nào?",
+    "o": [
+      "Hà Nội",
+      "Bắc Ninh",
+      "Hải Dương",
+      "Nam Định"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tranh Hàng Trống là dòng tranh dân gian của vùng nào?",
+    "o": [
+      "Hà Nội",
+      "Huế",
+      "Sài Gòn",
+      "Hải Phòng"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Nghệ thuật gấp giấy Origami có nguồn gốc từ đâu?",
+    "o": [
+      "Trung Quốc",
+      "Nhật Bản",
+      "Hàn Quốc",
+      "Việt Nam"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Múa ba lê có nguồn gốc từ đâu?",
+    "o": [
+      "Pháp",
+      "Ý",
+      "Nga",
+      "Anh"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhạc cụ piano có bao nhiêu phím đen và trắng?",
+    "o": [
+      "66",
+      "76",
+      "88",
+      "100"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Đàn guita có bao nhiêu dây?",
+    "o": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Đàn violin có bao nhiêu dây?",
+    "o": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Đàn ukulele có bao nhiêu dây?",
+    "o": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Nhạc sĩ Trịnh Công Sơn nổi tiếng với dòng nhạc nào?",
+    "o": [
+      "nhạc đỏ",
+      "tình ca",
+      "nhạc quê hương",
+      "nhạc thiếu nhi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhạc sĩ Văn Cao là tác giả của bài hát nào?",
+    "o": [
+      "Như có Bác trong ngày đại thắng",
+      "Tiến quân ca",
+      "Đất nước trọn niềm vui",
+      "Bài ca hy vọng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bài \"Tiến quân ca\" là quốc ca của nước nào?",
+    "o": [
+      "Lào",
+      "Campuchia",
+      "Việt Nam",
+      "Trung Quốc"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nhạc sĩ Phạm Tuyên viết bài hát nào nổi tiếng?",
+    "o": [
+      "Như có Bác trong ngày đại thắng",
+      "Tiến quân ca",
+      "Việt Nam quê hương tôi",
+      "Hà Nội mùa vắng những cơn mưa"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Bảo tàng Louvre nằm ở đâu?",
+    "o": [
+      "London",
+      "Paris",
+      "Rome",
+      "Madrid"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bảo tàng Hermitage nằm ở đâu?",
+    "o": [
+      "Moscow",
+      "St. Petersburg",
+      "Kyiv",
+      "Berlin"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhà hát Opera Sydney nằm ở đâu?",
+    "o": [
+      "New York",
+      "London",
+      "Sydney",
+      "Paris"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nghệ thuật sắp đặt là loại hình nghệ thuật gì?",
+    "o": [
+      "truyền thống",
+      "đương đại",
+      "cổ điển",
+      "dân gian"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Họa sĩ nào nổi tiếng với dòng tranh sơn mài Việt Nam?",
+    "o": [
+      "Nguyễn Gia Trí",
+      "Bùi Xuân Phái",
+      "Phan Kế An",
+      "Dương Bích Liên"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Họa sĩ Bùi Xuân Phái nổi tiếng với tranh về gì?",
+    "o": [
+      "phố cổ Hà Nội",
+      "nông thôn",
+      "chân dung",
+      "tĩnh vật"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Nhạc cụ dân tộc nào làm từ tre?",
+    "o": [
+      "đàn bầu",
+      "sáo",
+      "đàn nguyệt",
+      "trống"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cải lương sử dụng nhạc cụ chính là gì?",
+    "o": [
+      "đàn tranh",
+      "đàn bầu",
+      "đàn ghita phím lõm",
+      "trống"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Kịch nói là loại hình sân khấu du nhập từ đâu?",
+    "o": [
+      "châu Á",
+      "châu Âu",
+      "châu Mỹ",
+      "châu Phi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Điện ảnh được phát minh vào thế kỷ nào?",
+    "o": [
+      "18",
+      "19",
+      "20",
+      "21"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Phim hoạt hình đầu tiên của Disney là gì?",
+    "o": [
+      "Nàng Bạch Tuyết",
+      "Chuột Mickey",
+      "Nàng tiên cá",
+      "Vua sư tử"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Giải Oscar là giải thưởng trong lĩnh vực gì?",
+    "o": [
+      "âm nhạc",
+      "điện ảnh",
+      "hội họa",
+      "văn học"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhà hát Chèo Việt Nam nằm ở đâu?",
+    "o": [
+      "Hà Nội",
+      "Sài Gòn",
+      "Huế",
+      "Đà Nẵng"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Nàng tiên cá là nhân vật trong tác phẩm của ai?",
+    "o": [
+      "Grimm",
+      "Andersen",
+      "Perrault",
+      "Dumas"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Truyện \"Alice ở xứ sở thần tiên\" của ai?",
+    "o": [
+      "Lewis Carroll",
+      "J.K. Rowling",
+      "J.R.R. Tolkien",
+      "C.S. Lewis"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Tượng thần Vệ nữ (Venus de Milo) trưng bày ở đâu?",
+    "o": [
+      "Rome",
+      "Paris",
+      "London",
+      "Berlin"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tượng David của Michelangelo thuộc phong cách gì?",
+    "o": [
+      "Baroque",
+      "Phục Hưng",
+      "Hiện đại",
+      "Cổ điển"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Lễ hội âm nhạc Glastonbury tổ chức ở nước nào?",
+    "o": [
+      "Mỹ",
+      "Anh",
+      "Đức",
+      "Pháp"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhóm nhạc BTS đến từ nước nào?",
+    "o": [
+      "Nhật Bản",
+      "Trung Quốc",
+      "Hàn Quốc",
+      "Việt Nam"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cây lúa thuộc loại cây gì?",
+    "o": [
+      "cây ăn quả",
+      "cây lương thực",
+      "cây công nghiệp",
+      "cây cảnh"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây cà phê thuộc loại cây gì?",
+    "o": [
+      "cây lương thực",
+      "cây ăn quả",
+      "cây công nghiệp",
+      "cây dược liệu"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cây cao su thuộc loại cây gì?",
+    "o": [
+      "cây lương thực",
+      "cây ăn quả",
+      "cây công nghiệp",
+      "cây cảnh"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cây hoa hồng thuộc loại cây gì?",
+    "o": [
+      "cây ăn quả",
+      "cây cảnh",
+      "cây lương thực",
+      "cây công nghiệp"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây hoa sen là quốc hoa của nước nào?",
+    "o": [
+      "Nhật Bản",
+      "Trung Quốc",
+      "Việt Nam",
+      "Ấn Độ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cây tre thuộc họ gì?",
+    "o": [
+      "họ cau",
+      "họ hòa thảo",
+      "họ đậu",
+      "họ hoa môi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây thông thuộc loại cây gì?",
+    "o": [
+      "cây lá rộng",
+      "cây lá kim",
+      "cây bụi",
+      "cây dây leo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hoa sen mọc ở đâu?",
+    "o": [
+      "trên cạn",
+      "dưới nước",
+      "trên núi",
+      "trên cát"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây xương rồng sống được ở đâu?",
+    "o": [
+      "dưới nước",
+      "sa mạc khô hạn",
+      "rừng rậm",
+      "đầm lầy"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây đước thường mọc ở đâu?",
+    "o": [
+      "rừng ngập mặn",
+      "núi cao",
+      "sa mạc",
+      "đồng cỏ"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Quả táo có màu gì khi chín?",
+    "o": [
+      "xanh",
+      "vàng",
+      "đỏ hoặc xanh tùy loại",
+      "tím"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Quả chuối có hình dạng gì?",
+    "o": [
+      "tròn",
+      "dài cong",
+      "vuông",
+      "tam giác"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Quả cam thuộc họ gì?",
+    "o": [
+      "họ bầu bí",
+      "họ cam chanh",
+      "họ hoa hồng",
+      "họ cà"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Quả dừa có nhiều nước, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Không có nước",
+      "Ít nước"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây lúa nước cần gì để phát triển?",
+    "o": [
+      "nhiều cát",
+      "nhiều nước",
+      "nhiều đá",
+      "ít nước"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hoa mai thường nở vào dịp nào?",
+    "o": [
+      "Giáng sinh",
+      "Tết Nguyên đán",
+      "Trung thu",
+      "Quốc khánh"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hoa đào thường nở vào mùa nào?",
+    "o": [
+      "xuân",
+      "hạ",
+      "thu",
+      "đông"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cây nào là biểu tượng của mùa xuân ở miền Bắc?",
+    "o": [
+      "hoa mai",
+      "hoa đào",
+      "hoa sen",
+      "hoa cúc"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây nào là biểu tượng của mùa xuân ở miền Nam?",
+    "o": [
+      "hoa mai",
+      "hoa đào",
+      "hoa sen",
+      "hoa cúc"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hoa sen có màu gì phổ biến?",
+    "o": [
+      "đỏ",
+      "vàng",
+      "hồng hoặc trắng",
+      "tím"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cây bàng thường rụng lá vào mùa nào?",
+    "o": [
+      "xuân",
+      "hạ",
+      "thu",
+      "đông"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Rễ cây có chức năng gì?",
+    "o": [
+      "hút nước và dinh dưỡng",
+      "quang hợp",
+      "hô hấp",
+      "sinh sản"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Lá cây quang hợp tạo ra gì?",
+    "o": [
+      "nước",
+      "chất dinh dưỡng",
+      "CO2",
+      "bóng mát"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hoa có chức năng gì?",
+    "o": [
+      "hút nước",
+      "sinh sản",
+      "quang hợp",
+      "dự trữ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Quả có chức năng gì?",
+    "o": [
+      "bảo vệ và phát tán hạt",
+      "quang hợp",
+      "hút nước",
+      "hô hấp"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hạt giống cần gì để nảy mầm?",
+    "o": [
+      "ánh sáng, nước, nhiệt độ",
+      "chỉ cần nước",
+      "chỉ cần đất",
+      "chỉ cần phân bón"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cây ăn quả nào có nhiều vitamin C nhất?",
+    "o": [
+      "táo",
+      "ổi",
+      "cam",
+      "nho"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Quả mít có đặc điểm gì?",
+    "o": [
+      "nhỏ, trơn",
+      "to, có gai",
+      "mọng nước",
+      "có hạt to"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Quả sầu riêng có mùi như thế nào?",
+    "o": [
+      "thơm nhẹ",
+      "nồng đặc trưng",
+      "không mùi",
+      "hôi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây chè (trà) thường được trồng nhiều ở vùng nào?",
+    "o": [
+      "Tây Nguyên",
+      "Đồng bằng sông Cửu Long",
+      "Trung du miền núi phía Bắc",
+      "Duyên hải miền Trung"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cây cà phê được trồng nhiều ở vùng nào Việt Nam?",
+    "o": [
+      "Đồng bằng sông Hồng",
+      "Tây Nguyên",
+      "Đồng bằng sông Cửu Long",
+      "Bắc Trung Bộ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây hồ tiêu là loại cây gì?",
+    "o": [
+      "cây thân gỗ",
+      "cây thân leo",
+      "cây bụi",
+      "cây thân thảo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây điều là cây công nghiệp cho sản phẩm gì?",
+    "o": [
+      "dầu ăn",
+      "hạt điều",
+      "gỗ",
+      "nhựa"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây mía dùng để sản xuất gì?",
+    "o": [
+      "dầu ăn",
+      "đường",
+      "rượu",
+      "bột ngọt"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây bông dùng để sản xuất gì?",
+    "o": [
+      "thực phẩm",
+      "vải sợi",
+      "thuốc",
+      "phân bón"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây đậu nành dùng để sản xuất gì?",
+    "o": [
+      "sữa đậu nành, đậu phụ",
+      "dầu ăn",
+      "cả hai",
+      "bánh kẹo"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cây thuốc lá dùng để làm gì?",
+    "o": [
+      "thuốc chữa bệnh",
+      "thuốc lá hút",
+      "gia vị",
+      "phân bón"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cây dừa được trồng nhiều ở đâu?",
+    "o": [
+      "miền Bắc",
+      "miền Trung",
+      "miền Nam",
+      "Tây Nguyên"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Cây thanh long là đặc sản của vùng nào?",
+    "o": [
+      "Bắc Ninh",
+      "Bình Thuận",
+      "Hà Nội",
+      "Huế"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Quả nho thường được dùng để làm gì?",
+    "o": [
+      "rượu vang",
+      "nước ép",
+      "ăn tươi",
+      "tất cả đáp án trên"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Bánh xe được phát minh cách đây khoảng bao nhiêu năm?",
+    "o": [
+      "1000 năm",
+      "3000 năm",
+      "5500 năm",
+      "10000 năm"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Giấy được phát minh ở nước nào?",
+    "o": [
+      "Ai Cập",
+      "Hy Lạp",
+      "Trung Quốc",
+      "Ấn Độ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thuốc súng được phát minh ở nước nào?",
+    "o": [
+      "Ấn Độ",
+      "Trung Quốc",
+      "Ả Rập",
+      "Hy Lạp"
+    ],
+    "c": 1
+  },
+  {
+    "q": "La bàn được phát minh ở nước nào?",
+    "o": [
+      "Hy Lạp",
+      "Ai Cập",
+      "Trung Quốc",
+      "Ấn Độ"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Báo chí đầu tiên xuất hiện ở nước nào?",
+    "o": [
+      "Anh",
+      "Pháp",
+      "Trung Quốc",
+      "La Mã"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Con tem đầu tiên ra đời ở nước nào?",
+    "o": [
+      "Pháp",
+      "Anh",
+      "Mỹ",
+      "Đức"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tiền giấy đầu tiên xuất hiện ở nước nào?",
+    "o": [
+      "Hy Lạp",
+      "Trung Quốc",
+      "Ấn Độ",
+      "Ba Tư"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Kính mắt được phát minh ở nước nào?",
+    "o": [
+      "Trung Quốc",
+      "Ý",
+      "Đức",
+      "Hà Lan"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhiệt kế thủy ngân được phát minh bởi ai?",
+    "o": [
+      "Newton",
+      "Fahrenheit",
+      "Celsius",
+      "Galileo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Áo mưa được phát minh bởi ai?",
+    "o": [
+      "Charles Macintosh",
+      "Thomas Edison",
+      "Alexander Bell",
+      "James Watt"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cờ vua có nguồn gốc từ nước nào?",
+    "o": [
+      "Trung Quốc",
+      "Ấn Độ",
+      "Ba Tư",
+      "Hy Lạp"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bài tú lơ khơ có nguồn gốc từ đâu?",
+    "o": [
+      "Ấn Độ",
+      "Trung Quốc",
+      "Ba Tư",
+      "Ai Cập"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sô cô la được làm từ ca cao, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Làm từ cà phê",
+      "Làm từ sữa"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Kem đánh răng được phát minh ở đâu?",
+    "o": [
+      "Mỹ",
+      "Trung Quốc",
+      "Ai Cập cổ đại",
+      "Anh"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bàn chải đánh răng hiện đại được phát minh ở đâu?",
+    "o": [
+      "Trung Quốc",
+      "Anh",
+      "Mỹ",
+      "Đức"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Nước hoa có nguồn gốc từ đâu?",
+    "o": [
+      "Pháp",
+      "Ai Cập cổ đại",
+      "Ấn Độ",
+      "Hy Lạp"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Đồng hồ cơ được phát minh ở đâu?",
+    "o": [
+      "Trung Quốc",
+      "Thụy Sĩ",
+      "Đức",
+      "Anh"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Kẹo cao su được phát minh ở đâu?",
+    "o": [
+      "Mỹ",
+      "Mexico",
+      "Anh",
+      "Pháp"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Bút bi được phát minh bởi ai?",
+    "o": [
+      "László Bíró",
+      "John Loud",
+      "Quill Pen",
+      "Parker"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Khinh khí cầu được phát minh bởi ai?",
+    "o": [
+      "Anh em Wright",
+      "Anh em Montgolfier",
+      "Edison",
+      "Bell"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Băng vệ sinh được phát minh ở đâu?",
+    "o": [
+      "Mỹ",
+      "Anh",
+      "Đức",
+      "Pháp"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Xà phòng được phát minh từ thời cổ đại ở đâu?",
+    "o": [
+      "Hy Lạp",
+      "La Mã",
+      "Ai Cập",
+      "Babylon"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Bóng đèn LED được phát minh bởi ai?",
+    "o": [
+      "Edison",
+      "Tesla",
+      "Nick Holonyak",
+      "Einstein"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Pin điện được phát minh bởi ai?",
+    "o": [
+      "Edison",
+      "Volta",
+      "Tesla",
+      "Faraday"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Máy hơi nước được cải tiến bởi ai?",
+    "o": [
+      "Newton",
+      "Watt",
+      "Edison",
+      "Bell"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Xe hơi được phát minh bởi ai?",
+    "o": [
+      "Henry Ford",
+      "Karl Benz",
+      "Edison",
+      "Bell"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tàu hỏa được phát minh ở đâu?",
+    "o": [
+      "Mỹ",
+      "Đức",
+      "Anh",
+      "Pháp"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Tàu ngầm được phát minh bởi ai?",
+    "o": [
+      "Hà Lan",
+      "Pháp",
+      "Anh",
+      "Cornelis Drebbel"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Thang máy được phát minh bởi ai?",
+    "o": [
+      "Elisha Otis",
+      "Edison",
+      "Bell",
+      "Watt"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Máy giặt được phát minh ở đâu?",
+    "o": [
+      "Anh",
+      "Mỹ",
+      "Đức",
+      "Pháp"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Máy hút bụi được phát minh bởi ai?",
+    "o": [
+      "Edison",
+      "Spangler",
+      "Bell",
+      "Tesla"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tủ lạnh được phát minh ở đâu?",
+    "o": [
+      "Mỹ",
+      "Đức",
+      "Pháp",
+      "Anh"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Điều hòa nhiệt độ được phát minh bởi ai?",
+    "o": [
+      "Edison",
+      "Carrier",
+      "Tesla",
+      "Bell"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Kính hiển vi được phát minh bởi ai?",
+    "o": [
+      "Newton",
+      "Leeuwenhoek",
+      "Galileo",
+      "Darwin"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Kính thiên văn được phát minh bởi ai?",
+    "o": [
+      "Newton",
+      "Galileo",
+      "Copernicus",
+      "Kepler"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhiệt kế được phát minh bởi ai?",
+    "o": [
+      "Galileo",
+      "Newton",
+      "Fahrenheit",
+      "Celsius"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Phong vũ biểu được phát minh bởi ai?",
+    "o": [
+      "Galileo",
+      "Torricelli",
+      "Newton",
+      "Pascal"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Máy bay trực thăng do ai phát minh?",
+    "o": [
+      "Anh em Wright",
+      "Sikorsky",
+      "Bell",
+      "Edison"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Dù được phát minh bởi ai?",
+    "o": [
+      "Da Vinci",
+      "Montgolfier",
+      "Garnerin",
+      "Blanchard"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Kính râm được phát minh ở đâu?",
+    "o": [
+      "Trung Quốc",
+      "Ý",
+      "Pháp",
+      "Anh"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cà vạt có nguồn gốc từ đâu?",
+    "o": [
+      "Pháp",
+      "Ý",
+      "Croatia",
+      "Anh"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Khoai tây chiên (Pháp) có nguồn gốc từ đâu?",
+    "o": [
+      "Pháp",
+      "Bỉ",
+      "Mỹ",
+      "Anh"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Súp lơ là loại rau thuộc họ gì?",
+    "o": [
+      "họ cải",
+      "họ bầu bí",
+      "họ cà",
+      "họ đậu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Bông cải xanh (broccoli) thuộc họ gì?",
+    "o": [
+      "họ cải",
+      "họ bầu bí",
+      "họ cà",
+      "họ đậu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cà rốt thuộc họ gì?",
+    "o": [
+      "họ cà",
+      "họ hoa tán",
+      "họ cải",
+      "họ đậu"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hành tây thuộc họ gì?",
+    "o": [
+      "họ hành",
+      "họ cải",
+      "họ cà",
+      "họ đậu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Tỏi thuộc họ gì?",
+    "o": [
+      "họ hành",
+      "họ cải",
+      "họ cà",
+      "họ đậu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ớt chuông có vị gì?",
+    "o": [
+      "cay",
+      "ngọt",
+      "chua",
+      "đắng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cần tây thuộc họ gì?",
+    "o": [
+      "họ cần",
+      "họ cải",
+      "họ cà",
+      "họ hoa tán"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Bí đỏ thuộc họ gì?",
+    "o": [
+      "họ bầu bí",
+      "họ cải",
+      "họ cà",
+      "họ đậu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Dưa leo (dưa chuột) thuộc họ gì?",
+    "o": [
+      "họ bầu bí",
+      "họ cải",
+      "họ cà",
+      "họ đậu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cà tím thuộc họ gì?",
+    "o": [
+      "họ bầu bí",
+      "họ cải",
+      "họ cà",
+      "họ đậu"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Đậu phộng (lạc) thuộc họ gì?",
+    "o": [
+      "họ bầu bí",
+      "họ cải",
+      "họ cà",
+      "họ đậu"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Khoai lang thuộc họ gì?",
+    "o": [
+      "họ khoai lang",
+      "họ cà",
+      "họ bầu bí",
+      "họ đậu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Sắn (khoai mì) thuộc họ gì?",
+    "o": [
+      "họ khoai mì",
+      "họ cà",
+      "họ bầu bí",
+      "họ đậu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hạt điều là hạt của cây gì?",
+    "o": [
+      "cây điều",
+      "cây đào",
+      "cây mơ",
+      "cây hạnh nhân"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hạt hạnh nhân là hạt của cây gì?",
+    "o": [
+      "cây đào",
+      "cây hạnh nhân",
+      "cây mơ",
+      "cây hồ đào"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hạt óc chó là hạt của cây gì?",
+    "o": [
+      "cây hồ đào",
+      "cây óc chó",
+      "cây đào",
+      "cây mơ"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hạt dẻ là hạt của cây gì?",
+    "o": [
+      "cây dẻ",
+      "cây sồi",
+      "cây đào",
+      "cây hạnh nhân"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Gừng có vị gì?",
+    "o": [
+      "ngọt",
+      "chua",
+      "cay",
+      "mặn"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nghệ có màu gì?",
+    "o": [
+      "đỏ",
+      "vàng",
+      "xanh",
+      "tím"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Quế có mùi thơm đặc trưng, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Không mùi",
+      "Mùi hôi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tiêu đen và tiêu trắng cùng một loại cây, đúng không?",
+    "o": [
+      "Sai, khác cây",
+      "Đúng",
+      "Không rõ",
+      "Tiêu trắng là cây khác"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hoa hồi có mùi vị gì?",
+    "o": [
+      "ngọt",
+      "chua",
+      "thơm đặc trưng",
+      "đắng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thảo quả có mùi vị gì?",
+    "o": [
+      "ngọt",
+      "thơm đặc trưng",
+      "chua",
+      "mặn"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Lá chanh dùng để làm gì trong ẩm thực?",
+    "o": [
+      "trang trí",
+      "tạo mùi thơm",
+      "làm rau",
+      "không dùng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Rau mùi còn gọi là gì?",
+    "o": [
+      "hành lá",
+      "ngò rí",
+      "tía tô",
+      "húng quế"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Húng quế có mùi vị gì?",
+    "o": [
+      "thơm đặc trưng",
+      "ngọt",
+      "chua",
+      "đắng"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Bạc hà có vị gì?",
+    "o": [
+      "ngọt",
+      "the the mát",
+      "chua",
+      "đắng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sả có mùi thơm như thế nào?",
+    "o": [
+      "thơm chanh nhẹ",
+      "thơm nồng",
+      "thơm ngọt",
+      "không mùi"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Lá lốt thường được dùng để làm gì?",
+    "o": [
+      "gói thịt nướng",
+      "gói nem",
+      "nấu canh",
+      "xào"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Rau răm thường ăn kèm với gì?",
+    "o": [
+      "phở",
+      "bún",
+      "trứng vịt lộn",
+      "cơm"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Tía tô có màu gì?",
+    "o": [
+      "xanh",
+      "tím đỏ",
+      "vàng",
+      "trắng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Kinh giới thường dùng trong món gì?",
+    "o": [
+      "phở",
+      "bún, cháo",
+      "cơm",
+      "xôi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thì là thường dùng trong món gì?",
+    "o": [
+      "canh cá",
+      "xào",
+      "luộc",
+      "nướng"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Mùi tàu còn gọi là gì?",
+    "o": [
+      "rau mùi",
+      "ngò gai",
+      "húng lủi",
+      "rau thơm"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cà cuống là gia vị làm từ gì?",
+    "o": [
+      "thực vật",
+      "côn trùng",
+      "động vật",
+      "khoáng vật"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Mắm tôm được làm từ gì?",
+    "o": [
+      "tôm",
+      "cá",
+      "cua",
+      "mực"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Mắm ruốc được làm từ gì?",
+    "o": [
+      "tôm",
+      "cá cơm",
+      "cua",
+      "mực"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Mắm nêm được làm từ gì?",
+    "o": [
+      "tôm",
+      "cá cơm",
+      "cá thu",
+      "mực"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cá chép hóa rồng là truyền thuyết của nước nào?",
+    "o": [
+      "Nhật Bản",
+      "Trung Quốc",
+      "Việt Nam",
+      "Hàn Quốc"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Truyền thuyết \"Lạc Long Quân - Âu Cơ\" nói về nguồn gốc dân tộc nào?",
+    "o": [
+      "người Việt",
+      "người Trung Quốc",
+      "người Lào",
+      "người Campuchia"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Chử Đồng Tử là nhân vật trong truyền thuyết gì?",
+    "o": [
+      "tình yêu",
+      "chống giặc",
+      "làm giàu",
+      "học hành"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Mỵ Châu - Trọng Thủy là câu chuyện về điều gì?",
+    "o": [
+      "tình yêu và cảnh giác",
+      "chiến tranh",
+      "học tập",
+      "lao động"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hồ Gươm còn có tên gọi khác là gì?",
+    "o": [
+      "Hồ Tây",
+      "Hồ Hoàn Kiếm",
+      "Hồ Trúc Bạch",
+      "Hồ Bảy Mẫu"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cầu Thê Húc nằm ở đâu?",
+    "o": [
+      "Huế",
+      "Hồ Gươm",
+      "Sài Gòn",
+      "Đà Nẵng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chùa Hương thuộc tỉnh nào?",
+    "o": [
+      "Hà Nội",
+      "Hà Nam",
+      "Ninh Bình",
+      "Hà Tây cũ"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Tam Cốc - Bích Động thuộc tỉnh nào?",
+    "o": [
+      "Hà Nam",
+      "Thanh Hóa",
+      "Ninh Bình",
+      "Quảng Bình"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Động Phong Nha thuộc tỉnh nào?",
+    "o": [
+      "Nghệ An",
+      "Hà Tĩnh",
+      "Quảng Bình",
+      "Quảng Trị"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Vườn quốc gia Cúc Phương thuộc tỉnh nào?",
+    "o": [
+      "Hà Nội",
+      "Hòa Bình",
+      "Ninh Bình",
+      "Thanh Hóa"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Đảo Phú Quốc thuộc tỉnh nào?",
+    "o": [
+      "Cà Mau",
+      "Kiên Giang",
+      "Bạc Liêu",
+      "Sóc Trăng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Vịnh Hạ Long là di sản thế giới được UNESCO công nhận năm nào?",
+    "o": [
+      "1990",
+      "1994",
+      "2000",
+      "2010"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Quốc hoa của Việt Nam là hoa gì?",
+    "o": [
+      "hoa mai",
+      "hoa đào",
+      "hoa sen",
+      "hoa cúc"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Quốc thú của Việt Nam là con gì?",
+    "o": [
+      "voi",
+      "hổ",
+      "trâu",
+      "rồng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Ngày Gia đình Việt Nam là ngày nào?",
+    "o": [
+      "28/6",
+      "28/7",
+      "28/8",
+      "28/9"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ngày Thương binh Liệt sĩ là ngày nào?",
+    "o": [
+      "25/7",
+      "27/7",
+      "29/7",
+      "30/7"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Khuê Văn Các là công trình nằm trong khu di tích nào?",
+    "o": [
+      "Văn Miếu",
+      "Hoàng thành",
+      "Kinh thành Huế",
+      "Thành nhà Hồ"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cố đô Huế thuộc tỉnh nào?",
+    "o": [
+      "Đà Nẵng",
+      "Quảng Trị",
+      "Thừa Thiên Huế",
+      "Quảng Nam"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Biển Đông thuộc chủ quyền của quốc gia nào?",
+    "o": [
+      "Trung Quốc",
+      "Philippines",
+      "Việt Nam",
+      "nhiều quốc gia"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Hoàng Sa thuộc chủ quyền của nước nào?",
+    "o": [
+      "Việt Nam",
+      "Trung Quốc",
+      "Đài Loan",
+      "Philippines"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Trường Sa thuộc chủ quyền của nước nào?",
+    "o": [
+      "Việt Nam",
+      "Philippines",
+      "Trung Quốc",
+      "Malaysia"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Đồng bằng sông Hồng có mấy tỉnh?",
+    "o": [
+      "8",
+      "10",
+      "11",
+      "12"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thành phố Hồ Chí Minh có bao nhiêu quận?",
+    "o": [
+      "16",
+      "19",
+      "22",
+      "24"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Hà Nội có bao nhiêu quận?",
+    "o": [
+      "8",
+      "10",
+      "12",
+      "14"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Đà Nẵng là thành phố trực thuộc trung ương, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Trực thuộc tỉnh",
+      "Chưa rõ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Hải Phòng là thành phố trực thuộc trung ương, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Trực thuộc tỉnh",
+      "Chưa rõ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cần Thơ là thành phố trực thuộc trung ương, đúng không?",
+    "o": [
+      "Sai",
+      "Đúng",
+      "Trực thuộc tỉnh",
+      "Chưa rõ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Việt Nam có bao nhiêu thành phố trực thuộc trung ương?",
+    "o": [
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Đà Lạt thuộc tỉnh nào?",
+    "o": [
+      "Lâm Đồng",
+      "Đắk Lắk",
+      "Đắk Nông",
+      "Gia Lai"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Nha Trang thuộc tỉnh nào?",
+    "o": [
+      "Bình Thuận",
+      "Phú Yên",
+      "Khánh Hòa",
+      "Ninh Thuận"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Vũng Tàu thuộc tỉnh nào?",
+    "o": [
+      "Đồng Nai",
+      "Bình Dương",
+      "Bà Rịa - Vũng Tàu",
+      "Long An"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bác Hồ ra đi tìm đường cứu nước vào năm nào?",
+    "o": [
+      "1905",
+      "1911",
+      "1920",
+      "1930"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bến cảng Nhà Rồng nằm ở thành phố nào?",
+    "o": [
+      "Hà Nội",
+      "Đà Nẵng",
+      "TP. Hồ Chí Minh",
+      "Hải Phòng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Chiến dịch Điện Biên Phủ diễn ra trong bao nhiêu ngày?",
+    "o": [
+      "46 ngày",
+      "56 ngày",
+      "66 ngày",
+      "76 ngày"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tướng Võ Nguyên Giáp mất năm nào?",
+    "o": [
+      "2011",
+      "2012",
+      "2013",
+      "2014"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nhà bác học Einstein nổi tiếng với thuyết gì?",
+    "o": [
+      "thuyết tiến hóa",
+      "thuyết tương đối",
+      "thuyết vạn vật hấp dẫn",
+      "thuyết lượng tử"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Charles Darwin nổi tiếng với thuyết gì?",
+    "o": [
+      "tương đối",
+      "tiến hóa",
+      "vạn vật hấp dẫn",
+      "nguyên tử"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Isaac Newton nổi tiếng với định luật gì?",
+    "o": [
+      "tương đối",
+      "tiến hóa",
+      "vạn vật hấp dẫn",
+      "nhiệt động lực học"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Louis Pasteur nổi tiếng trong lĩnh vực gì?",
+    "o": [
+      "vật lý",
+      "hóa học",
+      "vi sinh vật - y học",
+      "toán học"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Marie Curie khám phá ra chất gì?",
+    "o": [
+      "urani",
+      "radium",
+      "plutonium",
+      "neptunium"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bảng tuần hoàn các nguyên tố hóa học do ai sáng tạo?",
+    "o": [
+      "Dalton",
+      "Mendeleev",
+      "Lavoisier",
+      "Boyle"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Khoa học nghiên cứu về sự sống gọi là gì?",
+    "o": [
+      "vật lý",
+      "hóa học",
+      "sinh học",
+      "địa chất"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Khoa học nghiên cứu về Trái đất gọi là gì?",
+    "o": [
+      "sinh học",
+      "địa chất",
+      "thiên văn",
+      "khí tượng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Khoa học nghiên cứu về vũ trụ gọi là gì?",
+    "o": [
+      "vật lý",
+      "địa chất",
+      "thiên văn",
+      "sinh học"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Hiện tượng nhật thực xảy ra khi nào?",
+    "o": [
+      "Mặt trăng che Mặt trời",
+      "Trái đất che Mặt trăng",
+      "Mặt trời che Mặt trăng",
+      "Sao chổi đi qua"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hiện tượng nguyệt thực xảy ra khi nào?",
+    "o": [
+      "Mặt trăng che Mặt trời",
+      "Trái đất che Mặt trăng",
+      "Mặt trời che Trái đất",
+      "Mặt trăng che Trái đất"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Năm nhuận có bao nhiêu ngày?",
+    "o": [
+      "364",
+      "365",
+      "366",
+      "367"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Tháng 2 năm nhuận có bao nhiêu ngày?",
+    "o": [
+      "28",
+      "29",
+      "30",
+      "31"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thường niên một năm có bao nhiêu ngày?",
+    "o": [
+      "364",
+      "365",
+      "366",
+      "367"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Tháng 2 thường có bao nhiêu ngày?",
+    "o": [
+      "28",
+      "29",
+      "30",
+      "31"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Các tháng có 31 ngày gồm tháng nào?",
+    "o": [
+      "1,3,5,7,8,10,12",
+      "2,4,6,9,11",
+      "1,4,6,8,10,12",
+      "3,5,7,9,11"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Rừng là tài nguyên gì?",
+    "o": [
+      "tài nguyên có thể tái tạo",
+      "tài nguyên không thể tái tạo",
+      "tài nguyên nhân tạo",
+      "tài nguyên khoáng sản"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Than đá là tài nguyên gì?",
+    "o": [
+      "có thể tái tạo",
+      "không thể tái tạo",
+      "vô tận",
+      "nhân tạo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Dầu mỏ là tài nguyên gì?",
+    "o": [
+      "có thể tái tạo",
+      "không thể tái tạo",
+      "vô tận",
+      "tài nguyên sinh học"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Phân loại rác đúng cách có ích lợi gì?",
+    "o": [
+      "giúp tái chế, bảo vệ môi trường",
+      "tốn thời gian",
+      "không ích lợi",
+      "làm mất vệ sinh"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Mùi hương của hoa có tác dụng gì đối với cây?",
+    "o": [
+      "thu hút côn trùng thụ phấn",
+      "xua đuổi sâu bọ",
+      "trang trí",
+      "làm đẹp môi trường"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cây cần ánh sáng để làm gì?",
+    "o": [
+      "hút nước",
+      "quang hợp",
+      "hô hấp",
+      "mọc rễ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Loại đất nào thích hợp trồng lúa nước?",
+    "o": [
+      "đất cát",
+      "đất sét",
+      "đất phù sa",
+      "đất đỏ bazan"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nông nghiệp là ngành sản xuất gì?",
+    "o": [
+      "công nghiệp",
+      "trồng trọt, chăn nuôi",
+      "dịch vụ",
+      "khai thác khoáng sản"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Công nghiệp là ngành sản xuất gì?",
+    "o": [
+      "dịch vụ",
+      "chế biến, chế tạo",
+      "trồng trọt",
+      "du lịch"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Dịch vụ là ngành gì?",
+    "o": [
+      "sản xuất hàng hóa",
+      "phục vụ nhu cầu con người",
+      "khai thác tài nguyên",
+      "trồng trọt"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Du lịch thuộc ngành gì?",
+    "o": [
+      "nông nghiệp",
+      "công nghiệp",
+      "dịch vụ",
+      "xây dựng"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Việt Nam nằm trong múi giờ thứ mấy?",
+    "o": [
+      "UTC+5",
+      "UTC+6",
+      "UTC+7",
+      "UTC+8"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nhật Bản nằm trong múi giờ thứ mấy?",
+    "o": [
+      "UTC+7",
+      "UTC+8",
+      "UTC+9",
+      "UTC+10"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Mỹ có bao nhiêu múi giờ?",
+    "o": [
+      "3",
+      "4",
+      "6",
+      "8"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nga có bao nhiêu múi giờ?",
+    "o": [
+      "5",
+      "7",
+      "9",
+      "11"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Bắc Kinh nằm trong múi giờ thứ mấy?",
+    "o": [
+      "UTC+7",
+      "UTC+8",
+      "UTC+9",
+      "UTC+10"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sự khác biệt giữa ngày và đêm là do gì?",
+    "o": [
+      "Mặt trăng",
+      "Trái đất tự quay",
+      "Mặt trời quay",
+      "Các vì sao"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhiệt lượng từ Mặt trời truyền đến Trái đất bằng cách nào?",
+    "o": [
+      "bức xạ nhiệt",
+      "dẫn nhiệt",
+      "đối lưu",
+      "dẫn nhiệt và đối lưu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Sương mù là hiện tượng gì?",
+    "o": [
+      "hơi nước ngưng tụ gần mặt đất",
+      "mây thấp",
+      "khói",
+      "bụi trong không khí"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Mưa đá là hiện tượng gì?",
+    "o": [
+      "nước mưa đóng băng",
+      "mưa từ đá",
+      "đá rơi từ trên cao",
+      "nước đá tan"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Tuyết rơi có hình dạng gì?",
+    "o": [
+      "hình tròn",
+      "hình lục giác",
+      "hình tam giác",
+      "hình vuông"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bông tuyết có hình dạng như thế nào?",
+    "o": [
+      "giống nhau",
+      "không cái nào giống nhau",
+      "hình tròn",
+      "hình vuông"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Núi lửa có thể phun trào chất gì?",
+    "o": [
+      "nước",
+      "dung nham và tro bụi",
+      "cát",
+      "đá"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Độ Richter dùng để đo gì?",
+    "o": [
+      "nhiệt độ",
+      "cường độ động đất",
+      "tốc độ gió",
+      "độ cao sóng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Thang độ Richter có bao nhiêu cấp?",
+    "o": [
+      "8",
+      "9",
+      "10",
+      "12"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bão được phân cấp từ mấy đến mấy?",
+    "o": [
+      "1-5",
+      "1-10",
+      "1-12",
+      "1-17"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Nhiệt độ cao nhất từng ghi nhận trên Trái đất khoảng bao nhiêu độ C?",
+    "o": [
+      "45°C",
+      "56.7°C",
+      "70°C",
+      "80°C"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Nhiệt độ thấp nhất từng ghi nhận trên Trái đất khoảng bao nhiêu độ C?",
+    "o": [
+      "-50°C",
+      "-70°C",
+      "-89.2°C",
+      "-100°C"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Sa mạc nóng nhất thế giới là sa mạc nào?",
+    "o": [
+      "Sahara",
+      "Gobi",
+      "Lut",
+      "Sonoran"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Nơi khô hạn nhất thế giới là ở đâu?",
+    "o": [
+      "Sahara",
+      "Thung lũng khô McMurdo",
+      "Sa mạc Atacama",
+      "Sa mạc Gobi"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Thiên thạch là gì?",
+    "o": [
+      "ngôi sao băng",
+      "đá từ vũ trụ rơi xuống Trái đất",
+      "hành tinh nhỏ",
+      "sao chổi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sao chổi có đặc điểm gì?",
+    "o": [
+      "có đuôi dài",
+      "tròn như hành tinh",
+      "phát sáng liên tục",
+      "to nhất vũ trụ"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Dải Ngân hà là gì?",
+    "o": [
+      "một dòng sông",
+      "thiên hà chứa Trái đất",
+      "đám mây",
+      "chòm sao"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Sao Bắc Đẩu là ngôi sao như thế nào?",
+    "o": [
+      "sáng nhất",
+      "chỉ phương Bắc",
+      "to nhất",
+      "gần nhất"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Chòm sao là gì?",
+    "o": [
+      "nhóm ngôi sao tạo thành hình trên bầu trời",
+      "một dải sáng",
+      "các hành tinh",
+      "đám mây sao"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Hoàng đạo là gì?",
+    "o": [
+      "đường đi của Mặt trời qua các chòm sao",
+      "đường đi của Mặt trăng",
+      "đường đi của Trái đất",
+      "đường xích đạo"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Con người có thể sống trên sao Hỏa không?",
+    "o": [
+      "có",
+      "chưa thể, do thiếu oxy và áp suất thấp",
+      "có, đã từng",
+      "không bao giờ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Trạm vũ trụ quốc tế (ISS) có bao nhiêu module?",
+    "o": [
+      "5",
+      "10",
+      "16",
+      "20"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Vệ tinh nhân tạo là gì?",
+    "o": [
+      "vật thể tự nhiên",
+      "vật thể con người phóng lên vũ trụ",
+      "ngôi sao",
+      "hành tinh nhỏ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "GPS là hệ thống gì?",
+    "o": [
+      "định vị toàn cầu",
+      "dự báo thời tiết",
+      "liên lạc",
+      "truyền hình"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Robot là gì?",
+    "o": [
+      "máy móc tự động",
+      "người máy",
+      "máy tính",
+      "cả A và B"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Máy bay không người lái (drone) dùng để làm gì?",
+    "o": [
+      "chụp ảnh, giám sát",
+      "chở người",
+      "chiến đấu",
+      "tất cả các mục đích"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Thực tế ảo (VR) là gì?",
+    "o": [
+      "công nghệ tạo môi trường ảo",
+      "chơi game",
+      "phim 3D",
+      "thực tế tăng cường"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Máy in 3D có thể in được gì?",
+    "o": [
+      "chỉ giấy",
+      "vật thể 3 chiều",
+      "mực",
+      "vải"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Công nghệ 5G có đặc điểm gì?",
+    "o": [
+      "tốc độ nhanh hơn 4G",
+      "chậm hơn 4G",
+      "giống 4G",
+      "không dùng được"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Cloud Computing (điện toán đám mây) là gì?",
+    "o": [
+      "lưu trữ và xử lý dữ liệu qua internet",
+      "máy tính mới",
+      "phần mềm",
+      "mạng xã hội"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Facebook được thành lập vào năm nào?",
+    "o": [
+      "2003",
+      "2004",
+      "2005",
+      "2006"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Instagram được thành lập vào năm nào?",
+    "o": [
+      "2008",
+      "2009",
+      "2010",
+      "2011"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Twitter (nay là X) được thành lập vào năm nào?",
+    "o": [
+      "2004",
+      "2005",
+      "2006",
+      "2007"
+    ],
+    "c": 2
+  },
+  {
+    "q": "TikTok thuộc sở hữu của công ty nào?",
+    "o": [
+      "Alibaba",
+      "Tencent",
+      "ByteDance",
+      "Baidu"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Email là viết tắt của từ gì?",
+    "o": [
+      "Electronic Mail",
+      "Electric Mail",
+      "Easy Mail",
+      "Extra Mail"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Google Dịch giúp làm gì?",
+    "o": [
+      "tìm kiếm thông tin",
+      "dịch ngôn ngữ",
+      "gửi thư",
+      "đọc báo"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Bản đồ Google Maps giúp làm gì?",
+    "o": [
+      "xem video",
+      "chỉ đường, xem bản đồ",
+      "nghe nhạc",
+      "gọi điện"
+    ],
+    "c": 1
+  },
+  {
+    "q": "iPad là sản phẩm của hãng nào?",
+    "o": [
+      "Microsoft",
+      "Google",
+      "Apple",
+      "Samsung"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Màn hình cảm ứng được phát minh bởi ai?",
+    "o": [
+      "Apple",
+      "IBM",
+      "Johnson (người phát minh)",
+      "Samsung"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Bluetooth đặt tên theo vị vua nào?",
+    "o": [
+      "Harald Bluetooth",
+      "King Henry",
+      "King Arthur",
+      "King John"
+    ],
+    "c": 0
+  },
+  {
+    "q": "WiFi 6 là chuẩn WiFi thế hệ thứ mấy?",
+    "o": [
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "c": 1
+  },
+  {
+    "q": "ChatGPT là sản phẩm của công ty nào?",
+    "o": [
+      "Google",
+      "Meta",
+      "OpenAI",
+      "Microsoft"
+    ],
+    "c": 2
+  },
+  {
+    "q": "AI có thể vẽ tranh không?",
+    "o": [
+      "có",
+      "không",
+      "chỉ vẽ người",
+      "chỉ vẽ phong cảnh"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Xe điện Tesla được sản xuất tại nước nào?",
+    "o": [
+      "Đức",
+      "Trung Quốc",
+      "Mỹ",
+      "Nhật Bản"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Pin lithium-ion thường dùng ở đâu?",
+    "o": [
+      "điện thoại, laptop",
+      "xe đạp",
+      "máy bay",
+      "tàu hỏa"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Ổ cứng SSD có ưu điểm gì so với HDD?",
+    "o": [
+      "chậm hơn",
+      "nhanh hơn, bền hơn",
+      "rẻ hơn",
+      "ồn ào hơn"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Pixel là đơn vị của gì?",
+    "o": [
+      "trọng lượng",
+      "độ phân giải màn hình",
+      "tốc độ",
+      "dung lượng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Byte có mấy bit?",
+    "o": [
+      "4",
+      "6",
+      "8",
+      "10"
+    ],
+    "c": 2
+  },
+  {
+    "q": "1 GB bằng bao nhiêu MB?",
+    "o": [
+      "100",
+      "500",
+      "1000",
+      "1024"
+    ],
+    "c": 3
+  },
+  {
+    "q": "Mật khẩu mạnh nên có đặc điểm gì?",
+    "o": [
+      "ngắn, dễ nhớ",
+      "dài, nhiều ký tự đặc biệt",
+      "chỉ có chữ cái",
+      "là ngày sinh"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Phishing là hình thức tấn công gì?",
+    "o": [
+      "virus",
+      "lừa đảo lấy thông tin",
+      "hacker",
+      "tấn công mạng"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cập nhật phần mềm thường xuyên để làm gì?",
+    "o": [
+      "bảo mật và sửa lỗi",
+      "làm chậm máy",
+      "mất dữ liệu",
+      "tốn tiền"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Mã nguồn mở là gì?",
+    "o": [
+      "phần mềm miễn phí",
+      "phần mềm có mã nguồn công khai",
+      "phần mềm bản quyền",
+      "phần mềm cũ"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Git là công cụ dùng để làm gì?",
+    "o": [
+      "chơi game",
+      "quản lý phiên bản mã nguồn",
+      "soạn thảo văn bản",
+      "thiết kế đồ họa"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Linux là gì?",
+    "o": [
+      "phần mềm văn phòng",
+      "hệ điều hành mã nguồn mở",
+      "trình duyệt web",
+      "ngôn ngữ lập trình"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Python là gì?",
+    "o": [
+      "hệ điều hành",
+      "ngôn ngữ lập trình",
+      "phần mềm",
+      "trò chơi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "JavaScript là ngôn ngữ lập trình chạy ở đâu?",
+    "o": [
+      "trên server",
+      "trên trình duyệt",
+      "trên máy chủ",
+      "trong game"
+    ],
+    "c": 1
+  },
+  {
+    "q": "HTML là viết tắt của gì?",
+    "o": [
+      "Hyper Text Markup Language",
+      "Home Text Markup Language",
+      "Hyper Tool Markup Language",
+      "Hyper Text Modern Language"
+    ],
+    "c": 0
+  },
+  {
+    "q": "CSS dùng để làm gì?",
+    "o": [
+      "tạo cấu trúc web",
+      "trang trí, tạo style cho web",
+      "lập trình web",
+      "quản lý dữ liệu"
+    ],
+    "c": 1
+  },
+  {
+    "q": "React là thư viện của hãng nào?",
+    "o": [
+      "Google",
+      "Microsoft",
+      "Meta (Facebook)",
+      "Apple"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Node.js là gì?",
+    "o": [
+      "trình duyệt",
+      "môi trường chạy JavaScript trên server",
+      "hệ điều hành",
+      "cơ sở dữ liệu"
+    ],
+    "c": 1
+  },
+  {
+    "q": "MySQL là gì?",
+    "o": [
+      "ngôn ngữ lập trình",
+      "hệ quản trị cơ sở dữ liệu",
+      "trình duyệt",
+      "hệ điều hành"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Dữ liệu lớn (Big Data) có đặc điểm gì?",
+    "o": [
+      "dung lượng nhỏ",
+      "khối lượng lớn, đa dạng",
+      "dữ liệu cũ",
+      "dữ liệu không chính xác"
+    ],
+    "c": 1
+  },
+  {
+    "q": "IoT (Internet of Things) là gì?",
+    "o": [
+      "mạng xã hội",
+      "kết nối các thiết bị thông minh",
+      "game online",
+      "thương mại điện tử"
+    ],
+    "c": 1
+  },
+  {
+    "q": "VPN là viết tắt của gì?",
+    "o": [
+      "Virtual Private Network",
+      "Virtual Public Network",
+      "Very Private Network",
+      "Visual Private Network"
+    ],
+    "c": 0
+  },
+  {
+    "q": "API là gì?",
+    "o": [
+      "giao diện lập trình ứng dụng",
+      "trình duyệt",
+      "hệ điều hành",
+      "cơ sở dữ liệu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "SSL là công nghệ bảo mật cho gì?",
+    "o": [
+      "email",
+      "website",
+      "game",
+      "phần mềm"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Cơ sở dữ liệu NoSQL lưu trữ dữ liệu dạng gì?",
+    "o": [
+      "bảng",
+      "tài liệu/key-value",
+      "cây",
+      "hàng đợi"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Docker là công cụ dùng để làm gì?",
+    "o": [
+      "đóng gói ứng dụng vào container",
+      "soạn thảo văn bản",
+      "thiết kế web",
+      "chỉnh sửa ảnh"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Agile là phương pháp gì?",
+    "o": [
+      "quản lý dự án linh hoạt",
+      "nấu ăn",
+      "học tập",
+      "du lịch"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Scrum là một framework của phương pháp nào?",
+    "o": [
+      "Waterfall",
+      "Agile",
+      "Lean",
+      "Six Sigma"
+    ],
+    "c": 1
+  },
+  {
+    "q": "DevOps là sự kết hợp giữa gì?",
+    "o": [
+      "Development và Operations",
+      "Design và Development",
+      "Developer và Tester",
+      "Data và Operations"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Trí tuệ nhân tạo (AI) đã xuất hiện từ thế kỷ nào?",
+    "o": [
+      "18",
+      "19",
+      "20",
+      "21"
+    ],
+    "c": 2
+  },
+  {
+    "q": "Deep Learning là một nhánh của lĩnh vực nào?",
+    "o": [
+      "Machine Learning",
+      "Hệ điều hành",
+      "Mạng máy tính",
+      "Cơ sở dữ liệu"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Blockchain là công nghệ sổ cái gì?",
+    "o": [
+      "tập trung",
+      "phân tán",
+      "trung gian",
+      "đơn giản"
+    ],
+    "c": 1
+  },
+  {
+    "q": "NFT là viết tắt của gì?",
+    "o": [
+      "Non-Fungible Token",
+      "New Financial Technology",
+      "Network File Transfer",
+      "Node Framework Tool"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Smart Contract (hợp đồng thông minh) chạy trên nền tảng nào?",
+    "o": [
+      "Windows",
+      "Blockchain",
+      "iOS",
+      "Android"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Metaverse là gì?",
+    "o": [
+      "vũ trụ ảo",
+      "hành tinh",
+      "game",
+      "phần mềm"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Web 3.0 là thế hệ web như thế nào?",
+    "o": [
+      "phi tập trung",
+      "tập trung",
+      "tĩnh",
+      "chỉ đọc"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Asana là công cụ quản lý gì?",
+    "o": [
+      "công việc - dự án",
+      "tài chính",
+      "nhân sự",
+      "kho hàng"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Zoom là ứng dụng gì?",
+    "o": [
+      "họp trực tuyến",
+      "chụp ảnh",
+      "chơi game",
+      "nghe nhạc"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Slack là ứng dụng giao tiếp dành cho gì?",
+    "o": [
+      "cá nhân",
+      "nhóm làm việc",
+      "giải trí",
+      "học tập"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Trello dùng để quản lý công việc theo phương pháp gì?",
+    "o": [
+      "kanban",
+      "scrum",
+      "waterfall",
+      "lean"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Figma là công cụ thiết kế gì?",
+    "o": [
+      "UI/UX",
+      "kiến trúc",
+      "thời trang",
+      "nội thất"
+    ],
+    "c": 0
+  },
+  {
+    "q": "Canva là công cụ thiết kế dành cho ai?",
+    "o": [
+      "chuyên gia",
+      "người không chuyên",
+      "lập trình viên",
+      "kiến trúc sư"
+    ],
+    "c": 1
+  },
+  {
+    "q": "Grammarly là công cụ kiểm tra gì?",
+    "o": [
+      "ngữ pháp, chính tả",
+      "thiết kế",
+      "lập trình",
+      "dịch thuật"
+    ],
+    "c": 0
+  }
+]

@@ -9,19 +9,14 @@
   <link rel="stylesheet" href="../../quests.css"/>
   <script type="module" src="../../quests.js"></script>
   <script src="../../fullscreen.js"></script>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
 </head>
-<body>
+<body data-bottom-nav="games">
+  <div id="top-nav-root"></div>
   <canvas id="bg-canvas"></canvas>
   <div class="orb orb1"></div><div class="orb orb2"></div>
-  <nav>
-    <div class="logo" onclick="location.href='../../games.html'" style="cursor:pointer">
-      <span class="logo-vt">VT</span><span class="logo-world">World</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <span id="nav-pts" style="font-family:'Science Gothic', sans-serif;font-size:13px;color:#38bdf8;font-weight:400"></span>
-      <button class="btn-secondary" style="padding:8px 18px;font-size:13px" onclick="location.href='../../games.html'">← Games</button>
-    </div>
-  </nav>
+
 
   <div class="g-container">
     <div class="g-card">

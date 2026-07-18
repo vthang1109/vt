@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VTWorld — Đại Chiến Songoku</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="songoku.css"/>
+  <link rel="stylesheet" href="../../quests.css"/>
+  <script src="../../fullscreen.js"></script>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+  <script type="module" src="../../quests.js"></script>
+  <!-- Canvas bg particles -->
+  <canvas id="bg-canvas"></canvas>
+</head>
+<body data-bottom-nav="games">
+  <div id="top-nav-root"></div>
+
+  <!-- ══════════ MODE SELECT ══════════ -->
+  <div id="modeScreen" class="screen active">
+    <div class="mode-title">⚡ ĐẠI CHIẾN SONGOKU</div>
+    <div class="mode-sub">— DRAGON BALL FIGHTER —</div>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="Game.selectMode('1v1')">
+        <span class="mc-icon">⚔️</span>
+        <div class="mc-name">1 vs 1</div>
+        <div class="mc-desc">Đấu với máy tính</div>
+      </div>
+      <div class="mode-card" onclick="Game.selectMode('2p')">
+        <span class="mc-icon">👥</span>
+        <div class="mc-name">2 Người</div>
+        <div class="mc-desc">Đấu với bạn bè</div>
+      </div>
+      <div class="mode-card" onclick="Game.selectMode('train')">
+        <span class="mc-icon">🥋</span>
+        <div class="mc-name">Luyện Tập</div>
+        <div class="mc-desc">Tập luyện tự do</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ CHARACTER SELECT ══════════ -->
+  <div id="charSelectScreen" class="screen">
+    <div class="cs-title">👤 CHỌN CHIẾN BINH</div>
+    <div id="csPlayerIndicator" class="cs-player-indicator">
+      <span class="cs-pi-p1">P1 ●</span>
+      <span class="cs-pi-p2">P2 ○</span>
+    </div>
+    <div class="cs-sub" id="csSub">Chọn nhân vật cho người chơi 1</div>
+    <div class="cs-grid" id="csGrid"></div>
+    <div class="cs-btn-row">
+      <button class="cs-btn back" onclick="Game.backToMode()">← QUAY LẠI</button>
+      <button class="cs-btn fight" id="csFightBtn" onclick="Game.startBattle()" disabled>CHIẾN ⚡</button>
+    </div>
+  </div>
+
+  <!-- ══════════ BATTLE ══════════ -->
+  <div id="battleScreen" class="screen">
+    <canvas id="battleCanvas"></canvas>
+
+    <!-- Settings button -->
+    <button id="settings-btn" onclick="Game.toggleSettings()">⚙️</button>
+
+    <!-- Joystick -->
+    <div id="joystick-zone">
+      <div id="joystick-base">
+        <div id="joystick-knob"></div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div id="action-btns">
+      <button class="action-btn atk" data-action="basic" ontouchstart="Game.pressAction('basic');event.preventDefault()" ontouchend="Game.releaseAction('basic')" onmousedown="Game.pressAction('basic')" onmouseup="Game.releaseAction('basic')">
+        <span class="ab-icon">⚔️</span>
+        <span class="ab-label">ĐÁNH</span>
+      </button>
+      <button class="action-btn skill1" data-action="skill1" ontouchstart="Game.pressAction('skill1');event.preventDefault()" ontouchend="Game.releaseAction('skill1')" onmousedown="Game.pressAction('skill1')" onmouseup="Game.releaseAction('skill1')">
+        <span class="ab-icon">💥</span>
+        <span class="ab-label">CHIÊU 1</span>
+      </button>
+      <button class="action-btn skill2" data-action="skill2" ontouchstart="Game.pressAction('skill2');event.preventDefault()" ontouchend="Game.releaseAction('skill2')" onmousedown="Game.pressAction('skill2')" onmouseup="Game.releaseAction('skill2')">
+        <span class="ab-icon">🔥</span>
+        <span class="ab-label">CHIÊU 2</span>
+      </button>
+      <button class="action-btn skill3" data-action="skill3" ontouchstart="Game.pressAction('skill3');event.preventDefault()" ontouchend="Game.releaseAction('skill3')" onmousedown="Game.pressAction('skill3')" onmouseup="Game.releaseAction('skill3')">
+        <span class="ab-icon">⚡</span>
+        <span class="ab-label">TUYỆT KỸ</span>
+      </button>
+    </div>
+
+    <!-- Countdown -->
+    <div id="countdown-overlay">
+      <div id="countdown-text">3</div>
+    </div>
+
+    <!-- Result -->
+    <div id="result-overlay">
+      <div id="result-text"></div>
+      <div id="result-sub"></div>
+      <div class="result-btns">
+        <button class="result-btn primary" onclick="Game.rematch()">ĐÁNH LẠI</button>
+        <button class="result-btn secondary" onclick="Game.toModeSelect()">SẢNH CHÍNH</button>
+      </div>
+    </div>
+
+    <!-- Settings panel -->
+    <div id="settings-panel">
+      <h2>⚙️ CÀI ĐẶT</h2>
+      <div class="setting-group">
+        <label>Kiểu Joystick</label>
+        <div class="setting-toggle" id="jsTypeToggle">
+          <button class="active" data-value="fixed" onclick="Game.setJoystickType('fixed')">Cố định</button>
+          <button data-value="float" onclick="Game.setJoystickType('float')">Xoay</button>
+        </div>
+      </div>
+      <div class="setting-group">
+        <label>Rung khi đánh</label>
+        <div class="setting-toggle" id="vibToggle">
+          <button class="active" data-value="on" onclick="Game.setVibration('on')">Bật</button>
+          <button data-value="off" onclick="Game.setVibration('off')">Tắt</button>
+        </div>
+      </div>
+      <div class="setting-group">
+        <label>Âm thanh</label>
+        <div class="setting-toggle" id="sfxToggle">
+          <button class="active" data-value="on" onclick="Game.setSFX('on')">Bật</button>
+          <button data-value="off" onclick="Game.setSFX('off')">Tắt</button>
+        </div>
+      </div>
+      <button id="settings-close" onclick="Game.toggleSettings()">ĐÓNG</button>
+    </div>
+  </div>
+
+  <script src="songoku.js"></script>
+</body>
+</html>

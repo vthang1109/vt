@@ -5,9 +5,9 @@ import {
   doc, onSnapshot, updateDoc, getDocs, collection,
   orderBy, query, limit, getDoc, where
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { renderAvatar } from './avatar.js';
-import { renderProfilePet, mountPetModal } from './pet-ui.js';
-import { getOwnedTitles, getDefaultTitle, getTitleById } from './titles.js';
+import { renderAvatar } from '../avatar.js';
+import { renderProfilePet, mountPetModal } from '../pet-ui.js';
+import { getOwnedTitles, getDefaultTitle, getTitleById } from '../titles.js';
 
 let currentUser = null;
 let currentViewUid = null;

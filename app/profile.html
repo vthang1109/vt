@@ -6,9 +6,8 @@
   <title>VTWorld — Hồ Sơ</title>
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="profile.css" />
-  <link rel="stylesheet" href="titles.css">
-  <link rel="stylesheet" href="pet.css" />
-  <link rel="stylesheet" href="character.css" />
+  <link rel="stylesheet" href="../titles.css">
+  <link rel="stylesheet" href="../pet.css" />
 
   <!-- Nav mới -->
   <script src="../top-nav.js"></script>
@@ -142,7 +141,7 @@
   <!-- ===== SCRIPT ===== -->
   <script type="module">
     import './profile.js';
-    import './pet-ui.js';
+    import '../pet-ui.js';
 
     // Khởi tạo nav
     document.addEventListener('DOMContentLoaded', () => {
@@ -156,7 +155,7 @@
       petCard.addEventListener('click', async () => {
         try {
           if (typeof window.openPetModal === 'function') { await window.openPetModal(); return; }
-          const petUI = await import('./pet-ui.js');
+          const petUI = await import('../pet-ui.js');
           if (typeof petUI.openPetModal === 'function') {
             window.openPetModal = petUI.openPetModal;
             await petUI.openPetModal();

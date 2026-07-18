@@ -279,6 +279,11 @@ window.BottomNav = (() => {
         <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.12);margin:10px auto 4px"></div>
         <div style="font-family:'Science Gothic', sans-serif;font-size:12px;font-weight:500;color:#7dd3fc;letter-spacing:.5px;padding:8px 18px 14px;display:block">📱 Ứng dụng & Trò chơi</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 18px">
+          <a href="${resolveHref('apps/expense/expense.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(20,184,166,0.18);background:rgba(20,184,166,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(20,184,166,0.3),rgba(13,148,136,0.2))"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f4b0.png" width="30" height="30" alt="Chi tiêu"></div>
+            <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Chi Tiêu</span>
+            <span style="font-family:'Science Gothic', sans-serif;font-size:11px;color:#4a7a9b;text-align:center">Quản lý thu chi cá nhân</span>
+          </a>
           <a href="${resolveHref('app/applications.html')}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;border-radius:16px;text-decoration:none;border:1px solid rgba(2,136,209,0.18);background:rgba(2,136,209,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent">
             <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(2,136,209,0.3),rgba(14,165,233,0.2))"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f4f1.png" width="30" height="30" alt="Ứng dụng"></div>
             <span style="font-family:'Science Gothic', sans-serif;font-size:13px;font-weight:500;color:#e0f2fe">Ứng dụng</span>

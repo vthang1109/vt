@@ -3,7 +3,7 @@ import { db, auth } from '../points.js';
 import { doc, runTransaction, onSnapshot, arrayUnion, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doGacha } from '../pet.js';
-import { TIER_META, getShopTitlesByTier, getTitleById } from './titles.js';
+import { TIER_META, getShopTitlesByTier, getTitleById } from '../titles.js';
 
 const TIER_COLOR = { 1:'#94a3b8', 2:'#34d399', 3:'#fbbf24', 4:'#f43f5e', 5:'#a78bfa' };
 const TIER_NAME  = { 1:'Ga mo', 2:'Tinh anh', 3:'Ba san', 4:'Kiet tac', 5:'Huyen thoai' };
@@ -238,8 +238,13 @@ function showResult(results, type) {
   grid.innerHTML = results.map(function(r) {
     const tier  = r.tier || { id: 1 };
     const color = TIER_COLOR[tier.id] || '#94a3b8';
+    const thumb = (r.images && r.images[0]) ? r.images[0] : '';
     return '<div class="result-card" style="border-color:' + color + '">' +
-      '<div class="r-emoji">' + (r.emoji || '🐾') + '</div>' +
+      '<div class="r-emoji">' +
+        (thumb
+          ? '<img src="' + thumb + '" alt="' + r.name + '" style="width:52px;height:52px;object-fit:contain;border-radius:8px" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"/><span style="font-size:32px;display:none">' + (r.emoji || '🐾') + '</span>'
+          : '<span style="font-size:32px">' + (r.emoji || '🐾') + '</span>') +
+      '</div>' +
       '<div class="r-name">' + r.name + '</div>' +
       '<div class="r-tier" style="color:' + color + '">' + (TIER_NAME[tier.id] || 'Thuong') + '</div>' +
     '</div>';

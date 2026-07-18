@@ -9,7 +9,7 @@ import {
   addDoc, serverTimestamp, deleteDoc, arrayUnion, arrayRemove, setDoc,
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { initProfileCard } from './profile-card.js';
+import { initProfileCard } from '../profile-card.js';
 
 // ===== FIREBASE CONFIG =====
 const firebaseConfig = {
