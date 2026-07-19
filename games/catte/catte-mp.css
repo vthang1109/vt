@@ -1,0 +1,113 @@
+/* ===================== CÁT TÊ MULTIPLAYER — bổ sung riêng ===================== */
+/* Dùng chung catte.css (bàn chơi) + status-bar.css (thanh trạng thái) với bản offline */
+
+/* Avatar tròn thay cho ô tròn + chữ cái trên mỗi ghế (ảnh nếu có, chữ cái đầu nếu không) */
+.seat-avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%; border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  background-size: cover; background-position: center;
+  color: #1a1400; font-weight: 800; font-size: 16px;
+  font-family: 'Science Gothic', sans-serif;
+}
+.my-avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  background-size: cover; background-position: center;
+  color: #1a1400; font-weight: 800; font-size: 14px;
+  font-family: 'Science Gothic', sans-serif;
+  box-shadow: 0 0 16px rgba(251,191,36,0.3);
+  border: 2px solid rgba(251,191,36,0.4);
+  flex-shrink: 0;
+}
+
+/* ===== BET ZONE ===== */
+.ctmp-bet-zone { margin-bottom: 10px; }
+.ctmp-bet-waiting {
+  text-align: center; padding: 16px; font-size: 13px; color: #94a3b8;
+  background: rgba(255,255,255,0.03); border-radius: 14px;
+  border: 1px dashed rgba(56,189,248,0.2);
+}
+.ctmp-bet-card {
+  padding: 14px 16px; border-radius: 14px;
+  background: rgba(15,23,42,0.9); border: 1px solid rgba(56,189,248,0.15);
+  text-align: center;
+}
+.ctmp-bet-card .label { font-size: 12px; color: #94a3b8; font-weight: 500; }
+.ctmp-bet-card .amount { font-size: 22px; font-weight: 700; color: #fbbf24; margin: 4px 0 10px; }
+.ctmp-bet-status { font-size: 11px; color: #7dd3fc; margin: 8px 0; }
+.ctmp-bet-picker { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ctmp-bet-picker .label { font-size: 13px; color: #7dd3fc; font-weight: 600; }
+.ctmp-bet-picker .row { display: flex; gap: 8px; align-items: center; justify-content: center; }
+.ctmp-bet-picker .row input {
+  width: 110px; padding: 8px 12px; border-radius: 10px;
+  border: 1px solid rgba(56,189,248,0.25); background: rgba(0,0,0,0.3);
+  color: #e0f2fe; font-family: "Science Gothic", sans-serif;
+  font-weight: 500; text-align: center; font-size: 14px;
+}
+.ctmp-bet-quick { display: flex; gap: 4px; }
+.ctmp-bet-quick button {
+  padding: 4px 12px; border-radius: 6px; border: 1px solid rgba(56,189,248,0.15);
+  background: rgba(56,189,248,0.06); color: #7dd3fc; cursor: pointer;
+  font-family: 'Science Gothic', sans-serif; font-size: 11px; transition: background 0.2s;
+}
+.ctmp-bet-quick button:hover { background: rgba(56,189,248,0.15); }
+.ctmp-bet-confirm {
+  padding: 9px 24px; border-radius: 10px; border: none; cursor: pointer;
+  font-weight: 600; font-family: 'Science Gothic', sans-serif; font-size: 13px;
+  background: linear-gradient(135deg, #34d399, #059669); color: #fff;
+  margin-top: 6px;
+}
+.ctmp-bet-confirm:hover { filter: brightness(1.1); }
+.ctmp-waiting-text { color: #94a3b8; font-size: 13px; text-align: center; padding: 8px; }
+
+/* ===== RESULT BOX (trong center-board sau khi ván kết thúc) ===== */
+.result-box { text-align: center; padding: 14px; }
+.result-box .emoji { font-size: 30px; }
+.result-box .title { font-weight: 700; color: #e0f2fe; margin-top: 6px; font-size: 14px; }
+
+.my-avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+
+/* ===== CORNER AVATAR (góc trên bên trái my-area/ghế người chơi) ===== */
+.my-corner-avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 2px;
+  border: 1px solid rgba(56,189,248,0.1);
+  flex-shrink: 0;
+  margin: 0;
+}
+.my-corner-avatar .my-avatar {
+  width: 26px;
+  height: 26px;
+  border-width: 1.5px;
+  box-shadow: 0 0 8px rgba(251,191,36,0.2);
+}
+.my-corner-avatar .seat-timer {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  transform: rotate(-90deg); z-index: 2;
+  pointer-events: none;
+}
+
+.my-name {
+  font-size: 11px; font-weight: 700; color: #e0f2fe;
+  font-family: "Science Gothic", sans-serif;
+  max-width: 60px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.seat-name {
+  margin-top: 2px; color: #e0f2fe;
+  font-family: "Science Gothic", sans-serif;
+  max-width: 56px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-left: auto; margin-right: auto;
+}
+@media (max-width: 480px) {
+  .seat-avatar { font-size: 13px; }
+  .my-avatar { width: 28px; height: 28px; }
+  .my-corner-avatar .my-avatar { width: 22px; height: 22px; }
+  .my-corner-avatar { padding: 1px; }
+}

@@ -3,7 +3,7 @@ import { db, auth } from '../points.js';
 import { doc, runTransaction, onSnapshot, arrayUnion, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doGacha } from '../pet.js';
-import { TIER_META, getShopTitlesByTier, getTitleById } from '../titles.js';
+import { TIER_META, getShopTitlesByTier, getTitleById, computeHighestTierOrder } from '../titles.js';
 
 const TIER_COLOR = { 1:'#94a3b8', 2:'#34d399', 3:'#fbbf24', 4:'#f43f5e', 5:'#a78bfa' };
 const TIER_NAME  = { 1:'Ga mo', 2:'Tinh anh', 3:'Ba san', 4:'Kiet tac', 5:'Huyen thoai' };
@@ -113,7 +113,9 @@ async function buyTitle(id, price) {
     const owned = d.ownedTitles || [];
     if (owned.includes(id)) throw new Error('Ban da so huu danh hieu nay!');
     if (pts < price) throw new Error('Khong du diem! Can ' + price.toLocaleString('vi-VN') + ' sao');
-    tx.update(userRef, { points: pts - price, ownedTitles: arrayUnion(id) });
+    const newOwned = [...owned, id];
+    const highestOrder = computeHighestTierOrder(newOwned);
+    tx.update(userRef, { points: pts - price, ownedTitles: arrayUnion(id), highestTierOrder: highestOrder });
   });
 }
 

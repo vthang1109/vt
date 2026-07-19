@@ -1,251 +1,812 @@
-// catte.js — Cát Tê (Sáu Lá) vs AI — chế độ cược
-import { createDeck, renderCardUI } from '../../cards.js';
+// ==================== CÁT TÊ 4 NGƯỜI (1 người + 3 AI) ====================
+// Luật: 6 lá/người · 6 vòng · Cùng chất & lớn hơn hoặc Úp bài · Vào tùng
+import { renderCardUI } from '../../cards.js';
 import { auth } from '../../points.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { addPoints, subscribeBalance } from '../../points.js';
-import { getActivePetInfo } from '../../pet.js';
+import { addPoints } from '../../points.js';
+import { getActiveBuff } from '../../pet.js';
 
-const suitRank = { '♠':1, '♣':2, '♦':3, '♥':4 };
-const valRank = { '2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14 };
+// ── CẤU HÌNH ──
+const RANK_LABELS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const SUIT_LABELS = ['♠','♣','♦','♥'];
+const SUIT_STR = [0,1,2,3]; // ♠ < ♣ < ♦ < ♥
+const AI_NAMES = ['Bạn', 'Minh', 'Hoa', 'Tuấn'];
 
-class CatTe {
-  constructor() {
-    this.player = { hand: [], played: [] };
-    this.ai = { hand: [], played: [] };
-    this.balance = 0;
-    this.currentBet = 0;
-    this.cachedBuffPct = 0;
-    this.cachedPet = null;
-    this.phase = 'betting';
-    this.turn = 'player';
-    this.round = 0;
-    this.betSettled = true;
-    this.unsubBalance = null;
-    this.lastPlayerCard = null;
-    this.lastAiCard = null;
-    this.selectedIdx = -1;
-    this.initAfterAuth();
+const TURN_SECONDS = 25;
+const RING_CIRC = 113;
+const TOTAL_ROUNDS = 6;
+
+// ── BỘ BÀI ──
+function buildDeck() {
+  const deck = [];
+  for (let r = 0; r < 13; r++)
+    for (let s = 0; s < 4; s++)
+      deck.push({ rIdx: r, sIdx: s });
+  return deck;
+}
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function sortHand(hand) {
+  return [...hand].sort((a, b) => SUIT_STR[a.sIdx] - SUIT_STR[b.sIdx] || a.rIdx - b.rIdx);
+}
+function cardLabel(c) { return RANK_LABELS[c.rIdx] + SUIT_LABELS[c.sIdx]; }
+function cardKey(c) { return `${c.rIdx}-${c.sIdx}`; }
+
+// ── TRẠNG THÁI ──
+let state = null;
+let currentNet = 0;
+let payoutSettled = false;
+let buffPct = 0;
+let buffLoadPromise = null;
+
+function newGame(bet = 100, buff = 0) {
+  const deck = shuffle(buildDeck());
+  const hands = [[], [], [], []];
+  for (let i = 0; i < 24; i++) hands[i % 4].push(deck[i]);
+  for (let i = 0; i < 4; i++) hands[i] = sortHand(hands[i]);
+
+  // Tìm người có 2♠ (rIdx=0, sIdx=0) để đi trước
+  let starter = 0;
+  for (let i = 0; i < 4; i++) {
+    if (hands[i].some(c => c.rIdx === 0 && c.sIdx === 0)) { starter = i; break; }
   }
 
-  async initAfterAuth() {
-    await new Promise(r => { const u = onAuthStateChanged(auth, user => { u(); if (user) r(); else location.href = 'index.html'; }); });
-    this.listenBalance();
-    this.refreshBuffCache();
-    this.bindEvents();
-    document.getElementById('bc-bet-row').style.display = 'flex';
-    window.game = this;
-  }
+  state = {
+    hands,
+    turn: starter,
+    phase: 'playing',
+    round: 1,
+    tricks: [{ plays: [], leadSuit: null, currentHighest: null, highestPlayer: null, winner: null }],
+    trickWins: [0, 0, 0, 0],
+    winner: null,
+    over: false,
+    bet,
+    buffPct: buff,
+    selectedIdx: -1,
+    lastActionMsg: '',
+    // cho UI
+    trickHistory: [],
+    // Tùng tracking
+    tungChecked: false,
+    survivors: null,
+    deadPlayers: null,
+  };
+  return state;
+}
 
-  listenBalance() {
-    if (this.unsubBalance) this.unsubBalance();
-    this.unsubBalance = subscribeBalance(pts => { this.balance = pts; if (window.TopNav) window.TopNav.setPoints(this.balance); });
-  }
-
-  async refreshBuffCache() {
-    try { const i = await getActivePetInfo(); this.cachedBuffPct = i.buff; this.cachedPet = i.pet; } catch { this.cachedBuffPct = 0; this.cachedPet = null; }
-  }
-
-  bindEvents() {
-    document.getElementById('btn-place-bet').addEventListener('click', () => this.placeBet());
-    document.getElementById('btn-play-ai').addEventListener('click', () => this.playCard());
-    document.getElementById('btn-fold-ct').addEventListener('click', () => this.fold());
-  }
-
-  placeBet() {
-    if (this.phase !== 'betting' && this.phase !== 'result') {
-      window.showToast('⏳ Không thể đặt cược lúc này', 'warn');
-      return;
+// ── KIỂM TRA ──
+// Một lá có thể đánh được không? Nếu là bài tấn (phải theo chất & lớn hơn)
+// Tìm người chơi kế tiếp còn sống (bỏ qua người đã chết Tùng ở vòng 5-6)
+function nextAliveTurn(from) {
+  let n = (from + 1) % 4;
+  if (state.tungChecked && state.deadPlayers && state.deadPlayers.length > 0) {
+    let guard = 0;
+    while (state.deadPlayers.includes(n) && guard < 4) {
+      n = (n + 1) % 4;
+      guard++;
     }
-    const amt = parseInt(document.getElementById('bc-bet-input').value);
-    if (!amt || amt < 50) { window.showToast('Cược tối thiểu 50 〄', 'warn'); return; }
-    if (amt > this.balance) { window.showToast('Không đủ điểm!', 'error'); return; }
-    this.currentBet = amt;
-    this.betSettled = false;
-    this.startGame(amt);
   }
+  return n;
+}
 
-  startGame(bet) {
-    this.phase = 'playing';
-    this.round = 0;
-    this.player.played = [];
-    this.ai.played = [];
-    this.lastPlayerCard = null;
-    this.lastAiCard = null;
-    this.selectedIdx = -1;
+function canPlayCard(card, leadSuit, currentHighest) {
+  if (leadSuit === null || !currentHighest) return true; // đang dẫn đầu
+  // Bắt buộc theo chất nếu có
+  if (card.sIdx !== leadSuit) return false;
+  // Phải lớn hơn lá cao nhất hiện tại
+  return card.rIdx > currentHighest.rIdx;
+}
 
-    document.getElementById('bc-bet-row').style.display = 'none';
-    document.getElementById('bc-status').className = 'bc-status';
-    document.getElementById('bc-bet-stat').textContent = this.currentBet.toLocaleString('vi-VN');
-    document.getElementById('bc-profit-stat').textContent = '0';
-    document.getElementById('bc-profit-stat').className = 'stat-profit zero';
-    document.getElementById('bc-status-msg').textContent = 'Đang chia bài...';
-    document.getElementById('ct-actions').style.display = 'none';
-    document.getElementById('ct-info').textContent = '';
+// Có lá nào trong tay có thể theo chất và đánh được không?
+function hasPlayableCard(hand, leadSuit, currentHighest) {
+  if (leadSuit === null || !currentHighest) return hand.length > 0;
+  return hand.some(c => c.sIdx === leadSuit && c.rIdx > currentHighest.rIdx);
+}
 
-    const deck = createDeck();
-    this.ai.hand = [];
-    this.player.hand = [];
-    for (let i = 0; i < 6; i++) { this.ai.hand.push(deck.pop()); this.player.hand.push(deck.pop()); }
+// ── THỰC HIỆN 1 NƯỚC ĐÁNH ──
+function playCard(playerIdx, cardIdx, faceDown = false) {
+  if (!state || state.over || state.phase !== 'playing') return { ok: false, msg: 'Game over' };
+  if (state.awaitingNextTrick) return { ok: false, msg: 'Đang chờ vòng tiếp theo...' };
+  if (state.turn !== playerIdx) return { ok: false, msg: 'Không phải lượt bạn' };
 
-    this.sortHand(this.player.hand);
-    this.sortHand(this.ai.hand);
+  const hand = state.hands[playerIdx];
+  if (cardIdx < 0 || cardIdx >= hand.length) return { ok: false, msg: 'Chọn lá bài hợp lệ' };
 
-    this.renderTable();
-    this.renderHand();
-    document.getElementById('bc-status-msg').textContent = 'Lượt 1 — Chọn bài';
+  const card = hand[cardIdx];
+  const currentTrick = state.tricks[state.tricks.length - 1];
 
-    setTimeout(() => {
-      if (this.phase !== 'playing') return;
-      document.getElementById('ct-actions').style.display = 'flex';
-    }, 500);
-  }
-
-  sortHand(hand) {
-    hand.sort((a, b) => { const s = suitRank[b.s] - suitRank[a.s]; return s !== 0 ? s : valRank[b.v] - valRank[a.v]; });
-  }
-
-  canBeat(playCard, lastCard) {
-    if (!lastCard) return true;
-    if (playCard.s !== lastCard.s) return false;
-    return valRank[playCard.v] > valRank[lastCard.v];
-  }
-
-  async playCard() {
-    if (this.phase !== 'playing' || this.turn !== 'player') return;
-    if (this.selectedIdx < 0 || this.selectedIdx >= this.player.hand.length) {
-      window.showToast('Chọn 1 lá bài trước!', 'warn');
-      return;
-    }
-    const card = this.player.hand[this.selectedIdx];
-    if (!this.canBeat(card, this.lastAiCard)) {
-      window.showToast('Không thể đánh lá này! Cần cùng chất và lớn hơn', 'warn');
-      return;
-    }
-
-    this.player.hand.splice(this.selectedIdx, 1);
-    this.player.played.push(card);
-    this.lastPlayerCard = card;
-    this.selectedIdx = -1;
-    this.turn = 'ai';
-    this.round++;
-
-    document.getElementById('ct-actions').style.display = 'none';
-    document.getElementById('bc-status-msg').textContent = `Lượt ${this.round + 1} — Máy đánh...`;
-    this.renderTable();
-    this.renderHand();
-
-    if (this.player.hand.length === 0) { this.endGame('player'); return; }
-    if (this.ai.hand.length === 0) { this.endGame('ai'); return; }
-
-    await this.delay(800);
-    this.aiTurn();
-  }
-
-  async aiTurn() {
-    if (this.phase !== 'playing') return;
-    let beatIdx = -1;
-    for (let i = 0; i < this.ai.hand.length; i++) {
-      if (this.canBeat(this.ai.hand[i], this.lastPlayerCard)) {
-        beatIdx = i;
-        break;
+  // Nếu đang có leadSuit và phải theo chất
+  if (currentTrick.leadSuit !== null && currentTrick.currentHighest && !faceDown) {
+    // Người chơi chọn đánh (face up) - phải theo chất & lớn hơn
+    if (!canPlayCard(card, currentTrick.leadSuit, currentTrick.currentHighest)) {
+      // Kiểm tra xem có lá nào đánh được không
+      if (hasPlayableCard(hand, currentTrick.leadSuit, currentTrick.currentHighest)) {
+        return { ok: false, msg: 'Phải đánh cùng chất và lớn hơn!' };
       }
+      // Nếu không có bài đánh được, bắt buộc úp bài
+      return { ok: false, msg: 'Không có bài đánh! Hãy ÚP bài', mustFold: true };
     }
+  } else if (currentTrick.leadSuit === null && faceDown) {
+    return { ok: false, msg: 'Đang dẫn đầu, không thể úp bài' };
+  }
 
-    if (beatIdx >= 0) {
-      const card = this.ai.hand.splice(beatIdx, 1)[0];
-      this.ai.played.push(card);
-      this.lastAiCard = card;
+  // Thực hiện đánh
+  hand.splice(cardIdx, 1);
+
+  const play = {
+    playerIdx,
+    card,
+    faceDown,
+    label: faceDown ? 'Úp' : cardLabel(card),
+  };
+
+  currentTrick.plays.push(play);
+
+  // Nếu là người đầu tiên đánh (lead), set leadSuit
+  if (currentTrick.plays.length === 1 && !faceDown) {
+    currentTrick.leadSuit = card.sIdx;
+    currentTrick.currentHighest = card;
+    currentTrick.highestPlayer = playerIdx;
+  } else if (!faceDown && card.sIdx === currentTrick.leadSuit) {
+    // Cập nhật lá cao nhất nếu cùng chất
+    if (card.rIdx > currentTrick.currentHighest.rIdx) {
+      currentTrick.currentHighest = card;
+      currentTrick.highestPlayer = playerIdx;
+    }
+  }
+
+  // Chuyển lượt
+  state.lastActionMsg = faceDown
+    ? `${AI_NAMES[playerIdx]} úp bài`
+    : `${AI_NAMES[playerIdx]} đánh ${cardLabel(card)}`;
+
+  const nextPlayer = nextAliveTurn(playerIdx);
+
+  // Kiểm tra đã đủ lượt trong vòng này (4 người, hoặc ít hơn nếu đã có người chết Tùng)
+  const expectedPlays = (state.tungChecked && state.survivors) ? state.survivors.length : 4;
+  if (currentTrick.plays.length === expectedPlays) {
+    finishTrick(currentTrick);
+  } else {
+    state.turn = nextPlayer;
+  }
+
+  return { ok: true };
+}
+
+// ── HOÀN TẤT 1 VÒNG (giữ lá cuối trên bàn 2.5s trước khi mở vòng mới) ──
+function finishTrick(trick) {
+  // Kết thúc vòng: người có lá cao nhất chất chủ thắng
+  // Nếu không ai đánh ngửa (toàn bộ úp), người đầu tiên thắng
+  const firstFaceUp = trick.plays.find(p => !p.faceDown);
+  const winner = firstFaceUp ? trick.highestPlayer : trick.plays[0].playerIdx;
+  state.trickWins[winner]++;
+  trick.winner = winner;
+  state.trickHistory.push({
+    round: state.round,
+    plays: trick.plays.map(p => ({ ...p })),
+    winner,
+  });
+  state.turn = winner;
+  state.lastActionMsg = `${AI_NAMES[winner]} thắng vòng ${state.round}!`;
+  state.round++;
+
+  // SAU VÒNG 4: Kiểm tra Tùng
+  if (state.round === 5 && !state.tungChecked) {
+    checkTung();
+  }
+
+  // Giữ lá bài cuối trên bàn để người chơi kịp nhìn trước khi sang vòng mới
+  state.awaitingNextTrick = true;
+  state.pendingGameOver = state.round > TOTAL_ROUNDS;
+}
+
+let trickFreezeTimer = null;
+function clearTrickFreeze() {
+  if (trickFreezeTimer) { clearTimeout(trickFreezeTimer); trickFreezeTimer = null; }
+}
+function scheduleTrickAdvance() {
+  if (trickFreezeTimer) return;
+  trickFreezeTimer = setTimeout(() => {
+    trickFreezeTimer = null;
+    if (!state) return;
+    state.awaitingNextTrick = false;
+    if (state.pendingGameOver) {
+      state.pendingGameOver = false;
+      endGame();
     } else {
-      this.endGame('player');
-      return;
+      state.tricks.push({ plays: [], leadSuit: null, currentHighest: null, highestPlayer: null, winner: null });
     }
+    render();
+    if (!state.over) maybeRunAi();
+  }, 2500);
+}
 
-    this.round++;
-    this.turn = 'player';
-    this.renderTable();
-    this.renderHand();
+// ── KẾT THÚC GAME ──
+function endGame() {
+  state.over = true;
+  state.phase = 'result';
 
-    if (this.ai.hand.length === 0) { this.endGame('ai'); return; }
-    if (this.player.hand.length === 0) { this.endGame('player'); return; }
+  // Luật: Nhất ăn tất — người (hoặc những người) thắng nhiều vòng nhất chia nhau cả bàn
+  const maxWins = Math.max(...state.trickWins);
+  const winners = [];
+  for (let i = 0; i < 4; i++) {
+    if (state.trickWins[i] === maxWins) winners.push(i);
+  }
+  state.winners = winners;
+  state.maxWins = maxWins;
 
-    document.getElementById('bc-status-msg').textContent = `Lượt ${this.round + 1} — Chọn bài`;
-    document.getElementById('ct-actions').style.display = 'flex';
+  const bet = state.bet;
+  const pot = bet * 4;
+
+  let net;
+  if (winners.includes(0)) {
+    net = Math.round(pot / winners.length) - bet;
+  } else {
+    net = -bet;
   }
 
-  async fold() {
-    if (this.phase !== 'playing') return;
-    this.endGame('ai');
+  // Buff pet (chỉ khi thắng)
+  if (net > 0 && buffPct > 0) {
+    net = Math.round(net * (1 + buffPct / 100));
   }
 
-  async endGame(winner) {
-    this.phase = 'result';
-    document.getElementById('ct-actions').style.display = 'none';
+  currentNet = net;
+}
 
-    const won = winner === 'player';
-    let net = 0, buffBonus = 0;
-    if (won) {
-      const profit = this.currentBet;
-      if (this.cachedBuffPct > 0) buffBonus = Math.round(profit * this.cachedBuffPct / 100);
-      net = profit + buffBonus;
-    } else {
-      net = -this.currentBet;
-    }
-
-    this.betSettled = true;
-    if (net !== 0) {
-      try { await addPoints('CatTe', won ? 'Thắng Cát Tê' : 'Thua Cát Tê', net, false); } catch {}
-    }
-
-    document.getElementById('bc-status').className = won ? 'bc-status result-win' : 'bc-status result-lose';
-    document.getElementById('bc-status-msg').textContent = won ? 'THẮNG!' : 'THUA';
-    const pe = document.getElementById('bc-profit-stat');
-    pe.textContent = (net > 0 ? '+' : '') + net.toLocaleString('vi-VN');
-    pe.className = 'stat-profit ' + (net > 0 ? 'positive' : 'negative');
-
-    document.getElementById('ct-info').innerHTML = won ? '🎉 Bạn thắng!' : '😢 Máy thắng!';
-    
-    this.phase = 'betting';
-    document.getElementById('bc-bet-row').style.display = 'flex';
+// ── TÍNH ĐIỂM ──
+// ── KIỂM TRA TÙNG SAU VÒNG 4 ──
+function checkTung() {
+  if (state.tungChecked) return;
+  const survivors = [];
+  const dead = [];
+  for (let i = 0; i < 4; i++) {
+    if (state.trickWins[i] > 0) survivors.push(i);
+    else dead.push(i);
   }
+  state.survivors = survivors;
+  state.deadPlayers = dead;
+  state.tungChecked = true;
 
-  renderTable() {
-    const ac = this.ai.played.length ? this.ai.played.map(c => renderCardUI(c)).join('') : '<span style="color:#64748b;font-size:12px">Chưa đánh</span>';
-    const pc = this.player.played.length ? this.player.played.map(c => renderCardUI(c)).join('') : '<span style="color:#64748b;font-size:12px">Chưa đánh</span>';
-    const ah = this.ai.hand.length ? `+${this.ai.hand.length} lá` : 'Hết bài!';
-    document.getElementById('ct-table').innerHTML = `
-      <div class="ct-seat dealer">
-        <div class="ct-seat-head">🤖 Máy · <span class="ct-card-count">${ah}</span></div>
-        <div class="ct-cards">${ac}</div>
-      </div>
-      <div class="ct-seat me">
-        <div class="ct-seat-head">Bạn · <span class="ct-card-count">${this.player.hand.length} lá</span></div>
-        <div class="ct-cards">${pc}</div>
-      </div>`;
-  }
-
-  renderHand() {
-    if (!this.player.hand.length) { document.getElementById('ct-hand').innerHTML = '<div style="color:#64748b;text-align:center;padding:10px">Hết bài!</div>'; return; }
-    document.getElementById('ct-hand').innerHTML = this.player.hand.map((c, i) => {
-      const sel = i === this.selectedIdx ? 'ct-card-selected' : '';
-      return `<div class="ct-hand-card ${sel}" data-idx="${i}" onclick="window.game?.selectCard(${i})">${renderCardUI(c)}</div>`;
-    }).join('');
-  }
-
-  selectCard(idx) {
-    if (this.phase !== 'playing' || this.turn !== 'player') return;
-    this.selectedIdx = this.selectedIdx === idx ? -1 : idx;
-    this.renderHand();
-  }
-
-  delay(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-  forfeitIfAbandoned() {
-    if (this.betSettled || this.phase === 'betting') return;
-    this.betSettled = true;
-    addPoints('CatTe', 'Cát Tê out phòng - mất cược', -this.currentBet, false).catch(() => {});
+  // Thông báo
+  if (dead.length > 0 && survivors.length > 0) {
+    state.lastActionMsg = `${survivors.map(i => AI_NAMES[i]).join(', ')} vào Tùng! ${dead.map(i => AI_NAMES[i]).join(', ')} chết Tùng!`;
+  } else if (survivors.length > 0) {
+    state.lastActionMsg = 'Tất cả vào Tùng!';
+  } else {
+    state.lastActionMsg = 'Tất cả chết Tùng!';
   }
 }
 
-new CatTe();
-window.addEventListener('pagehide', () => { window.game?.forfeitIfAbandoned(); window.game?.unsubBalance?.(); });
-window.addEventListener('beforeunload', () => window.game?.forfeitIfAbandoned());
+// Người chết Tùng không còn tham gia đánh ở vòng 5-6 (đã bị bỏ qua lượt qua nextAliveTurn)
+
+// ── AI ──
+function aiDecide(playerIdx) {
+  const hand = state.hands[playerIdx];
+  const trick = state.tricks[state.tricks.length - 1];
+  const leadSuit = trick.leadSuit;
+  const currentHighest = trick.currentHighest;
+
+  // Nếu đang dẫn đầu: đánh lá thấp nhất
+  if (leadSuit === null || trick.plays.length === 0) {
+    // Đánh lá thấp nhất
+    return { type: 'play', cardIdx: 0, faceDown: false };
+  }
+
+  // Đang phải theo chất
+  // Tìm lá cùng chất có thể đánh
+  const playable = [];
+  for (let i = 0; i < hand.length; i++) {
+    const c = hand[i];
+    if (c.sIdx === leadSuit && c.rIdx > currentHighest.rIdx) {
+      playable.push({ idx: i, card: c });
+    }
+  }
+
+  if (playable.length > 0) {
+    // Chọn lá thấp nhất có thể đánh (tiết kiệm bài mạnh)
+    playable.sort((a, b) => a.card.rIdx - b.card.rIdx);
+    return { type: 'play', cardIdx: playable[0].idx, faceDown: false };
+  }
+
+  // Không có bài đánh → úp bài lá thấp nhất (giữ bài mạnh cho lượt sau)
+  return { type: 'fold', cardIdx: 0 };
+}
+
+function runAiTurn(playerIdx, onDone) {
+  setTimeout(() => {
+    if (!state || state.over) { onDone(); return; }
+    const decision = aiDecide(playerIdx);
+    if (decision.type === 'fold') {
+      playCard(playerIdx, decision.cardIdx, true);
+    } else {
+      playCard(playerIdx, decision.cardIdx, false);
+    }
+    onDone();
+  }, 2000);
+}
+
+// ── GIAO DIỆN ──
+const setupBar = document.getElementById('setup-bar');
+const gameScreen = document.getElementById('game-screen');
+const startBtn = document.getElementById('start-btn');
+const betInput = document.getElementById('ct-bet-input');
+const playBtn = document.getElementById('play-btn');
+const foldBtn = document.getElementById('fold-btn');
+const myHandEl = document.getElementById('my-hand');
+const tableEl = document.getElementById('table-combo');
+
+// Nút Ván mới / Về menu — nằm ngay dưới bài (thay chỗ nút Đánh/Úp khi ván kết thúc)
+const xdActionsEl = foldBtn.parentElement;
+const newGameBtn = document.createElement('button');
+newGameBtn.id = 'ct-new-game-btn';
+newGameBtn.className = 'btn-deal';
+newGameBtn.textContent = 'Ván mới';
+newGameBtn.style.display = 'none';
+newGameBtn.addEventListener('click', () => window.restartGame());
+xdActionsEl.appendChild(newGameBtn);
+
+const menuBtn = document.createElement('button');
+menuBtn.id = 'ct-menu-btn';
+menuBtn.className = 'btn-hit';
+menuBtn.textContent = 'Về menu';
+menuBtn.style.display = 'none';
+menuBtn.addEventListener('click', () => window.backToSetup());
+xdActionsEl.appendChild(menuBtn);
+
+const betEl = document.getElementById('ct-bet');
+const scoreEl = document.getElementById('ct-score');
+const scoreSubEl = document.getElementById('ct-score-sub');
+const profitEl = document.getElementById('ct-profit');
+const statusBarEl = document.getElementById('bc-status');
+
+const seatEls = {
+  0: document.getElementById('seat-0'),
+  1: document.getElementById('seat-1'),
+  2: document.getElementById('seat-2'),
+  3: document.getElementById('seat-3'),
+};
+const countEls = {
+  1: document.getElementById('ct-count-1'),
+  2: document.getElementById('ct-count-2'),
+  3: document.getElementById('ct-count-3'),
+};
+const statusEls = {
+  1: document.getElementById('ct-status-1'),
+  2: document.getElementById('ct-status-2'),
+  3: document.getElementById('ct-status-3'),
+};
+const tungBadgeEls = {
+  1: document.getElementById('ct-tung-1'),
+  2: document.getElementById('ct-tung-2'),
+  3: document.getElementById('ct-tung-3'),
+};
+
+// ── TIMER ──
+const turnTimer = { remaining: TURN_SECONDS, playerIdx: null, interval: null };
+let lastTimerTurn = null;
+
+function setRingProgress(playerIdx, fraction, warn) {
+  const seat = seatEls[playerIdx];
+  if (!seat) return;
+  const fg = seat.querySelector('.seat-timer-fg');
+  if (!fg) return;
+  fg.style.strokeDashoffset = String(RING_CIRC * (1 - fraction));
+  fg.classList.toggle('timer-warn', !!warn);
+}
+
+function clearTurnTimer() {
+  if (turnTimer.interval) clearInterval(turnTimer.interval);
+  turnTimer.interval = null;
+}
+
+function startTurnTimer(playerIdx) {
+  clearTurnTimer();
+  if (!state || state.over || state.phase !== 'playing') return;
+  turnTimer.playerIdx = playerIdx;
+  turnTimer.remaining = TURN_SECONDS;
+  setRingProgress(playerIdx, 1, false);
+  updateStatusBar();
+  turnTimer.interval = setInterval(() => {
+    turnTimer.remaining--;
+    if (turnTimer.remaining <= 0) {
+      clearTurnTimer();
+      setRingProgress(playerIdx, 0, true);
+      handleTurnTimeout(playerIdx);
+      return;
+    }
+    setRingProgress(playerIdx, turnTimer.remaining / TURN_SECONDS, turnTimer.remaining <= 10);
+    updateStatusBar();
+  }, 1000);
+}
+
+function handleTurnTimeout(playerIdx) {
+  if (!state || state.over) return;
+  if (state.turn !== playerIdx) return;
+
+  // Tự động đánh lá đầu tiên hoặc úp bài
+  const hand = state.hands[playerIdx];
+  const trick = state.tricks[state.tricks.length - 1];
+
+  if (trick.leadSuit === null || trick.plays.length === 0) {
+    if (hand.length > 0) {
+      playCard(playerIdx, 0, false);
+    }
+  } else {
+    // Đang phòng thủ: kiểm tra có bài đánh không
+    let canPlay = false;
+    for (let i = 0; i < hand.length; i++) {
+      if (hand[i].sIdx === trick.leadSuit && hand[i].rIdx > trick.currentHighest.rIdx) {
+        canPlay = true;
+        playCard(playerIdx, i, false);
+        break;
+      }
+    }
+    if (!canPlay && hand.length > 0) {
+      playCard(playerIdx, hand.length - 1, true);
+    }
+  }
+
+  if (playerIdx === 0) state.selectedIdx = -1;
+  render();
+  maybeRunAi();
+}
+
+// ── RENDER ──
+function render() {
+  if (!state) return;
+
+  // Tay người chơi
+  myHandEl.innerHTML = '';
+  const hand = state.hands[0];
+  const isMyTurn = state.turn === 0 && !state.over && state.phase === 'playing' && !state.awaitingNextTrick;
+
+  hand.forEach((c, i) => {
+    const selected = i === state.selectedIdx;
+    const wrap = document.createElement('div');
+    wrap.className = 'card-slot' + (selected ? ' selected' : '') + (isMyTurn ? '' : ' disabled');
+    wrap.dataset.key = cardKey(c);
+    wrap.innerHTML = renderCardUI({ v: RANK_LABELS[c.rIdx], s: SUIT_LABELS[c.sIdx] });
+    if (isMyTurn) {
+      wrap.addEventListener('click', () => {
+        state.selectedIdx = state.selectedIdx === i ? -1 : i;
+        render();
+      });
+    }
+    myHandEl.appendChild(wrap);
+  });
+
+  // Bàn chơi: hiển thị các lá đã đánh trong vòng hiện tại
+  tableEl.innerHTML = '';
+  const trick = state.tricks[state.tricks.length - 1];
+  if (trick.plays && trick.plays.length > 0) {
+    const container = document.createElement('div');
+    container.className = 'ct-trick-cards';
+    trick.plays.forEach((p, i) => {
+      const cardWrap = document.createElement('div');
+      cardWrap.className = 'ct-trick-card' + (p.faceDown ? ' folded' : ' played');
+      if (p.faceDown) {
+        cardWrap.innerHTML = renderCardUI(null, true);
+      } else {
+        cardWrap.innerHTML = renderCardUI({ v: RANK_LABELS[p.card.rIdx], s: SUIT_LABELS[p.card.sIdx] });
+      }
+      // Nhãn tên người chơi
+      const label = document.createElement('div');
+      label.className = 'ct-trick-label' + (p.playerIdx === trick.highestPlayer ? ' winner' : '') + (p.faceDown ? ' up' : ' danh');
+      label.textContent = AI_NAMES[p.playerIdx];
+      cardWrap.appendChild(label);
+      container.appendChild(cardWrap);
+    });
+    tableEl.appendChild(container);
+  } else {
+    tableEl.innerHTML = '<span class="table-empty">— Đi tự do —</span>';
+  }
+
+  // Vòng hiện tại
+  const roundDisplay = document.getElementById('ct-round-display');
+  const tableArea = document.querySelector('.table-area');
+  
+  if (state.over) {
+    roundDisplay.style.display = 'none';
+    tableArea?.classList.remove('round-chung');
+  } else {
+    roundDisplay.style.display = '';
+
+    // VÒNG CHƯNG BÀI (5-6): chỉ hiện tên giai đoạn, không đếm số vòng
+    if (state.tungChecked && state.round >= 5) {
+      roundDisplay.className = 'ct-round-display chung';
+      roundDisplay.textContent = 'Chưng Bài';
+      tableArea?.classList.add('round-chung');
+    } else {
+      roundDisplay.className = 'ct-round-display';
+      roundDisplay.innerHTML = `Vòng <span id="ct-round-num">${state.round}</span>/4`;
+      tableArea?.classList.remove('round-chung');
+    }
+  }
+
+  // Ghế AI
+  for (let i = 1; i <= 3; i++) {
+    const seat = seatEls[i];
+    const cntEl = countEls[i];
+    const stEl = statusEls[i];
+    const tungEl = tungBadgeEls[i];
+    if (cntEl) cntEl.textContent = state.hands[i] ? `${state.hands[i].length} lá` : '0 lá';
+    seat.classList.toggle('active-turn', state.turn === i && !state.over);
+
+    const isAlive = state.trickWins[i] > 0;
+    if (tungEl) {
+      if (isAlive) {
+        tungEl.style.display = '';
+        tungEl.textContent = 'Tùng';
+        tungEl.classList.remove('rot');
+      } else if (state.tungChecked) {
+        tungEl.style.display = '';
+        tungEl.textContent = 'Rớt';
+        tungEl.classList.add('rot');
+      } else {
+        tungEl.style.display = 'none';
+        tungEl.classList.remove('rot');
+      }
+    }
+
+    if (state.tungChecked || state.over) {
+      seat.classList.toggle('dead', !isAlive);
+    } else {
+      seat.classList.remove('dead');
+    }
+
+    if (stEl) {
+      stEl.className = 'seat-status';
+      if (!state.over) {
+        const trick = state.tricks[state.tricks.length - 1];
+        const p = trick?.plays?.find(p => p.playerIdx === i);
+        if (p) {
+          stEl.textContent = p.faceDown ? 'Úp bài' : 'Đã đánh';
+          stEl.classList.add(p.faceDown ? 'up-bai' : 'danh-bai');
+          seat.classList.toggle('played', !p.faceDown);
+          seat.classList.toggle('folded', p.faceDown);
+        } else if (state.turn === i && !state.awaitingNextTrick) {
+          stEl.textContent = 'Đang suy nghĩ...';
+          stEl.classList.add('danh-bai');
+        } else {
+          stEl.textContent = '';
+        }
+      } else {
+        stEl.textContent = '';
+      }
+    }
+  }
+
+  // Ghế người chơi (seat-0): hiển thị avatar + timer ring
+  const seat0 = seatEls[0];
+  seat0.style.display = '';
+  const cnt0 = seat0.querySelector('.seat-count');
+  if (cnt0) {
+    cnt0.textContent = state.hands[0] ? `${state.hands[0].length} lá` : '0 lá';
+  }
+  const name0 = seat0.querySelector('.seat-name');
+  if (name0) name0.textContent = 'Bạn';
+  seat0.classList.toggle('active-turn', state.turn === 0 && !state.over);
+
+  // Huy hiệu Tùng góc trái
+  const tungBadgePlayer = document.getElementById('ct-my-tung-badge');
+  if (state.trickWins[0] > 0) {
+    tungBadgePlayer.style.display = '';
+    tungBadgePlayer.textContent = 'Tùng';
+    tungBadgePlayer.classList.remove('rot');
+  } else if (state.tungChecked) {
+    tungBadgePlayer.style.display = '';
+    tungBadgePlayer.textContent = 'Rớt';
+    tungBadgePlayer.classList.add('rot');
+  } else {
+    tungBadgePlayer.style.display = 'none';
+    tungBadgePlayer.classList.remove('rot');
+  }
+
+  // Nút
+  const myTurn = state.turn === 0 && !state.over && state.phase === 'playing' && !state.awaitingNextTrick;
+  playBtn.style.display = myTurn ? '' : 'none';
+  foldBtn.style.display = myTurn ? '' : 'none';
+  playBtn.disabled = !myTurn || state.selectedIdx < 0;
+
+  // Người chơi đã chết Tùng → không thể đánh, tự động úp
+  if (myTurn && state.deadPlayers && state.deadPlayers.includes(0)) {
+    playBtn.style.display = 'none';
+    foldBtn.style.display = 'none';
+  } else if (myTurn) {
+    playBtn.style.display = '';
+    foldBtn.style.display = '';
+    // Úp bài: luôn cho phép (giữ lá lại) khi không phải người dẫn đầu vòng
+    const trick = state.tricks[state.tricks.length - 1];
+    if (trick.leadSuit !== null && trick.plays.length > 0) {
+      const hasAnyPlayable = hasPlayableCard(state.hands[0], trick.leadSuit, trick.currentHighest);
+      playBtn.disabled = state.selectedIdx < 0;
+      foldBtn.disabled = state.selectedIdx < 0;
+      playBtn.classList.toggle('pass-glow', !hasAnyPlayable);
+      foldBtn.classList.toggle('pass-glow', !hasAnyPlayable);
+    } else {
+      playBtn.disabled = state.selectedIdx < 0;
+      foldBtn.disabled = true;
+      foldBtn.classList.remove('pass-glow');
+      playBtn.classList.remove('pass-glow');
+    }
+  }
+
+  updateStatusBar();
+  newGameBtn.style.display = state.over ? '' : 'none';
+  menuBtn.style.display = state.over ? '' : 'none';
+  if (state.over) {
+    clearTurnTimer();
+    lastTimerTurn = null;
+    settlePayout();
+  } else if (state.awaitingNextTrick) {
+    clearTurnTimer();
+    lastTimerTurn = null;
+  } else if (lastTimerTurn !== state.turn) {
+    lastTimerTurn = state.turn;
+    startTurnTimer(state.turn);
+  }
+}
+
+function updateStatusBar() {
+  if (!state) return;
+  statusBarEl.classList.remove('result-win', 'result-lose', 'result-draw');
+  if (!state.over) {
+    betEl.textContent = String(state.bet || 0);
+    scoreEl.textContent = state.turn === 0 ? 'LƯỢT BẠN' : AI_NAMES[state.turn].toUpperCase();
+    if (state.tungChecked && state.round >= 5) {
+      scoreSubEl.textContent = 'Chưng Bài';
+    } else {
+      scoreSubEl.textContent = state.tricks[state.tricks.length - 1]?.leadSuit !== null
+        ? `Vòng ${state.round}/4`
+        : `Vòng ${state.round}/4 · Đi tự do`;
+    }
+    profitEl.textContent = String(turnTimer.remaining);
+    profitEl.className = 'stat-profit timer-color' + (turnTimer.remaining <= 10 ? ' negative' : '');
+    return;
+  }
+  scoreEl.textContent = currentNet >= 0 ? 'THẮNG' : 'THUA';
+  scoreSubEl.textContent = '';
+  profitEl.textContent = (currentNet > 0 ? '+' : '') + currentNet.toLocaleString('vi-VN');
+  profitEl.className = 'stat-profit ' + (currentNet > 0 ? 'positive' : currentNet < 0 ? 'negative' : 'zero');
+  statusBarEl.classList.add(currentNet >= 0 ? 'result-win' : 'result-lose');
+}
+
+window.backToSetup = function backToSetup() {
+  gameScreen.style.display = 'none';
+  setupBar.style.display = '';
+  statusBarEl.style.display = 'none';
+  newGameBtn.style.display = 'none';
+  menuBtn.style.display = 'none';
+  clearTurnTimer();
+  clearTrickFreeze();
+  state = null;
+  lastTimerTurn = null;
+};
+
+window.restartGame = function() {
+  const bet = state?.bet || 100;
+  payoutSettled = false;
+  newGameBtn.style.display = 'none';
+  menuBtn.style.display = 'none';
+  clearTrickFreeze();
+  newGame(bet, buffPct);
+  lastTimerTurn = null;
+  render();
+  maybeRunAi();
+};
+
+// ── SETTLEMENT ──
+async function settlePayout() {
+  if (payoutSettled) return;
+  payoutSettled = true;
+  const net = currentNet;
+  try {
+    if (net !== 0) {
+      await addPoints('Casino', net > 0 ? 'Thắng Cát Tê' : 'Thua Cát Tê', net, false);
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function forfeitIfAbandoned() {
+  if (!state || state.over || payoutSettled) return;
+  payoutSettled = true;
+  const bet = state.bet || 100;
+  addPoints('Casino', 'Cát Tê out - mất cược', -bet, false).catch(() => {});
+}
+window.addEventListener('pagehide', forfeitIfAbandoned);
+window.addEventListener('beforeunload', forfeitIfAbandoned);
+
+// ── ACTION HANDLERS ──
+function afterPlayerAction() {
+  state.selectedIdx = -1;
+  render();
+  maybeRunAi();
+}
+
+function maybeRunAi() {
+  if (!state || state.over) { render(); return; }
+
+  if (state.awaitingNextTrick) { render(); scheduleTrickAdvance(); return; }
+
+  if (state.turn === 0) { render(); return; }
+  const p = state.turn;
+  render();
+  runAiTurn(p, () => {
+    afterAiStep();
+  });
+}
+
+function afterAiStep() {
+  maybeRunAi();
+}
+
+// ── EVENTS ──
+onAuthStateChanged(auth, (user) => {
+  if (!user) { location.href = 'index.html'; return; }
+  loadPetBuff();
+});
+
+function loadPetBuff() {
+  if (!buffLoadPromise) {
+    buffLoadPromise = getActiveBuff()
+      .then(buff => { buffPct = buff > 0 ? buff : 0; return buffPct; })
+      .catch(() => { buffPct = 0; return 0; });
+  }
+  return buffLoadPromise;
+}
+
+startBtn.addEventListener('click', async () => {
+  const bet = Math.max(10, parseInt(betInput.value, 10) || 100);
+  await loadPetBuff();
+  payoutSettled = false;
+  clearTrickFreeze();
+  newGame(bet, buffPct);
+  lastTimerTurn = null;
+  setupBar.style.display = 'none';
+  gameScreen.style.display = '';
+  statusBarEl.style.display = '';
+  render();
+  maybeRunAi();
+});
+
+playBtn.addEventListener('click', () => {
+  if (state.selectedIdx < 0) {
+    window.showToast?.('Chọn 1 lá bài trước!', 'warn');
+    return;
+  }
+  const res = playCard(0, state.selectedIdx, false);
+  if (!res.ok) {
+    if (res.mustFold) {
+      window.showToast?.('Không có bài đánh! Bấm "Úp bài"', 'warn');
+    } else {
+      window.showToast?.(res.msg, 'error');
+    }
+    return;
+  }
+  afterPlayerAction();
+});
+
+foldBtn.addEventListener('click', () => {
+  if (state.selectedIdx < 0) {
+    window.showToast?.('Chọn lá muốn úp!', 'warn');
+    return;
+  }
+  const trick = state.tricks[state.tricks.length - 1];
+  if (trick.leadSuit === null || trick.plays.length === 0) {
+    window.showToast?.('Đang dẫn đầu, không thể úp bài!', 'warn');
+    return;
+  }
+  const res = playCard(0, state.selectedIdx, true);
+  if (!res.ok) {
+    window.showToast?.(res.msg, 'error');
+    return;
+  }
+  afterPlayerAction();
+});

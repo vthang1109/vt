@@ -18,7 +18,8 @@ const GAMES = {
   chess:     { id: 'chess',     name: 'Cờ Vua',      icon: '♞', max: 2, min: 2, page: '../games/chess/chess-mp.html',            ready: true },
   xiangqi:   { id: 'xiangqi',   name: 'Cờ Tướng',    icon: '🀄', max: 2, min: 2, page: '../games/xiangqi/xiangqi-mp.html',       ready: true },
   altp:      { id: 'altp',      name: 'Ai Là Triệu Phú', icon: '💰', max: 8, min: 2, page: '../games/altp/altp-mp.html',         ready: true },
-  catte:     { id: 'catte',     name: 'Cát Tê',      icon: '♣️', max: 2, min: 2, page: '../games/catte/catte-mp.html',          ready: true },
+  catte:     { id: 'catte',     name: 'Cát Tê',      icon: '♣️', max: 4, min: 2, page: '../games/catte/catte-mp.html',          ready: true },
+  tienlen:   { id: 'tienlen',   name: 'Tiến Lên',    icon: '♥️', max: 4, min: 2, page: '../games/tienlen/tienlen-mp.html',       ready: true },
   timso:     { id: 'timso',     name: 'Tìm Số',      icon: '🔢', max: 2, min: 2, page: '../games/timso/timso-mp.html',          ready: true },
 };
 
@@ -78,7 +79,7 @@ setTimeout(() => {
 
 function startListeningPublicRooms(){
   if (_unsubRooms) _unsubRooms();
-  const q = query(collection(db, 'rooms'), where('status', '==', 'lobby'), limit(30));
+  const q = query(collection(db, 'rooms'), where('status', 'in', ['lobby', 'playing']), limit(30));
   _unsubRooms = onSnapshot(q, (snap) => {
     const list = $('rooms-list');
     if (!snap.size) {
@@ -89,13 +90,30 @@ function startListeningPublicRooms(){
     const rooms = [];
     snap.forEach(d => {
       const r = d.data();
-      if (r.status === 'lobby') rooms.push({ id: d.id, ...r });
+      if (r.status === 'lobby' || r.status === 'playing') rooms.push({ id: d.id, ...r });
     });
     rooms.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
     rooms.forEach(r => {
       const game = GAMES[r.gameType] || { name: r.gameType, icon: '🎮' };
       const full = (r.members || []).length >= (r.maxPlayers || 2);
+      const isPlaying = r.status === 'playing';
+      const isWaiting = (r.waitingMembers || []).includes(_user.uid);
+
+      let btnText, btnDisabled;
+      if (isPlaying) {
+        btnText = isWaiting ? '✅ Đã chờ' : '⏳ Chờ';
+        btnDisabled = isWaiting;
+      } else if (full) {
+        btnText = 'Đầy';
+        btnDisabled = true;
+      } else {
+        btnText = 'Vào';
+        btnDisabled = false;
+      }
+
+      const waitingCount = (r.waitingMembers||[]).length;
+
       const div = document.createElement('div');
       div.className = 'rm-card';
       div.innerHTML = `
@@ -105,14 +123,15 @@ function startListeningPublicRooms(){
           <div class="rm-meta">
             <span>${escHtml(game.name)}</span>
             <span class="rm-dot">·</span>
-            <span>${(r.members||[]).length}/${r.maxPlayers||2} người</span>
+            <span>${(r.members||[]).length}/${r.maxPlayers||2} người${waitingCount ? ` (+${waitingCount} chờ)` : ''}</span>
+            ${isPlaying ? '<span class="rm-dot">·</span><span style="color:#fbbf24;font-weight:700">ĐANG CHƠI</span>' : ''}
             <span class="rm-dot">·</span>
             <span>Chủ: ${escHtml(r.hostName || '?')}</span>
           </div>
         </div>
         <div class="rm-action">
           <span class="rm-code">#${r.code}</span>
-          <button class="btn-join" ${full ? 'disabled' : ''} data-id="${r.id}" data-pw="${r.password ? '1' : ''}">${full ? 'Đầy' : 'Vào'}</button>
+          <button class="btn-join" ${btnDisabled ? 'disabled' : ''} data-id="${r.id}" data-pw="${r.password ? '1' : ''}">${btnText}</button>
         </div>
       `;
       list.appendChild(div);
@@ -221,14 +240,24 @@ async function joinRoomFlow(id, needPw){
 
 async function joinRoomById(id, data){
   try {
-    if (!(data.members||[]).includes(_user.uid)){
-      const myName = _myProfile.nickname || _user.email.split('@')[0];
-      const memberInfo = data.memberInfo || {};
-      memberInfo[_user.uid] = { name: myName, avatarUrl: _myProfile.avatarUrl || '', ready: true };
-      await updateDoc(doc(db,'rooms',id), {
-        members: arrayUnion(_user.uid),
-        memberInfo
-      });
+    const myName = _myProfile.nickname || _user.email.split('@')[0];
+    if (data.status === 'playing') {
+      // Phòng đang chơi → vào ghế chờ
+      if (!(data.waitingMembers||[]).includes(_user.uid) && !(data.members||[]).includes(_user.uid)) {
+        await updateDoc(doc(db,'rooms',id), {
+          waitingMembers: arrayUnion(_user.uid),
+          [`waitingMemberInfo.${_user.uid}`]: { name: myName, avatarUrl: _myProfile.avatarUrl || '' }
+        });
+      }
+    } else {
+      if (!(data.members||[]).includes(_user.uid)){
+        const memberInfo = data.memberInfo || {};
+        memberInfo[_user.uid] = { name: myName, avatarUrl: _myProfile.avatarUrl || '', ready: true };
+        await updateDoc(doc(db,'rooms',id), {
+          members: arrayUnion(_user.uid),
+          memberInfo
+        });
+      }
     }
     enterLobby(id);
   } catch(e){ toast('Không thể vào phòng', 'error'); console.error(e); }
@@ -287,7 +316,23 @@ function renderLobby(r){
   $('lobby-title').textContent = r.name;
   $('lobby-game').textContent = (g.icon || '🎮') + ' ' + (g.name || r.gameType);
   $('lobby-code').textContent = '#' + r.code;
-  $('lobby-count').textContent = (r.members||[]).length + '/' + r.maxPlayers;
+  const waitingCount = (r.waitingMembers||[]).length;
+  $('lobby-count').textContent = (r.members||[]).length + '/' + r.maxPlayers + (waitingCount ? ' +' + waitingCount + ' chờ' : '');
+  $('lobby-count').textContent = (r.members||[]).length + '/' + r.maxPlayers + (waitingCount ? ' (+' + waitingCount + ' chờ)' : (r.status === 'playing' ? ' (đang chơi)' : ''));
+
+  // ── Waiting list ──
+  const waitingList = $('lobby-waiting');
+  const waiters = r.waitingMembers || [];
+  if (waiters.length) {
+    waitingList.style.display = '';
+    waitingList.innerHTML = '<div class="lw-title">⏳ Ghế chờ (' + waiters.length + ')</div>' +
+      waiters.map(uid => {
+        const info = (r.waitingMemberInfo||{})[uid] || { name: '?' };
+        return '<div class="lw-item"><div class="lw-av">' + (info.avatarUrl ? '' : (info.name||'?')[0].toUpperCase()) + '</div><span>' + escHtml(info.name) + '</span></div>';
+      }).join('');
+  } else {
+    waitingList.style.display = 'none';
+  }
 
   const list = $('lobby-members');
   list.innerHTML = '';
@@ -376,6 +421,10 @@ window.startGame = async function(){
     gameState = { phase: 'betting', round: 1, bets: {}, betAmount: null, betDeclinedBy: null, colors: {}, fen: null, turn: 'w', lastMove: null, moveCount: 0, players: data.members.slice(0, 2), result: null, winnerUid: null, drawOffer: null };
   } else if (data.gameType === 'xiangqi'){
     gameState = { phase: 'betting', round: 1, bets: {}, betAmount: null, betDeclinedBy: null, colors: {}, boardStr: null, turn: 'r', lastMove: null, moveCount: 0, players: data.members.slice(0, 2), result: null, winnerUid: null, drawOffer: null };
+  } else if (data.gameType === 'catte'){
+    gameState = { phase: 'betting', cycle: 0, betAmount: null, betConfirmed: {}, seats: [], hands: {}, turn: null, round: 0, currentTrick: null, trickWins: {}, tungChecked: false, survivors: null, deadPlayers: null, results: null, winners: null, maxWins: null };
+  } else if (data.gameType === 'tienlen'){
+    gameState = { phase: 'betting', cycle: 0, betAmount: null, betConfirmed: {}, seats: [], hands: {}, turn: null, tableCombo: null, lastPlayer: null, passCount: 0, whoPassedThisRound: [], chainPenalties: {}, chayBai: {}, finished: [], results: null, winners: null, lastActionMsg: null };
   } else if (data.gameType === 'altp'){
     gameState = {
       phase: 'waiting',
@@ -414,9 +463,13 @@ window.leaveLobby = async function(){
       } else {
         const memberInfo = data.memberInfo || {};
         delete memberInfo[_user.uid];
+        const wInfo = data.waitingMemberInfo || {};
+        delete wInfo[_user.uid];
         await updateDoc(doc(db,'rooms',_currentRoomId), {
           members: arrayRemove(_user.uid),
-          memberInfo
+          memberInfo,
+          waitingMembers: arrayRemove(_user.uid),
+          waitingMemberInfo: wInfo
         });
       }
     }

@@ -1,9 +1,13 @@
-// catte-mp.js — Cát Tê Multiplayer (PvP qua phòng)
+// ============================================================
+// ===== CÁT TÊ MULTIPLAYER (2-4 người) — theo luật catte.js offline =====
+// ============================================================
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, updateDoc, onSnapshot, deleteDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, updateDoc, onSnapshot, deleteDoc, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { createDeck, renderCardUI } from '../../cards.js';
-import { subscribeUserData, addPoints } from '../../points.js';
+import { getActiveBuff } from '../../pet.js';
+import { initRoomChat, getMyNickname } from '../../room-chat.js';
+import { subscribeUserData } from '../../points.js';
 
 const fbConfig = {
   apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -18,53 +22,102 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 const ROOM_ID = new URLSearchParams(location.search).get('room');
-let _user = null, _unsub = null, _unsubMe = null, _myBalance = 0;
-let _settledRound = -1;
-let _actionLock = false;
-let _room = null, _gs = null;
-let _selectedIdx = -1;
-let _lastDeclineHandled = null;
-
 if (!ROOM_ID) document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">⚠️ Thiếu mã phòng.</div>';
 
-// ===== CONSTANTS =====
-const suitRank = { '♠':1, '♣':2, '♦':3, '♥':4 };
-const valRank = { '2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14 };
+const TOTAL_ROUNDS = 6;
+const TUNG_AFTER_ROUND = 4;
+const TURN_SECONDS = 25;
+const RING_CIRC = 113;
+const MIN_BET = 10;
 
-// ===== UTILS =====
+let _user = null, _unsub = null, _unsubMe = null, _myBalance = 0, _myActivePet = null;
+let _room = null, _gs = null, _selectedIdx = -1, _actionLock = false;
+let _autoStartKey = null, _advancedTrickKey = null, _settledKey = null;
+let _trickTimer = null;
+let _turnTimer = null, _turnTimerFor = null, _turnRemaining = TURN_SECONDS;
+
+// ========== CARD UTILS ==========
+const suitRank = { '♠': 1, '♣': 2, '♦': 3, '♥': 4 };
+const valRank = { '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14 };
+
 function esc(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-
 function sortHand(hand) {
-  hand.sort((a, b) => {
-    const s = (suitRank[b.s] || 0) - (suitRank[a.s] || 0);
-    return s !== 0 ? s : (valRank[b.v] || 0) - (valRank[a.v] || 0);
-  });
-  return hand;
+  return hand.sort((a, b) => (suitRank[a.s] - suitRank[b.s]) || (valRank[a.v] - valRank[b.v]));
+}
+function cardDisplay(c) { return `${c.v}${c.s}`; }
+
+function canPlayCard(card, leadSuit, currentHighest) {
+  if (!leadSuit || !currentHighest) return true;
+  if (card.s !== leadSuit) return false;
+  return valRank[card.v] > valRank[currentHighest.v];
+}
+function hasPlayableCard(hand, leadSuit, currentHighest) {
+  if (!leadSuit || !currentHighest) return hand.length > 0;
+  return hand.some(c => c.s === leadSuit && valRank[c.v] > valRank[currentHighest.v]);
+}
+// Người kế tiếp còn sống (bỏ qua người đã chết Tùng ở vòng 5-6)
+function nextAliveTurn(fromUid, seats, gs) {
+  const idx = seats.indexOf(fromUid);
+  let n = (idx + 1) % seats.length;
+  if (gs.tungChecked && gs.deadPlayers?.length) {
+    let guard = 0;
+    while (gs.deadPlayers.includes(seats[n]) && guard < seats.length) { n = (n + 1) % seats.length; guard++; }
+  }
+  return seats[n];
+}
+// Danh sách đối thủ theo thứ tự lượt, bắt đầu từ người kế tiếp sau mình
+function relativeSeats(seats, myUid) {
+  const idx = seats.indexOf(myUid);
+  if (idx < 0) return seats.filter(u => u !== myUid);
+  return [...seats.slice(idx + 1), ...seats.slice(0, idx)];
+}
+function shortName(r, uid, myUid) {
+  if (uid === myUid) return 'Bạn';
+  const name = r.memberInfo?.[uid]?.name || '?';
+  return name.split(' ').pop();
+}
+function applyAvatar(el, r, uid) {
+  if (!el) return;
+  const url = r.memberInfo?.[uid]?.avatarUrl;
+  if (url) {
+    el.style.backgroundImage = `url(${url})`;
+    el.style.color = 'transparent';
+    el.textContent = '';
+  } else {
+    el.style.backgroundImage = '';
+    el.style.color = '';
+    const name = r.memberInfo?.[uid]?.name || '?';
+    el.textContent = (name.trim().charAt(0) || '?').toUpperCase();
+  }
 }
 
-function canBeat(playCard, lastCard) {
-  if (!lastCard) return true;
-  if (playCard.s !== lastCard.s) return false;
-  return (valRank[playCard.v] || 0) > (valRank[lastCard.v] || 0);
+function updateNavRoom(code) {
+  if (!code || !window.TopNav?.setRoomId) return;
+  window.TopNav.setRoomId(code, '♣️');
 }
 
-// ===== AUTH =====
+// ========== AUTH ==========
 onAuthStateChanged(auth, async (u) => {
-  if (!u) { location.href = 'index.html'; return; }
+  if (!u) { location.href = '../../index.html'; return; }
   _user = u;
-  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.leaveMpRoom());
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
   _unsubMe = subscribeUserData((data) => {
     if (data) {
       _myBalance = data.points || 0;
+      _myActivePet = data.activePet || null;
       if (window.TopNav) window.TopNav.setPoints(_myBalance);
     }
   });
-  if (ROOM_ID) start();
+  if (ROOM_ID) {
+    start();
+    const myName = await getMyNickname(db, _user.uid, _user.email);
+    initRoomChat({ db, roomId: ROOM_ID, uid: _user.uid, getName: () => myName });
+  }
 });
 
-// ===== ROOM LISTENER =====
+// ========== ROOM LISTENER ==========
 function start() {
   if (_unsub) _unsub();
   _unsub = onSnapshot(doc(db, 'rooms', ROOM_ID), (snap) => {
@@ -75,662 +128,700 @@ function start() {
     const r = snap.data();
     _room = r;
     updateNavRoom(r.code || '------');
-    if (!r.gameState) return;
+    if (r.gameType !== 'catte' || !r.gameState) return;
     render(r);
   });
 }
 
-function updateNavRoom(roomCode) {
-  if (!roomCode) return;
-  if (window.TopNav && window.TopNav.setRoomId) window.TopNav.setRoomId(roomCode, '♣️');
-}
-
-// ===== RENDER =====
+// ========== RENDER ==========
 function render(r) {
   const gs = r.gameState || {};
   _gs = gs;
-
   const uid = _user.uid;
   const members = r.members || [];
-  const oppUid = members.find(u => u !== uid);
   const isHost = r.hostUid === uid;
-  const isMeP1 = members[0] === uid;
-  const myPlayerId = isMeP1 ? 'p1' : 'p2';
 
-  const statusEl = document.getElementById('mp-status');
-  const p1Name = document.querySelector('#mp-p1 .name');
-  const p2Name = document.querySelector('#mp-p2 .name');
-  const p1Ready = document.getElementById('mp-p1-ready');
-  const p2Ready = document.getElementById('mp-p2-ready');
-  const p1Cards = document.getElementById('mp-cards-p1');
-  const p2Cards = document.getElementById('mp-cards-p2');
-  const p1El = document.getElementById('mp-p1');
-  const p2El = document.getElementById('mp-p2');
-  const btnReady = document.getElementById('btn-ready-mp');
-  const btnStart = document.getElementById('btn-start-mp');
-  const actEl = document.getElementById('mp-actions');
-  const waitingOverlay = document.getElementById('mp-waiting-overlay');
+  renderStatusBar(r, gs, uid);
+  renderBetZone(r, gs, isHost, uid, members);
+  renderTable(r, gs, uid);
+  renderMyArea(r, gs, uid);
 
-  // Room info
-  document.getElementById('mp-room-name').textContent = r.name || 'Phòng Cát Tê';
-  document.getElementById('mp-room-code').textContent = '#' + (r.code || '------');
+  if (gs.phase === 'playing' && !gs.currentTrick?.completed) startTurnTimerIfNeeded(gs);
+  else clearTurnTimerLocal();
 
-  // Player names
-  const mi = r.memberInfo || {};
-  if (members[0]) {
-    const info = mi[members[0]] || { name: '?', ready: false };
-    p1Name.textContent = members[0] === uid ? (info.name || 'Bạn') + ' (bạn)' : (info.name || '?');
-    p1Ready.textContent = info.ready ? '✅' : '⏳';
-    p1Ready.className = info.ready ? 'ready-badge' : 'wait-badge';
-  } else {
-    p1Name.textContent = 'Đang chờ...';
-    p1Ready.textContent = '⏳';
-    p1Ready.className = 'wait-badge';
-  }
-  if (members[1]) {
-    const info = mi[members[1]] || { name: '?', ready: false };
-    p2Name.textContent = members[1] === uid ? (info.name || 'Bạn') + ' (bạn)' : (info.name || '?');
-    p2Ready.textContent = info.ready ? '✅' : '⏳';
-    p2Ready.className = info.ready ? 'ready-badge' : 'wait-badge';
-  } else {
-    p2Name.textContent = 'Đang chờ...';
-    p2Ready.textContent = '⏳';
-    p2Ready.className = 'wait-badge';
+  // Tự động bắt đầu ván khi mọi người đã xác nhận cược
+  if (isHost && (!gs.phase || gs.phase === 'betting') && gs.betAmount && members.length >= 2) {
+    const allConfirmed = members.every(u => gs.betConfirmed?.[u] === gs.betAmount);
+    const key = String(gs.cycle || 0);
+    if (allConfirmed && _autoStartKey !== key) {
+      _autoStartKey = key;
+      setTimeout(() => { if (_room?.hostUid === _user.uid) startMatch(); }, 500);
+    }
   }
 
-  // Cards left
-  if (gs.hands) {
-    const p1CardCount = (gs.hands.p1 || []).length;
-    const p2CardCount = (gs.hands.p2 || []).length;
-    p1Cards.textContent = `(${p1CardCount} lá)`;
-    p2Cards.textContent = `(${p2CardCount} lá)`;
+  // Host điều khiển chuyển vòng sau khi 1 trick hoàn tất (giữ bài 2.5s)
+  if (gs.phase === 'playing' && gs.currentTrick?.completed) {
+    const key = `${gs.cycle || 0}:${gs.round}`;
+    if (isHost && _advancedTrickKey !== key) {
+      _advancedTrickKey = key;
+      if (_trickTimer) clearTimeout(_trickTimer);
+      _trickTimer = setTimeout(() => { advanceTrick(); }, 2500);
+    }
   }
 
-  // Active turn
-  const turnP = gs.turn; // 'p1' or 'p2'
-  p1El.classList.toggle('active', turnP === 'p1');
-  p2El.classList.toggle('active', turnP === 'p2');
+  // Cập nhật ghế chờ
+  renderWaitingList(r);
 
-  // If no gameState yet, just show lobby
-  if (r.status === 'lobby' || !gs.phase) {
-    document.getElementById('ctmp-status').style.display = 'none';
-    document.getElementById('ctmp-table').style.display = 'none';
-    document.getElementById('ctmp-hand').style.display = 'none';
-    document.getElementById('ctmp-game-actions').style.display = 'none';
-    document.getElementById('ctmp-bet-zone').style.display = '';
-
-    if (isHost) {
-      btnReady.style.display = 'none';
-      btnStart.style.display = 'inline-block';
-      const allReady = members.filter(u => u !== r.hostUid).every(u => mi[u]?.ready);
-      const enough = members.length >= 2;
-      btnStart.disabled = !(allReady && enough);
-      btnStart.textContent = enough ? (allReady ? '🚀 Bắt đầu' : '⏳ Chờ sẵn sàng') : '⏳ Cần 2 người';
-    } else {
-      btnStart.style.display = 'none';
-      btnReady.style.display = 'inline-block';
-      const myInfo = mi[uid] || { ready: false };
-      btnReady.textContent = myInfo.ready ? '↩ Huỷ sẵn sàng' : '✅ Sẵn sàng';
-      btnReady.classList.toggle('on', !!myInfo.ready);
-    }
-    actEl.style.display = '';
-
-    statusEl.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-        <span>🔄 Trong phòng chờ · ${members.length}/${r.maxPlayers || 2} người</span>
-        <span style="color:#fbbf24;font-weight:700;">🪙 ${gs.betAmount ? gs.betAmount.toLocaleString('vi-VN') : '?'}</span>
-      </div>
-    `;
-    statusEl.style.color = '#94a3b8';
-
-    if (members.length < 2) waitingOverlay.classList.remove('hidden');
-    else waitingOverlay.classList.add('hidden');
-
-    renderBetZone(r, gs, isHost, uid, oppUid);
-
-    // Auto-start check
-    const allBet = gs.betAmount && members[0] && members[1] && (gs.bets?.[members[0]] || 0) > 0 && (gs.bets?.[members[1]] || 0) > 0;
-    if (isHost && allBet && gs.round !== _autoStartRoundFlag) {
-      _autoStartRoundFlag = gs.round;
-      setTimeout(() => { hostStartMatch(); }, 400);
-    }
-
-    // Decline refund
-    if (isHost && gs.betDeclinedBy) {
-      const key = `${gs.round}:${gs.betDeclinedBy}`;
-      if (_lastDeclineHandled !== key) {
-        _lastDeclineHandled = key;
-        refundDeclinedBet(gs);
-      }
-    }
-    return;
-  }
-
-  // Playing or result
-  actEl.style.display = 'none';
-  waitingOverlay.classList.add('hidden');
-  document.getElementById('ctmp-bet-zone').style.display = 'none';
-  document.getElementById('ctmp-status').style.display = 'flex';
-  document.getElementById('ctmp-table').style.display = 'flex';
-
-  // Game state
-  const hands = gs.hands || {};
-  const played = gs.played || {};
-  const myHand = hands[myPlayerId] || [];
-  const oppPlayerId = myPlayerId === 'p1' ? 'p2' : 'p1';
-  const oppHand = hands[oppPlayerId] || [];
-
-  // Last card
-  const lastCard = gs.lastCard || null;
-  const lastPlayedBy = gs.lastPlayedBy || null;
-
-  // Render table
-  renderTable(played, lastCard, lastPlayedBy, myPlayerId, oppPlayerId);
-
-  // Render my hand
-  if (gs.phase === 'playing') {
-    document.getElementById('ctmp-hand').style.display = '';
-    renderHand(myHand, turnP === myPlayerId);
-    document.getElementById('ctmp-game-actions').style.display = turnP === myPlayerId ? 'flex' : 'none';
-  } else {
-    document.getElementById('ctmp-hand').style.display = 'none';
-    document.getElementById('ctmp-game-actions').style.display = 'none';
-  }
-
-  // Counts
-  document.getElementById('ctmp-my-count').textContent = `${myHand.length} lá`;
-  document.getElementById('ctmp-opp-count').textContent = `${oppHand.length} lá`;
-
-  // Status bar
-  const betStat = document.getElementById('ctmp-bet-stat');
-  const roundEl = document.getElementById('ctmp-round');
-  const subEl = document.getElementById('ctmp-sub');
-  const profitEl = document.getElementById('ctmp-profit');
-
-  const myBet = gs.bets?.[uid] || 0;
-  betStat.textContent = myBet.toLocaleString('vi-VN');
-
-  if (gs.phase === 'playing') {
-    const turnLabel = turnP === myPlayerId ? 'Lượt của bạn' : 'Lượt đối thủ';
-    roundEl.textContent = `Lượt ${gs.round || 1}`;
-    subEl.textContent = turnLabel;
-    profitEl.textContent = '';
-    profitEl.className = 'stat-profit zero';
-    document.getElementById('ctmp-status').className = 'bc-status';
-
-    document.getElementById('ctmp-info').textContent = gs.lastActionMessage || '';
-  } else if (gs.phase === 'result') {
-    const outcome = gs.result === 'draw' ? 'draw' : (gs.winnerPlayerId === myPlayerId ? 'win' : 'lose');
-
-    roundEl.textContent = outcome === 'win' ? 'WIN' : outcome === 'lose' ? 'LOSE' : 'HÒA';
-    subEl.textContent = '';
-    document.getElementById('ctmp-status').className = 'bc-status ' + (outcome === 'win' ? 'result-win' : outcome === 'lose' ? 'result-lose' : 'result-draw');
-
-    let net = 0;
-    if (outcome === 'win') net = gs.bets?.[oppUid] || 0;
-    else if (outcome === 'lose') net = -(myBet || 0);
-    profitEl.textContent = net === 0 ? '' : (net > 0 ? '+' : '') + net.toLocaleString('vi-VN');
-    profitEl.className = 'stat-profit ' + (net > 0 ? 'positive' : net < 0 ? 'negative' : 'zero');
-
-    document.getElementById('ctmp-info').textContent = gs.lastActionMessage || '';
-
-    // Show result modal
-    const members = r.members || [];
-    const oppUid = members.find(u => u !== uid);
-    const myBet = gs.bets?.[uid] || 0;
-    const oppBet = gs.bets?.[oppUid] || 0;
-    const outcome = gs.result === 'draw' ? 'draw' : (gs.winnerPlayerId === (members[0] === uid ? 'p1' : 'p2') ? 'win' : 'lose');
-
-    if (outcome === 'win') {
-      showResult('🏆', '🎉 Bạn thắng!', `+${oppBet.toLocaleString('vi-VN')}đ`, 'Thắng cược Cát Tê');
-    } else if (outcome === 'draw') {
-      showResult('🤝', 'Hòa!', `+${myBet.toLocaleString('vi-VN')}đ (hoàn cược)`, 'Không ai thắng');
-    } else {
-      showResult('😔', 'Bạn thua!', `-${myBet.toLocaleString('vi-VN')}đ`, 'Lần sau cố gắng nhé!');
-    }
-
-    // Action buttons
-    document.getElementById('ctmp-game-actions').style.display = 'none';
-    const hostAction = document.getElementById('host-action-area');
-    if (isHost) {
-      if (!hostAction) {
-        const div = document.createElement('div');
-        div.id = 'host-action-area';
-        div.style.cssText = 'text-align:center;margin-top:10px';
-        div.innerHTML = '<button class="btn-start-mp" onclick="hostNextRound()">⟳ Ván mới</button>';
-        document.getElementById('ctmp-hand').parentNode.insertBefore(div, document.getElementById('ctmp-hand'));
-      }
-    } else {
-      const ha = document.getElementById('host-action-area');
-      if (ha) {
-        ha.innerHTML = '<span style="color:#94a3b8;font-size:13px">⏳ Chờ chủ phòng bắt đầu ván mới...</span>';
-      } else {
-        const div = document.createElement('div');
-        div.id = 'host-action-area';
-        div.style.cssText = 'text-align:center;margin-top:10px;color:#94a3b8;font-size:13px';
-        div.textContent = '⏳ Chờ chủ phòng bắt đầu ván mới...';
-        document.getElementById('ctmp-hand').parentNode.insertBefore(div, document.getElementById('ctmp-hand'));
-      }
-    }
-
-    if (gs.round !== _settledRound) {
-      _settledRound = gs.round;
+  // Tất toán điểm khi có kết quả
+  if (gs.phase === 'result') {
+    const key = String(gs.cycle || 0);
+    if (_settledKey !== key) {
+      _settledKey = key;
       settleMyResult(r, gs);
     }
   }
 }
 
-// ===== RENDER TABLE =====
-function renderTable(played, lastCard, lastPlayedBy, myPid, oppPid) {
-  const myPlayed = played[myPid] || [];
-  const oppPlayed = played[oppPid] || [];
+// ===== STATUS BAR =====
+function renderStatusBar(r, gs, uid) {
+  const betEl = document.getElementById('ct-bet');
+  const scoreEl = document.getElementById('ct-score');
+  const subEl = document.getElementById('ct-score-sub');
+  const profitEl = document.getElementById('ct-profit');
+  const bar = document.getElementById('bc-status');
+  bar.classList.remove('result-win', 'result-lose', 'result-draw');
 
-  document.getElementById('ctmp-opp-cards').innerHTML = oppPlayed.length
-    ? oppPlayed.map(c => renderCardUI(c)).join('')
-    : '<span style="color:#64748b;font-size:12px">Chưa đánh</span>';
-
-  document.getElementById('ctmp-my-cards').innerHTML = myPlayed.length
-    ? myPlayed.map(c => renderCardUI(c)).join('')
-    : '<span style="color:#64748b;font-size:12px">Chưa đánh</span>';
-}
-
-// ===== RENDER HAND =====
-function renderHand(hand, isMyTurn) {
-  if (!hand || hand.length === 0) {
-    document.getElementById('ctmp-hand').innerHTML = '<div style="color:#64748b;text-align:center;padding:10px">Hết bài!</div>';
-    return;
+  if (gs.phase !== 'result') {
+    betEl.textContent = gs.betAmount ? gs.betAmount.toLocaleString('vi-VN') : '';
+    if (gs.phase === 'playing') {
+      scoreEl.textContent = gs.turn === uid ? 'LƯỢT BẠN' : esc(shortName(r, gs.turn, uid)).toUpperCase();
+      subEl.textContent = (gs.tungChecked && gs.round >= 5) ? 'Chưng Bài'
+        : (gs.currentTrick?.leadSuit ? `Vòng ${gs.round}/4` : `Vòng ${gs.round}/4 · Đi tự do`);
+      profitEl.textContent = String(_turnRemaining);
+      profitEl.className = 'stat-profit timer-color' + (_turnRemaining <= 10 ? ' negative' : '');
+    } else {
+      scoreEl.textContent = (r.members || []).length < 2 ? 'CHỜ NGƯỜI CHƠI' : 'CHỜ CƯỢC';
+      subEl.textContent = '';
+      profitEl.textContent = '';
+      profitEl.className = 'stat-profit zero';
+    }
+  } else {
+    const res = gs.results?.[uid];
+    const outcome = res?.outcome || 'draw';
+    scoreEl.textContent = outcome === 'win' ? 'THẮNG' : outcome === 'lose' ? 'THUA' : 'HUỶ';
+    subEl.textContent = '';
+    const delta = res?.delta || 0;
+    profitEl.textContent = delta === 0 ? '' : (delta > 0 ? '+' : '') + delta.toLocaleString('vi-VN');
+    profitEl.className = 'stat-profit ' + (delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'zero');
+    bar.classList.add(outcome === 'win' ? 'result-win' : outcome === 'lose' ? 'result-lose' : 'result-draw');
   }
-  document.getElementById('ctmp-hand').innerHTML = hand.map((c, i) => {
-    const sel = i === _selectedIdx ? 'selected' : '';
-    const dis = isMyTurn ? '' : 'disabled';
-    return `<div class="ctmp-hand-card ${sel} ${dis}" data-idx="${i}" onclick="${isMyTurn ? `selectCard(${i})` : ''}">${renderCardUI(c)}</div>`;
-  }).join('');
 }
 
-// ===== SELECT CARD =====
-window.selectCard = function(idx) {
-  if (_actionLock) return;
-  const gs = _gs;
-  if (!gs || gs.phase !== 'playing') return;
-  const uid = _user.uid;
-  const members = _room.members || [];
-  const isMeP1 = members[0] === uid;
-  const myPlayerId = isMeP1 ? 'p1' : 'p2';
-  if (gs.turn !== myPlayerId) return;
+// ===== BET ZONE (chủ phòng chọn cược, nhà con xác nhận 1 lần) =====
+function renderBetZone(r, gs, isHost, uid, members) {
+  const zone = document.getElementById('bet-zone');
+  if (gs.phase && gs.phase !== 'betting') { zone.style.display = 'none'; zone.innerHTML = ''; return; }
+  zone.style.display = '';
 
-  _selectedIdx = _selectedIdx === idx ? -1 : idx;
-  const hands = gs.hands || {};
-  const myHand = hands[myPlayerId] || [];
-  renderHand(myHand, true);
-};
-
-// ===== PLAY CARD =====
-window.playSelectedCard = async function() {
-  if (_actionLock) return;
-  const gs = _gs;
-  if (!gs || gs.phase !== 'playing') return;
-  const uid = _user.uid;
-  const members = _room.members || [];
-  const isMeP1 = members[0] === uid;
-  const myPlayerId = isMeP1 ? 'p1' : 'p2';
-  if (gs.turn !== myPlayerId) return;
-  if (_selectedIdx < 0) {
-    window.showToast('Chọn 1 lá bài trước!', 'warn');
+  if (members.length < 2) {
+    zone.innerHTML = `<div class="ctmp-bet-waiting">⏳ Đang chờ người chơi... (${members.length}/4)</div>`;
     return;
   }
 
-  const hands = JSON.parse(JSON.stringify(gs.hands || {}));
-  const myHand = hands[myPlayerId] || [];
-  if (_selectedIdx >= myHand.length) return;
-
-  const card = myHand[_selectedIdx];
-  const lastCard = gs.lastCard || null;
-  const lastPlayedBy = gs.lastPlayedBy || null;
-
-  // Cần đánh bài cùng chất lớn hơn nếu đối thủ vừa đánh
-  if (lastPlayedBy && lastPlayedBy !== myPlayerId && lastCard) {
-    if (!canBeat(card, lastCard)) {
-      window.showToast('Không thể đánh lá này! Cần cùng chất và lớn hơn', 'warn');
-      return;
-    }
-  }
-
-  _actionLock = true;
-
-  try {
-    myHand.splice(_selectedIdx, 1);
-    hands[myPlayerId] = myHand;
-
-    const played = JSON.parse(JSON.stringify(gs.played || {}));
-    if (!played[myPlayerId]) played[myPlayerId] = [];
-    played[myPlayerId].push(card);
-
-    const nextTurn = myPlayerId === 'p1' ? 'p2' : 'p1';
-    const oppPlayerId = nextTurn;
-    const oppHand = hands[oppPlayerId] || [];
-    const newRound = (gs.round || 1) + 1;
-
-    // Check if opponent can beat
-    const oppLastCard = card;
-    let canOppBeat = false;
-    for (const c of oppHand) {
-      if (canBeat(c, oppLastCard)) { canOppBeat = true; break; }
-    }
-
-    let winnerPlayerId = null;
-    let result = null;
-    let msg = `Bạn đã đánh ${cardDisplay(card)}`;
-
-    if (myHand.length === 0) {
-      // Win by playing all cards
-      winnerPlayerId = myPlayerId;
-      result = 'play_all';
-      msg = 'Bạn đã hết bài!';
-    } else if (oppHand.length === 0) {
-      winnerPlayerId = oppPlayerId;
-      result = 'play_all';
-      msg = 'Đối thủ đã hết bài!';
-    } else if (!canOppBeat) {
-      // Opponent can't beat - current player wins
-      winnerPlayerId = myPlayerId;
-      result = 'opponent_cant_beat';
-      msg = 'Đối thủ không thể đỡ! Bạn thắng!';
-    }
-
-    const updates = {
-      'gameState.hands': hands,
-      'gameState.played': played,
-      'gameState.lastCard': card,
-      'gameState.lastPlayedBy': myPlayerId,
-      'gameState.turn': nextTurn,
-      'gameState.round': newRound,
-      'gameState.lastActionMessage': msg
-    };
-
-    if (winnerPlayerId) {
-      updates['gameState.phase'] = 'result';
-      updates['gameState.result'] = result;
-      updates['gameState.winnerPlayerId'] = winnerPlayerId;
-    }
-
-    await updateDoc(doc(db, 'rooms', ROOM_ID), updates);
-
-    _selectedIdx = -1;
-
-  } catch (err) {
-    console.error('playSelectedCard error:', err);
-    window.showToast('❌ Lỗi khi đánh bài', 'error');
-  } finally {
-    _actionLock = false;
-  }
-};
-
-// ===== FOLD =====
-window.foldGame = async function() {
-  if (_actionLock) return;
-  const gs = _gs;
-  if (!gs || gs.phase !== 'playing') return;
-  const uid = _user.uid;
-  const members = _room.members || [];
-  const isMeP1 = members[0] === uid;
-  const myPlayerId = isMeP1 ? 'p1' : 'p2';
-  if (gs.turn !== myPlayerId) return;
-
-  _actionLock = true;
-  try {
-    const oppPlayerId = myPlayerId === 'p1' ? 'p2' : 'p1';
-    await updateDoc(doc(db, 'rooms', ROOM_ID), {
-      'gameState.phase': 'result',
-      'gameState.result': 'fold',
-      'gameState.winnerPlayerId': oppPlayerId,
-      'gameState.lastActionMessage': 'Bạn đã bỏ bài!'
-    });
-  } catch (err) {
-    console.error('foldGame error:', err);
-  } finally {
-    _actionLock = false;
-  }
-};
-
-function cardDisplay(c) {
-  return `${c.v}${c.s}`;
-}
-
-// ===== BET ZONE =====
-function renderBetZone(r, gs, isHost, uid, oppUid) {
-  const zone = document.getElementById('ctmp-bet-zone');
   const betAmount = gs.betAmount || null;
-  const oppConfirmed = oppUid && !!gs.bets?.[oppUid];
-  const meConfirmed = !!gs.bets?.[uid];
+  const myConfirmed = !!(betAmount && gs.betConfirmed?.[uid] === betAmount);
+  const confirmedCount = betAmount ? members.filter(u => gs.betConfirmed?.[u] === betAmount).length : 0;
 
   if (isHost) {
-    if (!betAmount) {
-      zone.innerHTML = `
+    zone.innerHTML = `
+      <div class="ctmp-bet-card">
         <div class="ctmp-bet-picker">
-          <div class="ctmp-bet-picker-label">Chọn mức cược cho ván này</div>
-          <div class="ctmp-bet-picker-row">
-            <input id="ctmp-bet-input" type="number" min="50" step="50" value="100"/>
-          </div>
+          <div class="label">Chọn mức cược · ${members.length} người</div>
+          <div class="row"><input id="ct-bet-input" type="number" min="${MIN_BET}" step="10" value="${betAmount || 100}"/></div>
           <div class="ctmp-bet-quick">
-            <button type="button" onclick="quickBet(100)">100</button>
-            <button type="button" onclick="quickBet(200)">200</button>
-            <button type="button" onclick="quickBet(500)">500</button>
-            <button type="button" onclick="quickBet(1000)">1000</button>
+            <button onclick="quickBet(100)">100</button>
+            <button onclick="quickBet(200)">200</button>
+            <button onclick="quickBet(500)">500</button>
+            <button onclick="quickBet(1000)">1000</button>
           </div>
-          <button class="ctmp-bet-confirm-btn" onclick="hostSetBet()">✅ Đặt mức cược</button>
-        </div>`;
-    } else {
-      zone.innerHTML = `<div class="ctmp-bet-waiting">⏳ Đã đặt mức cược <b>${betAmount.toLocaleString('vi-VN')}đ</b> — đang chờ đối thủ xác nhận...</div>`;
-    }
+          <button class="ctmp-bet-confirm" onclick="hostSetBet()">${betAmount ? '🔄 Đổi cược' : '✅ Đặt cược'}</button>
+        </div>
+        ${betAmount ? `<div class="ctmp-bet-status">Đã xác nhận ${confirmedCount}/${members.length}${myConfirmed ? '' : ' · Bạn chưa xác nhận'}</div>` : ''}
+        ${betAmount && !myConfirmed ? `<button class="ctmp-bet-confirm" onclick="confirmBet()">✅ Xác nhận ${betAmount.toLocaleString('vi-VN')}đ</button>` : ''}
+      </div>`;
     return;
   }
 
   if (!betAmount) {
     zone.innerHTML = `<div class="ctmp-bet-waiting">⏳ Đang chờ chủ phòng chọn mức cược...</div>`;
-  } else if (!meConfirmed) {
+  } else if (!myConfirmed) {
     zone.innerHTML = `
-      <div class="ctmp-bet-confirm-card">
-        <div class="ctmp-bet-confirm-title">Chủ phòng muốn đặt cược</div>
-        <div class="ctmp-bet-confirm-amt">${betAmount.toLocaleString('vi-VN')}đ</div>
-        <div class="ctmp-bet-confirm-actions">
-          <button class="decline" onclick="declineBet()">Từ chối</button>
-          <button class="accept" onclick="acceptBet()">Đồng ý</button>
-        </div>
+      <div class="ctmp-bet-card">
+        <div class="label">Chủ phòng đặt cược</div>
+        <div class="amount">${betAmount.toLocaleString('vi-VN')}đ</div>
+        <button class="ctmp-bet-confirm" onclick="confirmBet()">✅ Xác nhận</button>
       </div>`;
   } else {
-    zone.innerHTML = `<div class="ctmp-bet-waiting">✅ Đã xác nhận cược ${betAmount.toLocaleString('vi-VN')}đ — đang bắt đầu ván đấu...</div>`;
+    zone.innerHTML = `
+      <div class="ctmp-bet-card">
+        <div class="label">✅ Đã xác nhận ${betAmount.toLocaleString('vi-VN')}đ</div>
+        <div class="ctmp-bet-status">Đã xác nhận ${confirmedCount}/${members.length}</div>
+      </div>`;
   }
 }
 
-window.quickBet = function(amt) {
-  const el = document.getElementById('ctmp-bet-input');
+window.quickBet = function (amt) {
+  const el = document.getElementById('ct-bet-input');
   if (el) el.value = amt;
 };
 
-window.hostSetBet = async function() {
-  const el = document.getElementById('ctmp-bet-input');
+window.hostSetBet = async function () {
+  if (!_room || _room.hostUid !== _user.uid) return;
+  const el = document.getElementById('ct-bet-input');
   const amt = parseInt(el?.value);
-  if (!amt || amt < 50) { window.showToast('Cược tối thiểu 50', 'warn'); return; }
-  if (amt > _myBalance) { window.showToast('Không đủ điểm', 'error'); return; }
+  if (!amt || amt < MIN_BET) return;
+  if (amt > _myBalance) return;
   try {
-    await addPoints('Cát Tê', 'Đặt cược', -amt);
     await updateDoc(doc(db, 'rooms', ROOM_ID), {
       'gameState.betAmount': amt,
-      [`gameState.bets.${_user.uid}`]: amt
+      [`gameState.betConfirmed.${_user.uid}`]: amt
     });
-    window.showToast('✅ Đã đặt mức cược ' + amt.toLocaleString('vi-VN') + 'đ', 'success');
-  } catch (e) { console.error(e); window.showToast('Lỗi', 'error'); }
-};
-
-window.acceptBet = async function() {
-  const r = _room;
-  if (!r) return;
-  const gs = r.gameState;
-  const amt = gs.betAmount;
-  if (!amt || gs.bets?.[_user.uid]) return;
-  if (amt > _myBalance) { window.showToast('Không đủ điểm để đồng ý mức cược này', 'error'); return; }
-  try {
-    await addPoints('Cát Tê', 'Đặt cược', -amt);
-    await updateDoc(doc(db, 'rooms', ROOM_ID), { [`gameState.bets.${_user.uid}`]: amt });
-    window.showToast('✅ Đã xác nhận cược', 'success');
-  } catch (e) { console.error(e); window.showToast('Lỗi', 'error'); }
-};
-
-window.declineBet = async function() {
-  try {
-    await updateDoc(doc(db, 'rooms', ROOM_ID), { 'gameState.betDeclinedBy': _user.uid });
   } catch (e) { console.error(e); }
 };
 
-async function refundDeclinedBet(gs) {
-  const amt = gs.betAmount || 0;
+window.confirmBet = async function () {
+  const r = _room; if (!r) return;
+  const amt = r.gameState?.betAmount;
+  if (!amt) return;
+  if (amt > _myBalance) return;
   try {
-    if (amt > 0) {
-      await addPoints('Cát Tê', 'Hoàn cược', amt);
-      window.showToast(`↩️ Đối thủ từ chối mức cược, đã hoàn lại ${amt.toLocaleString('vi-VN')}đ`, 'info');
+    await updateDoc(doc(db, 'rooms', ROOM_ID), { [`gameState.betConfirmed.${_user.uid}`]: amt });
+  } catch (e) { console.error(e); }
+};
+
+// ===== BÀN CHƠI (giống catte offline: seat-top/left/right + trick cards) =====
+function renderTable(r, gs, uid) {
+  const seats = gs.seats?.length ? gs.seats : (r.members || []);
+  const inGame = gs.phase === 'playing' || gs.phase === 'result';
+  document.getElementById('game-screen').style.display = inGame ? '' : 'none';
+  if (!inGame) return;
+
+  const others = relativeSeats(seats, uid);
+  ['seat-left', 'seat-top', 'seat-right'].forEach((slotId, i) => {
+    const el = document.getElementById(slotId);
+    const oppUid = others[i];
+    if (!oppUid) { el.style.display = 'none'; return; }
+    el.style.display = '';
+    renderSeat(el, r, gs, oppUid, uid);
+  });
+
+  const roundDisplay = document.getElementById('ct-round-display');
+  const tableArea = document.getElementById('game-screen');
+  if (gs.phase !== 'playing') {
+    roundDisplay.style.display = 'none';
+    tableArea.classList.remove('round-chung');
+  } else {
+    roundDisplay.style.display = '';
+    if (gs.tungChecked && gs.round >= 5) {
+      roundDisplay.className = 'ct-round-display chung';
+      roundDisplay.textContent = 'Chưng Bài';
+      tableArea.classList.add('round-chung');
+    } else {
+      roundDisplay.className = 'ct-round-display';
+      roundDisplay.innerHTML = `Vòng <span>${gs.round || 1}</span>/4`;
+      tableArea.classList.remove('round-chung');
     }
-    await updateDoc(doc(db, 'rooms', ROOM_ID), {
-      'gameState.betAmount': null,
-      'gameState.bets': {},
-      'gameState.betDeclinedBy': null
-    });
-  } catch (e) { console.error(e); }
+  }
+
+  const comboEl = document.getElementById('table-combo');
+  const trick = gs.currentTrick;
+  if (gs.phase === 'playing' && trick?.plays?.length) {
+    comboEl.innerHTML = `<div class="ct-trick-cards">${trick.plays.map(p => {
+      const name = esc(shortName(r, p.uid, uid));
+      const isWinner = trick.completed && p.uid === trick.winner;
+      const cardHtml = p.faceDown ? renderCardUI(null, true) : renderCardUI(p.card);
+      return `<div class="ct-trick-card ${p.faceDown ? 'folded' : 'played'}">${cardHtml}<div class="ct-trick-label ${isWinner ? 'winner' : ''} ${p.faceDown ? 'up' : 'danh'}">${name}</div></div>`;
+    }).join('')}</div>`;
+  } else if (gs.phase === 'playing') {
+    comboEl.innerHTML = '<span class="table-empty">— Đi tự do —</span>';
+  } else if (gs.phase === 'result') {
+    comboEl.innerHTML = renderResultBox(r, gs, uid);
+  } else {
+    comboEl.innerHTML = '';
+  }
 }
 
-let _autoStartRoundFlag = -1;
+function renderSeat(el, r, gs, oppUid, myUid) {
+  const avatarEl = el.querySelector('.seat-avatar');
+  applyAvatar(avatarEl, r, oppUid);
+  const nameEl = el.querySelector('.seat-name');
+  if (nameEl) nameEl.textContent = shortName(r, oppUid, myUid);
 
-// ===== START MATCH =====
-window.startMpGame = async function() {
-  if (!_room) return;
-  if (_room.hostUid !== _user.uid) {
-    window.showToast('Chỉ chủ phòng mới bắt đầu được', 'warn');
+  const isTurn = gs.phase === 'playing' && gs.turn === oppUid && !gs.currentTrick?.completed;
+  el.classList.toggle('active-turn', isTurn);
+
+  const wins = gs.trickWins?.[oppUid] || 0;
+  const tungEl = el.querySelector('.seat-tung-badge');
+  if (tungEl) {
+    if (wins > 0) { tungEl.style.display = ''; tungEl.textContent = 'Tùng'; tungEl.classList.remove('rot'); }
+    else if (gs.tungChecked) { tungEl.style.display = ''; tungEl.textContent = 'Rớt'; tungEl.classList.add('rot'); }
+    else { tungEl.style.display = 'none'; tungEl.classList.remove('rot'); }
+  }
+  el.classList.toggle('dead', !!(gs.tungChecked && gs.deadPlayers?.includes(oppUid)));
+
+  const stEl = el.querySelector('.seat-status');
+  if (stEl) {
+    stEl.className = 'seat-status';
+    el.classList.remove('played', 'folded');
+    const p = gs.currentTrick?.plays?.find(p => p.uid === oppUid);
+    if (gs.phase !== 'playing') {
+      stEl.textContent = '';
+    } else if (p) {
+      stEl.textContent = p.faceDown ? 'Úp bài' : 'Đã đánh';
+      stEl.classList.add(p.faceDown ? 'up-bai' : 'danh-bai');
+      el.classList.add(p.faceDown ? 'folded' : 'played');
+    } else if (isTurn) {
+      stEl.textContent = 'Đang suy nghĩ...';
+      stEl.classList.add('danh-bai');
+    } else {
+      stEl.textContent = '';
+    }
+  }
+}
+
+function renderResultBox(r, gs, uid) {
+  const winners = gs.winners || [];
+  if (!winners.length) {
+    return `<div class="result-box"><div class="emoji">🚫</div><div class="title">Ván đã huỷ</div></div>`;
+  }
+  const names = winners.map(w => esc(shortName(r, w, uid))).join(', ');
+  const iWon = winners.includes(uid);
+  return `<div class="result-box">
+    <div class="emoji">${iWon ? '🏆' : '😔'}</div>
+    <div class="title">${names} thắng ${gs.maxWins || 0} vòng!</div>
+  </div>`;
+}
+
+// ===== TAY BÀI + HÀNH ĐỘNG CỦA TÔI =====
+function renderMyArea(r, gs, uid) {
+  const area = document.getElementById('my-area');
+  const inGame = gs.phase === 'playing' || gs.phase === 'result';
+  area.style.display = inGame ? '' : 'none';
+  if (!inGame) { document.getElementById('my-corner-avatar').style.display = 'none'; return; }
+  document.getElementById('my-corner-avatar').style.display = '';
+
+  const avatarEl = document.getElementById('my-avatar');
+  applyAvatar(avatarEl, r, uid);
+  const myNameEl = document.getElementById('my-name');
+  if (myNameEl) myNameEl.textContent = shortName(r, uid, uid);
+
+  const hand = gs.hands?.[uid] || [];
+  const isMyTurn = gs.phase === 'playing' && gs.turn === uid && !gs.currentTrick?.completed;
+  const dead = !!(gs.tungChecked && gs.deadPlayers?.includes(uid));
+
+  const handEl = document.getElementById('my-hand');
+  handEl.innerHTML = hand.length === 0
+    ? '<div style="color:#64748b;text-align:center;padding:10px">Hết bài!</div>'
+    : hand.map((c, i) => {
+      const sel = i === _selectedIdx ? 'selected' : '';
+      const dis = isMyTurn ? '' : 'disabled';
+      return `<div class="card-slot ${sel} ${dis}" onclick="${isMyTurn ? `selectCard(${i})` : ''}">${renderCardUI(c)}</div>`;
+    }).join('');
+
+  const tungBadge = document.getElementById('ct-my-tung-badge');
+  const myWins = gs.trickWins?.[uid] || 0;
+  if (myWins > 0) { tungBadge.style.display = ''; tungBadge.textContent = 'Tùng'; tungBadge.classList.remove('rot'); }
+  else if (gs.tungChecked) { tungBadge.style.display = ''; tungBadge.textContent = 'Rớt'; tungBadge.classList.add('rot'); }
+  else { tungBadge.style.display = 'none'; }
+
+  const actEl = document.getElementById('actions');
+  if (gs.phase === 'result') {
+    const isHost = r.hostUid === uid;
+    actEl.innerHTML = isHost
+      ? `<button id="ct-new-game-btn" onclick="hostNextRound()">🔄 Ván mới</button>`
+      : `<div class="ctmp-waiting-text">⏳ Chờ chủ phòng bắt đầu ván mới...</div>`;
     return;
   }
-  const members = _room.members || [];
-  if (members.length < 2) {
-    window.showToast('Cần ít nhất 2 người', 'warn');
-    return;
-  }
-  // Kiểm tra xem đã có cược chưa
-  const gs = _room.gameState || {};
-  if (!gs.betAmount || !members.every(u => (gs.bets?.[u] || 0) > 0)) {
-    window.showToast('Cả 2 người cần đặt cược trước!', 'warn');
-    return;
-  }
-  hostStartMatch();
+
+  if (!isMyTurn || dead) { actEl.innerHTML = ''; return; }
+
+  const trick = gs.currentTrick || {};
+  const canFold = !!trick.leadSuit && (trick.plays?.length || 0) > 0;
+  const hasPlayable = !trick.leadSuit ? true : hasPlayableCard(hand, trick.leadSuit, trick.currentHighest);
+  actEl.innerHTML = `
+    <button id="fold-btn" class="${(!hasPlayable && canFold) ? 'pass-glow' : ''}" ${canFold && _selectedIdx >= 0 ? '' : 'disabled'} onclick="foldHand()">Úp bài</button>
+    <button id="play-btn" class="${(!hasPlayable && canFold) ? 'pass-glow' : ''}" ${_selectedIdx >= 0 ? '' : 'disabled'} onclick="playCard()">Đánh</button>
+  `;
+}
+
+window.selectCard = function (idx) {
+  if (_actionLock) return;
+  const gs = _gs;
+  if (!gs || gs.phase !== 'playing' || gs.turn !== _user.uid) return;
+  _selectedIdx = _selectedIdx === idx ? -1 : idx;
+  renderMyArea(_room, gs, _user.uid);
 };
 
-async function hostStartMatch() {
-  const r = _room;
-  if (!r) return;
-  if (r.hostUid !== _user.uid) return;
-  const gs = r.gameState || {};
-  if (gs.phase !== 'betting') return;
-  const members = r.members || [];
-  if (members.length < 2) return;
-  const p1 = members[0], p2 = members[1];
-  if (!((gs.bets?.[p1] || 0) > 0 && (gs.bets?.[p2] || 0) > 0)) return;
+// ===== ĐÁNH BÀI / ÚP BÀI =====
+window.playCard = async function (faceDown = false) {
+  if (_actionLock) return;
+  const r = _room, gs = _gs;
+  if (!r || !gs || gs.phase !== 'playing') return;
+  const uid = _user.uid;
+  if (gs.turn !== uid) return;
+  const hand = gs.hands?.[uid] || [];
+  if (_selectedIdx < 0 || _selectedIdx >= hand.length) return;
 
-  // Create deck and deal
-  const deck = createDeck();
-  const hand1 = [], hand2 = [];
-  for (let i = 0; i < 6; i++) {
-    hand1.push(deck.pop());
-    hand2.push(deck.pop());
+  const card = hand[_selectedIdx];
+  const trick = gs.currentTrick || { plays: [], leadSuit: null, currentHighest: null, highestUid: null };
+
+  if (trick.leadSuit && trick.currentHighest && !faceDown) {
+    if (!canPlayCard(card, trick.leadSuit, trick.currentHighest)) {
+      if (hasPlayableCard(hand, trick.leadSuit, trick.currentHighest)) {
+        return;
+      }
+      return;
+    }
+  } else if (!trick.leadSuit && faceDown) {
+    return;
   }
-  sortHand(hand1);
-  sortHand(hand2);
 
-  if (window.VTQuests) window.VTQuests.trackPlay('catte');
+  _actionLock = true;
+  try {
+    const newHand = [...hand];
+    newHand.splice(_selectedIdx, 1);
+
+    const plays = [...(trick.plays || []), { uid, card, faceDown }];
+    let leadSuit = trick.leadSuit, currentHighest = trick.currentHighest, highestUid = trick.highestUid;
+    if (plays.length === 1 && !faceDown) {
+      leadSuit = card.s; currentHighest = card; highestUid = uid;
+    } else if (!faceDown && card.s === leadSuit && valRank[card.v] > valRank[currentHighest.v]) {
+      currentHighest = card; highestUid = uid;
+    }
+
+    const seats = gs.seats || [];
+    const expected = (gs.tungChecked && gs.survivors) ? gs.survivors.length : seats.length;
+    const name = esc(r.memberInfo?.[uid]?.name || 'Người chơi');
+
+    const updates = { [`gameState.hands.${uid}`]: newHand };
+
+    if (plays.length === expected) {
+      const firstFaceUp = plays.find(p => !p.faceDown);
+      const winnerUid = firstFaceUp ? highestUid : plays[0].uid;
+      const trickWins = { ...(gs.trickWins || {}) };
+      trickWins[winnerUid] = (trickWins[winnerUid] || 0) + 1;
+      const newRound = (gs.round || 1) + 1;
+
+      updates['gameState.currentTrick'] = { plays, leadSuit, currentHighest, highestUid, completed: true, winner: winnerUid };
+      updates['gameState.trickWins'] = trickWins;
+      updates['gameState.turn'] = winnerUid;
+      updates['gameState.round'] = newRound;
+      updates['gameState.lastActionMsg'] = `${esc(r.memberInfo?.[winnerUid]?.name || '?')} thắng vòng ${gs.round}!`;
+
+      if (newRound === TUNG_AFTER_ROUND + 1 && !gs.tungChecked) {
+        const survivors = seats.filter(u => trickWins[u] > 0);
+        const dead = seats.filter(u => !trickWins[u]);
+        updates['gameState.tungChecked'] = true;
+        updates['gameState.survivors'] = survivors;
+        updates['gameState.deadPlayers'] = dead;
+
+        // Chỉ còn ≤1 người sống → thắng luôn, không cần chưng bài vòng 5-6
+        if (survivors.length <= 1) {
+          const bet = gs.betAmount || 0;
+          const pot = bet * seats.length;
+          const results = {};
+          if (survivors.length === 1) {
+            const winner = survivors[0];
+            seats.forEach(u => {
+              results[u] = u === winner ? { outcome: 'win', delta: pot - bet } : { outcome: 'lose', delta: -bet };
+            });
+            updates['gameState.winners'] = survivors;
+            updates['gameState.maxWins'] = trickWins[winner] || 0;
+            updates['gameState.lastActionMsg'] = `${esc(r.memberInfo?.[winner]?.name || '?')} thắng luôn — mọi người khác rớt tùng!`;
+          } else {
+            seats.forEach(u => { results[u] = { outcome: 'draw', delta: 0 }; });
+            updates['gameState.winners'] = [];
+            updates['gameState.maxWins'] = 0;
+            updates['gameState.lastActionMsg'] = 'Tất cả rớt tùng — hoà!';
+          }
+          updates['gameState.phase'] = 'result';
+          updates['gameState.results'] = results;
+        }
+      }
+    } else {
+      updates['gameState.currentTrick'] = { plays, leadSuit, currentHighest, highestUid, completed: false, winner: null };
+      updates['gameState.turn'] = nextAliveTurn(uid, seats, gs);
+      updates['gameState.lastActionMsg'] = faceDown ? `${name} úp bài` : `${name} đánh ${cardDisplay(card)}`;
+    }
+
+    await updateDoc(doc(db, 'rooms', ROOM_ID), updates);
+    _selectedIdx = -1;
+  } catch (e) {
+    console.error('playCard error:', e);
+  } finally {
+    _actionLock = false;
+  }
+};
+
+window.foldHand = async function () {
+  if (_selectedIdx < 0) return;
+  await window.playCard(true);
+};
+
+// Host: sau 2.5s giữ bài trên bàn, chuyển vòng mới hoặc kết thúc ván
+async function advanceTrick() {
+  const r = _room;
+  if (!r || r.hostUid !== _user.uid) return;
+  const gs = r.gameState;
+  if (!gs || gs.phase !== 'playing' || !gs.currentTrick?.completed) return;
+
+  if ((gs.round || 1) > TOTAL_ROUNDS) {
+    await finishGame(r, gs);
+  } else {
+    await updateDoc(doc(db, 'rooms', ROOM_ID), {
+      'gameState.currentTrick': { plays: [], leadSuit: null, currentHighest: null, highestUid: null, completed: false, winner: null }
+    });
+  }
+}
+
+// ===== BẮT ĐẦU VÁN =====
+async function startMatch() {
+  const r = _room;
+  if (!r || r.hostUid !== _user.uid) return;
+  const gs = r.gameState || {};
+  const members = r.members || [];
+  if (members.length < 2 || !gs.betAmount) return;
+  if (!members.every(u => gs.betConfirmed?.[u] === gs.betAmount)) return;
+
+  const deck = createDeck();
+  const seats = [...members];
+  const hands = {};
+  seats.forEach(uid => { hands[uid] = []; });
+  for (let i = 0; i < seats.length * 6; i++) hands[seats[i % seats.length]].push(deck.pop());
+  seats.forEach(uid => sortHand(hands[uid]));
+
+  let starter = seats[0];
+  for (const uid of seats) {
+    if (hands[uid].some(c => c.v === '2' && c.s === '♠')) { starter = uid; break; }
+  }
 
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
     'gameState.phase': 'playing',
-    'gameState.hands': { p1: hand1, p2: hand2 },
-    'gameState.played': { p1: [], p2: [] },
-    'gameState.lastCard': null,
-    'gameState.lastPlayedBy': null,
-    'gameState.turn': 'p1',
+    'gameState.seats': seats,
+    'gameState.hands': hands,
+    'gameState.turn': starter,
     'gameState.round': 1,
-    'gameState.lastActionMessage': 'Bắt đầu! P1 đánh trước',
-    'gameState.result': null,
-    'gameState.winnerPlayerId': null
+    'gameState.currentTrick': { plays: [], leadSuit: null, currentHighest: null, highestUid: null, completed: false, winner: null },
+    'gameState.trickWins': Object.fromEntries(seats.map(u => [u, 0])),
+    'gameState.tungChecked': false,
+    'gameState.survivors': null,
+    'gameState.deadPlayers': null,
+    'gameState.results': null,
+    'gameState.winners': null,
+    'gameState.maxWins': null,
+    'gameState.lastActionMsg': `Bắt đầu! ${esc(r.memberInfo?.[starter]?.name || '?')} đánh trước`
+  });
+  if (window.VTQuests) window.VTQuests.trackPlay('catte');
+}
+
+// ===== KẾT THÚC VÁN — Nhất ăn tất =====
+async function finishGame(r, gs) {
+  const seats = gs.seats || [];
+  const trickWins = gs.trickWins || {};
+  const maxWins = Math.max(...seats.map(u => trickWins[u] || 0));
+  const winners = seats.filter(u => (trickWins[u] || 0) === maxWins);
+  const bet = gs.betAmount || 0;
+  const pot = bet * seats.length;
+  const share = Math.round(pot / winners.length);
+
+  const results = {};
+  seats.forEach(u => {
+    results[u] = winners.includes(u) ? { outcome: 'win', delta: share - bet } : { outcome: 'lose', delta: -bet };
+  });
+
+  await updateDoc(doc(db, 'rooms', ROOM_ID), {
+    'gameState.phase': 'result',
+    'gameState.results': results,
+    'gameState.winners': winners,
+    'gameState.maxWins': maxWins
   });
 }
 
-// ===== HOST NEXT ROUND =====
-window.hostNextRound = async function() {
-  const r = _room;
-  if (!r) return;
-  if (r.hostUid !== _user.uid) return;
-  _selectedIdx = -1;
-  const ha = document.getElementById('host-action-area');
-  if (ha) ha.remove();
-  await updateDoc(doc(db, 'rooms', ROOM_ID), {
-    'gameState.phase': 'betting',
-    'gameState.bets': {},
-    'gameState.betAmount': null,
-    'gameState.betDeclinedBy': null,
-    'gameState.hands': {},
-    'gameState.played': {},
-    'gameState.lastCard': null,
-    'gameState.lastPlayedBy': null,
-    'gameState.turn': 'p1',
-    'gameState.round': 1,
-    'gameState.lastActionMessage': null,
-    'gameState.result': null,
-    'gameState.winnerPlayerId': null,
-    'gameState.round': (r.gameState.round || 1) + 1
-  });
-};
-
-// ===== SETTLE RESULT =====
-async function settleMyResult(r, gs) {
-  const uid = _user.uid;
-  const members = r.members || [];
-  const oppUid = members.find(u => u !== uid);
-  const myBet = gs.bets?.[uid] || 0;
-  const oppBet = gs.bets?.[oppUid] || 0;
-  const outcome = gs.result === 'draw' ? 'draw' : (gs.winnerPlayerId === (members[0] === uid ? 'p1' : 'p2') ? 'win' : 'lose');
-
-  try {
-    if (outcome === 'win') {
-      const winAmount = oppBet;
-      if (myBet > 0) await addPoints('Cát Tê', 'Hoàn cược', myBet);
-      await addPoints('Cát Tê', 'Thắng Cát Tê', winAmount);
-      window.showToast(`🎉 Thắng +${winAmount.toLocaleString('vi-VN')}đ!`, 'success');
-    } else if (outcome === 'draw') {
-      if (myBet > 0) await addPoints('Cát Tê', 'Hoàn cược (hòa)', myBet);
-      window.showToast('🤝 Hoà, hoàn lại cược', 'info');
-    } else {
-      window.showToast(`💸 Thua ${myBet.toLocaleString('vi-VN')}đ`, 'warn');
-    }
-  } catch (e) {
-    console.error(e);
+function renderWaitingList(r) {
+  const waiters = r.waitingMembers || [];
+  const el = document.getElementById('ctmp-waiting-list');
+  const namesEl = document.getElementById('ctmp-waiting-names');
+  if (!el || !namesEl) return;
+  if (waiters.length) {
+    el.style.display = '';
+    namesEl.innerHTML = waiters.map(uid => {
+      const info = (r.waitingMemberInfo||{})[uid] || { name: '?' };
+      return '<span>' + esc(info.name) + '</span>';
+    }).join('');
+  } else {
+    el.style.display = 'none';
   }
 }
 
-// ===== LEAVE ROOM =====
-window.leaveMpRoom = async function() {
-  if (!ROOM_ID) { location.href = 'rooms.html'; return; }
+window.hostNextRound = async function () {
+  const r = _room;
+  if (!r || r.hostUid !== _user.uid) return;
+  
+  // Chuyển ghế chờ vào members cho ván mới
+  const waiters = r.waitingMembers || [];
+  const waitingInfo = r.waitingMemberInfo || {};
+  const updates = {};
+  if (waiters.length) {
+    const members = [...(r.members || [])];
+    const memberInfo = { ...(r.memberInfo || {}) };
+    let changed = false;
+    waiters.forEach(uid => {
+      if (!members.includes(uid)) {
+        members.push(uid);
+        memberInfo[uid] = waitingInfo[uid] || { name: '?', ready: true };
+        changed = true;
+      }
+    });
+    if (changed) {
+      updates.members = members;
+      updates.memberInfo = memberInfo;
+    }
+    updates.waitingMembers = [];
+    updates.waitingMemberInfo = {};
+  }
+  
+  // Giữ nguyên betAmount & betConfirmed để nhà con không phải xác nhận lại nếu mức cược không đổi
+  updates['gameState.phase'] = 'betting';
+  updates['gameState.seats'] = [];
+  updates['gameState.hands'] = {};
+  updates['gameState.turn'] = null;
+  updates['gameState.round'] = 0;
+  updates['gameState.currentTrick'] = null;
+  updates['gameState.trickWins'] = {};
+  updates['gameState.tungChecked'] = false;
+  updates['gameState.survivors'] = null;
+  updates['gameState.deadPlayers'] = null;
+  updates['gameState.results'] = null;
+  updates['gameState.winners'] = null;
+  updates['gameState.maxWins'] = null;
+  updates['gameState.lastActionMsg'] = null;
+
+  await updateDoc(doc(db, 'rooms', ROOM_ID), updates);
+};
+
+// ===== TURN TIMER (chạy cục bộ trên mỗi client; chỉ người đến lượt mới tự hết giờ) =====
+function clearTurnTimerLocal() {
+  if (_turnTimer) clearInterval(_turnTimer);
+  _turnTimer = null;
+  _turnTimerFor = null;
+  setActiveRing(null, 1, false);
+}
+function startTurnTimerIfNeeded(gs) {
+  if (_turnTimerFor === gs.turn) return;
+  clearTurnTimerLocal();
+  _turnTimerFor = gs.turn;
+  _turnRemaining = TURN_SECONDS;
+  setActiveRing(gs.turn, 1, false);
+  _turnTimer = setInterval(() => {
+    _turnRemaining--;
+    setActiveRing(gs.turn, Math.max(_turnRemaining, 0) / TURN_SECONDS, _turnRemaining <= 10);
+    renderStatusBar(_room, _gs, _user.uid);
+    if (_turnRemaining <= 0) {
+      clearTurnTimerLocal();
+      if (_user.uid === gs.turn) autoPlayOnTimeout();
+    }
+  }, 1000);
+}
+function setActiveRing(turnUid, fraction, warn) {
+  document.querySelectorAll('.seat-timer-fg').forEach(fg => {
+    fg.style.strokeDashoffset = '0';
+    fg.classList.remove('timer-warn');
+  });
+  if (!turnUid || !_room) return;
+  let fg;
+  if (turnUid === _user.uid) {
+    // Lượt của mình: hiển thị ring trên avatar của mình
+    fg = document.getElementById('my-corner-avatar')?.querySelector('.seat-timer-fg');
+  } else {
+    const seats = _gs?.seats?.length ? _gs.seats : (_room.members || []);
+    const others = relativeSeats(seats, _user.uid);
+    const slotIds = ['seat-left', 'seat-top', 'seat-right'];
+    const slotIdx = others.indexOf(turnUid);
+    if (slotIdx < 0) return;
+    const el = document.getElementById(slotIds[slotIdx]);
+    fg = el?.querySelector('.seat-timer-fg');
+  }
+  if (fg) {
+    fg.style.strokeDashoffset = String(RING_CIRC * (1 - fraction));
+    fg.classList.toggle('timer-warn', !!warn);
+  }
+}
+function autoPlayOnTimeout() {
+  const gs = _gs;
+  if (!gs || gs.turn !== _user.uid) return;
+  const hand = gs.hands?.[_user.uid] || [];
+  if (!hand.length) return;
+  const trick = gs.currentTrick || {};
+  if (!trick.leadSuit || !trick.plays?.length) {
+    _selectedIdx = 0;
+    window.playCard(false);
+    return;
+  }
+  const idx = hand.findIndex(c => c.s === trick.leadSuit && valRank[c.v] > valRank[trick.currentHighest.v]);
+  if (idx >= 0) { _selectedIdx = idx; window.playCard(false); }
+  else { _selectedIdx = hand.length - 1; window.playCard(true); }
+}
+
+// ===== TẤT TOÁN ĐIỂM =====
+async function settleMyResult(r, gs) {
+  const uid = _user.uid;
+  const res = gs.results?.[uid];
+  if (!res) return;
+  try {
+    if (res.outcome === 'win') {
+      const winAmt = res.delta;
+      let buffBonus = 0, buffPct = 0;
+      try {
+        buffPct = await getActiveBuff();
+        if (buffPct > 0) buffBonus = Math.round(winAmt * buffPct / 100);
+      } catch {}
+      const net = winAmt + buffBonus;
+      await updateDoc(doc(db, 'users', uid), { points: increment(net) });
+      if (window.VTQuests) { window.VTQuests.trackEarn(net); window.VTQuests.trackWinSmart(); }
+    } else if (res.outcome === 'lose') {
+      if (res.delta !== 0) await updateDoc(doc(db, 'users', uid), { points: increment(res.delta) });
+    }
+  } catch (e) { console.error(e); }
+}
+
+// ===== RỜI PHÒNG (huỷ ván nếu đang chơi dở — người rời mất cược) =====
+async function forfeitMatch(r, gs, leaverUid) {
+  const seats = gs.seats || [];
+  const bet = gs.betAmount || 0;
+  const results = {};
+  seats.forEach(u => {
+    results[u] = u === leaverUid ? { outcome: 'lose', delta: -bet } : { outcome: 'draw', delta: 0 };
+  });
+  await updateDoc(doc(db, 'rooms', ROOM_ID), {
+    'gameState.phase': 'result',
+    'gameState.results': results,
+    'gameState.winners': [],
+    'gameState.maxWins': 0,
+    'gameState.lastActionMsg': `${esc(r.memberInfo?.[leaverUid]?.name || '?')} đã rời — huỷ ván!`
+  });
+  if (bet > 0) {
+    try { await updateDoc(doc(db, 'users', leaverUid), { points: increment(-bet) }); } catch (e) { console.error(e); }
+  }
+}
+
+window.quitGame = async function () {
   try {
     const r = _room;
     if (r) {
       const gs = r.gameState || {};
-      if (gs.phase === 'betting') {
-        const myBet = gs.bets?.[_user.uid] || 0;
-        if (myBet > 0) await addPoints('Cát Tê', 'Hoàn cược (rời phòng)', myBet);
-      }
-      if (gs.phase === 'playing' && !gs.result && !gs.winnerPlayerId) {
-        const oppUid = (r.members || []).find(u => u !== _user.uid);
-        if (oppUid) {
-          const isMeP1 = r.members[0] === _user.uid;
-          await updateDoc(doc(db, 'rooms', ROOM_ID), {
-            'gameState.phase': 'result',
-            'gameState.result': 'leave',
-            'gameState.winnerPlayerId': isMeP1 ? 'p2' : 'p1',
-            'gameState.lastActionMessage': 'Đối thủ đã rời phòng!'
-          });
-        }
+      const stillIn = (gs.seats || []).includes(_user.uid) && !(gs.tungChecked && gs.deadPlayers?.includes(_user.uid));
+      if (gs.phase === 'playing' && stillIn) {
+        await forfeitMatch(r, gs, _user.uid);
       }
       if (r.hostUid === _user.uid) {
         await deleteDoc(doc(db, 'rooms', ROOM_ID));
@@ -741,50 +832,20 @@ window.leaveMpRoom = async function() {
         } else {
           const mi = r.memberInfo || {};
           delete mi[_user.uid];
-          await updateDoc(doc(db, 'rooms', ROOM_ID), { members: arrayRemove(_user.uid), memberInfo: mi });
+          const wInfo = { ...(r.waitingMemberInfo || {}) };
+          delete wInfo[_user.uid];
+          await updateDoc(doc(db, 'rooms', ROOM_ID), {
+            members: arrayRemove(_user.uid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(_user.uid),
+            waitingMemberInfo: wInfo
+          });
         }
       }
     }
-  } catch (e) {}
+  } catch (e) { console.error(e); }
   if (_unsub) { _unsub(); _unsub = null; }
-  location.href = 'rooms.html';
+  location.href = '../../app/rooms.html';
 };
 
-// ===== READY / START =====
-window.toggleMpReady = async function() {
-  if (!ROOM_ID || !_room) return;
-  const memberInfo = _room.memberInfo || {};
-  const me = memberInfo[_user.uid] || { name: '', ready: false };
-  me.ready = !me.ready;
-  memberInfo[_user.uid] = me;
-  await updateDoc(doc(db, 'rooms', ROOM_ID), { memberInfo });
-};
-
-// ===== RESULT HANDLING =====
-window.closeResultAndContinue = function() {
-  document.getElementById('result-modal').classList.add('hidden');
-  const r = _room;
-  if (r && r.hostUid === _user.uid) {
-    hostNextRound();
-  }
-};
-
-function showResult(emoji, title, pts, sub) {
-  document.getElementById('result-emoji').textContent = emoji;
-  document.getElementById('result-title').textContent = title;
-  document.getElementById('result-pts').textContent = pts || '';
-  document.getElementById('result-sub').textContent = sub || '';
-  document.getElementById('result-modal').classList.remove('hidden');
-}
-
-// ===== TOAST =====
-window.showToast = function(msg, type = 'info') {
-  const c = { info: '#38bdf8', success: '#34d399', warn: '#fbbf24', error: '#f87171' };
-  const t = document.createElement('div');
-  t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]||c.info};color:#e0f2fe;font-size:13px;font-weight:400;font-family:'Science Gothic', sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;
-  t.textContent = msg;
-  document.getElementById('toastContainer').appendChild(t);
-  setTimeout(() => t.remove(), 3500);
-};
-
-console.log('♣️ Cát Tê Multiplayer loaded');
+console.log('♣️ Cát Tê MP loaded');

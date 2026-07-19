@@ -264,13 +264,28 @@ function newGame(mode = 'an_tat', bet = 100, buffPct = 0) {
   let starter;
   let requireThreeSpades;
   if (lastWinner !== null) {
-    // ván sau: người thắng ván trước đi trước, không bắt buộc 3♠
+    // ván sau: người về NHÌ (hạng 2) ván trước đi trước, không bắt buộc 3♠
     starter = lastWinner;
     requireThreeSpades = false;
   } else {
-    starter = 0;
-    hands.forEach((h, i) => { if (h.some(c => c.rIdx === 0 && c.sIdx === 0)) starter = i; });
-    requireThreeSpades = true;
+    // Lượt đầu: tìm người có 3♠, nếu không có thì ai có lá nhỏ nhất đi trước
+    const threeSPlayer = hands.findIndex(h => h.some(c => c.rIdx === 0 && c.sIdx === 0));
+    if (threeSPlayer >= 0) {
+      starter = threeSPlayer;
+      requireThreeSpades = true;
+    } else {
+      let minPlayer = 0;
+      let minCard = hands[0][0]; // tay đã sort, lá đầu là nhỏ nhất
+      for (let i = 1; i < 4; i++) {
+        const c = hands[i][0];
+        if (c.rIdx < minCard.rIdx || (c.rIdx === minCard.rIdx && SUIT_STRENGTH[c.sIdx] < SUIT_STRENGTH[minCard.sIdx])) {
+          minCard = c;
+          minPlayer = i;
+        }
+      }
+      starter = minPlayer;
+      requireThreeSpades = false;
+    }
   }
 
   state = {
@@ -354,10 +369,10 @@ function playCombo(playerIdx, cards) {
       advanceTurn();
       return { ok: true };
     }
-    if (state.mode === 'nhi_ba_tu') {
-      for (let i = 0; i < 4; i++) if (!state.finished.includes(i)) state.finished.push(i);
-    }
-    lastWinner = state.finished[0];
+    // Populate đầy đủ thứ hạng để lấy người về nhì
+    for (let i = 0; i < 4; i++) if (!state.finished.includes(i)) state.finished.push(i);
+    // Nhì (hạng 2) đi trước ván sau, không phải nhất
+    lastWinner = state.finished[1];
     finishGame();
     return { ok: true, win: true };
   }
@@ -800,7 +815,20 @@ function render() {
     seat.classList.toggle('seat-passed', state.seatStatus[i] === 'passed');
     seat.classList.toggle('seat-played', state.seatStatus[i] === 'played');
   }
-  seatEls[0].classList.toggle('active-turn', state.turn === 0 && !state.over);
+  // Ghế người chơi (seat-0): hiển thị avatar + timer ring
+  const seat0 = seatEls[0];
+  seat0.style.display = '';
+  const cnt0 = seat0.querySelector('.seat-count');
+  if (cnt0) {
+    cnt0.textContent = state.over
+      ? `#${ranking ? ranking.indexOf(0) + 1 : '?'}`
+      : `${state.hands[0].length} lá`;
+  }
+  const name0 = seat0.querySelector('.seat-name');
+  if (name0) name0.textContent = 'Bạn';
+  seat0.classList.toggle('active-turn', state.turn === 0 && !state.over);
+  seat0.classList.toggle('seat-passed', state.seatStatus[0] === 'passed');
+  seat0.classList.toggle('seat-played', state.seatStatus[0] === 'played');
 
   if (state.over) {
     clearTurnTimer();

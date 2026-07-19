@@ -1,24 +1,24 @@
-<!-- catte-mp.html -->
+<!-- tienlen-mp.html -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>VTWorld — Cát Tê Online</title>
+  <title>VTWorld — Tiến Lên Online</title>
   <link rel="stylesheet" href="../../style.css"/>
   <link rel="stylesheet" href="../../cards.css"/>
   <link rel="stylesheet" href="../../quests.css"/>
   <link rel="stylesheet" href="../../status-bar.css"/>
-  <link rel="stylesheet" href="catte.css"/>
-  <link rel="stylesheet" href="catte-mp.css"/>
+  <link rel="stylesheet" href="tienlen.css"/>
+  <link rel="stylesheet" href="tienlen-mp.css"/>
   <style>
     .tlmp-waiting-list {
       position:absolute;bottom:8px;right:8px;
-      background:rgba(4,20,40,0.85);border:1px solid rgba(251,191,36,0.25);
+      background:rgba(4,20,40,0.85);border:1px solid rgba(56,189,248,0.25);
       border-radius:10px;padding:6px 10px;z-index:20;
       backdrop-filter:blur(6px);max-width:180px;
     }
-    .tlmp-waiting-title { font-size:10px;font-weight:700;color:#fcd34d;margin-bottom:3px; }
+    .tlmp-waiting-title { font-size:10px;font-weight:700;color:#7dd3fc;margin-bottom:3px; }
     .tlmp-waiting-names { display:flex;flex-wrap:wrap;gap:3px; }
     .tlmp-waiting-names span {
       display:inline-block;font-size:9px;color:#94a3b8;
@@ -36,82 +36,96 @@
 
   <div id="top-nav-root"></div>
 
-  <div class="ct-wrap">
+  <div class="tl-wrap">
     <!-- STATUS BAR (dùng chung status-bar.css với bản offline) -->
     <div class="bc-status" id="bc-status">
-      <span class="stat-bet" id="ct-bet"></span>
+      <span class="stat-bet" id="tl-bet"></span>
       <div class="stat-score-wrap">
-        <span class="stat-score" id="ct-score"></span>
-        <span class="stat-score-sub" id="ct-score-sub"></span>
+        <span class="stat-score" id="tl-score"></span>
+        <span class="stat-score-sub" id="tl-score-sub"></span>
       </div>
-      <span class="stat-profit zero" id="ct-profit"></span>
+      <span class="stat-profit zero" id="tl-profit"></span>
     </div>
 
     <!-- BET ZONE: chủ phòng chọn cược, nhà con xác nhận -->
-    <div class="ctmp-bet-zone" id="bet-zone"></div>
+    <div class="tlmp-bet-zone" id="bet-zone"></div>
 
-    <!-- BÀN CHƠI (giống catte offline) -->
+    <!-- BÀN CHƠI -->
     <div class="table-area" id="game-screen" style="display:none">
-      <div class="ct-round-display" id="ct-round-display">Vòng <span>1</span>/4</div>
+      <div class="tl-round-info" id="tl-round-info" style="display:none">Nhất ăn tất</div>
 
       <div class="seat seat-top" id="seat-top" style="display:none">
         <div class="seat-ring">
           <svg class="seat-timer" viewBox="0 0 40 40"><circle class="seat-timer-bg" cx="20" cy="20" r="18"/><circle class="seat-timer-fg" cx="20" cy="20" r="18"/></svg>
-          <div class="seat-tung-badge" style="display:none">Tùng</div>
           <div class="seat-badge">
             <div class="seat-avatar">?</div>
           </div>
         </div>
         <div class="seat-name"></div>
-        <div class="seat-status"></div>
+        <div class="tlmp-card-count">0 lá</div>
       </div>
 
       <div class="seat seat-left" id="seat-left" style="display:none">
         <div class="seat-ring">
           <svg class="seat-timer" viewBox="0 0 40 40"><circle class="seat-timer-bg" cx="20" cy="20" r="18"/><circle class="seat-timer-fg" cx="20" cy="20" r="18"/></svg>
-          <div class="seat-tung-badge" style="display:none">Tùng</div>
           <div class="seat-badge">
             <div class="seat-avatar">?</div>
           </div>
         </div>
         <div class="seat-name"></div>
-        <div class="seat-status"></div>
+        <div class="tlmp-card-count">0 lá</div>
       </div>
 
       <div class="seat seat-right" id="seat-right" style="display:none">
         <div class="seat-ring">
           <svg class="seat-timer" viewBox="0 0 40 40"><circle class="seat-timer-bg" cx="20" cy="20" r="18"/><circle class="seat-timer-fg" cx="20" cy="20" r="18"/></svg>
-          <div class="seat-tung-badge" style="display:none">Tùng</div>
           <div class="seat-badge">
             <div class="seat-avatar">?</div>
           </div>
         </div>
         <div class="seat-name"></div>
-        <div class="seat-status"></div>
+        <div class="tlmp-card-count">0 lá</div>
       </div>
 
-      <!-- GHẾ CHỜ -->
-      <div id="ctmp-waiting-list" class="tlmp-waiting-list" style="display:none">
-        <div class="tlmp-waiting-title">⏳ Ghế chờ</div>
-        <div class="tlmp-waiting-names" id="ctmp-waiting-names"></div>
+      <div class="seat seat-bottom" id="seat-bottom" style="display:none">
+        <div class="seat-ring">
+          <svg class="seat-timer" viewBox="0 0 40 40"><circle class="seat-timer-bg" cx="20" cy="20" r="18"/><circle class="seat-timer-fg" cx="20" cy="20" r="18"/></svg>
+          <div class="seat-badge">
+            <div class="seat-avatar">?</div>
+          </div>
+        </div>
+        <div class="seat-name"></div>
+        <div class="tlmp-card-count">0 lá</div>
       </div>
 
       <div class="center-board">
         <div id="table-combo" class="table-combo"></div>
       </div>
+
+      <!-- GHẾ CHỜ -->
+      <div id="tlmp-waiting-list" class="tlmp-waiting-list" style="display:none">
+        <div class="tlmp-waiting-title">⏳ Ghế chờ</div>
+        <div class="tlmp-waiting-names" id="tlmp-waiting-names"></div>
+      </div>
+
+      <!-- THANH THÔNG BÁO COMBO (góc trên phải) -->
+      <div id="combo-preview" class="combo-preview-corner" style="display:none">
+        <div class="combo-preview-label"></div>
+        <div class="combo-preview-cards"></div>
+      </div>
     </div>
 
     <!-- TAY BÀI CỦA TÔI -->
     <div class="my-area" id="my-area" style="display:none">
-      <div class="ct-my-top">
+      <div class="tl-my-top">
         <div class="my-corner-avatar" id="my-corner-avatar" style="display:none">
           <div class="my-avatar" id="my-avatar">?</div>
           <svg class="seat-timer" viewBox="0 0 40 40"><circle class="seat-timer-bg" cx="20" cy="20" r="18"/><circle class="seat-timer-fg" cx="20" cy="20" r="18"/></svg>
         </div>
-        <div class="ct-my-tung-badge" id="ct-my-tung-badge" style="display:none"></div>
+        <div class="tlmp-chain-notice" id="tlmp-chain-notice" style="display:none"></div>
       </div>
       <div class="hand-wrap">
-        <div id="my-hand" class="ct-hand"></div>
+        <div id="my-hand" class="tlmp-hand"></div>
       </div>
       <div class="xd-actions" id="actions"></div>
     </div>
@@ -125,7 +139,7 @@
     const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
     function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
     for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
-    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(251,191,36,0.25)';ctx.fill()});requestAnimationFrame(loop)})();
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(52,211,153,0.25)';ctx.fill()});requestAnimationFrame(loop)})();
 
     window.showToast = function(msg, type='info') {
       const colors = { info:'#38bdf8', success:'#34d399', warn:'#fbbf24', error:'#f87171' };
@@ -137,6 +151,6 @@
     };
   </script>
 
-  <script type="module" src="catte-mp.js"></script>
+  <script type="module" src="tienlen-mp.js"></script>
 </body>
 </html>

@@ -119,6 +119,7 @@
 .seat-top { top: 8px; left: 50%; transform: translateX(-50%); }
 .seat-left { top: 33%; left: 8px; transform: translateY(-50%); }
 .seat-right { top: 33%; right: 8px; transform: translateY(-50%); }
+.seat-bottom { bottom: 6px; left: 50%; transform: translateX(-50%); }
 
 .center-board { text-align: center; width: 300px; align-self: flex-end; margin-bottom: 0; }
 .table-combo { position: relative; display: flex; justify-content: center; flex-wrap: wrap; min-height: 100px; align-items: center; }
@@ -153,7 +154,7 @@
   border-radius: 16px;
   padding: 12px;
 }
-.seat-me { display: none; }
+.seat-me { display: none; position: relative; margin: 0 auto 8px; }
 
 .hand-wrap { position: relative; }
 
@@ -188,6 +189,16 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.4);
 }
 .table-combo .card-slot { margin-left: -30px; }
+
+/* ===== TL Round info badge ===== */
+.tl-round-info {
+  position: absolute; top: 8px; left: 10px; z-index: 4;
+  padding: 4px 14px; border-radius: 999px;
+  border: 1px solid rgba(52,211,153,0.3);
+  background: rgba(4,20,40,0.7); backdrop-filter: blur(4px);
+  font-family: 'Science Gothic', sans-serif;
+  font-size: 11px; font-weight: 700; color: #34d399;
+}
 .table-combo .card-slot:first-child { margin-left: 0; }
 
 .my-area .xd-actions {

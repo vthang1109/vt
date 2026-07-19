@@ -212,3 +212,86 @@ export function getDefaultTitle(stats, ownedShopIds = []) {
   const owned = getOwnedTitles(stats, ownedShopIds);
   return owned[0] || null;
 }
+
+// ── BXH RANK ──────────────────────────────────────────────
+// Thứ tự cấp độ dùng để so sánh trong leaderboard rank
+export const TIER_ORDER = {
+  'A':   1,
+  'S':   2,
+  'S+':  3,
+  'SS':  4,
+  'SK':  5,
+  'SSS': 6,
+};
+
+/**
+ * Lấy cấp (tier) từ một title object.
+ * Shop titles có field `tier`; auto titles dùng `cls` để suy ra.
+ */
+export function getTierFromTitle(title) {
+  if (!title) return null;
+  if (title.tier) return title.tier; // shop titles
+  // Auto titles: cls như 'tier-ss', 'tier-a', 'tier-s'
+  if (title.cls) {
+    const m = title.cls.match(/^tier-(sss|ss|s\+|s|a|sk)$/i);
+    if (m) return m[1].toUpperCase();
+  }
+  return null;
+}
+
+/**
+ * Tính highestTierOrder cao nhất từ danh sách title IDs đang sở hữu.
+ * @param {string[]} ownedTitleIds - Mảng ID title (shop + auto)
+ * @param {{points?:number,friends?:number}} [stats] - Thống kê để tính auto titles (nếu cần)
+ * @returns {number} 0 nếu không có title nào
+ */
+export function computeHighestTierOrder(ownedTitleIds, stats) {
+  let maxOrder = 0;
+  if (ownedTitleIds && ownedTitleIds.length) {
+    for (const id of ownedTitleIds) {
+      const title = getTitleById(id);
+      const tier = getTierFromTitle(title);
+      const order = tier ? (TIER_ORDER[tier] || 0) : 0;
+      if (order > maxOrder) maxOrder = order;
+    }
+  }
+  // Nếu có stats, tính luôn auto titles
+  if (stats) {
+    const autoTitles = getAutoOwnedTitles(stats);
+    for (const t of autoTitles) {
+      const tier = getTierFromTitle(t);
+      const order = tier ? (TIER_ORDER[tier] || 0) : 0;
+      if (order > maxOrder) maxOrder = order;
+    }
+  }
+  return maxOrder;
+}
+
+/**
+ * Lấy thông tin title cao nhất (dùng cho hiển thị BXH Rank).
+ * @returns {{label:string, cls:string, tier:string}|null}
+ */
+export function getHighestTitleInfo(ownedTitleIds, stats) {
+  let best = null;
+  let bestOrder = 0;
+
+  const check = (title) => {
+    if (!title) return;
+    const tier = getTierFromTitle(title);
+    const order = tier ? (TIER_ORDER[tier] || 0) : 0;
+    if (order > bestOrder) {
+      bestOrder = order;
+      best = { label: title.label, cls: title.cls, tier, order };
+    }
+  };
+
+  if (ownedTitleIds && ownedTitleIds.length) {
+    for (const id of ownedTitleIds) {
+      check(getTitleById(id));
+    }
+  }
+  if (stats) {
+    for (const t of getAutoOwnedTitles(stats)) check(t);
+  }
+  return best;
+}

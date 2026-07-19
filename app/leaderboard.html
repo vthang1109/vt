@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VTWorld — Bảng xếp hạng tiền</title>
+  <title>VTWorld — Bảng xếp hạng</title>
   <link rel="stylesheet" href="../style.css"/>
   
   <!-- Sử dụng nav chung -->
@@ -203,6 +203,71 @@
       font-size:14px; 
     }
 
+    /* ===== TAB SWITCHER ===== */
+    .lb-tabs {
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      margin:0 auto 4px;
+      max-width:400px;
+      padding:0 16px;
+    }
+    .lb-tab {
+      flex:1;
+      padding:12px 10px;
+      border-radius:14px;
+      border:1px solid rgba(56,189,248,0.15);
+      background:rgba(255,255,255,0.03);
+      color:#7dd3fc;
+      font-family:'Science Gothic', sans-serif;
+      font-size:13px;
+      font-weight:500;
+      cursor:pointer;
+      text-align:center;
+      transition:all .25s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .lb-tab:hover {
+      background:rgba(56,189,248,0.06);
+      border-color:rgba(56,189,248,0.3);
+    }
+    .lb-tab.active {
+      background:rgba(56,189,248,0.12);
+      border-color:rgba(56,189,248,0.5);
+      color:#e0f2fe;
+      box-shadow:0 0 20px rgba(56,189,248,0.1);
+    }
+    .lb-tab-icon { margin-right:6px; }
+
+    /* ===== RANK TIER BADGE (hiển thị trong BXH Rank) ===== */
+    .lb-tier-badge {
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      padding:3px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+      border:1px solid;
+      white-space:nowrap;
+    }
+    .lb-tier-badge.tier-a   { background:rgba(52,211,153,0.12); border-color:rgba(52,211,153,0.35); color:#34d399; }
+    .lb-tier-badge.tier-s   { background:rgba(167,139,250,0.12); border-color:rgba(167,139,250,0.35); color:#a78bfa; }
+    .lb-tier-badge.tier-sp  { background:rgba(248,113,113,0.12); border-color:rgba(248,113,113,0.35); color:#f87171; }
+    .lb-tier-badge.tier-ss  { background:rgba(251,191,36,0.12);  border-color:rgba(251,191,36,0.35);  color:#fbbf24; }
+    .lb-tier-badge.tier-sk  { background:rgba(244,114,182,0.12); border-color:rgba(244,114,182,0.35); color:#f472b6; }
+    .lb-tier-badge.tier-sss { 
+      background:rgba(241,245,249,0.08);
+      border-color:rgba(241,245,249,0.3);
+      color:#f1f5f9;
+      box-shadow:0 0 12px rgba(241,245,249,0.15);
+    }
+    .lb-tier-badge.tier-none {
+      background:rgba(74,122,155,0.08);
+      border-color:rgba(74,122,155,0.2);
+      color:#4a7a9b;
+    }
+
     @keyframes fadeUp { 
       from{opacity:0;transform:translateY(20px)} 
       to{opacity:1;transform:translateY(0)} 
@@ -235,8 +300,13 @@
 
     <!-- Đã bỏ nav cũ -->
     <div class="lb-hero">
-      <h1>🏆 Bảng <span>Xếp Hạng</span> Tiền</h1>
-      <p>Top những người giàu nhất VTWorld</p>
+      <h1>🏆 Bảng <span>Xếp Hạng</span></h1>
+      <p id="lbSubtitle">Top những người giàu nhất VTWorld</p>
+    </div>
+
+    <div class="lb-tabs">
+      <button class="lb-tab active" data-mode="money" id="tabMoney"><span class="lb-tab-icon">💰</span>BXH Tiền</button>
+      <button class="lb-tab" data-mode="rank" id="tabRank"><span class="lb-tab-icon">🏅</span>BXH Rank</button>
     </div>
 
     <div class="lb-podium" id="podium"></div>
@@ -278,9 +348,14 @@
       requestAnimationFrame(draw);
     })();
 
+    import { computeHighestTierOrder, getHighestTitleInfo } from '../titles.js';
+
     function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
     let myUid = null;
+    let _currentMode = 'money'; // 'money' | 'rank'
+    let _allUsers = []; // lưu users gốc để chuyển tab không cần query lại
+
     onAuthStateChanged(auth, async (u) => {
       if (!u) { window.location.href = '../index.html'; return; }
       myUid = u.uid;
@@ -298,20 +373,65 @@
       subscribeLeaderboard();
     });
 
+    // ── TAB SWITCH ──
+    document.getElementById('tabMoney').addEventListener('click', () => switchMode('money'));
+    document.getElementById('tabRank').addEventListener('click', () => switchMode('rank'));
+
+    function switchMode(mode) {
+      if (mode === _currentMode) return;
+      _currentMode = mode;
+      document.querySelectorAll('.lb-tab').forEach(el => el.classList.toggle('active', el.dataset.mode === mode));
+      
+      const sub = document.getElementById('lbSubtitle');
+      if (mode === 'money') {
+        sub.textContent = 'Top những người giàu nhất VTWorld';
+      } else {
+        sub.textContent = 'Top người chơi có danh hiệu cao nhất';
+      }
+      
+      renderView(_allUsers);
+    }
+
+    // ── SUBSCRIBE ──
     function subscribeLeaderboard() {
-      const q = query(collection(db, 'users'), orderBy('points', 'desc'), limit(100));
+      const q = query(collection(db, 'users'), orderBy('points', 'desc'), limit(200));
       onSnapshot(q, (snap) => {
         const users = [];
         snap.forEach(d => users.push({ uid: d.id, ...d.data() }));
-        renderPodium(users.slice(0, 3));
-        renderList(users);
+        _allUsers = users;
+        renderView(users);
       }, (err) => {
         document.getElementById('lbList').innerHTML =
           '<div style="color:#f87171;text-align:center;padding:30px">❌ Lỗi tải bảng xếp hạng: ' + esc(err.message) + '</div>';
       });
     }
 
-    function renderPodium(top3) {
+    // ── RENDER VIEW ──
+    function renderView(users) {
+      if (_currentMode === 'money') {
+        renderPodiumMoney(users.slice(0, 3));
+        renderListMoney(users);
+      } else {
+        const ranked = computeRankLeaderboard(users).slice(0, 100);
+        renderPodiumRank(ranked.slice(0, 3));
+        renderListRank(ranked);
+      }
+    }
+
+    // ── TÍNH TOÁN BXH RANK ──
+    function computeRankLeaderboard(users) {
+      return users.map(u => {
+        const ownedIds = u.ownedTitles || [];
+        const stats = { points: u.points || 0, friends: (u.friends || []).length };
+        const order = computeHighestTierOrder(ownedIds, stats);
+        const info = getHighestTitleInfo(ownedIds, stats);
+        return { ...u, _tierOrder: order, _tierInfo: info };
+      }).filter(u => u._tierOrder > 0) // chỉ giữ người có danh hiệu
+        .sort((a, b) => b._tierOrder - a._tierOrder || (b.points || 0) - (a.points || 0));
+    }
+
+    // ── PODIUM ──
+    function renderPodiumMoney(top3) {
       const order = [1, 0, 2];
       const pod = document.getElementById('podium');
       pod.innerHTML = '';
@@ -336,7 +456,36 @@
       });
     }
 
-    function renderList(users) {
+    function renderPodiumRank(top3) {
+      const order = [1, 0, 2];
+      const pod = document.getElementById('podium');
+      pod.innerHTML = '';
+      order.forEach(idx => {
+        const u = top3[idx];
+        const rank = idx + 1;
+        const div = document.createElement('div');
+        div.className = 'pod-card pod-' + rank;
+        if (!u) { div.innerHTML = `<div class="rank">#${rank}</div><div class="ava">?</div><div class="nm" style="color:#4a7a9b">— Trống —</div><div class="pts">—</div>`; }
+        else {
+          const nm = u.nickname || (u.email||'?').split('@')[0];
+          const medal = rank===1?'👑':(rank===2?'🥈':'🥉');
+          const tierInfo = u._tierInfo;
+          const tierCls = tierInfo ? getTierCls(tierInfo.tier) : 'tier-none';
+          const tierLabel = tierInfo ? tierInfo.label : 'Không có';
+          div.innerHTML = `
+            <div class="rank">${medal} #${rank}</div>
+            ${u.avatarUrl
+  ? `<div class="ava" style="background:url(${u.avatarUrl}) center/cover"></div>`
+  : `<div class="ava">${esc(nm[0].toUpperCase())}</div>`}
+            <div class="nm">${esc(nm)}</div>
+            <div class="pts"><span class="lb-tier-badge ${tierCls}">${esc(tierLabel)}</span></div>`;
+        }
+        pod.appendChild(div);
+      });
+    }
+
+    // ── LIST ──
+    function renderListMoney(users) {
       const el = document.getElementById('lbList');
       el.classList.remove('lb-loading');
       if (!users.length) { el.innerHTML = '<div style="color:#4a7a9b;text-align:center;padding:30px">Chưa có người chơi nào.</div>'; return; }
@@ -356,6 +505,37 @@
           <div class="lb-pts">${(u.points||0).toLocaleString()} đ</div>`;
         el.appendChild(div);
       });
+    }
+
+    function renderListRank(users) {
+      const el = document.getElementById('lbList');
+      el.classList.remove('lb-loading');
+      if (!users.length) { el.innerHTML = '<div style="color:#4a7a9b;text-align:center;padding:30px">Chưa có người chơi nào có danh hiệu.</div>'; return; }
+      el.innerHTML = '';
+      users.forEach((u, i) => {
+        const rank = i + 1;
+        const nm = u.nickname || (u.email||'?').split('@')[0];
+        const isMe = u.uid === myUid;
+        const ti = u._tierInfo;
+        const tierCls = ti ? getTierCls(ti.tier) : 'tier-none';
+        const tierLabel = ti ? ti.label : 'Không có';
+        const div = document.createElement('div');
+        div.className = 'lb-row' + (isMe ? ' me' : '');
+        div.innerHTML = `
+          <div class="lb-rank">#${rank}</div>
+          ${u.avatarUrl
+  ? `<div class="lb-ava" style="background:url(${u.avatarUrl}) center/cover"></div>`
+  : `<div class="lb-ava">${esc(nm[0].toUpperCase())}</div>`}
+          <div class="lb-name">${esc(nm)}${isMe ? ' <span style="color:#34d399;font-size:11px">(Bạn)</span>' : ''}</div>
+          <div class="lb-pts"><span class="lb-tier-badge ${tierCls}">${esc(tierLabel)}</span></div>`;
+        el.appendChild(div);
+      });
+    }
+
+    // ── HELPERS ──
+    function getTierCls(tier) {
+      const map = { 'A':'tier-a','S':'tier-s','S+':'tier-sp','SS':'tier-ss','SK':'tier-sk','SSS':'tier-sss' };
+      return map[tier] || 'tier-none';
     }
   </script>
 </body>
