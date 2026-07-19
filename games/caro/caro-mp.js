@@ -2,7 +2,7 @@
 // caro-mp.js — Caro Multiplayer qua phòng (rooms.js)
 import { db, auth } from '../../points.js';
 import {
-  doc, getDoc, updateDoc, onSnapshot, serverTimestamp, deleteDoc
+  doc, getDoc, updateDoc, onSnapshot, serverTimestamp, deleteDoc, arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { initRoomChat, getMyNickname } from '../../room-chat.js';
@@ -77,7 +77,7 @@ onAuthStateChanged(auth, async (user) => {
     statusMidEl.textContent = '⚠️ Không tìm thấy phòng. Quay lại danh sách.';
     return;
   }
-  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.leaveMpRoom());
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
   initRoom();
 
   const chatName = await getMyNickname(db, myUid, user.email);
@@ -91,6 +91,8 @@ onAuthStateChanged(auth, async (user) => {
   // Cập nhật điểm lên nav
   updateNavPoints();
 });
+
+window.addEventListener('pagehide', () => window.quitGame?.());
 
 // ============================================================
 //  UPDATE ROOM ID TRÊN TOP NAV
@@ -903,7 +905,7 @@ async function hostStartMatch() {
 // ============================================================
 //  LEAVE ROOM
 // ============================================================
-window.leaveMpRoom = async function() {
+window.quitGame = async function() {
   if (!roomId) {
     window.location.href = 'rooms.html';
     return;
@@ -917,7 +919,8 @@ window.leaveMpRoom = async function() {
       // Không cần hoàn cược khi rời phòng lúc đang chọn cược — vì chưa từng bị trừ điểm.
 
       // Thoát ngang giữa ván đang chơi (chưa có kết quả) → xử thua, đối thủ được xử thắng
-      if (gsPhase === 'playing' && !gs.winner) {
+      let forfeited = false;
+      if (gs.phase === 'playing' && !gs.winner) {
         const members = data.members || [];
         const oppUid = members.find(u => u !== myUid);
         if (oppUid) {
@@ -926,18 +929,28 @@ window.leaveMpRoom = async function() {
             await addPoints('Caro', `Bỏ ván Caro MP (mức ${currentBet.toLocaleString('vi-VN')})`, -currentBet, false);
           } catch (e) { console.error('forfeit deduct error:', e); }
           await updateDoc(doc(db, 'rooms', roomId), { 'gameState.winner': oppUid });
+          forfeited = true;
         }
       }
 
-      if (data.hostUid === myUid && gsPhase !== 'playing') {
+      if (data.hostUid === myUid && !forfeited) {
         await deleteDoc(doc(db, 'rooms', roomId));
       } else {
-        const memberInfo = data.memberInfo || {};
-        delete memberInfo[myUid];
-        await updateDoc(doc(db, 'rooms', roomId), {
-          members: (data.members || []).filter(u => u !== myUid),
-          memberInfo
-        });
+        const remaining = (data.members || []).filter(u => u !== myUid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db, 'rooms', roomId));
+        } else {
+          const mi = data.memberInfo || {};
+          delete mi[myUid];
+          const wInfo = { ...(data.waitingMemberInfo || {}) };
+          delete wInfo[myUid];
+          await updateDoc(doc(db, 'rooms', roomId), {
+            members: arrayRemove(myUid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(myUid),
+            waitingMemberInfo: wInfo
+          });
+        }
       }
     }
   } catch (err) {

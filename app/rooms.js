@@ -215,7 +215,7 @@ window.doJoinByCode = async function(){
     const docSnap = snap.docs[0];
     const data = docSnap.data();
     if (data.password && data.password !== pw) { toast('Sai mật khẩu', 'error'); return; }
-    if ((data.members||[]).length >= (data.maxPlayers||2) && !(data.members||[]).includes(_user.uid)) {
+    if (data.status !== 'playing' && (data.members||[]).length >= (data.maxPlayers||2) && !(data.members||[]).includes(_user.uid)) {
       toast('Phòng đã đầy', 'warn'); return;
     }
     closeJoinModal();
@@ -458,7 +458,8 @@ window.leaveLobby = async function(){
     const snap = await getDoc(doc(db,'rooms',_currentRoomId));
     if (snap.exists()){
       const data = snap.data();
-      if (data.hostUid === _user.uid && data.status === 'lobby'){
+      if (data.hostUid === _user.uid) {
+        // Chủ phòng rời: xoá phòng hoàn toàn (mọi trạng thái)
         await deleteDoc(doc(db,'rooms',_currentRoomId));
       } else {
         const memberInfo = data.memberInfo || {};
@@ -471,6 +472,14 @@ window.leaveLobby = async function(){
           waitingMembers: arrayRemove(_user.uid),
           waitingMemberInfo: wInfo
         });
+        // Kiểm tra nếu phòng không còn ai → xoá luôn
+        const snap2 = await getDoc(doc(db,'rooms',_currentRoomId));
+        if (snap2.exists()) {
+          const r2 = snap2.data();
+          if (!(r2.members||[]).length && !(r2.waitingMembers||[]).length) {
+            await deleteDoc(doc(db,'rooms',_currentRoomId));
+          }
+        }
       }
     }
   } catch(e){ console.error(e); }
@@ -485,6 +494,13 @@ function backToList(){
   $('lobbyView').style.display = 'none';
   $('listView').style.display = 'block';
 }
+
+// ── AUTO CLEANUP khi tắt tab (không chạy khi đang navigate sang game) ──
+window.addEventListener('pagehide', () => {
+  if (!window.__navigated && _currentRoomId && _user) {
+    leaveLobby().catch(() => {});
+  }
+});
 
 window.sendLobbyChat = async function(){
   const input = $('lobby-chat-input');

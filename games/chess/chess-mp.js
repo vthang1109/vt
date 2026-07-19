@@ -135,6 +135,8 @@ onAuthStateChanged(auth, async (u) => {
   }
 });
 
+window.addEventListener('pagehide', () => window.quitGame?.());
+
 /* ========== FIREBASE LISTENER ========== */
 function start() {
   if (_unsub) _unsub();
@@ -744,7 +746,14 @@ window.quitGame = async function() {
         } else {
           const mi = r.memberInfo || {};
           delete mi[_user.uid];
-          await updateDoc(doc(db, 'rooms', ROOM_ID), { members: arrayRemove(_user.uid), memberInfo: mi });
+          const wInfo = { ...(r.waitingMemberInfo || {}) };
+          delete wInfo[_user.uid];
+          await updateDoc(doc(db, 'rooms', ROOM_ID), {
+            members: arrayRemove(_user.uid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(_user.uid),
+            waitingMemberInfo: wInfo
+          });
         }
       }
     }

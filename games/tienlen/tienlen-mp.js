@@ -332,6 +332,8 @@ onAuthStateChanged(auth, async (u) => {
   }
 });
 
+window.addEventListener('pagehide', () => window.quitGame?.());
+
 // ========== ROOM LISTENER ==========
 function start() {
   if (_unsub) _unsub();

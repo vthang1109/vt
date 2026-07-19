@@ -1,7 +1,7 @@
 // timso-mp.js — Tìm Số Multiplayer qua phòng (rooms.js)
 import { db, auth } from '../../points.js';
 import {
-  doc, getDoc, updateDoc, onSnapshot, serverTimestamp, deleteDoc
+  doc, getDoc, updateDoc, onSnapshot, serverTimestamp, deleteDoc, arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -77,9 +77,12 @@ onAuthStateChanged(auth, async (user) => {
     statusEl.innerHTML = '⚠️ Không tìm thấy phòng. Quay lại danh sách.';
     return;
   }
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
   initRoom();
   updateNavPoints();
 });
+
+window.addEventListener('pagehide', () => window.quitGame?.());
 
 // ============================================================
 //  UPDATE NAV POINTS
@@ -721,24 +724,43 @@ window.startMpGame = async function() {
 // ============================================================
 //  LEAVE ROOM
 // ============================================================
-window.leaveMpRoom = async function() {
+window.quitGame = async function() {
   if (!roomId) {
     window.location.href = 'rooms.html';
     return;
   }
   try {
-    const snap = await getDoc(doc(db, 'rooms', roomId));
-    if (snap.exists()) {
-      const data = snap.data();
-      if (data.hostUid === myUid && data.status === 'lobby') {
+    const data = roomData;
+    if (data) {
+      // Forfeit if mid-game
+      let forfeited = false;
+      const gs = data.gameState || {};
+      if (data.status === 'playing' && !gs.winner) {
+        const oppUid = p1Uid === myUid ? p2Uid : p1Uid;
+        if (oppUid) {
+          await updateDoc(doc(db, 'rooms', roomId), { 'gameState.winner': oppUid });
+          forfeited = true;
+        }
+      }
+
+      if (data.hostUid === myUid && !forfeited) {
         await deleteDoc(doc(db, 'rooms', roomId));
       } else {
-        const memberInfo = data.memberInfo || {};
-        delete memberInfo[myUid];
-        await updateDoc(doc(db, 'rooms', roomId), {
-          members: data.members.filter(u => u !== myUid),
-          memberInfo
-        });
+        const remaining = (data.members || []).filter(u => u !== myUid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db, 'rooms', roomId));
+        } else {
+          const mi = data.memberInfo || {};
+          delete mi[myUid];
+          const wInfo = { ...(data.waitingMemberInfo || {}) };
+          delete wInfo[myUid];
+          await updateDoc(doc(db, 'rooms', roomId), {
+            members: arrayRemove(myUid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(myUid),
+            waitingMemberInfo: wInfo
+          });
+        }
       }
     }
   } catch (err) {

@@ -563,10 +563,19 @@ window.quitGame = async function() {
         } else {
           const mi = r.memberInfo || {};
           delete mi[_user.uid];
-          await updateDoc(doc(db, 'rooms', ROOM_ID), { members: arrayRemove(_user.uid), memberInfo: mi });
+          const wInfo = { ...(r.waitingMemberInfo || {}) };
+          delete wInfo[_user.uid];
+          await updateDoc(doc(db, 'rooms', ROOM_ID), {
+            members: arrayRemove(_user.uid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(_user.uid),
+            waitingMemberInfo: wInfo
+          });
         }
       }
     }
   } catch (e) {}
   location.href = 'rooms.html';
 };
+
+window.addEventListener('pagehide', () => window.quitGame?.());

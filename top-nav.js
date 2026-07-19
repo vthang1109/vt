@@ -231,11 +231,12 @@ window.TopNav = (() => {
   }
 
   function buildHTML() {
+    const isMpGame = new URLSearchParams(location.search).has('room');
     return `
       <div class="vt-top-nav" id="vtTopNav">
         <a class="vt-nav-logo" href="/index.html">
-          <span class="vt-logo-content" id="vtLogoContent"><img src="${LOGO_SRC}" alt="logo"><span class="logo-vt">VT</span><span class="logo-world">World</span></span>
-          <span class="vt-room-id" id="vtRoomId"></span>
+          <span class="vt-logo-content" id="vtLogoContent" style="${isMpGame ? 'display:none' : ''}"><img src="${LOGO_SRC}" alt="logo"><span class="logo-vt">VT</span><span class="logo-world">World</span></span>
+          <span class="vt-room-id${isMpGame ? ' visible' : ''}" id="vtRoomId">${isMpGame ? '🎮 Đang chơi' : ''}</span>
         </a>
         <div class="vt-nav-right">
           <span class="vt-nav-pts" id="vtNavPts">0 <span class="vt-coin">〄</span></span>
@@ -431,7 +432,9 @@ function setPoints(pts) {
     if (!code) {
       el.classList.remove('visible');
       el.innerHTML = '';
-      if (logoContent) logoContent.style.display = '';
+      // Trên trang MP game (?room=), luôn giấu logo dù có code hay không
+      const isMpGame = new URLSearchParams(location.search).has('room');
+      if (logoContent && !isMpGame) logoContent.style.display = '';
       return;
     }
     el.innerHTML = (icon ? `<span class="room-icon">${icon}</span>` : '') + '#' + code;

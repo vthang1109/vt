@@ -921,9 +921,13 @@ window.quitGame = async function() {
         } else {
           const mi = r.memberInfo || {};
           delete mi[_user.uid];
+          const wInfo = { ...(r.waitingMemberInfo || {}) };
+          delete wInfo[_user.uid];
           await updateDoc(doc(db, 'rooms', ROOM_ID), {
             members: arrayRemove(_user.uid),
-            memberInfo: mi
+            memberInfo: mi,
+            waitingMembers: arrayRemove(_user.uid),
+            waitingMemberInfo: wInfo
           });
         }
       }
