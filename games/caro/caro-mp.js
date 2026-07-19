@@ -907,7 +907,7 @@ async function hostStartMatch() {
 // ============================================================
 window.quitGame = async function() {
   if (!roomId) {
-    window.location.href = 'rooms.html';
+    window.location.href = '../../app/rooms.html';
     return;
   }
   try {
@@ -957,7 +957,7 @@ window.quitGame = async function() {
     console.error('leave error:', err);
   }
   if (_unsubRoom) { _unsubRoom(); _unsubRoom = null; }
-  window.location.href = 'rooms.html';
+  window.location.href = '../../app/rooms.html';
 };
 
 // ============================================================

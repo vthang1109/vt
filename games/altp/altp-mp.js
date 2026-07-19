@@ -7,6 +7,7 @@ import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemov
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getActiveBuff } from '../../pet.js';
 import { initRoomChat, getMyNickname } from '../../room-chat.js';
+import { play, playOnce, stopAll } from '../../assets/sound.js';
 
 const fbConfig = {
   apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -548,6 +549,14 @@ window.selectAnswer = async function(idx) {
       'gameState.answerOrder': newOrder
     });
 
+    // Play sound: correct option or wrong
+    const correct = gs.currentQ?.c;
+    if (idx === correct) {
+      playOnce('correct', { volume: 0.4 });
+    } else {
+      playOnce('wrong', { volume: 0.4 });
+    }
+
     if (window.VTQuests) window.VTQuests.trackPlay('altp');
   } finally {
     _actionLock = false;
@@ -595,6 +604,8 @@ window.hostInitGame = async function() {
 window.hostStartGame = async function() {
   const r = _room;
   if (!r || r.hostUid !== _user.uid) return;
+  stopAll();
+  play('bg', { loop: true, volume: 0.25 });
   // Trigger câu hỏi đầu tiên
   await hostNextQuestion(true);
 };
@@ -730,6 +741,8 @@ window.hostReveal = async function() {
     }
   }
 
+  play('correct');
+
   try {
     await updateDoc(doc(db, 'rooms', ROOM_ID), {
       'gameState.phase': 'revealed',
@@ -788,11 +801,13 @@ window.hostEndGame = async function() {
     }
   }
 
+  stopAll();
+  play('final');
+
   try {
     await updateDoc(doc(db, 'rooms', ROOM_ID), {
       'gameState.phase': 'result'
     });
-    showToast('🏁 Game kết thúc!', 'info');
   } catch (e) {
     showToast('Lỗi: ' + e.message, 'error');
   }
@@ -933,5 +948,5 @@ window.quitGame = async function() {
       }
     }
   } catch (e) {}
-  location.href = 'rooms.html';
+  location.href = '../../app/rooms.html';
 };

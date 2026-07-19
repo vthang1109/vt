@@ -23,6 +23,8 @@ const GAMES = {
   timso:     { id: 'timso',     name: 'Tìm Số',      icon: '🔢', max: 2, min: 2, page: '../games/timso/timso-mp.html',          ready: true },
 };
 
+const ADMIN_EMAIL = 'thang@game.com';
+
 let _user = null;
 let _myProfile = null;
 let _unsubRooms = null;
@@ -58,6 +60,9 @@ try {
       const ps = await getDoc(doc(db, 'users', user.uid));
       _myProfile = ps.exists() ? ps.data() : { nickname: user.email.split('@')[0] };
       setText('me-name', _myProfile.nickname || user.email.split('@')[0]);
+      // Hiện nút xoá tất cả nếu là admin
+      const btnDelAll = $('btn-delete-all');
+      if (btnDelAll) btnDelAll.style.display = (user.email === ADMIN_EMAIL) ? 'inline-block' : 'none';
       startListeningPublicRooms();
     } catch (err) {
       showDebugError('onAuthStateChanged callback', err);
@@ -97,7 +102,8 @@ function startListeningPublicRooms(){
     rooms.forEach(r => {
       const game = GAMES[r.gameType] || { name: r.gameType, icon: '🎮' };
       const full = (r.members || []).length >= (r.maxPlayers || 2);
-      const isPlaying = r.status === 'playing';
+      const gsPhase = r.gameState?.phase;
+      const isPlaying = r.status === 'playing' && (!gsPhase || gsPhase === 'playing');
       const isWaiting = (r.waitingMembers || []).includes(_user.uid);
 
       let btnText, btnDisabled;
@@ -114,35 +120,53 @@ function startListeningPublicRooms(){
 
       const waitingCount = (r.waitingMembers||[]).length;
 
+      const canDelete = _user && (_user.uid === r.hostUid || _user.email === ADMIN_EMAIL);
+
       const div = document.createElement('div');
       div.className = 'rm-card';
       div.innerHTML = `
         <div class="rm-icon">${game.icon}</div>
         <div class="rm-info">
-          <div class="rm-name">${escHtml(r.name || 'Phòng không tên')} ${r.password ? '🔒' : ''}</div>
+          <div class="rm-name">${escHtml(r.name || 'Phòng không tên')} ${r.password ? '🔒' : ''} ${isPlaying ? '<span class="rm-badge-playing">ĐANG CHƠI</span>' : ''}</div>
           <div class="rm-meta">
             <span>${escHtml(game.name)}</span>
             <span class="rm-dot">·</span>
-            <span>${(r.members||[]).length}/${r.maxPlayers||2} người${waitingCount ? ` (+${waitingCount} chờ)` : ''}</span>
-            ${isPlaying ? '<span class="rm-dot">·</span><span style="color:#fbbf24;font-weight:700">ĐANG CHƠI</span>' : ''}
-            <span class="rm-dot">·</span>
-            <span>Chủ: ${escHtml(r.hostName || '?')}</span>
+            <span>${(r.members||[]).length}/${r.maxPlayers||2}</span>
           </div>
         </div>
         <div class="rm-action">
           <span class="rm-code">#${r.code}</span>
-          <button class="btn-join" ${btnDisabled ? 'disabled' : ''} data-id="${r.id}" data-pw="${r.password ? '1' : ''}">${btnText}</button>
+          <div class="rm-btns">
+            ${canDelete ? `<button class="btn-rm-del" data-id="${r.id}">Xoá</button>` : ''}
+            <button class="btn-join" ${btnDisabled ? 'disabled' : ''} data-id="${r.id}" data-pw="${r.password ? '1' : ''}">${btnText}</button>
+          </div>
         </div>
       `;
       list.appendChild(div);
     });
     list.querySelectorAll('.btn-join').forEach(b => {
-      b.addEventListener('click', () => {
+      b.addEventListener('click', (e) => {
+        e.stopPropagation();
         const id = b.getAttribute('data-id');
         const needPw = b.getAttribute('data-pw') === '1';
         joinRoomFlow(id, needPw);
       });
     });
+    list.querySelectorAll('.btn-rm-del').forEach(b => {
+      b.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = b.getAttribute('data-id');
+        if (!confirm('🗑️ Xoá phòng này? Tất cả người chơi sẽ bị đẩy ra ngoài.')) return;
+        try {
+          await deleteDoc(doc(db, 'rooms', id));
+          toast('Đã xoá phòng', 'success');
+        } catch(err) {
+          console.error(err);
+          toast('Xoá thất bại', 'error');
+        }
+      });
+    });
+
   }, (err) => {
     console.error('rooms snapshot err', err);
     $('rooms-list').innerHTML = '<div class="rm-empty">⚠️ Không tải được danh sách. Kiểm tra quyền Firestore.</div>';
@@ -317,23 +341,9 @@ function renderLobby(r){
   $('lobby-game').textContent = (g.icon || '🎮') + ' ' + (g.name || r.gameType);
   $('lobby-code').textContent = '#' + r.code;
   const waitingCount = (r.waitingMembers||[]).length;
-  $('lobby-count').textContent = (r.members||[]).length + '/' + r.maxPlayers + (waitingCount ? ' +' + waitingCount + ' chờ' : '');
   $('lobby-count').textContent = (r.members||[]).length + '/' + r.maxPlayers + (waitingCount ? ' (+' + waitingCount + ' chờ)' : (r.status === 'playing' ? ' (đang chơi)' : ''));
 
-  // ── Waiting list ──
-  const waitingList = $('lobby-waiting');
-  const waiters = r.waitingMembers || [];
-  if (waiters.length) {
-    waitingList.style.display = '';
-    waitingList.innerHTML = '<div class="lw-title">⏳ Ghế chờ (' + waiters.length + ')</div>' +
-      waiters.map(uid => {
-        const info = (r.waitingMemberInfo||{})[uid] || { name: '?' };
-        return '<div class="lw-item"><div class="lw-av">' + (info.avatarUrl ? '' : (info.name||'?')[0].toUpperCase()) + '</div><span>' + escHtml(info.name) + '</span></div>';
-      }).join('');
-  } else {
-    waitingList.style.display = 'none';
-  }
-
+  // ── Members (compact) ──
   const list = $('lobby-members');
   list.innerHTML = '';
   (r.members||[]).forEach(uid => {
@@ -354,29 +364,38 @@ div.innerHTML = `
 `;
     list.appendChild(div);
   });
+  // Empty slots
   for (let i = (r.members||[]).length; i < r.maxPlayers; i++){
     const div = document.createElement('div');
     div.className = 'lobby-member empty';
-    div.innerHTML = `<div class="lm-avatar">+</div><div class="lm-info"><div class="lm-name">Đang chờ người chơi...</div></div>`;
+    div.innerHTML = `<div class="lm-avatar">+</div><div class="lm-info"><div class="lm-name">Đang chờ...</div></div>`;
     list.appendChild(div);
   }
 
   const isHost = r.hostUid === _user.uid;
+  const isAdmin = _user && _user.email === ADMIN_EMAIL;
   const me = (r.memberInfo||{})[_user.uid];
   const btnReady = $('btn-ready');
   const btnStart = $('btn-start');
+  const btnDelete = $('btn-delete-room');
+  
+  // Delete room button (for host and admin)
+  if (btnDelete) {
+    btnDelete.style.display = (isHost || isAdmin) ? 'inline-block' : 'none';
+  }
+
   if (isHost){
     btnReady.style.display = 'none';
     btnStart.style.display = 'inline-block';
     const allReady = (r.members||[]).filter(u => u !== r.hostUid).every(u => (r.memberInfo||{})[u]?.ready);
     const enough = (r.members||[]).length >= 2;
     btnStart.disabled = !(allReady && enough);
-    btnStart.textContent = enough ? (allReady ? '🚀 Bắt đầu' : '⏳ Chờ mọi người sẵn sàng') : '⏳ Cần ít nhất 2 người';
+    btnStart.textContent = enough ? (allReady ? '🚀 Bắt đầu' : '⏳ Chờ sẵn sàng') : '⏳ Cần 2 người';
   } else {
     btnStart.style.display = 'none';
     btnReady.style.display = 'inline-block';
     const ready = me && me.ready;
-    btnReady.textContent = ready ? '↩ Huỷ sẵn sàng' : '✅ Sẵn sàng';
+    btnReady.textContent = ready ? '↩ Huỷ' : '✅ Sẵn sàng';
     btnReady.classList.toggle('on', !!ready);
   }
 }
@@ -444,6 +463,9 @@ window.startGame = async function(){
       streaks: {},
       timerEndAt: null
     };
+  } else if (data.gameType === 'timso'){
+    const players = data.members.slice(0, 2);
+    gameState = { phase: 'betting', betConfirmed: {}, betAmount: null, bet: null, players };
   }
   await updateDoc(doc(db,'rooms',_currentRoomId), {
     status: 'playing',
@@ -455,34 +477,84 @@ window.startGame = async function(){
 window.leaveLobby = async function(){
   if (!_currentRoomId) { backToList(); return; }
   try {
-    const snap = await getDoc(doc(db,'rooms',_currentRoomId));
-    if (snap.exists()){
-      const data = snap.data();
-      if (data.hostUid === _user.uid) {
-        // Chủ phòng rời: xoá phòng hoàn toàn (mọi trạng thái)
+    await removeUserFromRoom();
+  } catch(e){ console.error(e); }
+  backToList();
+};
+
+/**
+ * Remove current user from the room and auto-delete if empty.
+ * Also used by pagehide for cleanup.
+ */
+async function removeUserFromRoom() {
+  if (!_currentRoomId || !_user) return;
+  const snap = await getDoc(doc(db,'rooms',_currentRoomId));
+  if (!snap.exists()) return;
+  const data = snap.data();
+  if (data.hostUid === _user.uid) {
+    // Chủ phòng rời: xoá phòng hoàn toàn
+    await deleteDoc(doc(db,'rooms',_currentRoomId));
+  } else {
+    const memberInfo = data.memberInfo || {};
+    delete memberInfo[_user.uid];
+    const wInfo = data.waitingMemberInfo || {};
+    delete wInfo[_user.uid];
+    await updateDoc(doc(db,'rooms',_currentRoomId), {
+      members: arrayRemove(_user.uid),
+      memberInfo,
+      waitingMembers: arrayRemove(_user.uid),
+      waitingMemberInfo: wInfo
+    });
+    // Kiểm tra nếu phòng không còn ai → xoá luôn
+    const snap2 = await getDoc(doc(db,'rooms',_currentRoomId));
+    if (snap2.exists()) {
+      const r2 = snap2.data();
+      const allMembers = [...(r2.members||[]), ...(r2.waitingMembers||[])];
+      if (!allMembers.length) {
         await deleteDoc(doc(db,'rooms',_currentRoomId));
-      } else {
-        const memberInfo = data.memberInfo || {};
-        delete memberInfo[_user.uid];
-        const wInfo = data.waitingMemberInfo || {};
-        delete wInfo[_user.uid];
-        await updateDoc(doc(db,'rooms',_currentRoomId), {
-          members: arrayRemove(_user.uid),
-          memberInfo,
-          waitingMembers: arrayRemove(_user.uid),
-          waitingMemberInfo: wInfo
-        });
-        // Kiểm tra nếu phòng không còn ai → xoá luôn
-        const snap2 = await getDoc(doc(db,'rooms',_currentRoomId));
-        if (snap2.exists()) {
-          const r2 = snap2.data();
-          if (!(r2.members||[]).length && !(r2.waitingMembers||[]).length) {
-            await deleteDoc(doc(db,'rooms',_currentRoomId));
-          }
-        }
       }
     }
-  } catch(e){ console.error(e); }
+  }
+}
+
+/**
+ * Delete all rooms (admin only)
+ */
+window.deleteAllRooms = async function() {
+  if (_user?.email !== ADMIN_EMAIL) return;
+  if (!confirm('⚠️ Xoá TẤT CẢ phòng? Người chơi trong phòng sẽ bị đẩy ra ngoài!')) return;
+  if (!confirm('Bạn chắc chắn? Hành động này không thể hoàn tác!')) return;
+  const btn = $('btn-delete-all');
+  if (btn) { btn.disabled = true; btn.textContent = '🔄 Đang xoá...'; }
+  try {
+    const snap = await getDocs(collection(db, 'rooms'));
+    const ids = snap.docs.map(d => d.id);
+    if (!ids.length) { toast('Không có phòng nào để xoá', 'info'); return; }
+    toast(`Đang xoá ${ids.length} phòng...`, 'info');
+    const batchSize = 10;
+    for (let i = 0; i < ids.length; i += batchSize) {
+      const batch = ids.slice(i, i + batchSize);
+      await Promise.all(batch.map(id => deleteDoc(doc(db, 'rooms', id))));
+    }
+    toast(`✅ Đã xoá ${ids.length} phòng`, 'success');
+  } catch(e) {
+    console.error(e);
+    toast('Xoá thất bại: ' + (e.message || ''), 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🗑️ Xoá tất cả'; }
+  }
+};
+
+/**
+ * Host delete room with confirmation
+ */
+window.deleteRoom = async function() {
+  if (!_currentRoomId) return;
+  if (!confirm('Xoá phòng này? Tất cả người chơi sẽ bị đẩy ra ngoài.')) return;
+  try {
+    await deleteDoc(doc(db,'rooms',_currentRoomId));
+    toast('Đã xoá phòng', 'success');
+  } catch(e) { console.error(e); toast('Xoá phòng thất bại', 'error'); }
   backToList();
 };
 

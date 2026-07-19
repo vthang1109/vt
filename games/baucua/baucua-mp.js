@@ -446,7 +446,7 @@ window.quitGame = async function(){
       }
     }
   } catch(e){}
-  location.href='rooms.html';
+  location.href='../../app/rooms.html';
 };
 
 window.addEventListener('pagehide', () => window.quitGame?.());

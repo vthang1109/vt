@@ -1,786 +1,345 @@
-// timso-mp.js — Tìm Số Multiplayer qua phòng (rooms.js)
-import { db, auth } from '../../points.js';
+// timso-mp.js — Tìm Số MP (cược + đối kháng)
+import { db, auth, addPoints } from '../../points.js';
 import {
   doc, getDoc, updateDoc, onSnapshot, serverTimestamp, deleteDoc, arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// ============================================================
-//  STATE
-// ============================================================
-let roomId = null;
-let roomData = null;
-let myUid = null;
-let myName = 'Bạn';
-let myPoints = 0;
+// === STATE ===
+var roomId = null, roomData = null, myUid = null, myName = 'Bạn', myPts = 0;
+var p1Uid = null, p2Uid = null;
+var board = [], found = [], target = 1, scores = {};
+var active = false, over = false, tLeft = 10, timer = null, proc = false;
+var _unsub = null, _quitting = false, _resultDone = false, _starting = false;
+var curBet = 100, gameMode = 'shuffle';
 
-let board = [];        // mảng 100 số (1-100, đã xáo)
-let found = [];        // mảng boolean 100 phần tử
-let target = 1;        // số cần tìm (1-100)
-let scores = { 1: 0, 2: 0 }; // điểm của P1, P2
-let currentTurn = null; // uid của người đang chơi
-let gameActive = false;
-let gameOver = false;
-let isMyTurn = false;
-let turnTimeLeft = 10;
-let turnTimerInterval = null;
-let isProcessing = false;
-let currentBet = 100;
+// === DOM ===
+function $(id){return document.getElementById(id)}
+function qs(s){return document.querySelector(s)}
+var waitEl = $('mp-wait'), waitT = $('mp-wait-t');
+var betRow = $('mp-bet'), betSel = $('mp-bet-sel'), betHost = $('btn-bet-host'), betPly = $('btn-bet-player'), betInfo = $('mp-bet-info');
+var modeSel = $('mp-mode-sel');
+var sbar = $('ts-sbar'), lEl = $('ts-l'), tgEl = $('ts-tg'), sbEl = $('ts-sb'), rEl = $('ts-r');
+var bd = $('ts-bd'), rsM = $('rs-modal');
 
-// mapping: index trong members[] -> uid
-let p1Uid = null;
-let p2Uid = null;
+// === AUTH ===
+onAuthStateChanged(auth, async function(user){
+  if(!user){window.location.href='index.html';return}
+  myUid=user.uid;
+  try{
+    var snap=await getDoc(doc(db,'users',user.uid));
+    var d=snap.exists()?snap.data():{};
+    myName=d.nickname||user.email.split('@')[0];
+    myPts=d.points||0;
+  }catch(e){myName=user.email.split('@')[0]}
 
-let _unsubRoom = null;
-const TURN_TIME = 10; // giây
-
-// ============================================================
-//  DOM REFS
-// ============================================================
-const $ = id => document.getElementById(id);
-const statusEl = $('mp-status');
-const p1El = $('mp-p1');
-const p2El = $('mp-p2');
-const p1Name = p1El.querySelector('.name');
-const p2Name = p2El.querySelector('.name');
-const p1Ready = $('mp-p1-ready');
-const p2Ready = $('mp-p2-ready');
-const p1Score = $('mp-score-p1');
-const p2Score = $('mp-score-p2');
-const btnReady = $('btn-ready-mp');
-const btnStart = $('btn-start-mp');
-const roomNameEl = $('mp-room-name');
-const roomCodeEl = $('mp-room-code');
-const resultModal = $('result-modal');
-const waitingOverlay = $('mp-waiting-overlay');
-const turnTimerEl = $('tsmp-turn-timer');
-const boardEl = $('tsmp-board');
-const tsStatus = $('tsmp-status');
-const targetLabel = $('tsmp-target-label');
-const remainingEl = $('tsmp-remaining');
-const subEl = $('tsmp-sub');
-const betDisplay = $('tsmp-bet-display');
-
-// ============================================================
-//  AUTH & INIT
-// ============================================================
-onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.href = 'index.html'; return; }
-  myUid = user.uid;
-  const snap = await getDoc(doc(db, 'users', user.uid));
-  myName = snap.exists() ? (snap.data().nickname || user.email.split('@')[0]) : user.email.split('@')[0];
-  myPoints = snap.exists() ? (snap.data().points || 0) : 0;
-
-  const params = new URLSearchParams(window.location.search);
-  roomId = params.get('room');
-  if (!roomId) {
-    statusEl.innerHTML = '⚠️ Không tìm thấy phòng. Quay lại danh sách.';
-    return;
-  }
-  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
-  initRoom();
-  updateNavPoints();
+  var params=new URLSearchParams(window.location.search);
+  roomId=params.get('room');
+  if(!roomId){var a=$('mp-app');if(a)a.innerHTML='<p style="color:#fff;text-align:center;padding:60px">Thiếu mã phòng</p>';return}
+  if(window.TopNav&&window.TopNav.setLeaveAction)window.TopNav.setLeaveAction(function(){window.quitGame()});
+  listen();
 });
 
-window.addEventListener('pagehide', () => window.quitGame?.());
+window.addEventListener('pagehide',function(){if(window.quitGame)window.quitGame()});
 
-// ============================================================
-//  UPDATE NAV POINTS
-// ============================================================
-function updateNavPoints() {
-  const ptsStr = myPoints.toLocaleString('vi-VN');
-  document.querySelectorAll('[data-points]').forEach(el => {
-    el.textContent = ptsStr;
-  });
-  if (window.TopNav && typeof window.TopNav.setPoints === 'function') {
-    window.TopNav.setPoints(myPoints);
-  } else {
-    const vtPts = document.getElementById('vtNavPts');
-    if (vtPts) { vtPts.textContent = '⭐ ' + ptsStr; vtPts.classList.add('visible'); }
-  }
-  ['user-points-home', 'status-pts', 'pro-points', 'wd-pts', 'shPts'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = ptsStr;
-  });
+// === LISTEN ===
+function listen(){
+  if(_unsub)_unsub();
+  _unsub=onSnapshot(doc(db,'rooms',roomId),function(snap){
+    if(!snap.exists()){var a=$('mp-app');if(a)a.innerHTML='<p style="color:#fff;text-align:center;padding:60px">Phòng đã bị xoá</p>';return}
+    roomData=snap.data();
+    render();
+  },function(e){console.error(e)});
 }
 
-// ============================================================
-//  ROOM LISTENER
-// ============================================================
-function initRoom() {
-  if (_unsubRoom) _unsubRoom();
-  _unsubRoom = onSnapshot(doc(db, 'rooms', roomId), (snap) => {
-    if (!snap.exists()) {
-      statusEl.innerHTML = '❌ Phòng đã bị xoá hoặc không tồn tại.';
-      return;
-    }
-    roomData = snap.data();
-    renderRoomInfo();
-    handleGameState(roomData);
-  }, (err) => {
-    console.error('room snapshot error', err);
-    statusEl.innerHTML = '⚠️ Lỗi kết nối phòng.';
-  });
-}
+// === RENDER ===
+function render(){
+  if(!roomData)return;
+  var r=roomData, mem=r.members||[], mInfo=r.memberInfo||{}, gs=r.gameState||{}, phase=gs.phase||'lobby', isHost=r.hostUid===myUid;
+  // Show room code in top nav
+  if(window.TopNav&&window.TopNav.setRoomId&&r.code)window.TopNav.setRoomId(r.code,'🔢');
+  p1Uid=mem[0]||null; p2Uid=mem[1]||null;
 
-// ============================================================
-//  RENDER UI
-// ============================================================
-function renderRoomInfo() {
-  if (!roomData) return;
-  roomNameEl.textContent = roomData.name || 'Phòng Tìm Số';
-  roomCodeEl.textContent = '#' + (roomData.code || '------');
-
-  const members = roomData.members || [];
-  const memberInfo = roomData.memberInfo || {};
-
-  p1Uid = members[0] || null;
-  p2Uid = members[1] || null;
-
-  // P1
-  if (p1Uid) {
-    const info = memberInfo[p1Uid] || { name: '?', ready: false };
-    p1Name.textContent = p1Uid === myUid ? myName + ' (bạn)' : info.name;
-    p1Ready.textContent = info.ready ? '✅' : '⏳';
-    p1Ready.className = info.ready ? 'ready-badge' : 'wait-badge';
-  } else {
-    p1Name.textContent = 'Đang chờ...';
-    p1Ready.textContent = '⏳';
-    p1Ready.className = 'wait-badge';
-  }
-
-  // P2
-  if (p2Uid) {
-    const info = memberInfo[p2Uid] || { name: '?', ready: false };
-    p2Name.textContent = p2Uid === myUid ? myName + ' (bạn)' : info.name;
-    p2Ready.textContent = info.ready ? '✅' : '⏳';
-    p2Ready.className = info.ready ? 'ready-badge' : 'wait-badge';
-  } else {
-    p2Name.textContent = 'Đang chờ...';
-    p2Ready.textContent = '⏳';
-    p2Ready.className = 'wait-badge';
-  }
-
-  // Active turn highlight
-  p1El.classList.toggle('active', currentTurn === p1Uid && gameActive && !gameOver);
-  p2El.classList.toggle('active', currentTurn === p2Uid && gameActive && !gameOver);
-
-  // Bắt đầu / sẵn sàng buttons
-  const isHost = roomData.hostUid === myUid;
-  if (isHost && roomData.status === 'lobby') {
-    btnReady.style.display = 'none';
-    btnStart.style.display = 'inline-block';
-    const allReady = members.filter(u => u !== roomData.hostUid).every(u => memberInfo[u]?.ready);
-    const enough = members.length >= 2;
-    btnStart.disabled = !(allReady && enough);
-    btnStart.textContent = enough ? (allReady ? '🚀 Bắt đầu' : '⏳ Chờ sẵn sàng') : '⏳ Cần 2 người';
-  } else if (roomData.status === 'lobby') {
-    btnStart.style.display = 'none';
-    btnReady.style.display = 'inline-block';
-    const myInfo = memberInfo[myUid] || { ready: false };
-    btnReady.textContent = myInfo.ready ? '↩ Huỷ sẵn sàng' : '✅ Sẵn sàng';
-    btnReady.classList.toggle('on', !!myInfo.ready);
-  } else {
-    btnReady.style.display = 'none';
-    btnStart.style.display = 'none';
-  }
-
-  // Waiting overlay
-  if (roomData.status === 'lobby' && members.length < 2) {
-    waitingOverlay.classList.remove('hidden');
-  } else {
-    waitingOverlay.classList.add('hidden');
-  }
-
-  updateStatusBar();
-}
-
-// ============================================================
-//  UPDATE STATUS BAR
-// ============================================================
-function updateStatusBar() {
-  const members = roomData?.members || [];
-  const memberInfo = roomData?.memberInfo || {};
-
-  if (roomData?.status === 'lobby') {
-    statusEl.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-        <span>🔄 Trong phòng chờ · ${members.length}/${roomData.maxPlayers || 2} người</span>
-        <span style="color:#fbbf24;font-weight:700;">🪙 ${currentBet.toLocaleString('vi-VN')}</span>
-      </div>
-    `;
-    statusEl.style.color = '#94a3b8';
-    turnTimerEl.style.display = 'none';
-    tsStatus.style.display = 'none';
-    boardEl.style.display = 'none';
-  } else if (roomData?.status === 'playing') {
-    tsStatus.style.display = 'flex';
-    boardEl.style.display = 'grid';
-    turnTimerEl.style.display = 'block';
-
-    if (gameActive && !gameOver) {
-      const turnName = currentTurn === myUid ? 'bạn' : (memberInfo[currentTurn]?.name || 'đối thủ');
-      const turnColor = currentTurn === myUid ? '#38bdf8' : '#f87171';
-
-      statusEl.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-          <span style="color:${turnColor};font-weight:800;">⚔️ Lượt của ${turnName}</span>
-          <span style="color:#fbbf24;font-weight:700;">🪙 ${currentBet.toLocaleString('vi-VN')}</span>
-        </div>
-      `;
-      statusEl.style.color = turnColor;
-
-      // Turn timer
-      const tCls = turnTimeLeft <= 3 ? 'tt-warn' : 'tt-active';
-      turnTimerEl.innerHTML = `⏱️ <span class="${tCls}">${turnTimeLeft}s</span> — Lượt <span class="${tCls}">${turnName}</span>`;
-
-      // Target & scores
-      updateGameUI();
-    } else if (gameOver) {
-      // handled by result modal
-    } else {
-      statusEl.innerHTML = `<span>⏳ Đang tải trận đấu...</span>`;
-      statusEl.style.color = '#94a3b8';
-    }
-  }
-}
-
-function updateGameUI() {
-  if (!p1Uid || !p2Uid) return;
-  const memberInfo = roomData?.memberInfo || {};
-  const gameScores = roomData?.gameState?.scores || {};
-
-  p1Score.textContent = gameScores[p1Uid] || 0;
-  p2Score.textContent = gameScores[p2Uid] || 0;
-
-  // Target number
-  const gs = roomData?.gameState || {};
-  const gsTarget = gs.target || 1;
-  targetLabel.textContent = `🎯 ${gsTarget}`;
-  const totalFound = gs.foundCount || 0;
-  remainingEl.textContent = 100 - totalFound;
-  subEl.textContent = `Số còn lại`;
-  betDisplay.textContent = currentBet > 0 ? `🪙 ${currentBet.toLocaleString('vi-VN')}` : '';
-}
-
-// ============================================================
-//  HANDLE GAME STATE
-// ============================================================
-function handleGameState(data) {
-  if (data.status !== 'playing') {
-    gameActive = false;
-    gameOver = false;
-    boardEl.classList.remove('mp-clickable', 'mp-disabled');
-    boardEl.classList.add('mp-disabled');
-    clearInterval(turnTimerInterval);
+  // === WAITING ===
+  if(phase==='lobby'||mem.length<2){
+    hide(sbar); hide(bd); hide(betRow); hide(betInfo);
+    show(waitEl);
+    if(waitT)waitT.textContent=mem.length<2?'Đang chờ người chơi...':'Đang chờ chủ phòng bắt đầu...';
+    stopTimer();
     return;
   }
 
-  const gs = data.gameState || {};
-  if (!gs.board) return;
+  // === BETTING ===
+  if(phase==='betting'){
+    hide(waitEl); hide(sbar); hide(bd);
+    show(betRow); show(betInfo);
+    stopTimer();
 
-  if (gs.bet) currentBet = gs.bet;
-
-  // Parse board
-  board = gs.board || [];
-  found = gs.found || [];
-  target = gs.target || 1;
-  currentTurn = gs.currentTurn || null;
-  gameOver = gs.winner !== null && gs.winner !== undefined;
-  gameActive = !gameOver;
-
-  // Scores
-  if (gs.scores) {
-    scores = gs.scores;
-  }
-
-  isMyTurn = currentTurn === myUid && !gameOver;
-
-  // Render board
-  renderBoard();
-
-  // Turn timer
-  if (gameActive && !gameOver) {
-    if (gs.turnTimeLeft !== undefined) {
-      turnTimeLeft = gs.turnTimeLeft;
-    }
-    startTurnTimer();
-  } else {
-    clearInterval(turnTimerInterval);
-    boardEl.classList.remove('mp-clickable');
-    boardEl.classList.add('mp-disabled');
-  }
-
-  // Clickable state
-  if (isMyTurn && gameActive) {
-    boardEl.classList.remove('mp-disabled');
-    boardEl.classList.add('mp-clickable');
-  } else {
-    boardEl.classList.remove('mp-clickable');
-    boardEl.classList.add('mp-disabled');
-  }
-
-  renderRoomInfo();
-
-  if (gs.winner) {
-    if (gs.winner !== 'draw') {
-      showResultFromState(gs);
-    } else {
-      showResult('🤝', 'Hòa!', `+${currentBet.toLocaleString('vi-VN')} (hoàn cược)`, 'Cùng tìm được số lượng bằng nhau');
-    }
-  }
-}
-
-// ============================================================
-//  BOARD RENDER
-// ============================================================
-function renderBoard() {
-  if (!board || board.length === 0) {
-    boardEl.innerHTML = '<div style="color:#64748b;text-align:center;padding:20px;grid-column:1/-1">Đang tạo bảng...</div>';
-    return;
-  }
-
-  boardEl.innerHTML = board.map((num, idx) => {
-    const isFound = found && found[idx];
-    let cls = 'ts-cell';
-    if (isFound) {
-      // Xác định màu theo người tìm
-      const owner = found[idx];
-      if (owner === p1Uid) cls += ' correct-p1';
-      else if (owner === p2Uid) cls += ' correct-p2';
-      else cls += ' correct';
-    }
-    const disabled = isFound ? 'disabled' : '';
-    return `<button class="${cls}" data-idx="${idx}" data-num="${num}" onclick="handleCellClick(${idx})" ${disabled}>${num}</button>`;
-  }).join('');
-}
-
-// ============================================================
-//  TURN TIMER
-// ============================================================
-function startTurnTimer() {
-  clearInterval(turnTimerInterval);
-  turnTimerInterval = setInterval(() => {
-    turnTimeLeft--;
-    if (turnTimeLeft <= 0) {
-      clearInterval(turnTimerInterval);
-      handleTurnTimeout();
-    } else {
-      updateTurnTimerDisplay();
-    }
-  }, 1000);
-}
-
-function stopTurnTimer() {
-  clearInterval(turnTimerInterval);
-  turnTimerInterval = null;
-}
-
-function updateTurnTimerDisplay() {
-  if (!turnTimerEl || turnTimerEl.style.display === 'none') return;
-  const memberInfo = roomData?.memberInfo || {};
-  const turnName = currentTurn === myUid ? 'bạn' : (memberInfo[currentTurn]?.name || 'đối thủ');
-  const tCls = turnTimeLeft <= 3 ? 'tt-warn' : 'tt-active';
-  turnTimerEl.innerHTML = `⏱️ <span class="${tCls}">${turnTimeLeft}s</span> — Lượt <span class="${tCls}">${turnName}</span>`;
-}
-
-// ============================================================
-//  TURN TIMEOUT
-// ============================================================
-async function handleTurnTimeout() {
-  if (!gameActive || gameOver || isProcessing) return;
-  isProcessing = true;
-
-  try {
-    window.showToast(`⏰ Hết giờ! Chuyển lượt`, 'warn');
-
-    // Switch turn
-    const nextTurn = currentTurn === p1Uid ? p2Uid : p1Uid;
-    const gs = roomData?.gameState || {};
-
-    const newGs = {
-      ...gs,
-      currentTurn: nextTurn,
-      turnTimeLeft: TURN_TIME,
-      lastAction: 'timeout'
-    };
-
-    await updateDoc(doc(db, 'rooms', roomId), { gameState: newGs });
-
-  } catch (err) {
-    console.error('handleTurnTimeout error:', err);
-  } finally {
-    isProcessing = false;
-  }
-}
-
-// ============================================================
-//  CELL CLICK
-// ============================================================
-window.handleCellClick = async function(idx) {
-  if (!gameActive || gameOver || !isMyTurn || isProcessing) {
-    if (!isMyTurn && gameActive && !gameOver) {
-      window.showToast('🔴 Chưa đến lượt bạn!', 'warn');
-    }
-    return;
-  }
-  if (!roomId || !roomData) return;
-  if (!board || !found) return;
-  if (found[idx]) return; // đã tìm thấy
-
-  const num = board[idx];
-  const gs = roomData?.gameState || {};
-  const gsTarget = gs.target || 1;
-
-  if (num === gsTarget) {
-    await handleCorrectClick(idx, gs);
-  } else {
-    await handleWrongClick(idx);
-  }
-};
-
-async function handleCorrectClick(idx, gs) {
-  if (isProcessing) return;
-  isProcessing = true;
-
-  try {
-    const cellEl = boardEl.querySelector(`[data-idx="${idx}"]`);
-    if (cellEl) { cellEl.classList.add('correct-p' + (currentTurn === p1Uid ? '1' : '2')); cellEl.disabled = true; }
-
-    const newFound = (gs.found || []).slice();
-    newFound[idx] = currentTurn;
-
-    const newScores = { ...(gs.scores || {}) };
-    newScores[currentTurn] = (newScores[currentTurn] || 0) + 1;
-
-    const newTarget = (gs.target || 1) + 1;
-    const foundCount = newFound.filter(f => f).length;
-
-    const newGs = {
-      ...gs,
-      found: newFound,
-      scores: newScores,
-      target: newTarget,
-      foundCount: foundCount,
-      currentTurn: currentTurn, // giữ lượt nếu đúng
-      turnTimeLeft: TURN_TIME,
-      lastAction: 'correct',
-      bet: currentBet
-    };
-
-    // Check win
-    if (newTarget > 100) {
-      const s1 = newScores[p1Uid] || 0;
-      const s2 = newScores[p2Uid] || 0;
-
-      if (s1 > s2) {
-        newGs.winner = p1Uid;
-      } else if (s2 > s1) {
-        newGs.winner = p2Uid;
-      } else {
-        newGs.winner = 'draw';
+    if(isHost){
+      show(betHost); hide(betPly); show(betSel); show(modeSel);
+      var confirmed=!!gs.betConfirmed&&!!gs.betConfirmed[myUid];
+      betHost.disabled=confirmed;
+      betHost.textContent=confirmed?'Đã cược':'Xác nhận cược';
+      betInfo.textContent=gs.betAmount
+        ?'Cược '+numFmt(gs.betAmount)+' · '+(gs.mode==='fixed'?'📌 Cố định':'🔄 Đảo số')+' — Chờ người chơi xác nhận...'
+        :(mem.length<2?'Cần 2 người':'Chọn mức cược, chế độ và xác nhận');
+    }else{
+      hide(betHost); hide(betSel); hide(modeSel);
+      if(gs.betAmount){
+        show(betPly);
+        var c=!!gs.betConfirmed&&!!gs.betConfirmed[myUid];
+        betPly.textContent=c?'Đã xác nhận':'Xác nhận';
+        betPly.className='btn-bet-yes'+(c?' on':'');
+        betPly.disabled=c;
+        var modeLabel=gs.mode==='fixed'?'📌 Cố định':'🔄 Đảo số';
+        betInfo.textContent='Cược '+numFmt(gs.betAmount)+' · '+modeLabel+' — Hãy xác nhận!';
+      }else{
+        hide(betPly);
+        betInfo.textContent=mem.length<2?'Cần 2 người':'Chờ chủ phòng đặt cược...';
       }
-      gameOver = true;
-      gameActive = false;
     }
 
-    await updateDoc(doc(db, 'rooms', roomId), { gameState: newGs });
-
-    if (newGs.winner) {
-      if (newGs.winner === myUid) {
-        const winAmount = currentBet * 2;
-        try {
-          const { addPoints } = await import('../../points.js');
-          await addPoints('Tìm Số MP', `Thắng game (cược ${currentBet.toLocaleString('vi-VN')})`, winAmount);
-          myPoints += winAmount;
-          updateNavPoints();
-        } catch (e) {}
-      } else if (newGs.winner === 'draw') {
-        try {
-          const { addPoints } = await import('../../points.js');
-          await addPoints('Tìm Số MP', `Hoàn cược (hòa)`, currentBet);
-          myPoints += currentBet;
-          updateNavPoints();
-        } catch (e) {}
-      }
-      setTimeout(() => {
-        if (newGs.winner === myUid) {
-          showResult('🏆', '🎉 Bạn thắng!', `+${(currentBet * 2).toLocaleString('vi-VN')} điểm`, `Thắng cược ${currentBet.toLocaleString('vi-VN')}`);
-        } else if (newGs.winner === 'draw') {
-          showResult('🤝', 'Hòa!', `+${currentBet.toLocaleString('vi-VN')} (hoàn cược)`, 'Cùng tìm được số lượng bằng nhau');
-        } else {
-          const winnerName = roomData?.memberInfo?.[newGs.winner]?.name || 'Đối thủ';
-          showResult('😔', `${winnerName} thắng!`, `-${currentBet.toLocaleString('vi-VN')} điểm`, 'Lần sau cố gắng nhé!');
-        }
-      }, 500);
+    // Auto-start when all confirmed
+    if(gs.betAmount&&gs.betConfirmed&&!_starting){
+      var allOk=mem.length>0&&mem.every(function(u){return gs.betConfirmed[u]});
+      if(allOk&&mem.length>=2){_starting=true;startGameInternal()}
     }
-  } catch (err) {
-    console.error('handleCorrectClick error:', err);
-  } finally {
-    isProcessing = false;
-  }
-}
-
-async function handleWrongClick(idx) {
-  if (isProcessing) return;
-  isProcessing = true;
-
-  try {
-    const cellEl = boardEl.querySelector(`[data-idx="${idx}"]`);
-    if (cellEl) {
-      cellEl.classList.add('wrong');
-      setTimeout(() => cellEl.classList.remove('wrong'), 300);
-    }
-
-    window.showToast('❌ Sai số! Chuyển lượt', 'error');
-
-    // Switch turn
-    const nextTurn = currentTurn === p1Uid ? p2Uid : p1Uid;
-    const gs = roomData?.gameState || {};
-
-    const newGs = {
-      ...gs,
-      currentTurn: nextTurn,
-      turnTimeLeft: TURN_TIME,
-      lastAction: 'wrong'
-    };
-
-    await updateDoc(doc(db, 'rooms', roomId), { gameState: newGs });
-
-  } catch (err) {
-    console.error('handleWrongClick error:', err);
-  } finally {
-    isProcessing = false;
-  }
-}
-
-// ============================================================
-//  RESULT
-// ============================================================
-function showResultFromState(gs) {
-  const winner = gs.winner;
-  if (winner === 'draw') {
-    showResult('🤝', 'Hòa!', `+${currentBet.toLocaleString('vi-VN')} (hoàn cược)`, 'Không ai thắng');
     return;
   }
-  const isMe = winner === myUid;
-  const memberInfo = roomData.memberInfo || {};
-  const winnerName = isMe ? 'Bạn' : (memberInfo[winner]?.name || 'Người chơi');
 
-  if (isMe) {
-    showResult('🏆', '🎉 Bạn thắng!', `+${(currentBet * 2).toLocaleString('vi-VN')} điểm`, `Thắng cược ${currentBet.toLocaleString('vi-VN')}`);
-  } else {
-    showResult('😔', `${winnerName} thắng!`, `-${currentBet.toLocaleString('vi-VN')} điểm`, 'Lần sau cố gắng nhé!');
+  // === PLAYING ===
+  hide(waitEl); hide(betRow); hide(betInfo);
+  show(sbar); show(bd);
+
+  if(gs.board&&gs.board.length>0){
+    curBet=gs.bet||curBet;
+    board=gs.board; found=gs.found||[]; target=gs.target||1;
+    scores=gs.scores||{};
+    active=!gs.winner; over=!!gs.winner;
+    tLeft=(gs.turnTimeLeft!==undefined&&gs.turnTimeLeft!==null)?gs.turnTimeLeft:10;
+
+    drawBoard();
+    if(active&&!over){startTimer();removeClass(bd,'mp-disabled');addClass(bd,'mp-clickable')}
+    else{stopTimer();addClass(bd,'mp-disabled');removeClass(bd,'mp-clickable')}
+
+    // Status bar — player names, countdown next to target
+    var n1=mInfo[p1Uid]?mInfo[p1Uid].name:'P1', n2=mInfo[p2Uid]?mInfo[p2Uid].name:'P2';
+    var s1=scores[p1Uid]||0, s2=scores[p2Uid]||0;
+    if(lEl){lEl.textContent=n1+': '+s1;lEl.className='stat-bet'}
+    if(rEl){rEl.textContent=n2+': '+s2;rEl.className='stat-profit zero'}
+    if(active&&!over){
+      var tc=tLeft<=3?' warn':'';
+      if(tgEl)tgEl.innerHTML=target>100?'Done':'<span class="ts-num">'+target+'</span> <span class="ts-countdown'+tc+'">'+tLeft+'s</span>';
+      var modeLabel=gs.mode==='fixed'?'📌 Cố định':'🔄 Đảo số';
+      if(sbEl)sbEl.textContent='Cùng tìm! '+modeLabel;
+    }
+    if(gs.winner&&!_resultDone){_resultDone=true;showResult(gs)}
   }
 }
 
-function showResult(emoji, title, pts, sub) {
-  document.getElementById('result-emoji').textContent = emoji;
-  document.getElementById('result-title').textContent = title;
-  document.getElementById('result-pts').textContent = pts || '';
-  document.getElementById('result-sub').textContent = sub || '';
-  resultModal.classList.remove('hidden');
+function drawBoard(){
+  if(!bd)return;
+  if(!board||board.length===0){bd.innerHTML='<div style="color:#64748b;text-align:center;padding:20px">Đang tạo bảng...</div>';return}
+  var h='';
+  for(var i=0;i<board.length;i++){
+    var n=board[i], ow=found&&found[i], cl='ts-cell', dis='';
+    if(ow){cl+=ow===p1Uid?' correct-p1':' correct-p2';dis='disabled'}
+    h+='<button class="'+cl+'" data-i="'+i+'" onclick="cellClick('+i+')" '+dis+'>'+n+'</button>'
+  }
+  bd.innerHTML=h;
 }
 
-// ============================================================
-//  RESET GAME
-// ============================================================
-window.closeResultAndContinue = function() {
-  resultModal.classList.add('hidden');
-  resetGameState();
+// === BET ===
+window.betAction=async function(){
+  if(!roomId||!roomData)return;
+  var r=roomData, gs=r.gameState||{}, isHost=r.hostUid===myUid;
+
+  if(isHost){
+    if(gs.phase==='playing')return;
+    var amt=parseInt(betSel.value);
+    if(!amt||amt<50){toast('Mức cược tối thiểu 50','warn');return}
+    if(myPts<amt){toast('Không đủ tiền! Có '+numFmt(myPts)+', cần '+numFmt(amt),'error');return}
+    try{
+      await addPoints('Tìm Số MP','Đặt cược '+numFmt(amt),-amt);
+      myPts-=amt;
+    }catch(e){toast('Không thể trừ tiền cược!','error');return}
+    var cf=Object.assign({},gs.betConfirmed||{},{[myUid]:true});
+    curBet=amt;
+    gameMode=modeSel?modeSel.value:'shuffle';
+    await updateDoc(doc(db,'rooms',roomId),{gameState:Object.assign({},gs,{phase:'betting',betAmount:amt,betConfirmed:cf,bet:amt,mode:gameMode})});
+  }else{
+    if(gs.phase!=='betting'||!gs.betAmount)return;
+    if(gs.betConfirmed&&gs.betConfirmed[myUid])return;
+    if(myPts<gs.betAmount){toast('Không đủ tiền!','error');return}
+    try{
+      await addPoints('Tìm Số MP','Xác nhận cược '+numFmt(gs.betAmount),-gs.betAmount);
+      myPts-=gs.betAmount;
+    }catch(e){toast('Không thể trừ tiền!','error');return}
+    var cf=Object.assign({},gs.betConfirmed||{},{[myUid]:true});
+    await updateDoc(doc(db,'rooms',roomId),{gameState:Object.assign({},gs,{betConfirmed:cf})});
+  }
 };
 
-async function resetGameState() {
-  if (!roomId || !roomData) return;
-  try {
-    const members = roomData.members || [];
-    const p1 = members[0] || null;
-    const p2 = members[1] || null;
-
-    // Tạo board mới
-    const newBoard = shuffle(Array.from({ length: 100 }, (_, i) => i + 1));
-    const newFound = Array(100).fill(null);
-
-    gameOver = false;
-    gameActive = true;
-    isProcessing = false;
-    currentTurn = p1;
-    isMyTurn = p1 === myUid;
-    turnTimeLeft = TURN_TIME;
-
-    const newGs = {
-      board: newBoard,
-      found: newFound,
-      target: 1,
-      foundCount: 0,
-      scores: {},
-      currentTurn: p1,
-      winner: null,
-      lastAction: null,
-      turnTimeLeft: TURN_TIME,
-      players: members,
-      bet: currentBet
-    };
-    // Gán score ban đầu cho cả 2 thành 0
-    newGs.scores[p1] = 0;
-    newGs.scores[p2] = 0;
-
-    await updateDoc(doc(db, 'rooms', roomId), { gameState: newGs });
-
-    renderBoard();
-    renderRoomInfo();
-    window.showToast(`🔄 Ván mới! Cược ${currentBet.toLocaleString('vi-VN')}`, 'success');
-
-  } catch (err) {
-    console.error('resetGameState error:', err);
-    window.showToast('Không thể reset game', 'error');
-  }
+function shuffleArray(a){
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}
+  return a;
 }
 
-// ============================================================
-//  SHUFFLE
-// ============================================================
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+async function startGameInternal(){
+  if(!roomId||!roomData)return;
+  var r=roomData, mem=r.members||[], p1=mem[0], p2=mem[1];
+  if(!p1||!p2)return;
 
-// ============================================================
-//  READY / START
-// ============================================================
-window.toggleMpReady = async function() {
-  if (!roomId || !roomData) return;
-  const memberInfo = roomData.memberInfo || {};
-  const me = memberInfo[myUid] || { name: myName, ready: false };
-  me.ready = !me.ready;
-  memberInfo[myUid] = me;
-  await updateDoc(doc(db, 'rooms', roomId), { memberInfo });
-};
+  var gs=r.gameState||{};
+  // Luôn shuffle board ban đầu cho cả 2 chế độ
+  var nb=shuffleArray(Array.from({length:100},function(_,i){return i+1}));
+  var sc={};sc[p1]=0;sc[p2]=0;
 
-window.startMpGame = async function() {
-  if (!roomId || !roomData) return;
-  if (roomData.hostUid !== myUid) {
-    window.showToast('Chỉ chủ phòng mới bắt đầu được', 'warn');
-    return;
-  }
-  const members = roomData.members || [];
-  if (members.length < 2) {
-    window.showToast('Cần ít nhất 2 người', 'warn');
-    return;
-  }
-
-  if (myPoints < currentBet) {
-    window.showToast(`❌ Bạn không đủ tiền! Cần ${currentBet.toLocaleString('vi-VN')}, bạn có ${myPoints.toLocaleString('vi-VN')}`, 'error');
-    return;
-  }
-
-  // Trừ tiền host
-  try {
-    const { addPoints } = await import('../../points.js');
-    await addPoints('Tìm Số MP', `Đặt cược ${currentBet.toLocaleString('vi-VN')}`, -currentBet);
-    myPoints -= currentBet;
-    updateNavPoints();
-  } catch (e) {
-    window.showToast('❌ Không thể trừ tiền cược!', 'error');
-    return;
-  }
-
-  const p1 = members[0];
-  const p2 = members[1];
-
-  // Tạo board
-  const newBoard = shuffle(Array.from({ length: 100 }, (_, i) => i + 1));
-  const newFound = Array(100).fill(null);
-  const scores = {};
-  scores[p1] = 0;
-  scores[p2] = 0;
-
-  const gameState = {
-    board: newBoard,
-    found: newFound,
-    target: 1,
-    foundCount: 0,
-    scores: scores,
-    currentTurn: p1,
-    winner: null,
-    lastAction: null,
-    turnTimeLeft: TURN_TIME,
-    players: members,
-    bet: currentBet
-  };
-
-  await updateDoc(doc(db, 'rooms', roomId), {
-    status: 'playing',
-    gameState,
-    startedAt: serverTimestamp()
+  var ng=Object.assign({},gs,{
+    phase:'playing',board:nb,found:Array(100).fill(null),target:1,scores:sc,
+    winner:null,turnTimeLeft:10
   });
+  await updateDoc(doc(db,'rooms',roomId),{gameState:ng});
+  _starting=false;
+}
 
-  window.showToast(`🚀 Trận đấu bắt đầu! Cược ${currentBet.toLocaleString('vi-VN')}`, 'success');
+function shuffleRemaining(board,found){
+  var idxs=[],vals=[];
+  for(var i=0;i<board.length;i++){
+    if(!found[i]){idxs.push(i);vals.push(board[i])}
+  }
+  shuffleArray(vals);
+  for(var i=0;i<idxs.length;i++){board[idxs[i]]=vals[i]}
+  return board;
+}
+
+// === TIMER ===
+function startTimer(){stopTimer();timer=setInterval(function(){tLeft--;if(tLeft<=0){stopTimer();timeout()}else updateTimer()},1000)}
+function stopTimer(){if(timer){clearInterval(timer);timer=null}}
+function updateTimer(){
+  if(over||!active)return;
+  var tc=tLeft<=3?' warn':'';
+  if(tgEl)tgEl.innerHTML=target>100?'Done':'<span class="ts-num">'+target+'</span> <span class="ts-countdown'+tc+'">'+tLeft+'s</span>';
+}
+
+async function timeout(){
+  if(!active||over||proc)return; proc=true;
+  try{
+    var gs=(roomData&&roomData.gameState)||{};
+    await updateDoc(doc(db,'rooms',roomId),{gameState:Object.assign({},gs,{turnTimeLeft:10})});
+  }catch(e){console.error(e)}
+  proc=false;
+}
+
+// === CLICK ===
+window.cellClick=async function(idx){
+  if(!active||over||proc)return;
+  if(!roomId||!roomData||(found&&found[idx]))return;
+  var num=board[idx], gs=(roomData&&roomData.gameState)||{}, gsTarget=gs.target||1;
+  if(num===gsTarget)await correct(idx,gs); else await wrong(idx);
 };
 
-// ============================================================
-//  LEAVE ROOM
-// ============================================================
-window.quitGame = async function() {
-  if (!roomId) {
-    window.location.href = 'rooms.html';
-    return;
-  }
-  try {
-    const data = roomData;
-    if (data) {
-      // Forfeit if mid-game
-      let forfeited = false;
-      const gs = data.gameState || {};
-      if (data.status === 'playing' && !gs.winner) {
-        const oppUid = p1Uid === myUid ? p2Uid : p1Uid;
-        if (oppUid) {
-          await updateDoc(doc(db, 'rooms', roomId), { 'gameState.winner': oppUid });
-          forfeited = true;
-        }
-      }
+async function correct(idx,gs){
+  if(proc)return; proc=true;
+  try{
+    var nf=(gs.found||[]).slice(); nf[idx]=myUid;
+    var ns=Object.assign({},gs.scores||{}); ns[myUid]=(ns[myUid]||0)+1;
+    var nt=(gs.target||1)+1;
+    var nb=(gs.board||[]).slice();
+    var mode=gs.mode||'shuffle';
+    // Đảo số: shuffle các vị trí chưa tìm thấy
+    if(mode==='shuffle'&&nt<=100)shuffleRemaining(nb,nf);
+    var ng=Object.assign({},gs,{found:nf,scores:ns,target:nt,board:nb,turnTimeLeft:10});
+    if(nt>100){
+      var s1=ns[p1Uid]||0,s2=ns[p2Uid]||0;
+      ng.winner=s1>s2?p1Uid:(s2>s1?p2Uid:'draw');
+      active=false;over=true;stopTimer();
+      if(bd){removeClass(bd,'mp-clickable');addClass(bd,'mp-disabled')}
+    }
+    await updateDoc(doc(db,'rooms',roomId),{gameState:ng});
+  }catch(e){console.error(e)}
+  proc=false;
+}
 
-      if (data.hostUid === myUid && !forfeited) {
-        await deleteDoc(doc(db, 'rooms', roomId));
-      } else {
-        const remaining = (data.members || []).filter(u => u !== myUid);
-        if (remaining.length === 0) {
-          await deleteDoc(doc(db, 'rooms', roomId));
-        } else {
-          const mi = data.memberInfo || {};
-          delete mi[myUid];
-          const wInfo = { ...(data.waitingMemberInfo || {}) };
-          delete wInfo[myUid];
-          await updateDoc(doc(db, 'rooms', roomId), {
-            members: arrayRemove(myUid),
-            memberInfo: mi,
-            waitingMembers: arrayRemove(myUid),
-            waitingMemberInfo: wInfo
-          });
+async function wrong(idx){
+  if(proc)return; proc=true;
+  try{
+    var el=qs('[data-i="'+idx+'"]');
+    if(el){el.classList.add('wrong');setTimeout(function(){el.classList.remove('wrong')},300)}
+  }catch(e){console.error(e)}
+  proc=false;
+}
+
+// === RESULT ===
+function showResult(gs){
+  stopTimer();
+  if(bd){removeClass(bd,'mp-clickable');addClass(bd,'mp-disabled')}
+  var w=gs.winner, mi=(roomData&&roomData.memberInfo)||{}, s1=scores[p1Uid]||0, s2=scores[p2Uid]||0;
+  var n1=mi[p1Uid]?mi[p1Uid].name:'P1', n2=mi[p2Uid]?mi[p2Uid].name:'P2';
+  if(w==='draw'){
+    if(lEl)lEl.className='stat-bet'; if(rEl)rEl.className='stat-profit zero';
+    if(tgEl)tgEl.textContent='Hoà'; if(sbEl)sbEl.textContent='Hoà!';
+    openRs('🤝','Hoà!',n1+': '+s1+' · '+n2+': '+s2,'');
+  }else if(w===myUid){
+    var mp=w===p1Uid;
+    if(lEl)lEl.className=mp?'stat-bet ts-win':'stat-bet ts-lose';
+    if(rEl)rEl.className=mp?'stat-profit ts-lose':'stat-profit ts-win';
+    if(tgEl)tgEl.textContent='Thắng'; if(sbEl)sbEl.textContent='Bạn thắng!';
+    openRs('🏆','Bạn thắng!',n1+': '+s1+' · '+n2+': '+s2,'');
+    addPoints('Tìm Số MP','Thắng',50).catch(function(){});
+  }else{
+    var wn=mi[w]?mi[w].name:'Đối thủ', mp=w===p1Uid;
+    if(lEl)lEl.className=mp?'stat-bet ts-win':'stat-bet ts-lose';
+    if(rEl)rEl.className=mp?'stat-profit ts-lose':'stat-profit ts-win';
+    if(tgEl)tgEl.textContent='Thua'; if(sbEl)sbEl.textContent=wn+' thắng!';
+    openRs('😔',wn+' thắng!',n1+': '+s1+' · '+n2+': '+s2,'');
+  }
+}
+
+function openRs(emoji,title,pts,sub){
+  setText('rs-em',emoji); setText('rs-tl',title);
+  setText('rs-pt',pts||''); setText('rs-sb',sub||'');
+  if(rsM)rsM.classList.remove('hidden');
+}
+
+window.gameReset=async function(){
+  _resultDone=false;_starting=false;
+  if(!roomId||!roomData)return;
+  try{
+    var mem=roomData.members||[], p1=mem[0], p2=mem[1];
+    if(!p1||!p2)return;
+    await updateDoc(doc(db,'rooms',roomId),{status:'lobby',gameState:{phase:'lobby'}});
+  }catch(e){console.error(e)}
+};
+
+// === QUIT ===
+window.quitGame=async function(){
+  if(_quitting)return; _quitting=true;
+  if(!roomId){window.location.href='../../app/rooms.html';return}
+  try{
+    var snap=await getDoc(doc(db,'rooms',roomId));
+    if(snap.exists()){
+      var r=snap.data();
+      if(r.hostUid===myUid){await deleteDoc(doc(db,'rooms',roomId))}else{
+        var rem=(r.members||[]).filter(function(u){return u!==myUid});
+        if(rem.length===0){await deleteDoc(doc(db,'rooms',roomId))}else{
+          var mi=Object.assign({},r.memberInfo||{}); delete mi[myUid];
+          await updateDoc(doc(db,'rooms',roomId),{members:arrayRemove(myUid),memberInfo:mi})
         }
       }
     }
-  } catch (err) {
-    console.error('leave error:', err);
-  }
-  if (_unsubRoom) { _unsubRoom(); _unsubRoom = null; }
-  window.location.href = 'rooms.html';
+  }catch(e){console.error(e)}
+  if(_unsub){_unsub();_unsub=null}
+  window.location.href='../../app/rooms.html';
 };
 
-// ============================================================
-//  TOAST HELPER
-// ============================================================
-window.showToast = function(msg, type = 'info') {
-  const c = { info: '#38bdf8', success: '#34d399', warn: '#fbbf24', error: '#f87171' };
-  const t = document.createElement('div');
-  t.style.cssText = `pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]||c.info};color:#e0f2fe;font-size:13px;font-weight:400;font-family:'Science Gothic', sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;
-  t.textContent = msg;
-  document.getElementById('toastContainer').appendChild(t);
-  setTimeout(() => t.remove(), 3500);
-};
+// === HELPERS ===
+function setText(id,v){var e=$(id);if(e)e.textContent=v}
+function hide(e){if(e)e.style.display='none'}
+function show(e){if(e)e.style.display=''}
+function addClass(e,c){if(e)e.classList.add(c)}
+function removeClass(e,c){if(e)e.classList.remove(c)}
+function toast(m,t){if(window.showToast)window.showToast(m,t)}
+function numFmt(n){return n.toLocaleString('vi-VN')}
 
-console.log('🎮 Tìm Số Multiplayer loaded');
-console.log(`🪙 Mức cược mặc định: ${currentBet.toLocaleString('vi-VN')}`);
+console.log('Tìm Số MP loaded');

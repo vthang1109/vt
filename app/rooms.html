@@ -35,6 +35,7 @@
     <div class="rooms-toolbar">
       <button class="btn-primary" onclick="openCreateModal()">➕ Tạo phòng mới</button>
       <button class="btn-secondary" onclick="openJoinByCode()">🔑 Vào bằng mã</button>
+      <button class="btn-delete-all" id="btn-delete-all" onclick="deleteAllRooms()" style="display:none">🗑️ Xoá tất cả</button>
     </div>
 
     <div class="rooms-section">
@@ -67,6 +68,7 @@
       <div class="lobby-actions">
         <button class="btn-ready" id="btn-ready" onclick="toggleReady()">✅ Sẵn sàng</button>
         <button class="btn-start" id="btn-start" onclick="startGame()" style="display:none">🚀 Bắt đầu</button>
+        <button class="btn-delete" id="btn-delete-room" onclick="deleteRoom()" style="display:none">🗑️ Xoá phòng</button>
       </div>
     </div>
 

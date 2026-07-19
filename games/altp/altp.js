@@ -4,6 +4,7 @@
 import { doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getActivePetInfo } from '../../pet.js';
 import { subscribeUserData, auth, db, onAuthStateChanged } from '../../points.js';
+import { play, playOnce, stopAll } from '../../assets/sound.js';
 
 // ========== BẢNG THƯỞNG (15 mốc, an toàn ở câu 5 & 10) ==========
 const PRIZE_TABLE = [10, 20, 40, 70, 100, 150, 300, 600, 1200, 2000, 3000, 4000, 5500, 7500, 10000];
@@ -155,6 +156,7 @@ function startTimer() {
     _timeLeft--;
     profitEl.textContent = `⏱ ${_timeLeft}s`;
     profitEl.classList.toggle('warn', _timeLeft <= 10);
+    if (_timeLeft <= 10 && _timeLeft > 0) playOnce('tick', { volume: 0.2 });
     if (_timeLeft <= 0) {
       clearInterval(_timer);
       window.altp.answer(-1); // hết giờ = trả lời sai
@@ -173,6 +175,8 @@ window.altp.startGame = async function () {
   _lifelines = { fifty: false, audience: false, phone: false };
   document.getElementById('btn-start').style.display = 'none';
   document.getElementById('bc-status').classList.remove('result-win', 'result-lose');
+  stopAll();
+  play('bg', { loop: true, volume: 0.3 });
   nextQuestion();
 };
 
@@ -196,14 +200,16 @@ window.altp.answer = function (choiceIdx) {
     if (choiceIdx >= 0 && choiceIdx !== correct) opts[choiceIdx].classList.add('wrong');
 
     if (choiceIdx === correct) {
+      play('correct');
       _currentIdx++;
       if (_currentIdx >= 15) {
-        setTimeout(() => endGame('win', PRIZE_TABLE[14]), 2000);
+        setTimeout(() => { stopAll(); play('final'); endGame('win', PRIZE_TABLE[14]); }, 2000);
       } else {
         setTimeout(nextQuestion, 2000);
       }
     } else {
-      setTimeout(() => endGame('lose', safePrizeBefore(_currentIdx)), 2000);
+      playOnce('wrong');
+      setTimeout(() => { stopAll(); endGame('lose', safePrizeBefore(_currentIdx)); }, 2000);
     }
   }, 700);
 };

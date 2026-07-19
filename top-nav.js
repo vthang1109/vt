@@ -236,7 +236,7 @@ window.TopNav = (() => {
       <div class="vt-top-nav" id="vtTopNav">
         <a class="vt-nav-logo" href="/index.html">
           <span class="vt-logo-content" id="vtLogoContent" style="${isMpGame ? 'display:none' : ''}"><img src="${LOGO_SRC}" alt="logo"><span class="logo-vt">VT</span><span class="logo-world">World</span></span>
-          <span class="vt-room-id${isMpGame ? ' visible' : ''}" id="vtRoomId">${isMpGame ? '🎮 Đang chơi' : ''}</span>
+          <span class="vt-room-id${isMpGame ? ' visible' : ''}" id="vtRoomId"></span>
         </a>
         <div class="vt-nav-right">
           <span class="vt-nav-pts" id="vtNavPts">0 <span class="vt-coin">〄</span></span>
@@ -351,7 +351,7 @@ window.TopNav = (() => {
           dd.classList.remove('open');
           btn.classList.remove('open');
           if (confirm('Rời phòng và thoát game?')) {
-            window.location.href = 'games.html';
+            window.location.href = '/app/rooms.html';
           }
         };
       }

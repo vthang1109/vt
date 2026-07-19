@@ -1,0 +1,238 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===== HELPER: kiểm tra admin bằng email cố định =====
+    function isAdmin() {
+      return request.auth != null &&
+             request.auth.token.email == 'thang@game.com';
+    }
+
+    // ===== USERS =====
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth.uid == userId &&
+                       request.resource.data.keys().hasAll(['uid', 'email', 'nickname', 'points', 'friends', 'createdAt']);
+      
+      allow update: if request.auth != null && (
+        isAdmin()
+        ||
+        (request.auth.uid == userId && (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['friends']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points', 'lastUpdate']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points', 'lastUpdate', 'lastClaimDate']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points', 'tickets_normal']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points', 'tickets_vip']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['shards', 'petCollection']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['petCollection']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['shards']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['activePet']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['characterV3']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['characterV3.system']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['characterV3.equipped']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['characterV3.system', 'characterV3.equipped']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['characterV3', 'ownedItems']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownedItems']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['characterShards']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['characterShards', 'ownedItems']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['characterShards', 'points']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['characterShards', 'points', 'ownedItems']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['characterV3', 'ownedItems', 'points']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['characterV3', 'ownedItems', 'characterShards']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points', 'ownedItems']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points', 'ownedItems', 'characterShards']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nickname']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['avatarUrl']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['coverUrl']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photoUrl']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nickname', 'avatarUrl']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nickname', 'lastUpdate']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['avatarUrl', 'lastUpdate']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nickname', 'avatarUrl', 'lastUpdate']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownedTitles']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['activeTitle']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points', 'ownedTitles']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points', 'activeTitle']) ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points', 'ownedTitles', 'activeTitle'])
+        ))
+        ||
+        (request.auth.uid != userId &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points']))
+      );
+      allow delete: if request.auth.uid == userId || isAdmin();
+    }
+
+    // ===== EMAIL RIÊNG (chỉ owner + admin đọc được) =====
+    match /users/{userId}/private/data {
+      allow read: if request.auth != null &&
+                     (request.auth.uid == userId || isAdmin());
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ===== SUB-COLLECTIONS CỦA USERS =====
+    match /users/{userId}/dailyState/{dateId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /users/{userId}/missions/{missionId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /users/{userId}/gachaHistory/{docId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    match /users/{userId}/pets/{petId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /users/{userId}/character/{charId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ===== TRANSACTIONS =====
+    match /transactions/{txId} {
+      allow read: if request.auth != null &&
+                     (resource.data.fromUid == request.auth.uid ||
+                      resource.data.toUid == request.auth.uid);
+      allow create: if request.auth != null &&
+                       request.resource.data.fromUid == request.auth.uid &&
+                       request.resource.data.toUid is string &&
+                       request.resource.data.toUid != request.auth.uid &&
+                       request.resource.data.amount is int &&
+                       request.resource.data.amount > 0 &&
+                       request.resource.data.type == 'transfer';
+      allow update, delete: if false;
+    }
+
+    match /friendRequests/{toUserId}/requests/{fromUserId} {
+      allow read: if request.auth.uid == toUserId;
+      allow create: if request.auth.uid == fromUserId &&
+                       request.resource.data.fromUid == fromUserId &&
+                       request.resource.data.toUid == toUserId &&
+                       fromUserId != toUserId;
+      allow delete: if request.auth.uid == toUserId || request.auth.uid == fromUserId;
+    }
+
+    // ===== CHATS =====
+    match /chats/{roomId}/messages/{messageId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null &&
+                       request.resource.data.senderUid == request.auth.uid &&
+                       request.resource.data.text is string &&
+                       request.resource.data.text.size() > 0 &&
+                       request.resource.data.text.size() <= 2000;
+      allow update: if request.auth != null && request.auth.uid == resource.data.senderUid;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.senderUid;
+    }
+    
+    match /chats/{roomId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null &&
+                       request.resource.data.diff(resource.data)
+                         .affectedKeys().hasOnly(['typing', 'pinnedMessage', 'members', 'name']);
+    }
+    match /chats/{roomId}/typing/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
+    }
+    match /chats/{roomId}/readReceipts/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
+    }
+
+    // ===== ROOMS =====
+    match /rooms/{roomId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null &&
+                       request.resource.data.hostUid == request.auth.uid;
+      allow update: if request.auth != null && (
+                       resource.data.hostUid == request.auth.uid ||
+                       request.auth.uid in resource.data.members ||
+                       request.auth.uid in request.resource.data.members
+                    );
+      allow delete: if request.auth != null && (
+                       resource.data.hostUid == request.auth.uid ||
+                       isAdmin()
+                    );
+      match /chat/{msgId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null &&
+                         request.resource.data.senderUid == request.auth.uid;
+        allow update, delete: if false;
+      }
+    }
+    match /rooms/{roomId}/chat/{msgId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+    }
+
+    // ===== PETS (collection riêng) =====
+    match /pets/{petId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow update: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    // ===== SYSTEM =====
+    match /system/jackpot {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // shopConfig: mọi user đọc được, chỉ admin ghi
+    match /system/shopConfig {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // ===== TIM SO - LICH SU (ghi 1 lan/van, khong sua/xoa) =====
+    match /timso_records_solo/{docId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+    match /timso_records_destroy/{docId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // ===== TIM SO - TOP 10 (denormalize, cap nhat qua transaction) =====
+    match /timso_leaderboards/{tab} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+                      request.resource.data.keys().hasOnly(['entries']) &&
+                      request.resource.data.entries is list &&
+                      request.resource.data.entries.size() <= 10;
+    }
+
+        // ===== LOVE APPS =====
+    match /love_apps/{coupleId} {
+      allow read: if request.auth != null;
+      
+      allow create: if request.auth != null
+        && request.resource.data.person1 is map
+        && request.resource.data.person1.uid == request.auth.uid
+        && request.resource.data.person2 == null
+        && request.resource.data.inviteCode is string
+        && request.resource.data.startDate is string;
+      
+      // SỬA: cho phép người lạ join khi person2 đang null
+      allow update: if request.auth != null && (
+        resource.data.person1.uid == request.auth.uid
+        || (resource.data.person2 == null && request.auth.uid != resource.data.person1.uid)
+        || (resource.data.person2 != null && resource.data.person2.uid == request.auth.uid)
+      );
+      
+      allow delete: if request.auth != null
+        && resource.data.person1.uid == request.auth.uid;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
