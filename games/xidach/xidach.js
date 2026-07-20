@@ -56,7 +56,7 @@ class XiDach {
 
     async refreshBuffCache() {
         try {
-            const { getPetData, getPetById, getTierById } = await import('./pet.js');
+            const { getPetData, getPetById, getTierById } = await import('../../pet.js');
             const d = await getPetData();
             const pet = d.activePet ? getPetById(d.activePet) : null;
             this.cachedBuffPct = pet ? (getTierById(pet.tier).buff || 0) : 0;
