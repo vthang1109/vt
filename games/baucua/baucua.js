@@ -406,7 +406,8 @@ class BauCua {
         }
         const net = winAmt - totalBet + buffBonus;
 
-        if (net !== 0) {
+        let committed = false;
+        if (net !== 0 && this._userId) {
             const newBalance = await this.commitBalance(net, winAmt > 0 ? 'Thắng' : 'Thua');
             if (newBalance === null) {
                 console.error('Không thể cập nhật balance');
@@ -414,10 +415,13 @@ class BauCua {
                 if (btnRoll) btnRoll.disabled = false;
                 return;
             }
+            committed = true;
         }
-        // Local đã trừ totalBet lúc đặt cược rồi, giờ chỉ cộng lại phần thắng + buff.
-        this._myBalance += (winAmt + buffBonus);
-        this.syncNavPoints();
+        // Chỉ cộng tay khi chưa commit qua Firestore (net=0 hoặc chưa đăng nhập)
+        if (!committed) {
+            this._myBalance += (winAmt + buffBonus);
+            this.syncNavPoints();
+        }
 
         if (buffBonus > 0) {
             const petLabel = this.cachedPet ? `${this.cachedPet.emoji} ${this.cachedPet.name}` : '🐾 Pet';
@@ -453,8 +457,10 @@ class BauCua {
     // Nếu người chơi thoát/đóng tab khi đã đặt cược nhưng chưa lắc xong, tính thua toàn bộ cược
     // (vì cược mới chỉ trừ ở local, chưa từng ghi Firestore).
     forfeitIfAbandoned() {
+        if (this._forfeited) return;
         const total = Object.values(this.bets).reduce((a, b) => a + b, 0);
         if (total > 0) {
+            this._forfeited = true;
             addPoints('Casino', 'Bầu Cua out phòng - mất cược', -total, false).catch(() => {});
         }
     }
