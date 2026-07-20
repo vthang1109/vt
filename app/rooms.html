@@ -68,6 +68,7 @@
       <div class="lobby-actions">
         <button class="btn-ready" id="btn-ready" onclick="toggleReady()">✅ Sẵn sàng</button>
         <button class="btn-start" id="btn-start" onclick="startGame()" style="display:none">🚀 Bắt đầu</button>
+        <button class="btn-secondary" id="btn-room-settings" onclick="openRoomSettings()" style="display:none;flex:1">⚙️ Cài đặt</button>
         <button class="btn-delete" id="btn-delete-room" onclick="deleteRoom()" style="display:none">🗑️ Xoá phòng</button>
       </div>
     </div>
@@ -86,6 +87,10 @@
   <div id="createModal" class="modal-overlay" onclick="if(event.target===this)closeCreateModal()">
     <div class="modal-box" style="max-width:420px">
       <div class="modal-header"><span>➕ Tạo phòng mới</span><button class="modal-close" onclick="closeCreateModal()">✕</button></div>
+      <div class="rm-category-row">
+        <button class="rm-cat-btn active" data-cat="casino" onclick="selectCategory('casino')">🃏 Casino</button>
+        <button class="rm-cat-btn" data-cat="tritue" onclick="selectCategory('tritue')">🧠 Trí Tuệ</button>
+      </div>
       <label class="rm-label">Game</label>
       <select id="cr-game" class="input"></select>
       <label class="rm-label">Tên phòng</label>

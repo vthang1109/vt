@@ -9,18 +9,19 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 import { initProfileCard } from '../profile-card.js';
 
 const GAMES = {
-  xidach:    { id: 'xidach',    name: 'Xì dách',     icon: '♣️', max: 5, min: 2, page: '../games/xidach/xidach-mp.html',         ready: true },
-  baucua:    { id: 'baucua',    name: 'Bầu Cua',     icon: '🎲', max: 8, min: 2, page: '../games/baucua/baucua-mp.html',         ready: true },
-  baicao:    { id: 'baicao',    name: 'Bài Cào',     icon: '🃏', max: 5, min: 2, page: '../games/baicao/baicao-mp.html',         ready: true },
-  caro:      { id: 'caro',      name: 'Caro',        icon: '♟️', max: 2, min: 2, page: '../games/caro/caro-mp.html',            ready: true },
-  tictactoe: { id: 'tictactoe', name: 'Tic-Tac-Toe', icon: '⭕', max: 2, min: 2, page: '../games/tictactoe/tictactoe-mp.html',    ready: true },
-  pickso:    { id: 'pickso',    name: 'Pick Số',     icon: '🔢', max: 6, min: 2, page: '../games/pickso/pickso-mp.html',         ready: true },
-  chess:     { id: 'chess',     name: 'Cờ Vua',      icon: '♞', max: 2, min: 2, page: '../games/chess/chess-mp.html',            ready: true },
-  xiangqi:   { id: 'xiangqi',   name: 'Cờ Tướng',    icon: '🀄', max: 2, min: 2, page: '../games/xiangqi/xiangqi-mp.html',       ready: true },
-  altp:      { id: 'altp',      name: 'Ai Là Triệu Phú', icon: '💰', max: 8, min: 2, page: '../games/altp/altp-mp.html',         ready: true },
-  catte:     { id: 'catte',     name: 'Cát Tê',      icon: '♣️', max: 4, min: 2, page: '../games/catte/catte-mp.html',          ready: true },
-  tienlen:   { id: 'tienlen',   name: 'Tiến Lên',    icon: '♥️', max: 4, min: 2, page: '../games/tienlen/tienlen-mp.html',       ready: true },
-  timso:     { id: 'timso',     name: 'Tìm Số',      icon: '🔢', max: 2, min: 2, page: '../games/timso/timso-mp.html',          ready: true },
+  // === CASINO ===
+  baucua:    { id: 'baucua',    name: 'Bầu Cua',     icon: '🎲', max: 8, min: 2, page: '../games/baucua/baucua-mp.html',         ready: true, category: 'casino' },
+  xidach:    { id: 'xidach',    name: 'Xì dách',     icon: '🃏', max: 5, min: 2, page: '../games/xidach/xidach-mp.html',         ready: true, category: 'casino' },
+  baicao:    { id: 'baicao',    name: 'Bài Cào',     icon: '🃏', max: 5, min: 2, page: '../games/baicao/baicao-mp.html',         ready: true, category: 'casino' },
+  catte:     { id: 'catte',     name: 'Cát Tê',      icon: '♣️', max: 4, min: 2, page: '../games/catte/catte-mp.html',          ready: true, category: 'casino' },
+  tienlen:   { id: 'tienlen',   name: 'Tiến Lên',    icon: '♥️', max: 4, min: 2, page: '../games/tienlen/tienlen-mp.html',       ready: true, category: 'casino' },
+  // === TRÍ TUỆ ===
+  caro:      { id: 'caro',      name: 'Caro',        icon: '⭕', max: 2, min: 2, page: '../games/caro/caro-mp.html',            ready: true, category: 'tritue' },
+  tictactoe: { id: 'tictactoe', name: 'Tic-Tac-Toe', icon: '⭕', max: 2, min: 2, page: '../games/tictactoe/tictactoe-mp.html',    ready: true, category: 'tritue' },
+  chess:     { id: 'chess',     name: 'Cờ Vua',      icon: '♟️', max: 2, min: 2, page: '../games/chess/chess-mp.html',            ready: true, category: 'tritue' },
+  xiangqi:   { id: 'xiangqi',   name: 'Cờ Tướng',    icon: '🐘', max: 2, min: 2, page: '../games/xiangqi/xiangqi-mp.html',       ready: true, category: 'tritue' },
+  altp:      { id: 'altp',      name: 'Ai Là Triệu Phú', icon: '💰', max: 8, min: 2, page: '../games/altp/altp-mp.html',         ready: true, category: 'tritue' },
+  timso:     { id: 'timso',     name: 'Tìm Số',      icon: '🔟', max: 2, min: 2, page: '../games/timso/timso-mp.html',          ready: true, category: 'tritue' },
 };
 
 const ADMIN_EMAIL = 'thang@game.com';
@@ -95,26 +96,29 @@ function startListeningPublicRooms(){
     const rooms = [];
     snap.forEach(d => {
       const r = d.data();
-      if (r.status === 'lobby' || r.status === 'playing') rooms.push({ id: d.id, ...r });
+      if ((r.status === 'lobby' || r.status === 'playing') && !r.hidden) rooms.push({ id: d.id, ...r });
     });
     rooms.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
     rooms.forEach(r => {
       const game = GAMES[r.gameType] || { name: r.gameType, icon: '🎮' };
       const full = (r.members || []).length >= (r.maxPlayers || 2);
-      const gsPhase = r.gameState?.phase;
-      const isPlaying = r.status === 'playing' && (!gsPhase || gsPhase === 'playing');
+      const isMember = (r.members || []).includes(_user.uid);
+      const isPlaying = r.status === 'playing';
       const isWaiting = (r.waitingMembers || []).includes(_user.uid);
 
       let btnText, btnDisabled;
-      if (isPlaying) {
+      if (isMember) {
+        btnText = isPlaying ? '↩️ Vào lại' : 'Vào';
+        btnDisabled = false;
+      } else if (isPlaying && full) {
         btnText = isWaiting ? '✅ Đã chờ' : '⏳ Chờ';
         btnDisabled = isWaiting;
       } else if (full) {
         btnText = 'Đầy';
         btnDisabled = true;
       } else {
-        btnText = 'Vào';
+        btnText = isPlaying ? '⚡ Vào ngay' : 'Vào';
         btnDisabled = false;
       }
 
@@ -174,18 +178,46 @@ function startListeningPublicRooms(){
 }
 
 // ── CREATE / JOIN / LOBBY ──────────────────────────────────
-window.openCreateModal = function(){
-  $('createModal').classList.add('open');
-  const sel = $('cr-game');
+var _selectedCategory = 'casino';
+
+window.selectCategory = function(cat){
+  _selectedCategory = cat;
+  document.querySelectorAll('.rm-cat-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.cat === cat);
+  });
+  renderGameSelect();
+  // Cập nhật max players nếu vượt quá giới hạn của game đầu tiên trong danh mục
+  var first = Object.values(GAMES).find(function(g){return g.category===cat && g.ready});
+  if(first&&$('cr-max')){
+    var cur=parseInt($('cr-max').value)||4;
+    if(cur>first.max)$('cr-max').value=first.max;
+  }
+};
+
+function renderGameSelect(){
+  var sel = $('cr-game');
+  if(!sel)return;
   sel.innerHTML = '';
-  Object.values(GAMES).forEach(g => {
-    const o = document.createElement('option');
+  var games = Object.values(GAMES).filter(function(g){return g.category===_selectedCategory});
+  games.forEach(function(g){
+    var o = document.createElement('option');
     o.value = g.id;
     o.textContent = g.icon + ' ' + g.name + (g.ready ? '' : ' (sắp ra mắt)');
     if (!g.ready) o.disabled = true;
     sel.appendChild(o);
   });
-  sel.value = 'xidach';
+  // Select first ready game
+  var first = games.find(function(g){return g.ready});
+  if(first)sel.value=first.id;
+}
+
+window.openCreateModal = function(){
+  $('createModal').classList.add('open');
+  _selectedCategory = 'casino';
+  document.querySelectorAll('.rm-cat-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.cat === 'casino');
+  });
+  renderGameSelect();
   $('cr-name').value = (_myProfile.nickname || 'Phòng') + ' của ' + (_myProfile.nickname || 'tôi');
   $('cr-pw').value = '';
   $('cr-max').value = 4;
@@ -265,8 +297,9 @@ async function joinRoomFlow(id, needPw){
 async function joinRoomById(id, data){
   try {
     const myName = _myProfile.nickname || _user.email.split('@')[0];
-    if (data.status === 'playing') {
-      // Phòng đang chơi → vào ghế chờ
+    const isFull = (data.members||[]).length >= (data.maxPlayers||2);
+    if (data.status === 'playing' && isFull) {
+      // Phòng đang chơi và đã đầy chỗ → vào ghế chờ
       if (!(data.waitingMembers||[]).includes(_user.uid) && !(data.members||[]).includes(_user.uid)) {
         await updateDoc(doc(db,'rooms',id), {
           waitingMembers: arrayUnion(_user.uid),
@@ -302,8 +335,15 @@ function enterLobby(roomId){
       return;
     }
     const data = snap.data();
+    const stillIn = (data.members||[]).includes(_user.uid) || (data.waitingMembers||[]).includes(_user.uid);
+    if (!stillIn) {
+      toast('Bạn đã bị kick khỏi phòng', 'warn');
+      backToList();
+      return;
+    }
     renderLobby(data);
-    if (data.status === 'playing'){
+    const isSeated = (data.members||[]).includes(_user.uid);
+    if (data.status === 'playing' && isSeated){
       const g = GAMES[data.gameType];
       if (g && g.page && g.page !== '#'){
         const url = `${g.page}?room=${roomId}`;
@@ -383,6 +423,11 @@ div.innerHTML = `
   if (btnDelete) {
     btnDelete.style.display = (isHost || isAdmin) ? 'inline-block' : 'none';
   }
+  // Room settings button (host only)
+  const btnSettings = $('btn-room-settings');
+  if (btnSettings) {
+    btnSettings.style.display = isHost ? 'inline-block' : 'none';
+  }
 
   if (isHost){
     btnReady.style.display = 'none';
@@ -399,6 +444,15 @@ div.innerHTML = `
     btnReady.classList.toggle('on', !!ready);
   }
 }
+
+window.openRoomSettings = function(){
+  if (!_currentRoomId) return;
+  if (window.TopNav && window.TopNav.openRoomSettings) {
+    window.TopNav.openRoomSettings(_currentRoomId);
+  } else {
+    toast('Không thể mở cài đặt phòng', 'error');
+  }
+};
 
 window.toggleReady = async function(){
   if (!_currentRoomId) return;
@@ -434,8 +488,6 @@ window.startGame = async function(){
     gameState = { phase: 'betting', round: 1, hands: {}, bets: {}, stands: {}, turnOrder: [], turnIdx: 0, results: {}, deck: [], revealed: {}, dealerChecked: {} };
   } else if (data.gameType === 'baicao'){
     gameState = { phase: 'betting', round: 1, hands: {}, bets: {}, results: {}, deck: [] };
-  } else if (data.gameType === 'pickso'){
-    gameState = { phase: 'betting', round: 1, bets: {}, picks: {}, turnOrder: [], turnIdx: 0, winners: [], deltas: {} };
   } else if (data.gameType === 'chess'){
     gameState = { phase: 'betting', round: 1, bets: {}, betAmount: null, betDeclinedBy: null, colors: {}, fen: null, turn: 'w', lastMove: null, moveCount: 0, players: data.members.slice(0, 2), result: null, winnerUid: null, drawOffer: null };
   } else if (data.gameType === 'xiangqi'){

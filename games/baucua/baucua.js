@@ -464,3 +464,6 @@ class BauCua {
 new BauCua();
 window.addEventListener('pagehide', () => { window.bcGame?.forfeitIfAbandoned(); window.bcGame?._unsubBalance?.(); });
 window.addEventListener('beforeunload', () => window.bcGame?.forfeitIfAbandoned());
+
+// Rời game
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);

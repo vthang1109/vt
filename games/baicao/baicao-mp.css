@@ -58,9 +58,9 @@
 .stat-bet {
   font-family: "Science Gothic", sans-serif;
   font-weight: 500;
-  font-size: 19px;
+  font-size: 15px;
   color: #fbbf24;
-  min-width: 65px;
+  min-width: 50px;
 }
 .stat-score-wrap {
   flex: 1;
@@ -71,8 +71,8 @@
 }
 .stat-score {
   font-family: "Science Gothic", sans-serif;
-  font-weight: 500;
-  font-size: 22px;
+  font-weight: 400;
+  font-size: 15px;
   color: #fff;
   text-align: center;
   text-shadow: 0 0 12px rgba(251,191,36,0.6);
@@ -83,9 +83,9 @@
 .stat-profit {
   font-family: "Science Gothic", sans-serif;
   font-weight: 500;
-  font-size: 19px;
+  font-size: 15px;
   text-align: right;
-  min-width: 65px;
+  min-width: 50px;
 }
 .stat-profit.positive { color: #4ade80; }
 .stat-profit.negative { color: #f87171; }

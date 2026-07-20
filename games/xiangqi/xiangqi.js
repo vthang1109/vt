@@ -805,3 +805,6 @@ undoBtn.addEventListener('click', undoMove);
 resetBtn.addEventListener('click', backToSetup);
 
 buildLevelStrip();
+
+// Rời game
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);

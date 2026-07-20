@@ -328,3 +328,6 @@ class BaiCao {
 new BaiCao();
 window.addEventListener('pagehide', () => { window.game?.forfeitIfAbandoned(); window.game?.unsubBalance?.(); });
 window.addEventListener('beforeunload', () => window.game?.forfeitIfAbandoned());
+
+// Rời game
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);

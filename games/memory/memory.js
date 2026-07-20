@@ -262,3 +262,6 @@ async function endGame(){
   document.getElementById('mem-res-stats').innerHTML=statsHTML;
   showScreen('result');
 }
+
+// Rời game
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);

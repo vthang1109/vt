@@ -113,7 +113,6 @@
   padding: 16px 16px;
   border-radius: 12px;
   margin-bottom: 12px;
-  font-weight: 700;
   font-size: 13px;
   --bc-right: rgba(148, 163, 184, 0.08);
   --bc-left-border: rgba(251, 191, 36, 0.9);
@@ -170,10 +169,9 @@
 }
 .stat-bet {
   font-family: 'Science Gothic', sans-serif;
-  font-weight: 500;
-  font-size: 19px;
+  font-size: 15px;
   color: #fbbf24;
-  min-width: 65px;
+  min-width: 50px;
 }
 .stat-score-wrap {
   flex: 1;
@@ -184,8 +182,7 @@
 }
 .stat-score {
   font-family: 'Science Gothic', sans-serif;
-  font-weight: 500;
-  font-size: 22px;
+  font-size: 15px;
   color: #fff;
   text-align: center;
   text-shadow: 0 0 12px rgba(251,191,36,0.6);
@@ -205,10 +202,9 @@
 .bc-status.rolling .stat-score { color: #fbbf24; }
 .stat-profit {
   font-family: 'Science Gothic', sans-serif;
-  font-weight: 500;
-  font-size: 19px;
+  font-size: 15px;
   text-align: right;
-  min-width: 65px;
+  min-width: 50px;
 }
 .stat-profit.positive { color: #4ade80; }
 .stat-profit.negative { color: #f87171; }
@@ -548,6 +544,30 @@
 }
 .xd-modal-btn.decline { background: rgba(248,113,113,.15); color: #f87171; border: 1px solid rgba(248,113,113,.4); }
 .xd-modal-btn.accept { background: linear-gradient(135deg,#34d399,#059669); color: #fff; }
+
+/* ===================== BANNER THÔNG BÁO CHO NHÀ CÁI ===================== */
+.xd-host-notice {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15,23,42,.95);
+  border: 1px solid rgba(248,113,113,.5);
+  color: #fca5a5;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  z-index: 6000;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
+  animation: xdNoticeIn .25s ease both;
+  white-space: nowrap;
+}
+@keyframes xdNoticeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
 /* ===== THÊM VÀO CUỐI FILE xidach-mp.css ===== */
 
 /* ===== ROOM ID TRÊN NAV ===== */

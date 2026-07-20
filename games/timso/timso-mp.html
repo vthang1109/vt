@@ -10,39 +10,133 @@
   <style>
     .tsmp-wrap { min-height:100vh; padding:14px 12px 60px; max-width:600px; margin:0 auto; position:relative; z-index:1; }
 
-    /* Bet row */
-    .mp-bet { display:flex; align-items:center; justify-content:center; gap:10px; padding:14px 12px; margin:20px 0; background:rgba(167,139,250,0.04); border:1px solid rgba(167,139,250,0.15); border-radius:14px; }
-    .mp-bet label { color:#fbbf24; font-weight:600; font-size:13px; font-family:"Science Gothic",sans-serif; }
-    .mp-bet select { padding:7px 10px; border-radius:8px; border:1px solid rgba(167,139,250,0.3); background:rgba(0,0,0,0.3); color:#e0f2fe; font-size:14px; font-family:"Science Gothic",sans-serif; font-weight:600; }
-    .mp-bet select:focus { outline:none; border-color:rgba(167,139,250,0.6); }
-    .mp-bet button { padding:7px 18px; border-radius:8px; border:none; cursor:pointer; font-weight:600; font-size:12px; font-family:"Science Gothic",sans-serif; transition:all .2s; }
-    .mp-bet button:hover { transform:translateY(-1px); }
-    .btn-bet-go { background:linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; }
-    .btn-bet-go:disabled { opacity:.5; cursor:not-allowed; transform:none; }
-    .btn-bet-yes { background:linear-gradient(135deg,#34d399,#10b981); color:#fff; }
-    .btn-bet-yes.on { background:linear-gradient(135deg,#fbbf24,#f59e0b); }
-    .mp-bet-info { text-align:center; color:#94a3b8; font-size:12px; font-weight:600; margin-bottom:8px; }
+    /* ===== VÙNG ĐẶT CƯỢC MỚI (giống chess) ===== */
+    .ts-bet-zone { margin-bottom:12px; }
 
-    /* Waiting */
-    .mp-wait { text-align:center; padding:50px 20px; color:#94a3b8; }
-    .mp-wait .e { font-size:48px; }
-    .mp-wait .t { font-size:18px; font-weight:700; color:#e0f2fe; margin:10px 0 4px; font-family:"Science Gothic",sans-serif; }
+    /* Chủ phòng chọn cược */
+    .ts-bet-picker {
+      padding:16px 18px; border-radius:14px;
+      background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));
+      border:1px solid rgba(251,191,36,0.2);
+    }
+    .ts-bet-picker-title {
+      font-family:"Science Gothic",sans-serif;
+      font-weight:400; font-size:11px; color:#94a3b8;
+      text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;
+    }
+    .ts-bet-picker-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+    .ts-bet-picker-row input {
+      flex:1; padding:10px 12px; border-radius:10px;
+      border:1px solid rgba(251,191,36,0.3);
+      background:rgba(0,0,0,0.35); color:#fde68a;
+      font-family:"Science Gothic",sans-serif;
+      font-weight:500; font-size:16px; text-align:center;
+    }
+    .ts-bet-quick {
+      display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:10px;
+    }
+    .ts-bet-quick button {
+      padding:8px 0; border-radius:8px;
+      border:1px solid rgba(255,255,255,0.07);
+      background:rgba(255,255,255,0.04);
+      color:#cbd5e1; font-family:"Science Gothic",sans-serif;
+      font-weight:400; font-size:12px; cursor:pointer; transition:all .15s;
+    }
+    .ts-bet-quick button:hover { background:rgba(251,191,36,0.12); color:#fbbf24; }
+    .ts-bet-quick button:active { transform:scale(0.95); }
 
-    /* Result modal */
-    .result-modal { position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center; background:rgba(2,6,23,0.7); backdrop-filter:blur(4px); padding:16px; }
-    .result-modal.hidden { display:none; }
-    .result-box { background:linear-gradient(160deg,rgba(15,23,42,.98),rgba(7,16,32,.98)); border:1px solid rgba(167,139,250,.25); border-radius:22px; padding:24px 28px; max-width:340px; width:100%; text-align:center; }
-    .result-emoji { font-size:48px; margin-bottom:8px; }
-    .result-title { font-size:20px; font-weight:700; color:#e0f2fe; margin-bottom:6px; font-family:"Science Gothic",sans-serif; }
-    .result-pts { font-size:24px; font-weight:800; font-family:"Science Gothic",sans-serif; color:#fbbf24; margin-bottom:4px; }
-    .result-sub { font-size:13px; color:#94a3b8; font-weight:600; margin-bottom:16px; }
-    .result-box .acts { display:flex; gap:10px; justify-content:center; }
-    .result-box .acts button { padding:10px 18px; border-radius:12px; border:none; cursor:pointer; font-weight:500; font-size:13px; font-family:"Science Gothic",sans-serif; }
-    .result-box .acts button:hover { transform:translateY(-2px); }
-    .btn-restart { background:linear-gradient(135deg,#34d399,#10b981); color:#fff; }
-    .btn-home { background:rgba(248,113,113,.15); color:#f87171; border:1px solid rgba(248,113,113,.4) !important; }
+    /* Mode & type row */
+    .ts-bet-opts { display:flex; gap:8px; margin-bottom:10px; }
+    .ts-bet-opt-btn {
+      flex:1; padding:8px 6px; border-radius:8px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.04);
+      color:#94a3b8; font-family:"Science Gothic",sans-serif;
+      font-weight:500; font-size:11px; cursor:pointer; transition:all .2s;
+      text-align:center;
+    }
+    .ts-bet-opt-btn:hover { border-color:rgba(56,189,248,0.3); color:#e0f2fe; }
+    .ts-bet-opt-btn.active { border-color:rgba(56,189,248,0.6); color:#38bdf8; background:rgba(56,189,248,0.08); }
+
+    .ts-bet-confirm-btn {
+      width:100%; padding:12px 0; border-radius:10px; border:none; cursor:pointer;
+      font-family:"Science Gothic",sans-serif; font-weight:500; font-size:13px;
+      background:linear-gradient(135deg,#fbbf24,#f59e0b);
+      color:#0a101e; box-shadow:0 4px 16px rgba(251,191,36,0.25);
+      transition:all .15s;
+    }
+    .ts-bet-confirm-btn:hover { box-shadow:0 6px 24px rgba(251,191,36,0.4); }
+    .ts-bet-confirm-btn:active { transform:scale(0.97); }
+    .ts-bet-confirm-btn:disabled { opacity:.4; cursor:not-allowed; box-shadow:none; transform:none; }
+
+    /* Trạng thái chờ */
+    .ts-bet-waiting {
+      text-align:center; font-family:"Science Gothic",sans-serif;
+      font-weight:400; font-size:13px; color:#94a3b8;
+      padding:16px 0;
+    }
+    .ts-bet-waiting b { color:#fbbf24; }
+
+    /* Thẻ xác nhận cho đối thủ */
+    .ts-bet-confirm-card {
+      padding:18px 16px; border-radius:14px;
+      background:rgba(56,189,248,0.06);
+      border:1px solid rgba(56,189,248,0.35); text-align:center;
+    }
+    .ts-bet-confirm-info {
+      font-family:"Science Gothic",sans-serif;
+      font-weight:500; font-size:13px; color:#94a3b8; margin-bottom:4px;
+    }
+    .ts-bet-confirm-info span { color:#38bdf8; }
+    .ts-bet-confirm-amt {
+      font-family:"Science Gothic",sans-serif;
+      font-weight:500; font-size:22px; color:#fbbf24; margin-bottom:8px;
+    }
+    .ts-bet-confirm-type {
+      font-size:12px; color:#94a3b8; margin-bottom:14px;
+    }
+    .ts-bet-confirm-actions { display:flex; gap:10px; }
+    .ts-bet-confirm-actions button {
+      flex:1; padding:11px 0; border-radius:10px; border:none; cursor:pointer;
+      font-family:"Science Gothic",sans-serif; font-weight:500; font-size:13px;
+      transition:all .15s;
+    }
+    .ts-bet-confirm-actions button:active { transform:scale(0.97); }
+    .ts-bet-confirm-actions .decline {
+      background:rgba(255,255,255,0.08); color:#cbd5e1;
+    }
+    .ts-bet-confirm-actions .accept {
+      background:linear-gradient(135deg,#4ade80,#22c55e); color:#06240f;
+    }
+    .ts-bet-confirm-actions .accept:disabled, .ts-bet-confirm-actions .decline:disabled {
+      opacity:.4; cursor:not-allowed; transform:none;
+    }
+
+    /* Inline result banner */
+    .ts-rs-banner {
+      display:none; align-items:center; gap:14px; padding:14px 18px; margin:12px 0;
+      background:linear-gradient(135deg,rgba(15,23,42,.98),rgba(7,16,32,.98));
+      border:1px solid rgba(167,139,250,.25); border-radius:16px;
+      text-align:center; justify-content:center; flex-wrap:wrap;
+    }
+    .ts-rs-emoji { font-size:34px; line-height:1; }
+    .ts-rs-title { font-size:17px; font-weight:700; color:#e0f2fe; font-family:"Science Gothic",sans-serif; }
+    .ts-rs-sub { font-size:12px; color:#94a3b8; font-weight:600; width:100%; }
+    .ts-rs-acts { display:flex; gap:8px; }
+    .ts-rs-acts button {
+      padding:9px 18px; border-radius:10px; border:none; cursor:pointer;
+      font-weight:600; font-size:12px; font-family:"Science Gothic",sans-serif; transition:all .2s;
+    }
+    .ts-rs-acts button:hover { transform:translateY(-2px); }
+    .ts-rs-restart { background:linear-gradient(135deg,#34d399,#10b981); color:#fff; }
+    .ts-rs-home { background:rgba(248,113,113,.15); color:#f87171; border:1px solid rgba(248,113,113,.4) !important; }
+
     .ts-board.mp-clickable .ts-cell:not(:disabled) { cursor:pointer; }
     .ts-board.mp-disabled .ts-cell { cursor:default !important; opacity:0.6; }
+
+    /* Destroy mode indicator */
+    .ts-destroy-stat { text-align:center; font-size:12px; color:#94a3b8; margin-bottom:6px; font-weight:600; }
+    .ts-destroy-stat span { color:#ef4444; }
   </style>
 </head>
 <body data-bottom-nav="games">
@@ -59,25 +153,10 @@
       <div class="t" id="mp-wait-t">&#272;ang ch&#7901; ng&#432;&#7901;i ch&#417;i...</div>
     </div>
 
-    <!-- BET ROW -->
-    <div class="mp-bet" id="mp-bet" style="display:none">
-      <label>C&#432;&#7903;c:</label>
-      <select id="mp-bet-sel">
-        <option value="100">100</option>
-        <option value="200">200</option>
-        <option value="500">500</option>
-        <option value="1000">1.000</option>
-        <option value="2000">2.000</option>
-        <option value="5000">5.000</option>
-      </select>
-      <button class="btn-bet-go" id="btn-bet-host" onclick="betAction()">X&#225;c nh&#7853;n c&#432;&#7903;c</button>
-      <button class="btn-bet-yes" id="btn-bet-player" onclick="betAction()" style="display:none">X&#225;c nh&#7853;n</button>
-      <select id="mp-mode-sel" style="margin-left:6px">
-        <option value="shuffle">&#127922; &#272;&#7843;o s&#7889;</option>
-        <option value="fixed">&#128204; C&#7889; &#273;&#7883;nh</option>
-      </select>
-    </div>
-    <div class="mp-bet-info" id="mp-bet-info"></div>
+    <!-- VÙNG ĐẶT CƯỢC MỚI (giống chess) -->
+    <div class="ts-bet-zone" id="ts-bet-zone" style="display:none"></div>
+
+
 
     <!-- STATUS BAR -->
     <div class="bc-status" id="ts-sbar" style="display:none">
@@ -91,19 +170,16 @@
 
     <!-- BOARD -->
     <div class="ts-board" id="ts-bd" style="display:none"></div>
-  </div>
 
-  <!-- RESULT MODAL -->
-  <div id="rs-modal" class="result-modal hidden">
-    <div class="result-box">
-      <div class="result-emoji" id="rs-em">&#127942;</div>
-      <div class="result-title" id="rs-tl">Th&#7855;ng!</div>
-      <div class="result-pts" id="rs-pt"></div>
-      <div class="result-sub" id="rs-sb"></div>
-      <div class="acts">
-        <button class="btn-restart" onclick="closeRs()">Ch&#417;i ti&#7871;p</button>
-        <button class="btn-home" onclick="window.quitGame()">R&#7901;i</button>
+    <!-- INLINE RESULT BANNER -->
+    <div class="ts-rs-banner" id="ts-rs-banner">
+      <span class="ts-rs-emoji" id="rs-b-em">&#127942;</span>
+      <span class="ts-rs-title" id="rs-b-tl">Th&#7855;ng!</span>
+      <div class="ts-rs-acts">
+        <button class="ts-rs-restart" onclick="closeRs()">Ch&#417;i ti&#7871;p</button>
+        <button class="ts-rs-home" onclick="window.quitGame()">R&#7901;i</button>
       </div>
+      <div class="ts-rs-sub" id="rs-b-sub"></div>
     </div>
   </div>
 
@@ -117,9 +193,9 @@
     function dr(){x.clearRect(0,0,c.width,c.height);p.forEach(function(q){q.x+=q.vx;q.y+=q.vy;if(q.x<0)q.x=c.width;if(q.x>c.width)q.x=0;if(q.y<0)q.y=c.height;if(q.y>c.height)q.y=0;x.beginPath();x.arc(q.x,q.y,q.r,0,Math.PI*2);x.fillStyle='rgba(56,189,248,0.4)';x.fill()});requestAnimationFrame(dr)}
     dr();
     // Toast
-    window.showToast=function(m,t){t=t||'info';var cols={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};var e=document.createElement('div');e.style.cssText='pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid '+(cols[t]||cols.info)+';color:#e0f2fe;font-size:13px;font-weight:400;font-family:\"Science Gothic\",sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px';e.textContent=m;document.getElementById('toastContainer').appendChild(e);setTimeout(function(){e.remove()},3500);};
+    window.showToast=function(m,t){t=t||'info';var cols={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};var e=document.createElement('div');e.style.cssText='pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid '+(cols[t]||cols.info)+';color:#e0f2fe;font-size:13px;font-weight:400;font-family:\\\"Science Gothic\\\",sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px';e.textContent=m;document.getElementById('toastContainer').appendChild(e);setTimeout(function(){e.remove()},3500);};
     // Close result
-    window.closeRs=function(){var m=document.getElementById('rs-modal');if(m)m.classList.add('hidden');if(window.gameReset)window.gameReset();};
+    window.closeRs=function(){if(window.gameReset)window.gameReset();};
   </script>
 
   <script src="../../bottom-nav.js"></script>

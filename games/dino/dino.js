@@ -150,3 +150,6 @@ async function refreshPts() {
     if(document.getElementById('nav-pts')) document.getElementById('nav-pts').textContent = '⭐ ' + p.toLocaleString();
 }
 onAuthStateChanged(auth, user => { if(user) refreshPts(); });
+
+// Rời game
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);

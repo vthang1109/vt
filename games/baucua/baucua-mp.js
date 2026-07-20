@@ -92,6 +92,13 @@ function start(){
   _unsub = onSnapshot(doc(db,'rooms',ROOM_ID), (snap) => {
     if (!snap.exists()){ document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">Phòng đã bị xoá.</div>'; return; }
     const r = snap.data();
+    // Bị host kick khỏi phòng → đẩy ra ngoài ngay
+    if (!(r.members||[]).includes(_user.uid)) {
+      window.__navigated = true; // chặn quitGame chạy lại ở pagehide
+      if (window.showToast) window.showToast('Bạn đã bị kick khỏi phòng', 'error');
+      setTimeout(() => { location.href = '../../app/rooms.html'; }, 800);
+      return;
+    }
     const roomCode = r.code || '------';
     updateNavWithRoom(roomCode);
     if (r.gameType !== 'baucua') return;

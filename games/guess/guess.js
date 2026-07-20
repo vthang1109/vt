@@ -1,6 +1,12 @@
+// ============================================================
+//  guess.js — Đoán Số cho VTWorld
+//  Style sạch như Pong · Phần thưởng lớn
+// ============================================================
+
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { addPoints, getPoints, updateMission } from '../../points.js';
+import { addPoints } from '../../points.js';
+import { getActivePetInfo } from '../../pet.js';
 
 const firebaseConfig = {
   apiKey:"AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",authDomain:"lienquan-fake.firebaseapp.com",
@@ -10,124 +16,301 @@ const firebaseConfig = {
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Particles
-const bgC = document.getElementById('bg-canvas'), bgX = bgC.getContext('2d');
-let pts2 = [];
-function resizeBg(){bgC.width=innerWidth;bgC.height=innerHeight}resizeBg();window.addEventListener('resize',resizeBg);
-for(let i=0;i<40;i++)pts2.push({x:Math.random()*bgC.width,y:Math.random()*bgC.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
-function drawBg(){bgX.clearRect(0,0,bgC.width,bgC.height);pts2.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=bgC.width;if(p.x>bgC.width)p.x=0;if(p.y<0)p.y=bgC.height;if(p.y>bgC.height)p.y=0;bgX.beginPath();bgX.arc(p.x,p.y,p.r,0,Math.PI*2);bgX.fillStyle='rgba(56,189,248,0.5)';bgX.fill();});requestAnimationFrame(drawBg);}drawBg();
+// ===== CONFIG =====
+const REWARDS = { 100: 50, 500: 100, 1000: 200 };
+const MAX_ATTEMPTS = { 100: 10, 500: 12, 1000: 15 };
 
-let secret, maxGuesses=10, guesses=[], rangeMin=1, rangeMax=100, maxNum=100, over=false;
+const Guess = {
+  maxNum: 100,
+  secret: 0,
+  maxAttempts: 10,
+  attempts: [],
+  rangeMin: 1,
+  rangeMax: 100,
+  over: false,
+  won: false,
 
-function init(){
-  maxNum = parseInt(document.getElementById('g-diff').value);
-  secret = Math.floor(Math.random()*maxNum)+1;
-  maxGuesses = maxNum<=100?10:maxNum<=500?12:15;
-  guesses=[]; rangeMin=1; rangeMax=maxNum; over=false;
-  document.getElementById('g-hint').textContent='🤔 Hãy nhập số đầu tiên!';
-  document.getElementById('g-hint').className='g-hint';
-  document.getElementById('g-history').innerHTML='';
-  document.getElementById('g-result').classList.add('hidden');
-  document.getElementById('g-input').value='';
-  document.getElementById('g-input').disabled=false;
-  document.querySelector('.g-btn').disabled=false;
-  document.getElementById('attempts-left').textContent=maxGuesses;
-  renderDots();
-  updateRange();
-}
+  // ── SCREEN NAV ──────────────────────────────────────
+  show(id) {
+    document.querySelectorAll('.gs-screen').forEach(s => s.classList.add('hidden'));
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('hidden');
+  },
 
-function renderDots(){
-  const d=document.getElementById('g-dots');
-  d.innerHTML='';
-  for(let i=0;i<maxGuesses;i++){
-    const dot=document.createElement('div');
-    dot.className='g-dot'+(i<guesses.length?(guesses[i].correct?' used':' wrong'):'');
-    d.appendChild(dot);
+  toast(msg, error) {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'caro-toast' + (error ? ' error-toast' : '');
+    el.classList.add('show');
+    clearTimeout(el._hide);
+    el._hide = setTimeout(() => el.classList.remove('show'), 2500);
+  },
+
+  // ── STATUS BAR ──────────────────────────────────────
+  hideStatusBar() {
+    const el = document.getElementById('bc-status');
+    if (el) el.style.display = 'none';
+  },
+
+  showStatusBar() {
+    const el = document.getElementById('bc-status');
+    if (el) {
+      el.style.display = '';
+      el.className = 'bc-status';
+    }
+    this.updateStatusBar();
+  },
+
+  updateStatusBar() {
+    const leftEl = document.getElementById('gs-status-left');
+    const centerEl = document.getElementById('gs-status-center');
+    const rightEl = document.getElementById('gs-status-right');
+    if (!leftEl || !centerEl || !rightEl) return;
+
+    leftEl.textContent = '1-' + this.maxNum;
+    centerEl.textContent = 'Lần ' + (this.attempts.length + 1);
+    const remaining = this.maxAttempts - this.attempts.length;
+    rightEl.textContent = remaining;
+    rightEl.className = 'stat-profit' + (remaining <= 2 ? ' negative' : remaining <= 5 ? ' zero' : ' positive');
+  },
+
+  // ── START ───────────────────────────────────────────
+  start(maxNum) {
+    if (maxNum) {
+      this.maxNum = parseInt(maxNum);
+      this.maxAttempts = MAX_ATTEMPTS[this.maxNum] || 10;
+    }
+    this.secret = Math.floor(Math.random() * this.maxNum) + 1;
+    this.attempts = [];
+    this.rangeMin = 1;
+    this.rangeMax = this.maxNum;
+    this.over = false;
+    this.won = false;
+
+    const inp = document.getElementById('gs-input');
+    inp.value = '';
+    inp.disabled = false;
+    inp.max = this.maxNum;
+    document.getElementById('guess-btn').disabled = false;
+    document.getElementById('gs-hint').textContent = 'Nhập số từ 1 đến ' + this.maxNum + '!';
+    document.getElementById('gs-hint').className = 'gs-hint';
+    document.getElementById('gs-history').innerHTML = '';
+    document.getElementById('gs-attempts').textContent = this.maxAttempts;
+    document.getElementById('gs-result').classList.add('hidden');
+
+    this.renderDots();
+    this.updateRange();
+    this.show('screen-game');
+    this.showStatusBar();
+
+    setTimeout(() => inp.focus(), 100);
+  },
+
+  // ── GUESS ───────────────────────────────────────────
+  async guess() {
+    if (this.over) return;
+    const inp = document.getElementById('gs-input');
+    const val = parseInt(inp.value);
+    if (isNaN(val) || val < 1 || val > this.maxNum) {
+      this.toast('Nhập số từ 1 đến ' + this.maxNum + '!', true);
+      return;
+    }
+    inp.value = '';
+    inp.focus();
+
+    const hint = document.getElementById('gs-hint');
+    const badge = document.createElement('div');
+    badge.className = 'gs-badge';
+
+    // ── CORRECT ──
+    if (val === this.secret) {
+      this.over = true;
+      this.won = true;
+      this.attempts.push({ val, result: 'win' });
+      badge.classList.add('win');
+      badge.textContent = val + ' ✓';
+      document.getElementById('gs-history').appendChild(badge);
+      this.renderDots();
+      hint.textContent = 'Đúng rồi! Số bí mật là ' + this.secret;
+      hint.className = 'gs-hint win';
+
+      inp.disabled = true;
+      document.getElementById('guess-btn').disabled = true;
+
+      // Calculate reward
+      const remaining = this.maxAttempts - this.attempts.length;
+      let pts = REWARDS[this.maxNum] || 50;
+      // Bonus for remaining attempts
+      if (remaining >= 8) pts += 100;
+      else if (remaining >= 5) pts += 60;
+      else if (remaining >= 3) pts += 30;
+      else pts += 10;
+
+      // Pet buff
+      let totalPts = pts;
+      let buffText = '';
+      try {
+        const petInfo = await getActivePetInfo();
+        const buffPct = petInfo.buff || 0;
+        if (buffPct > 0 && auth.currentUser) {
+          const bonus = Math.round(pts * buffPct / 100);
+          totalPts += bonus;
+          buffText = petInfo.pet ? ' (+' + bonus + ' pet)' : '';
+        }
+      } catch {}
+
+      // Award
+      try {
+        if (auth.currentUser) {
+          await addPoints('Đoán số', 'Thắng game', totalPts);
+        }
+      } catch(e) { console.error(e); }
+
+      // Update status bar
+      const bcStatus = document.getElementById('bc-status');
+      if (bcStatus) {
+        bcStatus.className = 'bc-status result-win';
+        const centerEl = document.getElementById('gs-status-center');
+        if (centerEl) centerEl.textContent = 'THẮNG!';
+        const rightEl = document.getElementById('gs-status-right');
+        if (rightEl) {
+          rightEl.textContent = '+' + totalPts;
+          rightEl.className = 'stat-profit positive';
+        }
+      }
+
+      // Show inline result
+      document.getElementById('res-emoji').textContent = '🏆';
+      document.getElementById('res-title').textContent = 'Bạn đoán đúng!';
+      document.getElementById('res-sub').textContent = 'Số bí mật là ' + this.secret;
+      document.getElementById('res-rewards').innerHTML =
+        '<div><span class="rwd-val">+' + totalPts + '</span><span class="rwd-lbl">Điểm' + buffText + '</span></div>';
+      document.getElementById('gs-result').classList.remove('hidden');
+
+      this.spawnPop('+' + totalPts);
+      return;
+    }
+
+    // ── WRONG ──
+    this.attempts.push({ val, result: val < this.secret ? 'low' : 'high' });
+
+    if (val < this.secret) {
+      hint.textContent = val + ' — Nhỏ hơn!';
+      hint.className = 'gs-hint low';
+      if (val > this.rangeMin) this.rangeMin = val;
+      badge.classList.add('low');
+      badge.textContent = val + ' ↑';
+    } else {
+      hint.textContent = val + ' — Lớn hơn!';
+      hint.className = 'gs-hint high';
+      if (val < this.rangeMax) this.rangeMax = val;
+      badge.classList.add('high');
+      badge.textContent = val + ' ↓';
+    }
+
+    document.getElementById('gs-history').appendChild(badge);
+    document.getElementById('gs-attempts').textContent = this.maxAttempts - this.attempts.length;
+    this.renderDots();
+    this.updateRange();
+    this.updateStatusBar();
+
+    // ── OUT OF ATTEMPTS ──
+    if (this.attempts.length >= this.maxAttempts) {
+      this.over = true;
+      hint.textContent = 'Hết lượt! Số bí mật là ' + this.secret;
+      hint.className = 'gs-hint high';
+      inp.disabled = true;
+      document.getElementById('guess-btn').disabled = true;
+
+      const bcStatus = document.getElementById('bc-status');
+      if (bcStatus) {
+        bcStatus.className = 'bc-status result-lose';
+        const centerEl = document.getElementById('gs-status-center');
+        if (centerEl) centerEl.textContent = 'THUA!';
+        const rightEl = document.getElementById('gs-status-right');
+        if (rightEl) {
+          rightEl.textContent = '0';
+          rightEl.className = 'stat-profit negative';
+        }
+      }
+
+      document.getElementById('res-emoji').textContent = '😔';
+      document.getElementById('res-title').textContent = 'Hết lượt rồi!';
+      document.getElementById('res-sub').textContent = 'Số bí mật là ' + this.secret;
+      document.getElementById('res-rewards').innerHTML = '';
+      document.getElementById('gs-result').classList.remove('hidden');
+    }
+  },
+
+  // ── UI HELPERS ─────────────────────────────────────
+  renderDots() {
+    const d = document.getElementById('gs-dots');
+    d.innerHTML = '';
+    for (let i = 0; i < this.maxAttempts; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'gs-dot';
+      if (i < this.attempts.length) {
+        dot.classList.add(this.attempts[i].result);
+      }
+      d.appendChild(dot);
+    }
+  },
+
+  updateRange() {
+    document.getElementById('gs-range-min').textContent = this.rangeMin;
+    document.getElementById('gs-range-max').textContent = this.rangeMax;
+    const pct = this.maxNum > 0 ? ((this.rangeMax - this.rangeMin) / this.maxNum) * 100 : 100;
+    document.getElementById('gs-range-fill').style.width = pct + '%';
+  },
+
+  spawnPop(text) {
+    const el = document.createElement('div');
+    el.className = 'coin-pop';
+    el.textContent = text;
+    el.style.cssText = 'position:fixed;left:50%;top:40%;transform:translateX(-50%);' +
+      'font-family:Orbitron,monospace;font-size:20px;font-weight:900;color:#fbbf24;' +
+      'pointer-events:none;z-index:9999;text-shadow:0 0 12px rgba(251,191,36,0.8)';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1200);
+  },
+
+  backToMenu() {
+    this.hideStatusBar();
+    this.show('screen-menu');
+    document.getElementById('gs-result').classList.add('hidden');
+  },
+
+  // ── INIT ───────────────────────────────────────────
+  init() {
+    // Leave action
+    if (window.TopNav && typeof window.TopNav.setLeaveAction === 'function') {
+      window.TopNav.setLeaveAction(() => { window.location.href = '../../games.html'; });
+    }
+
+    // Enter key submits
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const gameScreen = document.getElementById('screen-game');
+        if (gameScreen && !gameScreen.classList.contains('hidden')) {
+          this.guess();
+        }
+      }
+    });
+
+    this.maxNum = 100;
+    this.maxAttempts = MAX_ATTEMPTS[this.maxNum] || 10;
   }
-}
+};
 
-function updateRange(){
-  document.getElementById('range-min').textContent=rangeMin;
-  document.getElementById('range-max').textContent=rangeMax;
-  const pct=((rangeMax-rangeMin)/maxNum)*100;
-  document.getElementById('range-fill').style.width=pct+'%';
-}
+// ===== EXPORT GLOBALS =====
+window.Guess = Guess;
 
-window.doGuess = async function(){
-  if(over) return;
-  const val=parseInt(document.getElementById('g-input').value);
-  if(isNaN(val)||val<1||val>maxNum){
-    document.getElementById('g-hint').textContent=`⚠️ Nhập số từ 1 đến ${maxNum}!`;
-    return;
-  }
-  document.getElementById('g-input').value='';
-
-  const hint=document.getElementById('g-hint');
-  const badge=document.createElement('div');
-  badge.className='g-badge';
-
-  if(val===secret){
-    over=true;
-    guesses.push({correct:true});
-    badge.className='g-badge used'; badge.textContent=val+'✓';
-    document.getElementById('g-history').appendChild(badge);
-    renderDots();
-    hint.textContent=`🎉 Đúng rồi! Số bí mật là ${secret}`;
-    hint.className='g-hint';
-    const remaining=maxGuesses-guesses.length+1;
-    const pts=remaining>=8?50:remaining>=5?35:20;
-    document.getElementById('g-input').disabled=true;
-    document.querySelector('.g-btn').disabled=true;
-    document.getElementById('res-emoji').textContent='🎉';
-    document.getElementById('res-text').textContent='Bạn đoán đúng!';
-    document.getElementById('res-pts').textContent=`+${pts} điểm`;
-    document.getElementById('g-result').classList.remove('hidden');
-    await addPoints('Đoán số','Thắng game',pts);
-    await updateMission('win1');await updateMission('win3');await updateMission('win5');await updateMission('play3');
-    refreshPts();
-    return;
-  }
-
-  guesses.push({correct:false});
-  if(val<secret){
-    hint.textContent=`📈 ${val} — Nhỏ hơn! Thử số lớn hơn`;
-    hint.className='g-hint low';
-    if(val>rangeMin) rangeMin=val;
-    badge.className='g-badge low'; badge.textContent=val+'↑';
-  } else {
-    hint.textContent=`📉 ${val} — Lớn hơn! Thử số nhỏ hơn`;
-    hint.className='g-hint high';
-    if(val<rangeMax) rangeMax=val;
-    badge.className='g-badge high'; badge.textContent=val+'↓';
-  }
-  document.getElementById('g-history').appendChild(badge);
-  document.getElementById('attempts-left').textContent=maxGuesses-guesses.length;
-  renderDots();
-  updateRange();
-
-  if(guesses.length>=maxGuesses){
-    over=true;
-    hint.textContent=`😔 Hết lượt! Số bí mật là ${secret}`;
-    hint.className='g-hint high';
-    document.getElementById('g-input').disabled=true;
-    document.querySelector('.g-btn').disabled=true;
-    document.getElementById('res-emoji').textContent='😔';
-    document.getElementById('res-text').textContent='Hết lượt rồi!';
-    document.getElementById('res-pts').textContent='';
-    document.getElementById('g-result').classList.remove('hidden');
-    await updateMission('play3');
-  }
-}
-
-window.newGame = init;
-
-async function refreshPts(){
-  try{const p=await getPoints();const n=document.getElementById('nav-pts');if(n)n.textContent='⭐ '+p.toLocaleString();}catch(e){}
-}
-
-onAuthStateChanged(auth,async(user)=>{
-  if(!user){location.href='index.html';return;}
-  init();
-  const p=await getPoints();
-  const n=document.getElementById('nav-pts');if(n)n.textContent='⭐ '+p.toLocaleString();
+// ===== AUTH =====
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = '../../index.html'; return; }
+  Guess.init();
 });
+
+// ===== PARTICLES (inline in HTML) =====
+// (handled by inline script in guess.html)

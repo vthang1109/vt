@@ -445,3 +445,5 @@ onAuthStateChanged(auth, async (user) => {
   // Chỉ cần lấy buff pet cho tính thưởng.
   petBuff = await getActiveBuff();
 });
+// Rời game
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);

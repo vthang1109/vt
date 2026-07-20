@@ -37,6 +37,19 @@
 
 .rm-label { display:block; color:#7dd3fc; font-weight:700; font-size:12px; margin: 14px 0 6px; letter-spacing: .3px; }
 
+/* ===== Danh mục game (Casino / Trí Tuệ) ===== */
+.rm-category-row { display:flex; gap:8px; margin-bottom:10px; }
+.rm-cat-btn {
+  flex:1; padding:10px 8px; border-radius:10px;
+  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.03);
+  color:#94a3b8; font-family:'Science Gothic',sans-serif;
+  font-weight:500; font-size:12px; cursor:pointer; transition:all .2s;
+  text-align:center;
+}
+.rm-cat-btn:hover { border-color:rgba(167,139,250,0.3); color:#e0f2fe; }
+.rm-cat-btn.active { border-color:rgba(167,139,250,0.6); color:#c4b5fd; background:rgba(167,139,250,0.08); box-shadow:0 0 12px rgba(167,139,250,0.15); }
+
 /* ===== LOBBY ===== */
 .lobby-page { min-height:100vh; padding: 20px 16px 40px; max-width: 880px; margin: 0 auto; position:relative; z-index:1; display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start; }
 .lobby-card { flex: 1 1 420px; background: linear-gradient(160deg, rgba(15,23,42,.85), rgba(7,16,32,.85)); border:1px solid rgba(167,139,250,.25); border-radius:22px; padding:20px; animation: fadeUp .4s both; }

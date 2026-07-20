@@ -162,33 +162,30 @@
   margin-bottom: 14px; 
 }
 
-.ap-pl { 
-  padding: 10px 12px 10px 12px;
+/* === PLAYER CARD - TO HƠN, TÊN SÁT GÓC TRÊN TRÁI (giống Bầu Cua) === */
+.bc-pl { 
+  padding: 10px 12px 32px 12px;
   border-radius: 12px; 
   background: rgba(255,255,255,.03); 
   border: 1px solid rgba(255,255,255,.06); 
   transition: all .3s; 
   position: relative; 
-  min-height: 60px;
+  min-height: 70px;
 }
 
-.ap-pl.top-rank { 
-  border-color: rgba(251,191,36,.4); 
-  box-shadow: 0 0 12px rgba(251,191,36,.15); 
-}
-
-.ap-pl.win { 
+.bc-pl.win { 
   border-color: rgba(52,211,153,.6); 
   box-shadow: 0 0 20px rgba(52,211,153,.3); 
   background: rgba(52,211,153,.08); 
 }
-.ap-pl.lose { 
+.bc-pl.lose { 
   border-color: rgba(248,113,113,.4); 
   box-shadow: 0 0 20px rgba(248,113,113,.2); 
   background: rgba(248,113,113,.06); 
 }
-/* TÊN + RANK */
-.ap-pl-name { 
+
+/* TÊN SÁT GÓC TRÊN BÊN TRÁI */
+.bc-pl-name { 
   font-weight: 800; 
   color: #e0f2fe; 
   font-size: 14px; 
@@ -196,70 +193,60 @@
   line-height: 1.4;
   text-align: left;
 }
-.ap-pl-rank {
-  display: inline-block;
-  margin-right: 4px;
-  font-size: 12px;
-}
 
-/* STREAK NUMBER (top right corner of player card) */
-.ap-pl-streak {
+/* STREAK (CHUỖI) GÓC TRÊN PHẢI */
+.bc-pl-status {
   position: absolute;
-  top: 4px;
-  right: 6px;
-  font-size: 11px;
+  top: 6px;
+  right: 8px;
+  font-size: 13px;
   font-weight: 700;
   color: #f97316;
-  display: flex;
-  align-items: center;
-  gap: 2px;
   pointer-events: none;
 }
-.ap-pl-streak.broken {
-  color: #94a3b8;
-  font-size: 10px;
-}
-.ap-pl-streak span {
-  font-size: 12px;
-}
 
-/* ĐIỂM SỐ ONLINE */
-.ap-pl-score {
-  position: absolute;
-  bottom: 6px;
-  left: 6px;
-  font-family: "Orbitron", "Science Gothic", sans-serif;
-  font-weight: 700;
-  font-size: 14px;
-  color: #fbbf24;
-  pointer-events: none;
-  border: 1px solid rgba(251,191,36,0.35);
-  background: rgba(251,191,36,0.08);
-  border-radius: 8px;
-  padding: 2px 10px;
-}
-
-/* DELTA (thay đổi điểm trong câu này) */
-.ap-pl-delta {
+/* BADGE ĐIỂM SỐ - GÓC DƯỚI BÊN PHẢI */
+.bc-pl-bet-badge {
   position: absolute;
   bottom: 6px;
   right: 8px;
-  padding: 2px 10px;
+  padding: 3px 12px;
   border-radius: 6px;
+  border: 1px solid rgba(251,191,36,0.4);
+  background: rgba(251,191,36,0.1);
+  color: #fbbf24;
   font-family: "Science Gothic", sans-serif;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 12px;
   pointer-events: none;
 }
-.ap-pl-delta.win {
+
+/* BADGE DELTA (THAY ĐỔI ĐIỂM TRONG CÂU NÀY) - GÓC DƯỚI BÊN TRÁI */
+.bc-pl-result-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 8px;
+  padding: 3px 12px;
+  border-radius: 6px;
+  font-family: "Science Gothic", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  pointer-events: none;
+}
+.bc-pl-result-badge.win {
   color: #34d399;
   border: 1px solid rgba(52,211,153,0.4);
   background: rgba(52,211,153,0.1);
 }
-.ap-pl-delta.lose {
+.bc-pl-result-badge.lose {
   color: #f87171;
   border: 1px solid rgba(248,113,113,0.4);
   background: rgba(248,113,113,0.1);
+}
+.bc-pl-result-badge.draw {
+  color: #94a3b8;
+  border: 1px solid rgba(148,163,184,0.3);
+  background: rgba(148,163,184,0.08);
 }
 
 /* ===================== TIME LIMIT SELECTOR ===================== */
@@ -325,93 +312,7 @@
 .altp-act-orange { background: #f97316; }
 .altp-act-red { background: #ef4444; }
 
-/* ===================== STATUS BAR ===================== */
-.bc-status {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 16px;
-  border-radius: 12px;
-  margin-bottom: 4px;
-  font-weight: 700;
-  font-size: 13px;
-  --bc-right: rgba(148, 163, 184, 0.08);
-  --bc-left-border: rgba(251, 191, 36, 0.9);
-  --bc-right-border: rgba(56, 189, 248, 0.4);
-  background-image:
-    linear-gradient(135deg,
-      rgba(251, 191, 36, 0.1) 0%,
-      rgba(251, 191, 36, 0.1) 20%,
-      transparent 38%,
-      transparent 62%,
-      var(--bc-right) 80%,
-      var(--bc-right) 100%),
-    linear-gradient(#0a101e, #0a101e),
-    linear-gradient(135deg,
-      var(--bc-left-border) 0%,
-      var(--bc-left-border) 35%,
-      var(--bc-right-border) 65%,
-      var(--bc-right-border) 100%);
-  background-origin: padding-box, padding-box, border-box;
-  background-clip: padding-box, padding-box, border-box;
-  border: 1px solid transparent;
-  min-height: 64px;
-  width: 100%;
-  box-sizing: border-box;
-  transition: all 0.3s;
-  gap: 8px;
-  box-shadow: 0 0 16px rgba(251, 191, 36, 0.18);
-  font-family: "Science Gothic", sans-serif;
-  line-height: 1.2;
-}
-.bc-status.result-win {
-  --bc-right: rgba(8, 60, 28, 0.7);
-  --bc-right-border: #22c55e;
-  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
-}
-.bc-status.result-lose {
-  --bc-right: rgba(70, 12, 12, 0.7);
-  --bc-right-border: #ef4444;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
-}
-.bc-status.result-win .stat-score { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
-.bc-status.result-lose .stat-score { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
-.stat-bet {
-  font-family: "Orbitron", "Science Gothic", sans-serif;
-  font-weight: 700;
-  font-size: 22px;
-  color: #fbbf24;
-  min-width: 65px;
-  transition: color 0.3s;
-}
-.stat-bet.positive { color: #4ade80; }
-.stat-bet.negative { color: #f87171; }
-.stat-score-wrap {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1.1;
-}
-.stat-score {
-  font-family: "Science Gothic", sans-serif;
-  font-weight: 500;
-  font-size: 22px;
-  color: #fff;
-  text-align: center;
-  text-shadow: 0 0 12px rgba(251,191,36,0.6);
-  transition: color 0.3s;
-}
-.stat-profit {
-  font-family: "Orbitron", "Science Gothic", sans-serif;
-  font-weight: 700;
-  font-size: 22px;
-  text-align: right;
-  min-width: 65px;
-}
-.stat-profit.positive { color: #4ade80; }
-.stat-profit.negative { color: #f87171; }
-.stat-profit.zero { color: #ffffff; }
+
 
 /* ===================== ROOM ID TRÊN NAV ===================== */
 .vt-top-nav .vt-nav-logo .vt-room-id {
@@ -490,12 +391,10 @@
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 480px) {
   .altp-players { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .ap-pl { min-height: 55px; padding: 8px 10px 8px 10px; }
-  .ap-pl-name { font-size: 12px; padding-right: 30px; }
-  .ap-pl-rank { font-size: 10px; }
-  .ap-pl-status { font-size: 14px; top: 4px; right: 6px; }
-  .ap-pl-score { font-size: 14px; }
-  .ap-pl-delta { font-size: 10px; padding: 1px 6px; }
-  .ap-pl-role { display: none; }
+  .bc-pl { min-height: 60px; padding: 8px 10px 28px 10px; }
+  .bc-pl-name { font-size: 12px; padding-right: 30px; }
+  .bc-pl-status { font-size: 12px; top: 4px; right: 6px; }
+  .bc-pl-bet-badge { font-size: 10px; padding: 2px 8px; }
+  .bc-pl-result-badge { font-size: 11px; padding: 2px 8px; }
   .altp-timer { font-size: 20px; }
 }

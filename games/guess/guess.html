@@ -2,64 +2,125 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>VTWorld — Đoán Số</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
   <link rel="stylesheet" href="guess.css"/>
   <link rel="stylesheet" href="../../quests.css"/>
-  <script type="module" src="../../quests.js"></script>
-  <script src="../../fullscreen.js"></script>
   <script src="../../top-nav.js"></script>
   <script src="../../bottom-nav.js"></script>
+  <script type="module" src="../../quests.js"></script>
+  <script src="../../fullscreen.js"></script>
 </head>
 <body data-bottom-nav="games">
-  <div id="top-nav-root"></div>
   <canvas id="bg-canvas"></canvas>
   <div class="orb orb1"></div><div class="orb orb2"></div>
 
+  <div id="top-nav-root"></div>
 
-  <div class="g-container">
-    <div class="g-card">
-      <div class="g-title">🔢 Đoán Số Bí Mật</div>
-      <p class="g-sub">Số từ <b>1</b> đến <b>100</b> · Tối đa <b>10</b> lần đoán</p>
+  <div class="guess-container">
 
-      <div class="g-range-bar">
-        <span id="range-min">1</span>
-        <div class="g-range-track"><div class="g-range-fill" id="range-fill"></div></div>
-        <span id="range-max">100</span>
+    <!-- STATUS BAR -->
+    <div class="bc-status" id="bc-status" style="display:none">
+      <span class="stat-bet" id="gs-status-left">1-100</span>
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="gs-status-center">Lần 1</span>
       </div>
+      <span class="stat-profit zero" id="gs-status-right">10</span>
+    </div>
 
-      <div class="g-hint" id="g-hint">🤔 Hãy nhập số đầu tiên!</div>
+    <!-- ===== DIFFICULTY / MENU ===== -->
+    <div id="screen-menu" class="gs-screen">
+      <div class="gs-logo">?</div>
+      <h1 class="gs-title">Đoán Số</h1>
+      <p class="gs-sub">Máy nghĩ ra 1 số — bạn đoán càng nhanh càng nhiều điểm</p>
 
-      <div class="g-attempts">
-        <span id="attempts-left">10</span> lần còn lại
-        <div class="g-dots" id="g-dots"></div>
-      </div>
-
-      <div class="g-input-row">
-        <input id="g-input" class="g-input" type="number" min="1" max="100" placeholder="Nhập số..." onkeydown="if(event.key==='Enter')doGuess()"/>
-        <button class="g-btn" onclick="doGuess()">Đoán</button>
-      </div>
-
-      <div class="g-history" id="g-history"></div>
-
-      <div class="g-result hidden" id="g-result">
-        <div class="g-result-emoji" id="res-emoji">🎉</div>
-        <div class="g-result-text" id="res-text">Bạn thắng!</div>
-        <div class="g-result-pts" id="res-pts"></div>
-        <button class="g-btn" onclick="newGame()">🔄 Chơi lại</button>
-      </div>
-
-      <div class="g-difficulty">
-        <span>Độ khó:</span>
-        <select id="g-diff" onchange="newGame()">
-          <option value="100">Dễ (1-100)</option>
-          <option value="500">Trung bình (1-500)</option>
-          <option value="1000">Khó (1-1000)</option>
-        </select>
+      <div class="gs-diff-grid">
+        <div class="gs-diff-card" onclick="Guess.start(100)">
+          <div>
+            <span class="gs-diff-name">Dễ</span>
+            <span class="gs-diff-desc">1-100 · 10 lượt</span>
+          </div>
+          <span class="gs-diff-pts">50〄</span>
+        </div>
+        <div class="gs-diff-card" onclick="Guess.start(500)">
+          <div>
+            <span class="gs-diff-name">Trung bình</span>
+            <span class="gs-diff-desc">1-500 · 12 lượt</span>
+          </div>
+          <span class="gs-diff-pts">100〄</span>
+        </div>
+        <div class="gs-diff-card" onclick="Guess.start(1000)">
+          <div>
+            <span class="gs-diff-name">Khó</span>
+            <span class="gs-diff-desc">1-1000 · 15 lượt</span>
+          </div>
+          <span class="gs-diff-pts">200〄</span>
+        </div>
       </div>
     </div>
+
+    <!-- ===== GAME SCREEN ===== -->
+    <div id="screen-game" class="gs-screen hidden">
+      <div class="gs-range-bar">
+        <span class="gs-range-num" id="gs-range-min">1</span>
+        <div class="gs-range-track">
+          <div class="gs-range-fill" id="gs-range-fill"></div>
+        </div>
+        <span class="gs-range-num" id="gs-range-max">100</span>
+      </div>
+
+      <div class="gs-hint" id="gs-hint">Nhập số đầu tiên!</div>
+
+      <div class="gs-attempts">
+        <span class="gs-attempts-label">Còn lại</span>
+        <span class="gs-attempts-num" id="gs-attempts">10</span>
+        <div class="gs-dots" id="gs-dots"></div>
+      </div>
+
+      <div class="gs-input-row">
+        <input id="gs-input" class="gs-input" type="number" min="1" max="100" placeholder="..." autofocus/>
+        <button class="gs-btn" id="guess-btn" onclick="Guess.guess()">Đoán</button>
+      </div>
+
+      <div class="gs-history" id="gs-history"></div>
+
+      <!-- KẾT QUẢ INLINE (không popup) -->
+      <div class="gs-result hidden" id="gs-result">
+        <div class="gs-result-emoji" id="res-emoji"></div>
+        <div class="gs-result-title" id="res-title">Kết quả</div>
+        <div class="gs-result-sub" id="res-sub"></div>
+        <div class="gs-result-rewards" id="res-rewards"></div>
+        <div class="gs-result-actions">
+          <button class="caro-btn green" onclick="Guess.start()">Chơi lại</button>
+          <button class="caro-btn" onclick="Guess.backToMenu()">Chọn độ khó</button>
+        </div>
+      </div>
+
+      <div class="gs-controls">
+        <button class="caro-btn" onclick="Guess.backToMenu()">Thoát</button>
+        <button class="caro-btn" onclick="Guess.start()">Ván mới</button>
+      </div>
+    </div>
+
   </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="caro-toast"></div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+      for(let i=0;i<30;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+      (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(56,189,248,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    }
+    window.showToast = window.showToast || function(){};
+  </script>
 
   <script type="module" src="guess.js"></script>
 </body>

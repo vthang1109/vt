@@ -152,3 +152,6 @@ async function refreshPts() {
     } catch(e) {}
 }
 onAuthStateChanged(auth, user => { if(user) refreshPts(); });
+
+// Rời game
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);

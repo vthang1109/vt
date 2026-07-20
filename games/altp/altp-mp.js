@@ -3,7 +3,7 @@
 // ===== Bỏ cược • +50/-50 • Thưởng nhanh nhất +50 =====
 // ============================================================
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove, increment, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getActiveBuff } from '../../pet.js';
 import { initRoomChat, getMyNickname } from '../../room-chat.js';
@@ -25,6 +25,7 @@ const ROOM_ID = new URLSearchParams(location.search).get('room');
 const showToast = window.showToast || function(){};
 let _user = null, _unsub = null, _unsubMe = null;
 let _room = null, _myActivePet = null;
+let _autoRevealing = false;
 let _actionLock = false;
 let _timerInterval = null;
 let _myLocalHidden = [];   // per-player 50:50 hidden options (local)
@@ -36,9 +37,9 @@ let _lastRoundTimer = 0;  // track which round the timer was started for
 window.addEventListener('pagehide', () => window.quitGame?.());
 window.addEventListener('beforeunload', () => window.quitGame?.());
 
-// ========== BẢNG THƯỞNG OFFLINE (15 câu) ==========
-const PRIZE_TABLE = [0, 0, 0, 0, 0, 1000, 2000, 3000, 4000, 5000, 10000, 15000, 20000, 30000, 50000, 100000];
-const SAFE_IDX = [4, 9, 14]; // câu 5, 10, 15 (0-index: 4, 9, 14)
+// ========== BẢNG THƯỞNG OFFLINE (15 câu) — đồng bộ với altp.js ==========
+const PRIZE_TABLE = [10, 20, 40, 70, 100, 150, 300, 600, 1200, 2000, 3000, 4000, 5500, 7500, 10000];
+const SAFE_IDX = [4, 9]; // câu 5 và câu 10 (0-index: 4, 9)
 const TIER_BY_RANGE = (idx) => idx < 5 ? 'de' : idx < 10 ? 'vua' : 'kho';
 
 if (!ROOM_ID) document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">⚠️ Thiếu mã phòng.</div>';
@@ -78,6 +79,21 @@ function fmt(n) { return (n || 0).toLocaleString('vi-VN'); }
 function fmtScore(n) {
   const v = n || 0;
   return (v >= 0 ? '+' : '') + v;
+}
+
+// Thưởng chuỗi cuối game (giống hệt luật altp.js offline)
+function computeFinalPrize(gs, uid) {
+  const ps = (gs.streaks || {})[uid] || {};
+  if (ps.streakBroken) return ps.safePrize || 0;
+  // Chưa từng trả lời sai: nhận đúng giá trị bậc thang của câu đã trả lời đúng gần nhất
+  // (không chỉ dừng ở mốc an toàn Q5/Q10 — nếu đúng hết 15 câu phải nhận full bậc 15)
+  const roundIdx = gs.roundIdx || 0;
+  return roundIdx > 0 ? (PRIZE_TABLE[roundIdx - 1] || 0) : 0;
+}
+
+// Tổng nhận cuối game = thưởng chuỗi (bậc thang) + điểm thưởng mỗi câu (+50/-50/+100 nhanh nhất)
+function computeGrandTotal(gs, uid) {
+  return computeFinalPrize(gs, uid) + (gs.scores?.[uid] || 0);
 }
 
 // ========== AUTH ==========
@@ -196,6 +212,18 @@ function start() {
       }
       return;
     }
+
+    // Tự động lật đáp án khi tất cả người chơi đã trả lời
+    if (r.hostUid === _user.uid && r.gameState.phase === 'playing') {
+      const gs = r.gameState;
+      const members = r.members || [];
+      const answeredCount = Object.keys(gs.answers || {}).length;
+      if (members.length > 0 && answeredCount >= members.length && !_autoRevealing) {
+        _autoRevealing = true;
+        hostReveal().finally(() => { _autoRevealing = false; });
+      }
+    }
+
     render(r);
   });
 }
@@ -286,24 +314,14 @@ function render(r) {
       rightEl.className = 'stat-profit ' + (myDelta >= 0 ? 'positive' : 'negative');
     }
   } else if (gs.phase === 'result') {
-    // Tính thưởng streak
-    const ps = gs.streaks?.[_user.uid] || {};
-    let streakPrize = 0;
-    if (ps.streakBroken) {
-      streakPrize = ps.safePrize || 0;
-    } else {
-      const roundIdx = gs.roundIdx || 0;
-      for (const si of SAFE_IDX) {
-        if (si + 1 <= roundIdx) streakPrize = PRIZE_TABLE[si] || 0;
-      }
-    }
-    midEl.textContent = streakPrize > 0
-      ? `Kết thúc 🏆 +${fmt(streakPrize)}đ`
-      : 'Kết thúc';
-    const myScore = gs.scores?.[_user.uid] || 0;
-    leftEl.textContent = fmtScore(myScore);
-    leftEl.className = 'stat-bet ' + (myScore >= 0 ? 'positive' : 'negative');
-    rightEl.textContent = `Vòng ${gs.roundIdx || 0}/15`;
+    // Tổng nhận = thưởng chuỗi + điểm thưởng mỗi câu
+    const grandTotal = computeGrandTotal(gs, _user.uid);
+    const correctCount = gs.streaks?.[_user.uid]?.correctCount || 0;
+    midEl.textContent = grandTotal > 0 ? 'WIN' : 'LOSE';
+    statusEl.classList.add(grandTotal > 0 ? 'result-win' : 'result-lose');
+    leftEl.textContent = fmtScore(grandTotal) + 'đ';
+    leftEl.className = 'stat-bet ' + (grandTotal >= 0 ? 'positive' : 'negative');
+    rightEl.textContent = `✅ ${correctCount}/15`;
     rightEl.className = 'stat-profit zero';
   }
 
@@ -438,8 +456,13 @@ function render(r) {
       // Determine result styling
       let resultCls = '';
       let deltaStr = '';
+      let grandTotal = 0;
 
-      if (wrong) {
+      if (gs.phase === 'result') {
+        grandTotal = computeGrandTotal(gs, uid);
+        if (grandTotal > 0) resultCls = 'win';
+        else if (grandTotal < 0) resultCls = 'lose';
+      } else if (wrong) {
         resultCls = 'lose';
         deltaStr = '-50';
       } else if (correct) {
@@ -460,28 +483,27 @@ function render(r) {
       else if (rankIdx === 2 && gs.phase === 'result') rankBadge = '🥉';
 
       const div = document.createElement('div');
-      div.className = 'ap-pl';
+      div.className = 'bc-pl';
       if (resultCls) div.classList.add(resultCls);
-      if (isMe) div.classList.add('me');
-      if (rankBadge) div.classList.add('top-rank');
 
-      // Streak badge (top right corner)
-      let streakHtml = '';
-      if (streakCount > 0 || streakBroken) {
-        const streakCls = streakBroken ? 'ap-pl-streak broken' : 'ap-pl-streak';
-        streakHtml = `<div class="${streakCls}">${streakBroken ? '💔' : '🔥'}
-          <span>${streakCount > 0 || !streakBroken ? streakCount : ''}</span>
-        </div>`;
+      // Streak display ở góc trên phải (thay thế icon tròn đỏ xanh)
+      let streakIcon = '';
+      if (streakCount > 0) {
+        streakIcon = `🔥${streakCount}`;
+      } else if (streakBroken) {
+        streakIcon = '💔';
       }
 
       div.innerHTML = `
-        <div class="ap-pl-name">
-          ${rankBadge ? `<span class="ap-pl-rank">${rankBadge}</span>` : `<span class="ap-pl-rank">#${rankIdx + 1}</span>`}
-          ${esc(info.name || '?')} ${isMe ? '<span style="color:#fbbf24">(bạn)</span>' : ''}
+        <div class="bc-pl-name">
+          ${rankBadge || `#${rankIdx + 1}`} ${esc(info.name || '?')} ${isMe ? '<span style="color:#fbbf24">(bạn)</span>' : ''} ${uid === hostId ? '👑' : ''}
         </div>
-        ${streakHtml}
-        <div class="ap-pl-score">${fmtScore(score)}</div>
-        ${deltaStr ? `<div class="ap-pl-delta ${correct ? 'win' : 'lose'}">${deltaStr}</div>` : ''}
+        ${streakIcon ? `<div class="bc-pl-status">${streakIcon}</div>` : ''}
+        ${gs.phase === 'result'
+          ? `<div class="bc-pl-bet-badge">${fmtScore(grandTotal)}đ</div>
+             <div class="bc-pl-result-badge ${grandTotal > 0 ? 'win' : 'lose'}">✅ ${myStreak.correctCount || 0}/15</div>`
+          : (score !== 0 ? `<div class="bc-pl-bet-badge">${fmtScore(score)}</div>` : '')}
+        ${gs.phase !== 'result' && deltaStr ? `<div class="bc-pl-result-badge ${resultCls === 'win' ? 'win' : 'lose'}">${deltaStr}</div>` : ''}
       `;
       playersEl.appendChild(div);
     });
@@ -508,8 +530,8 @@ function render(r) {
         ${!nextRoundEnabled ? '<button class="altp-act-btn altp-act-yellow" onclick="window.hostEndGame()">🏁 Kết thúc game</button>' : ''}`;
     } else if (gs.phase === 'result') {
       actEl.innerHTML = `
-        <button class="altp-act-btn altp-act-green" onclick="window.hostRestartGame()">🔄 Chơi lại</button>
-        <button class="altp-act-btn altp-act-red" onclick="window.quitGame()">🚪 Rời phòng</button>`;
+        <button class="altp-act-btn altp-act-green" onclick="window.hostRestartGame()" style="display:inline-flex;align-items:center;justify-content:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.35 1.83l1.46 1.46A6.995 6.995 0 0 0 19 13c0-3.87-3.13-7-7-7zm-6 7c0-.65.13-1.26.35-1.83L4.89 9.71A6.995 6.995 0 0 0 5 13c0 3.87 3.13 7 7 7v3l4-4-4-4v3c-2.76 0-5-2.24-5-5z"/></svg> Chơi lại</button>
+        <button class="altp-act-btn altp-act-red" onclick="window.quitGame()" style="display:inline-flex;align-items:center;justify-content:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg> Rời phòng</button>`;
     }
   } else {
     // Non-host player actions
@@ -722,12 +744,13 @@ window.hostReveal = async function() {
   if (correct !== undefined && r.members) {
     const roundIdx = gs.roundIdx || 1;
     for (const uid of r.members) {
-      let ps = newStreaks[uid] || { correctStreak: 0, streakBroken: false, safePrize: 0 };
+      let ps = newStreaks[uid] || { correctStreak: 0, streakBroken: false, safePrize: 0, correctCount: 0 };
       ps = { ...ps };
       const ans = answers[uid];
       if (ans === correct) {
-        // Correct answer: increment streak
-        ps.correctStreak = (ps.correctStreak || 0) + 1;
+        // Correct answer: tăng chuỗi + tổng số câu đúng
+        ps.correctCount = (ps.correctCount || 0) + 1;
+        if (!ps.streakBroken) ps.correctStreak = (ps.correctStreak || 0) + 1;
       } else if (!ps.streakBroken) {
         // Wrong or unanswered: break streak, claim nearest safe milestone
         ps.streakBroken = true;
@@ -777,27 +800,20 @@ window.hostEndGame = async function() {
   stopTimer();
 
   const gs = r.gameState;
-  const streaks = gs.streaks || {};
 
-  // Pay out per-player offline streak prize
-  if (r.members) {
+  // Trả thưởng tổng cộng (streak + điểm thưởng mỗi câu), 1 lần duy nhất, gộp thành 1 batch để giảm số lần ghi
+  if (r.members && r.members.length > 0) {
+    const batch = writeBatch(db);
+    let hasPayout = false;
     for (const uid of r.members) {
-      const ps = streaks[uid] || {};
-      let finalPrize = 0;
-      if (ps.streakBroken) {
-        finalPrize = ps.safePrize || 0;
-      } else {
-        // Streak still intact - claim nearest safe milestone
-        const roundIdx = gs.roundIdx || 0;
-        for (const si of SAFE_IDX) {
-          if (si + 1 <= roundIdx) finalPrize = PRIZE_TABLE[si] || 0;
-        }
+      const grandTotal = computeGrandTotal(gs, uid);
+      if (grandTotal !== 0) {
+        batch.update(doc(db, 'users', uid), { points: increment(grandTotal) });
+        hasPayout = true;
       }
-      if (finalPrize > 0) {
-        try {
-          await updateDoc(doc(db, 'users', uid), { points: increment(finalPrize) });
-        } catch(e) {}
-      }
+    }
+    if (hasPayout) {
+      try { await batch.commit(); } catch (e) {}
     }
   }
 

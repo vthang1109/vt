@@ -267,3 +267,6 @@ class TaiXiu {
 new TaiXiu();
 window.addEventListener('pagehide', () => { window.txGame?.forfeitIfAbandoned(); window.txGame?.unsubBalance?.(); });
 window.addEventListener('beforeunload', () => window.txGame?.forfeitIfAbandoned());
+
+// Rời game
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
