@@ -31,11 +31,13 @@ export const PET_TIERS = [
 // Thêm pet mới chỉ cần append vào đúng nhóm tier, tăng số thứ tự
 // Ảnh: /assets/pet/{id}_1.png, /assets/pet/{id}_2.png, /assets/pet/{id}_3.png
 // Dùng đường dẫn tuyệt đối (có / đầu) để hoạt động từ mọi thư mục
+const PET_BASE = new URL('.', import.meta.url).pathname;
+
 function makePet(id, name, emoji, tier) {
   return { id, name, emoji, tier, images: [
-    `/assets/pet/${id}_1.png`,
-    `/assets/pet/${id}_2.png`,
-    `/assets/pet/${id}_3.png`,
+    `${PET_BASE}assets/pet/${id}_1.png`,
+    `${PET_BASE}assets/pet/${id}_2.png`,
+    `${PET_BASE}assets/pet/${id}_3.png`,
   ]};
 }
 
