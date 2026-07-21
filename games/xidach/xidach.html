@@ -6,7 +6,7 @@
   <title>VTWorld — Xì Dách Offline</title>
   <link rel="stylesheet" href="../../style.css"/>
   <link rel="stylesheet" href="../../quests.css"/>
-  <link rel="stylesheet" href="cards.css"/>
+  <link rel="stylesheet" href="../../cards.css"/>
   <link rel="stylesheet" href="../../status-bar.css"/>
   <link rel="stylesheet" href="xidach.css"/>
   <script src="../../top-nav.js"></script>
@@ -22,30 +22,77 @@
   <div id="top-nav-root"></div>
   <div class="xd-wrap">
 
-    <!-- STATUS BAR đồng bộ slot/bầu cua/tài xỉu -->
-    <div class="bc-status" id="bc-status">
-      <span class="stat-bet" id="xd-bet">0</span>
-      <div class="stat-score-wrap">
-        <span class="stat-score" id="xd-score">--</span>
-        <span class="stat-score-sub" id="xd-score-sub"></span>
+    <!-- ===== MENU SCREEN ===== -->
+    <div id="xd-menu" class="xd-screen active">
+      <!-- Decorative floating cards background -->
+      <div class="xd-menu-glow"></div>
+      <div class="xd-floating-card xd-fc-1">🂡</div>
+      <div class="xd-floating-card xd-fc-2">🂱</div>
+      <div class="xd-floating-card xd-fc-3">🃁</div>
+
+      <div class="xd-logo"><img src="../../assets/icons/xidach.png" alt="Xì Dách" class="xd-logo-img"/></div>
+      <h1 class="xd-title">Xì Dách</h1>
+      <p class="xd-sub">Dằn dơ tuyệt đỉnh đời người, hơn kẻ bị quắc ngồi cười giả nai!</p>
+
+      <!-- Glass card container -->
+      <div class="xd-menu-card">
+
+        <!-- Mode selector -->
+        <div class="xd-mode-select">
+          <button class="xd-mode-btn active" data-mode="player">👤 Người chơi</button>
+          <button class="xd-mode-btn" data-mode="dealer">👑 Cầm cái</button>
+        </div>
+
+        <!-- Bet selector -->
+        <div class="xd-bet-section">
+          <div class="xd-bet-chips" id="xd-bet-chips">
+            <button class="xd-chip" data-amt="50">50</button>
+            <button class="xd-chip active" data-amt="100">100</button>
+            <button class="xd-chip" data-amt="500">500</button>
+            <button class="xd-chip" data-amt="1000">1K</button>
+            <button class="xd-chip" data-amt="5000">5K</button>
+            <button class="xd-chip" data-amt="10000">10K</button>
+          </div>
+          <div class="xd-bet-input-row">
+            <input id="xd-bet-input" type="number" min="50" step="50" value="100" placeholder="Nhập số tiền"/>
+            <button class="xd-play-btn" id="xd-play-btn">
+              <span class="xd-play-icon">▶</span>
+              Chơi Ngay
+            </button>
+          </div>
+        </div>
+
       </div>
-      <span class="stat-profit zero" id="xd-profit">+0</span>
     </div>
 
-    <!-- TABLE -->
-    <div class="xd-table" id="xd-table"></div>
+    <!-- ===== GAME SCREEN ===== -->
+    <div id="xd-game" class="xd-screen">
 
-    <!-- BET ROW (nằm dưới bàn) -->
-    <div class="xd-bet-row" id="xd-bet-row">
-      <label>Đặt cược:</label>
-      <input id="xd-bet-input" type="number" min="50" step="50" value="100"/>
-      <button onclick="window.game.placeBet()">✅ Đặt cược</button>
-    </div>
+      <!-- STATUS BAR đồng bộ slot/bầu cua/tài xỉu -->
+      <div class="bc-status" id="bc-status">
+        <span class="stat-bet" id="xd-bet">0</span>
+        <div class="stat-score-wrap">
+          <span class="stat-score" id="xd-score">--</span>
+          <span class="stat-score-sub" id="xd-score-sub"></span>
+        </div>
+        <span class="stat-profit zero" id="xd-profit">+0</span>
+      </div>
 
-    <!-- ACTIONS -->
-    <div class="xd-actions">
-      <button class="btn-hit"   id="btn-hit"        onclick="window.game.hit()"    style="display:none">➕ Rút</button>
-      <button class="btn-stand" id="btn-stand"      onclick="window.game.stand()"  style="display:none">✋ Dằn</button>
+      <!-- TABLE -->
+      <div class="xd-table" id="xd-table"></div>
+
+      <!-- BET ROW (nằm dưới bàn) -->
+      <div class="xd-bet-row" id="xd-bet-row">
+        <label>Đặt cược:</label>
+        <input id="xd-game-bet-input" type="number" min="50" step="50" value="100"/>
+        <button id="xd-bet-btn">✅ Đặt cược</button>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="xd-actions">
+        <button class="btn-hit"   id="btn-hit"        style="display:none">➕ Rút</button>
+        <button class="btn-stand" id="btn-stand"      style="display:none">✋ Dằn</button>
+      </div>
     </div>
   </div>
 

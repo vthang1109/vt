@@ -16,7 +16,7 @@
 .bnd-status { text-align: center; font-size: 13px; color: #7dd3fc; margin: 8px 0; font-weight: 600; min-height: 40px; padding: 0 10px; }
 
 .bnd-actions { display: flex; gap: 10px; margin: 8px 0; justify-content: center; }
-.bnd-actions button { padding: 10px 22px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.25s; border: 1px solid rgba(56,189,248,0.2); }
+.bnd-actions button { padding: 10px 22px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.25s; border: 1px solid rgba(56,189,248,0.2); }
 .bnd-act-play { background: rgba(52,211,153,0.15); color: #34d399; border-color: rgba(52,211,153,0.3); }
 .bnd-act-play:hover { background: rgba(52,211,153,0.25); }
 .bnd-act-call { background: rgba(239,68,68,0.15); color: #f87171; border-color: rgba(239,68,68,0.3); }

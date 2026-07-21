@@ -1,8 +1,6 @@
 /* =============================================
    ⚡ DRAGON BALL Z 2D FIGHTER — songoku.css
    ============================================= */
-@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700;900&family=Nunito:wght@400;600;700;800&display=swap');
-
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
 :root {
@@ -22,7 +20,6 @@
 html,body {
   width:100%;height:100%;
   background:var(--bg-dark);
-  font-family:'Nunito',sans-serif;
   color:var(--text-primary);
   overflow:hidden;
   user-select:none;
@@ -49,7 +46,6 @@ html,body {
 
 /* ── MODE SELECT SCREEN ── */
 .mode-title {
-  font-family:'Bangers',cursive;
   font-size:clamp(2rem,7vw,4.5rem);
   letter-spacing:4px;
   text-align:center;
@@ -61,7 +57,6 @@ html,body {
   filter:drop-shadow(0 0 30px rgba(251,191,36,.3));
 }
 .mode-sub {
-  font-family:'Orbitron',sans-serif;
   font-size:clamp(.65rem,1.5vw,.85rem);
   color:var(--text-dim);
   letter-spacing:6px;
@@ -100,12 +95,11 @@ html,body {
 }
 .mode-card:active{transform:scale(.97)}
 .mode-card .mc-icon{font-size:3rem;margin-bottom:10px;display:block}
-.mode-card .mc-name{font-family:'Bangers',cursive;font-size:1.4rem;color:#fff;letter-spacing:1px}
+.mode-card .mc-name{font-size:1.4rem;color:#fff;letter-spacing:1px}
 .mode-card .mc-desc{font-size:.8rem;color:var(--text-dim);margin-top:6px;line-height:1.4}
 
 /* ── CHARACTER SELECT SCREEN ── */
 .cs-title {
-  font-family:'Orbitron',sans-serif;
   font-size:clamp(1rem,2.5vw,1.6rem);
   color:var(--ki-gold);
   letter-spacing:4px;
@@ -160,7 +154,6 @@ html,body {
 .cs-card.p1-selected .cs-avatar{border-color:var(--ki-blue)}
 .cs-card.p2-selected .cs-avatar{border-color:var(--ki-red)}
 .cs-card .cs-name{
-  font-family:'Bangers',cursive;
   font-size:1.1rem;
   color:#fff;
   letter-spacing:1px;
@@ -187,7 +180,6 @@ html,body {
   padding:10px 28px;
   border-radius:12px;
   border:none;
-  font-family:'Orbitron',sans-serif;
   font-size:.75rem;
   font-weight:700;
   cursor:pointer;
@@ -213,7 +205,6 @@ html,body {
   display:flex;
   gap:32px;
   margin-bottom:12px;
-  font-family:'Orbitron',sans-serif;
   font-size:.8rem;
   letter-spacing:2px;
 }
@@ -281,7 +272,6 @@ html,body {
   border:2px solid rgba(255,255,255,.15);
   background:rgba(15,23,42,.85);
   color:#fff;
-  font-family:'Orbitron',sans-serif;
   font-size:.6rem;
   font-weight:700;
   cursor:pointer;
@@ -358,7 +348,6 @@ html,body {
 }
 #settings-panel.open{right:0}
 #settings-panel h2{
-  font-family:'Orbitron',sans-serif;
   font-size:.9rem;
   color:var(--ki-gold);
   letter-spacing:3px;
@@ -386,7 +375,6 @@ html,body {
   font-size:.7rem;
   font-weight:600;
   cursor:pointer;
-  font-family:'Nunito',sans-serif;
   transition:all .15s;
 }
 .setting-toggle button.active{
@@ -419,7 +407,6 @@ html,body {
 }
 #countdown-overlay.active{display:flex}
 #countdown-text {
-  font-family:'Bangers',cursive;
   font-size:8rem;
   background:linear-gradient(180deg,#fbbf24,#f97316);
   -webkit-background-clip:text;
@@ -446,7 +433,6 @@ html,body {
 }
 #result-overlay.active{display:flex}
 #result-text{
-  font-family:'Bangers',cursive;
   font-size:clamp(2.5rem,8vw,5rem);
   letter-spacing:4px;
   margin-bottom:8px;
@@ -464,7 +450,6 @@ html,body {
   padding:10px 24px;
   border-radius:10px;
   border:none;
-  font-family:'Orbitron',sans-serif;
   font-size:.7rem;
   font-weight:700;
   cursor:pointer;

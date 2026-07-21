@@ -2,108 +2,128 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>VTWorld — Memory Card</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
   <link rel="stylesheet" href="memory.css"/>
   <link rel="stylesheet" href="../../quests.css"/>
-  <script type="module" src="../../quests.js"></script>
   <script src="../../fullscreen.js"></script>
   <script src="../../top-nav.js"></script>
   <script src="../../bottom-nav.js"></script>
+  <script type="module" src="../../quests.js"></script>
 </head>
 <body data-bottom-nav="games">
-  <div id="top-nav-root"></div>
   <canvas id="bg-canvas"></canvas>
   <div class="orb orb1"></div><div class="orb orb2"></div>
 
+  <div id="top-nav-root"></div>
 
   <div class="mem-container">
+    <!-- STATUS BAR -->
+    <div class="bc-status" id="bc-status" style="display:none">
+      <span class="stat-bet" id="mem-left-label">Đơn</span>
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="mem-matches">0</span>
+        <span class="stat-score-sub" id="mem-sub">Cặp tìm được</span>
+      </div>
+      <span class="stat-profit zero" id="mem-right-label">0s</span>
+    </div>
 
-    <!-- MENU -->
+    <!-- MENU SCREEN -->
     <div id="screen-menu" class="mem-screen active">
-      <div style="font-size:56px;text-align:center;margin-bottom:12px">🧠</div>
-      <h2 class="mem-title">Memory Card</h2>
-      <p class="mem-sub">Lật thẻ tìm cặp giống nhau · Lưới 5×5</p>
+      <div class="mem-logo">🧠</div>
+      <h1 class="mem-title">Memory Card</h1>
+      <p class="mem-sub">Lật thẻ tìm cặp giống nhau</p>
+
+      <!-- Grid Size -->
+      <div class="mem-option-section">
+        <span class="mem-option-label">Kích thước lưới</span>
+        <div class="mem-chip-group" id="size-chips">
+          <button class="mem-chip" data-size="3">3×3</button>
+          <button class="mem-chip active" data-size="4">4×4</button>
+          <button class="mem-chip" data-size="5">5×5</button>
+          <button class="mem-chip" data-size="6">6×6</button>
+        </div>
+      </div>
+
+      <!-- Theme -->
+      <div class="mem-option-section">
+        <span class="mem-option-label">Chủ đề thẻ</span>
+        <div class="mem-chip-group" id="theme-chips">
+          <button class="mem-chip active" data-theme="animals">🐾 Động vật</button>
+          <button class="mem-chip" data-theme="food">🍕 Đồ ăn</button>
+          <button class="mem-chip" data-theme="space">🚀 Vũ trụ</button>
+        </div>
+      </div>
+
+      <!-- Mode Cards -->
       <div class="mem-mode-list">
         <div class="mem-mode-card" onclick="Memory.start('solo')">
           <span class="mem-mode-icon">👤</span>
           <div>
             <div class="mem-mode-name">Chơi đơn</div>
-            <div class="mem-mode-desc">1 người · Đua với thời gian</div>
+            <div class="mem-mode-desc">1 người · Tìm cặp nhanh nhất</div>
           </div>
+          <span class="mem-mode-badge">Chơi ngay</span>
         </div>
         <div class="mem-mode-card" onclick="Memory.start('local')">
           <span class="mem-mode-icon">👥</span>
           <div>
-            <div class="mem-mode-name">2 người cùng máy</div>
-            <div class="mem-mode-desc">Thay nhau chơi · Ai nhiều cặp hơn thắng</div>
+            <div class="mem-mode-name">2 Người</div>
+            <div class="mem-mode-desc">Cùng máy · Thay nhau lật · Ai nhiều hơn thắng</div>
           </div>
-        </div>
-        <div class="mem-mode-card" onclick="Memory.startOnline()">
-          <span class="mem-mode-icon">🌐</span>
-          <div>
-            <div class="mem-mode-name">Online</div>
-            <div class="mem-mode-desc">Tạo phòng · Mời bạn bè</div>
-          </div>
+          <span class="mem-mode-badge">Chơi ngay</span>
         </div>
       </div>
     </div>
 
-    <!-- ONLINE LOBBY -->
-    <div id="screen-online" class="mem-screen">
-      <h2 class="mem-title">🌐 Online</h2>
-      <div class="mem-online-box">
-        <button class="btn-primary" onclick="Memory.createRoom()" style="width:100%;margin-bottom:12px">+ Tạo phòng mới</button>
-        <div style="text-align:center;color:#7dd3fc;margin-bottom:12px;font-size:13px">— hoặc —</div>
-        <input id="room-input" class="mem-input" placeholder="Nhập mã phòng 6 số..." maxlength="6" type="number"/>
-        <button class="btn-secondary" onclick="Memory.joinRoom()" style="width:100%;margin-top:8px">Vào phòng</button>
-        <p id="online-msg" style="color:#f87171;font-size:13px;margin-top:12px;text-align:center"></p>
-      </div>
-      <div id="room-waiting" class="mem-waiting hidden">
-        <div class="mem-room-id">Mã phòng: <span id="room-id-display">------</span></div>
-        <p style="color:#7dd3fc;font-size:14px">Đợi đối thủ vào phòng...</p>
-        <div class="mem-spinner"></div>
-      </div>
-      <button class="btn-secondary" onclick="Memory.showMenu()" style="margin-top:16px">← Quay lại</button>
-    </div>
-
-    <!-- GAME -->
+    <!-- GAME SCREEN -->
     <div id="screen-game" class="mem-screen">
-      <!-- Header info -->
-      <div class="mem-header">
-        <div id="p1-info" class="mem-player p1 active">
-          <span id="p1-name">Người chơi 1</span>
-          <span id="p1-score" class="mem-pscore">0</span>
-        </div>
-        <div class="mem-center-info">
-          <div id="mem-timer" class="mem-timer">00:00</div>
-          <div id="mem-pairs" style="font-size:12px;color:#7dd3fc">0/12 cặp</div>
-        </div>
-        <div id="p2-info" class="mem-player p2">
-          <span id="p2-name">Người chơi 2</span>
-          <span id="p2-score" class="mem-pscore">0</span>
-        </div>
+      <div class="mem-board-wrap">
+        <div class="mem-board" id="mem-board"></div>
       </div>
 
-      <!-- Turn indicator -->
-      <div id="turn-indicator" class="mem-turn hidden">🎮 Lượt của <span id="turn-name">Người chơi 1</span></div>
-
-      <!-- Board 5x5 -->
-      <div class="mem-board" id="mem-board"></div>
+      <div class="mem-controls">
+        <button class="mem-back-btn" onclick="Memory.showMenu()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+          Thoát
+        </button>
+      </div>
     </div>
 
-    <!-- RESULT -->
+    <!-- RESULT SCREEN -->
     <div id="screen-result" class="mem-screen">
-      <div id="res-emoji" style="font-size:72px;text-align:center;margin-bottom:12px">🏆</div>
-      <div id="res-title" class="mem-title"></div>
+      <div class="mem-res-emoji" id="res-emoji">🏆</div>
+      <h2 class="mem-title" id="res-title">Hoàn thành!</h2>
       <div class="mem-res-stats" id="mem-res-stats"></div>
-      <button class="btn-primary" onclick="Memory.showMenu()" style="margin:8px">🔄 Chơi lại</button>
-      <button class="btn-secondary" onclick="location.href='../../games.html'" style="margin:8px">← Games</button>
+      <div class="mem-res-actions">
+        <button class="btn-primary" onclick="Memory.restart()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Chơi lại
+        </button>
+        <button class="btn-secondary" onclick="Memory.showMenu()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Menu
+        </button>
+      </div>
     </div>
-
   </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    // Background particles
+    const canvas = document.getElementById('bg-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+      for(let i=0;i<30;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+      (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(56,189,248,0.4)';ctx.fill()});requestAnimationFrame(loop)})();
+    }
+    window.showToast = window.showToast || function(){};
+  </script>
 
   <script type="module" src="memory.js"></script>
 </body>

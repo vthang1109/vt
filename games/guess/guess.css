@@ -24,7 +24,6 @@
 
 /* ===== MENU ===== */
 .gs-logo {
-  font-family: 'Orbitron', monospace;
   font-size: 64px;
   font-weight: 900;
   color: #38bdf8;
@@ -39,7 +38,6 @@
 }
 
 .gs-title {
-  font-family: 'Orbitron', monospace;
   font-size: 28px;
   font-weight: 900;
   color: #e0f2fe;
@@ -106,7 +104,6 @@
   color: #4a7a9b;
 }
 .gs-diff-pts {
-  font-family: 'Orbitron', monospace;
   font-size: 16px;
   font-weight: 900;
   color: #fbbf24;
@@ -124,7 +121,6 @@
   margin-bottom: 14px;
 }
 .gs-range-num {
-  font-family: 'Orbitron', monospace;
   font-size: 13px;
   font-weight: 900;
   color: #38bdf8;
@@ -195,7 +191,6 @@
   font-weight: 700;
 }
 .gs-attempts-num {
-  font-family: 'Orbitron', monospace;
   font-size: 18px;
   font-weight: 900;
   color: #38bdf8;
@@ -244,7 +239,6 @@
   color: #e0f2fe;
   font-size: 20px;
   font-weight: 700;
-  font-family: 'Orbitron', monospace;
   outline: none;
   text-align: center;
   transition: border-color 0.2s;
@@ -341,7 +335,6 @@
   line-height: 1;
 }
 .gs-result-title {
-  font-family: 'Orbitron', monospace;
   font-size: 18px;
   font-weight: 900;
   color: #e0f2fe;
@@ -360,7 +353,6 @@
   text-align: center;
 }
 .gs-result-rewards .rwd-val {
-  font-family: 'Orbitron', monospace;
   font-size: 20px;
   font-weight: 900;
   color: #fbbf24;
@@ -438,7 +430,6 @@
 /* Coin pop animation */
 .coin-pop {
   position: fixed;
-  font-family: 'Orbitron', monospace;
   font-size: 16px; font-weight: 900;
   color: #fbbf24;
   pointer-events: none;

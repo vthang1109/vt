@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>VTWorld — Snake</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <title>VTWorld — Rắn Săn Mồi</title>
   <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
   <link rel="stylesheet" href="snake.css"/>
   <link rel="stylesheet" href="../../quests.css"/>
   <script type="module" src="../../quests.js"></script>
@@ -18,47 +18,282 @@
   <canvas id="bg-canvas"></canvas>
   <div class="orb orb1"></div><div class="orb orb2"></div>
 
+  <div class="snk-container">
 
-  <div class="snake-container">
-    <div id="screen-menu" class="snake-screen active">
-      <div class="snake-logo">🐍</div>
-      <h1 class="snake-title">Rắn Săn Mồi</h1>
-      <div class="speed-select">
-        <button class="speed-btn" data-speed="150">Dễ</button>
-        <button class="speed-btn active" data-speed="100">Vừa</button>
-        <button class="speed-btn" data-speed="60">Khó</button>
+    <!-- STATUS BAR -->
+    <div class="bc-status" id="bc-status" style="display:none">
+      <span class="stat-bet" id="snk-left-label">🐍</span>
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="snk-center-label">0</span>
+        <span class="stat-score-sub" id="snk-sub">Điểm</span>
       </div>
-      <button class="start-btn" id="btn-start">Bắt đầu chơi</button>
+      <span class="stat-profit zero" id="snk-right-label">0</span>
     </div>
 
-    <div id="screen-game" class="snake-screen">
-      <div class="game-header">
-        <div class="score-box">🍎 <span id="current-score">0</span></div>
-        <div class="score-box">🏆 <span id="best-score">0</span></div>
+    <!-- ===== MENU ===== -->
+    <div id="screen-menu" class="snk-screen active">
+      <div class="snk-logo">🐍</div>
+      <h1 class="snk-title">Rắn Săn Mồi</h1>
+      <p class="snk-sub">Điều khiển rắn ăn mồi — càng dài càng cao điểm</p>
+
+      <!-- HIGH SCORE CARD (chuyển lên trên) -->
+      <div class="snk-hs-card">
+        <div class="snk-hs-icon">👑</div>
+        <div class="snk-hs-body">
+          <span class="snk-hs-label">Kỷ lục</span>
+          <span class="snk-hs-value" id="snk-hs-display">0</span>
+        </div>
+        <div class="snk-hs-glow"></div>
       </div>
-      <div class="canvas-wrapper"><canvas id="snake-canvas"></canvas></div>
-      <div class="mobile-controls">
-        <div class="ctrl-row"><button class="ctrl-btn" id="btn-up">▲</button></div>
-        <div class="ctrl-row">
-          <button class="ctrl-btn" id="btn-left">◀</button>
-          <button class="ctrl-btn" id="btn-down">▼</button>
-          <button class="ctrl-btn" id="btn-right">▶</button>
+
+      <!-- ===== CHẾ ĐỘ CHƠI (tạm ẩn, chỉ basic) ===== -->
+      <!-- <div class="snk-mode-selector">
+        <button class="snk-mode-btn active" data-mode="basic">Cơ bản</button>
+        <button class="snk-mode-btn" data-mode="advanced">Nâng cao</button>
+      </div> -->
+
+      <div class="snk-speed-widget" id="snk-speed-widget">
+        <span class="snk-frame-label">Chọn tốc độ</span>
+        <!-- Bar gradient track -->
+        <div class="snk-speed-bar-wrap">
+          <div class="snk-speed-bar" id="snk-speed-bar" data-active="6">
+            <div class="snk-speed-track">
+              <div class="snk-speed-fill" id="snk-speed-fill"></div>
+              <div class="snk-speed-notch"></div>
+            </div>
+            <div class="snk-speed-ticks">
+              <span data-level="1">1</span>
+              <span data-level="2">2</span>
+              <span data-level="3">3</span>
+              <span data-level="4">4</span>
+              <span data-level="5">5</span>
+              <span data-level="6" class="active">6</span>
+              <span data-level="7">7</span>
+              <span data-level="8">8</span>
+              <span data-level="9">9</span>
+              <span data-level="10">10</span>
+            </div>
+          </div>
+        </div>
+        <div class="snk-speed-meta">
+          <span class="snk-speed-icon">🐢</span>
+          <div class="snk-speed-info">
+            <span class="snk-speed-level" id="snk-speed-level">Tốc độ 6</span>
+            <span class="snk-speed-desc" id="snk-speed-desc">Trung bình</span>
+          </div>
+          <span class="snk-speed-reward" id="snk-speed-reward">x1.2</span>
+          <span class="snk-speed-icon">🚀</span>
+        </div>
+      </div>
+
+      <!-- ===== TÙY CHỈNH: MÀU RẮN + SÀN CHƠI ===== -->
+      <div class="snk-custom-frame">
+        <span class="snk-frame-label">Tùy chỉnh</span>
+        <div class="snk-custom-row">
+          <!-- Màu rắn (trái) -->
+          <div class="snk-color-preview" id="snk-color-preview" title="Nhấn để chọn màu rắn">
+            <div class="snk-color-preview-swatch" id="snk-preview-swatch"></div>
+            <div class="snk-color-preview-info">
+              <span class="snk-color-preview-name" id="snk-preview-name">Xanh dương</span>
+              <span class="snk-color-preview-type" id="snk-preview-type">đơn sắc</span>
+            </div>
+          </div>
+          <!-- Sàn chơi (phải) -->
+          <div class="snk-theme-preview" id="snk-theme-preview" title="Nhấn để chọn sàn chơi">
+            <div class="snk-theme-landscape" id="snk-theme-landscape"></div>
+            <div class="snk-theme-info">
+              <span class="snk-theme-current-icon" id="snk-theme-current-icon">🌾</span>
+              <span class="snk-theme-current-name" id="snk-theme-current-name">Đồng bằng</span>
+            </div>
+            <svg class="snk-color-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <button class="snk-play-btn" id="snk-btn-start">
+        <svg class="snk-play-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <span>Bắt đầu chơi</span>
+      </button>
+    </div>
+
+    <!-- ===== GAME ===== -->
+    <div id="screen-game" class="snk-screen">
+      <!-- PROGRESS BAR - đặt ngoài board -->
+      <div class="snk-progress-wrapper" id="snk-progress-wrapper" style="display:none">
+        <div class="snk-progress-track">
+          <div class="snk-progress-bar" id="snk-progress-bar">
+            <div class="snk-progress-fill" id="snk-progress-fill"></div>
+          </div>
+          <div class="snk-progress-pct" id="snk-progress-pct">0%</div>
+        </div>
+      </div>
+      <div class="snk-board-wrap">
+        <div class="snk-board-border">
+          <canvas id="snake-canvas"></canvas>
+          <!-- COUNTDOWN OVERLAY -->
+          <div class="snk-countdown-overlay" id="snk-countdown">
+            <div class="snk-countdown-circle" id="snk-countdown-circle">
+              <span class="snk-countdown-num" id="snk-countdown-num">3</span>
+            </div>
+            <span class="snk-countdown-label" id="snk-countdown-label">BẮT ĐẦU</span>
+          </div>
+          <!-- LEVEL TRANSITION OVERLAY -->
+          <div class="snk-countdown-overlay" id="snk-level-overlay" style="background:rgba(4,20,40,0.8)">
+            <div class="snk-countdown-circle" style="width:110px;height:110px;border-color:rgba(168,85,247,0.5);box-shadow:0 0 50px rgba(168,85,247,0.3)">
+              <span class="snk-countdown-num" id="snk-level-num" style="font-size:32px">Level 2</span>
+            </div>
+            <span class="snk-countdown-label" id="snk-level-label" style="color:#a855f7">TIẾP THEO</span>
+          </div>
+        </div>
+      </div>
+      <div class="snk-controls">      <div class="snk-dpad">
+        <button class="snk-dpad-btn" id="btn-up">▲</button>
+        <div class="snk-dpad-row">
+          <button class="snk-dpad-btn" id="btn-left">◀</button>
+            <button class="snk-dpad-btn" id="btn-down">▼</button>
+            <button class="snk-dpad-btn" id="btn-right">▶</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div id="screen-result" class="snake-screen">
-      <div class="res-emoji">💀</div>
-      <h2 class="snake-title">Game Over!</h2>
-      <div class="res-stats">
-        <div class="res-stat"><span class="res-val" id="final-score">0</span><span class="res-label">Điểm số</span></div>
-        <div class="res-stat"><span class="res-val" id="earned-pts">+0</span><span class="res-label">Thưởng</span></div>
+    <!-- ===== RESULT ===== -->
+    <div id="screen-result" class="snk-screen">
+      <div class="snk-res-frame">
+        <!-- Neon corner accents -->
+        <div class="snk-res-corner snk-res-corner-tl"></div>
+        <div class="snk-res-corner snk-res-corner-tr"></div>
+        <div class="snk-res-corner snk-res-corner-bl"></div>
+        <div class="snk-res-corner snk-res-corner-br"></div>
+
+        <div class="snk-res-emoji" id="snk-res-emoji">💀</div>
+        <h2 class="snk-res-title" id="snk-res-title">Game Over</h2>
+        <div class="snk-res-divider">
+          <span class="snk-res-divider-line"></span>
+          <span class="snk-res-divider-icon">◆</span>
+          <span class="snk-res-divider-line"></span>
+        </div>
+        <div class="snk-res-stats">
+          <div class="snk-res-stat">
+            <span class="snk-res-stat-icon">🎯</span>
+            <span class="snk-res-val" id="snk-res-score">0</span>
+            <span class="snk-res-label">Điểm số</span>
+          </div>
+          <div class="snk-res-stat">
+            <span class="snk-res-stat-icon">👑</span>
+            <span class="snk-res-val" id="snk-res-best">0</span>
+            <span class="snk-res-label">Kỷ lục</span>
+          </div>
+        </div>
+        <div class="snk-res-actions">
+          <button class="btn-primary" id="snk-btn-restart">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Chơi lại
+          </button>
+          <button class="btn-secondary" id="snk-btn-home">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Menu
+          </button>
+        </div>
       </div>
-      <button class="start-btn" id="btn-restart" style="margin-bottom:12px">Chơi lại</button>
-      <button class="speed-btn" id="btn-home" style="width:100%">Về menu</button>
     </div>
   </div>
 
+  <!-- Nút tạm dừng (floating, giống timso) -->
+  <button class="snk-pause-btn" id="snk-pause-btn" style="display:none" title="Tạm dừng">
+    <svg id="snk-pause-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+      <rect x="6" y="5" width="4" height="14" rx="1"></rect>
+      <rect x="14" y="5" width="4" height="14" rx="1"></rect>
+    </svg>
+  </button>
+
+  <!-- ===== THEME POPUP MODAL ===== -->
+  <div class="snk-modal-overlay" id="snk-theme-modal">
+    <div class="snk-modal-box">
+      <div class="snk-modal-header">
+        <h3>Chọn sàn chơi</h3>
+        <button class="snk-modal-close" id="snk-theme-modal-close">✕</button>
+      </div>
+      <p class="snk-modal-desc">Chọn khung cảnh cho bàn chơi của bạn.</p>
+      <div class="snk-theme-modal-grid" id="snk-theme-modal-grid"></div>
+      <div class="snk-modal-actions">
+        <button class="btn-secondary snk-modal-cancel" id="snk-theme-modal-cancel">Hủy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COLOR POPUP MODAL ===== -->
+  <div class="snk-modal-overlay" id="snk-color-modal">
+    <div class="snk-modal-box">
+      <div class="snk-modal-header">
+        <h3>Tùy chỉnh màu rắn</h3>
+        <button class="snk-modal-close" id="snk-modal-close">✕</button>
+      </div>
+      
+      <!-- Tabs -->
+      <div class="snk-modal-tabs">
+        <button class="snk-modal-tab active" data-tab="solid">Đơn sắc</button>
+        <button class="snk-modal-tab" data-tab="dual">Song sắc</button>
+        <button class="snk-modal-tab" data-tab="special">Đa sắc</button>
+      </div>
+
+      <!-- Tab: Đơn sắc -->
+      <div class="snk-modal-content active" id="snk-tab-solid">
+        <p class="snk-modal-desc">Chọn một màu đơn — mỗi màu 1.000〄. Sau khi mua có thể dùng để pha song sắc.</p>
+        <div class="snk-solid-grid" id="snk-solid-grid"></div>
+      </div>
+
+      <!-- Tab: Song sắc -->
+      <div class="snk-modal-content" id="snk-tab-dual">
+        <p class="snk-modal-desc">Chọn 2 màu đơn đã mua để tạo song sắc.</p>
+        <div class="snk-dual-row">
+          <div class="snk-dual-pick">
+            <span class="snk-dual-label">Màu 1</span>
+            <select class="snk-dual-select" id="snk-dual-a"></select>
+            <div class="snk-dual-swatch" id="snk-dual-swatch-a"></div>
+          </div>
+          <span class="snk-dual-plus">+</span>
+          <div class="snk-dual-pick">
+            <span class="snk-dual-label">Màu 2</span>
+            <select class="snk-dual-select" id="snk-dual-b"></select>
+            <div class="snk-dual-swatch" id="snk-dual-swatch-b"></div>
+          </div>
+        </div>
+        <div class="snk-dual-preview">
+          <span class="snk-dual-preview-label">Kết quả</span>
+          <div class="snk-dual-preview-swatch" id="snk-dual-preview"></div>
+        </div>
+      </div>
+
+      <!-- Tab: Đa sắc -->
+      <div class="snk-modal-content" id="snk-tab-special">
+        <p class="snk-modal-desc">Hiệu ứng đặc biệt cho rắn.</p>
+        <div class="snk-special-grid" id="snk-special-grid"></div>
+      </div>
+
+      <div class="snk-modal-actions">
+        <button class="btn-primary snk-modal-apply" id="snk-modal-apply">Áp dụng</button>
+        <button class="btn-secondary snk-modal-cancel" id="snk-modal-cancel">Hủy</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="snk-toast" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
+  <script>
+    window.showToast = function(msg, type) {
+      const el = document.createElement('div');
+      el.style.cssText = 'padding:10px 18px;border-radius:12px;font-weight:700;font-size:13px;backdrop-filter:blur(8px);animation:snkToastIn 0.3s ease;box-shadow:0 4px 20px rgba(0,0,0,0.3)';
+      if (type === 'error') { el.style.background = 'rgba(239,68,68,0.9)'; el.style.color = '#fff'; el.style.border = '1px solid rgba(255,255,255,0.2)'; }
+      else if (type === 'success') { el.style.background = 'rgba(34,197,94,0.9)'; el.style.color = '#fff'; el.style.border = '1px solid rgba(255,255,255,0.2)'; }
+      else { el.style.background = 'rgba(56,189,248,0.9)'; el.style.color = '#fff'; el.style.border = '1px solid rgba(255,255,255,0.2)'; }
+      el.textContent = msg;
+      document.getElementById('snk-toast').appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => el.remove(), 300); }, 2500);
+    };
+  </script>
+  <style>
+    @keyframes snkToastIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+  </style>
   <script type="module" src="snake.js"></script>
 </body>
 </html>

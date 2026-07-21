@@ -50,9 +50,24 @@ class BauCua {
 
         this.buildBoard();
         this.bindEvents();
+        this.setupSplash();
         this.updateStatusBar('betting', 0);
         this.updateRollButton('roll');
         window.bcGame = this;
+    }
+
+    setupSplash() {
+        const splashScreen = document.getElementById('bc-splash');
+        const gameContainer = document.getElementById('bc-game');
+        const startBtn = document.getElementById('bc-btn-start');
+
+        if (!startBtn || !splashScreen || !gameContainer) return;
+
+        startBtn.addEventListener('click', () => {
+            splashScreen.classList.remove('active');
+            splashScreen.style.display = 'none';
+            gameContainer.classList.add('active');
+        });
     }
 
     // Sync realtime từ points.js, chỉ ghi đè _myBalance khi không có cược đang treo.

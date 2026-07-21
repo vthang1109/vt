@@ -4,7 +4,6 @@ body {
     min-height: 100vh;
     margin: 0;
     overflow-y: auto;
-    font-family: "Science Gothic", sans-serif;
     color: white;
 }
 
@@ -31,14 +30,169 @@ body {
 .orb1 { width: 300px; height: 300px; background: #fbbf24; top: -80px; left: -80px; }
 .orb2 { width: 320px; height: 320px; background: #38bdf8; bottom: -100px; right: -100px; }
 
+/* ===== SPLASH / MENU SCREEN ===== */
+.bc-splash-screen {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 80px 20px 100px;
+    position: relative;
+    z-index: 1;
+    animation: bcSplashFadeUp 0.5s ease both;
+}
+.bc-splash-screen.active {
+    display: flex;
+}
+
+@keyframes bcSplashFadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.bc-splash-content {
+    max-width: 460px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.bc-splash-logo {
+    font-size: 80px;
+    margin-bottom: 12px;
+    animation: bcSplashFloat 2.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 40px rgba(251,191,36,0.4));
+}
+@keyframes bcSplashFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+.bc-splash-title {
+    font-size: 34px;
+    font-weight: 800;
+    color: #e0f2fe;
+    margin-bottom: 8px;
+    text-shadow: 0 0 30px rgba(56,189,248,0.5);
+}
+
+.bc-splash-sub {
+    color: #7dd3fc;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 28px;
+    opacity: 0.9;
+}
+
+.bc-splash-rules {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 32px;
+}
+
+.bc-splash-rule {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(56,189,248,0.12);
+    border-radius: 14px;
+    padding: 14px 18px;
+    transition: all 0.25s;
+}
+.bc-splash-rule:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(56,189,248,0.25);
+    transform: translateX(4px);
+}
+
+.bc-splash-rule-icon {
+    font-size: 26px;
+    flex-shrink: 0;
+    width: 40px;
+    text-align: center;
+}
+
+.bc-splash-rule-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #cbd5e1;
+    text-align: left;
+}
+
+.bc-splash-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 18px;
+    border-radius: 18px;
+    border: none;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1e293b;
+    font-weight: 800;
+    font-size: 17px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(251,191,36,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    animation: bcSplashBtnPulse 2.5s ease-in-out infinite;
+}
+@keyframes bcSplashBtnPulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(251,191,36,0.3), inset 0 1px 0 rgba(255,255,255,0.3); }
+    50% { box-shadow: 0 8px 35px rgba(251,191,36,0.5), 0 0 40px rgba(251,191,36,0.15), inset 0 1px 0 rgba(255,255,255,0.3); }
+}
+.bc-splash-btn::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent, rgba(255,255,255,0.1));
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+}
+.bc-splash-btn:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 10px 35px rgba(251,191,36,0.5), 0 0 50px rgba(251,191,36,0.2);
+    animation: none;
+}
+.bc-splash-btn:hover::after {
+    opacity: 1;
+}
+.bc-splash-btn:active {
+    transform: scale(0.96) translateY(0);
+    box-shadow: 0 2px 10px rgba(251,191,36,0.3);
+}
+
+.bc-splash-btn-icon {
+    flex-shrink: 0;
+    animation: bcSplashBtnBounce 2s ease-in-out infinite;
+}
+@keyframes bcSplashBtnBounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(4px); }
+}
+
 /* ---- Khu vực game ---- */
 .game-container {
+    display: none;
     max-width: 760px;
     margin: 0 auto;
     padding: 14px 12px 40px;
     box-sizing: border-box;
     position: relative;
     z-index: 1;
+    animation: bcSplashFadeUp 0.4s ease both;
+}
+.game-container.active {
+    display: block;
 }
 
 /* ===== XÚC XẮC (KÍCH THƯỚC SIÊU TO) ===== */
@@ -74,10 +228,6 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-.bc-die.win {
-    /* Bỏ hiệu ứng win - không viền xanh */
-}
-
 /* ===== BOARD ===== */
 .bc-board-wrap {
     display: flex;
@@ -105,7 +255,6 @@ body {
     cursor: pointer;
     transition: all 0.25s;
     text-align: center;
-    font-family: "Science Gothic", sans-serif;
     font-weight: 400;
     display: flex;
     flex-direction: column;
@@ -136,7 +285,6 @@ body {
     border-radius: 10px;
     font-size: 13px;
     font-weight: 500;
-    font-family: "Science Gothic", sans-serif;
     min-height: 22px;
 }
 .bc-tile.disabled { opacity: 0.55; cursor: not-allowed; }
@@ -145,7 +293,6 @@ body {
     position: absolute; 
     top: 4px; 
     right: 6px; 
-    font-family: "Science Gothic", sans-serif; 
     font-weight: 500; 
     color: #34d399; 
     font-size: 12px; 
@@ -169,7 +316,6 @@ body {
     color: #fff;
     font-weight: 400;
     cursor: pointer;
-    font-family: "Science Gothic", sans-serif;
     font-size: 12px;
     transition: all .2s;
     text-align: center;
@@ -204,7 +350,6 @@ body {
     border: none;
     cursor: pointer;
     font-weight: 500;
-    font-family: "Science Gothic", sans-serif;
     font-size: 15px;
     white-space: nowrap;
     flex-shrink: 0;
@@ -298,6 +443,11 @@ body {
         padding: 6px 8px; 
         font-size: 11px; 
     }
+    .bc-splash-title { font-size: 28px; }
+    .bc-splash-logo { font-size: 64px; }
+    .bc-splash-rule { padding: 12px 14px; }
+    .bc-splash-rule-icon { font-size: 22px; width: 34px; }
+    .bc-splash-rule-text { font-size: 13px; }
     .bc-tile { min-height: 65px; padding: 10px 4px; }
     .bc-tile-icon { font-size: 30px; }
     .bc-bottom-row { flex-direction: row; flex-wrap: wrap; gap: 6px; }

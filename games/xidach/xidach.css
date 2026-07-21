@@ -1,3 +1,276 @@
+/* ===================== SCREENS ===================== */
+.xd-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  animation: xdFadeUp 0.4s ease both;
+}
+.xd-screen.active { display: flex; }
+
+@keyframes xdFadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================== MENU ===================== */
+.xd-menu-glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(251,191,36,0.1), transparent 70%);
+  pointer-events: none;
+  animation: xdGlowPulse 3s ease-in-out infinite;
+}
+@keyframes xdGlowPulse {
+  0%,100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.12); }
+}
+
+/* Floating decorative cards */
+.xd-floating-card {
+  position: absolute;
+  font-size: 48px;
+  opacity: 0.1;
+  pointer-events: none;
+  animation: xdCardDrift 10s ease-in-out infinite;
+}
+.xd-fc-1 { top: 5%; left: 3%; animation-delay: 0s; }
+.xd-fc-2 { top: 8%; right: 3%; animation-delay: 2.5s; }
+.xd-fc-3 { bottom: 20%; left: 5%; animation-delay: 5s; }
+
+@keyframes xdCardDrift {
+  0%,100% { transform: translateY(0) rotate(-6deg); opacity: 0.07; }
+  25% { transform: translateY(-10px) rotate(3deg); opacity: 0.14; }
+  50% { transform: translateY(5px) rotate(10deg); opacity: 0.1; }
+  75% { transform: translateY(-5px) rotate(-3deg); opacity: 0.14; }
+}
+
+#xd-menu {
+  position: relative;
+  padding: 20px 20px 40px;
+  gap: 0;
+}
+#xd-menu.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.xd-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  animation: xdFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(251,191,36,0.4));
+}
+.xd-logo-img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+}
+.xd-logo-img:hover {
+  transform: scale(1.1) rotate(-3deg);
+}
+@keyframes xdFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.xd-title {
+  font-size: 36px;
+  font-weight: 900;
+  color: #fbbf24;
+  text-align: center;
+  margin: 0 0 6px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 40px rgba(251,191,36,0.5), 0 2px 4px rgba(0,0,0,0.3);
+}
+.xd-sub {
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 28px;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+/* ===== Glass card container for controls ===== */
+.xd-menu-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(15,23,42,0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(148,163,184,0.08);
+  border-radius: 20px;
+  padding: 24px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+/* ===== Mode selector ===== */
+.xd-mode-select {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.xd-mode-btn {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 12px;
+  border: 1.5px solid rgba(148,163,184,0.1);
+  background: rgba(0,0,0,0.2);
+  color: #64748b;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+.xd-mode-btn:active {
+  transform: scale(0.97);
+}
+/* Player mode — blue */
+.xd-mode-btn[data-mode="player"]:hover {
+  border-color: rgba(56,189,248,0.4);
+  color: #38bdf8;
+  background: rgba(56,189,248,0.06);
+  transform: translateY(-1px);
+}
+.xd-mode-btn[data-mode="player"].active {
+  border-color: #38bdf8;
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(56,189,248,0.3);
+  transform: translateY(-1px);
+}
+/* Dealer mode — purple */
+.xd-mode-btn[data-mode="dealer"]:hover {
+  border-color: rgba(167,139,250,0.4);
+  color: #a78bfa;
+  background: rgba(167,139,250,0.06);
+  transform: translateY(-1px);
+}
+.xd-mode-btn[data-mode="dealer"].active {
+  border-color: #a78bfa;
+  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(167,139,250,0.3);
+  transform: translateY(-1px);
+}
+
+/* ===== Bet selector ===== */
+.xd-bet-section {
+  width: 100%;
+}
+
+.xd-bet-chips {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.xd-chip {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: #1e293b;
+  color: #e2e8f0;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+  font-family: inherit;
+  text-align: center;
+}
+.xd-chip:hover {
+  border-color: rgba(251,191,36,0.5);
+  color: #fbbf24;
+  transform: translateY(-2px);
+}
+.xd-chip:active {
+  transform: scale(0.94);
+}
+.xd-chip.active {
+  border-color: #fff;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #1e293b;
+  box-shadow: 0 0 12px #fbbf24;
+  transform: translateY(-2px);
+}
+
+.xd-bet-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.xd-bet-input-row input {
+  flex: 1;
+  padding: 14px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(148,163,184,0.1);
+  background: rgba(0,0,0,0.25);
+  color: #fbbf24;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  min-width: 0;
+}
+.xd-bet-input-row input:focus {
+  border-color: #22d3ee;
+  box-shadow: 0 0 20px rgba(34,211,238,0.12);
+}
+.xd-bet-input-row input::placeholder {
+  color: #475569;
+}
+
+/* ===== Play button — emerald primary CTA ===== */
+.xd-play-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  color: #fff;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(52,211,153,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+.xd-play-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 35px rgba(52,211,153,0.55), 0 0 50px rgba(52,211,153,0.2);
+}
+.xd-play-btn:active {
+  transform: scale(0.97) translateY(0);
+}
+.xd-play-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
 /* ===================== LAYOUT ===================== */
 .xd-wrap {
   min-height: 100vh;
@@ -8,14 +281,15 @@
   z-index: 1;
 }
 
-/* ===================== HEADER & HAMBURGER ===================== */
-
 /* ===================== TABLE & SEATS ===================== */
 .xd-table {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-bottom: 14px;
+}
+#xd-game > * {
+  width: 100%;
 }
 
 .xd-seat {
@@ -42,15 +316,15 @@
 .xd-seat.lose { background: rgba(248, 113, 113, 0.07); border-color: rgba(248, 113, 113, 0.35); opacity: 0.85; }
 
 .xd-seat.dealer {
-  background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(124, 58, 237, 0.1));
+  background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06));
   border: 2px solid #fbbf24;
-  box-shadow: 0 0 18px rgba(251, 191, 36, 0.35);
+  box-shadow: 0 0 18px rgba(251,191,36,0.3);
 }
 .xd-seat.dealer .xd-seat-name {
   font-size: 16px;
   font-weight: 900;
   color: #fbbf24;
-  text-shadow: 0 0 6px rgba(251, 191, 36, 0.7);
+  text-shadow: 0 0 6px rgba(251,191,36,0.7);
 }
 
 .xd-seat.me {
@@ -74,10 +348,10 @@
 }
 
 .xd-score-inline {
-  font-family: "Science Gothic", sans-serif;
+  font-family: 'Science Gothic', sans-serif;
   font-weight: 500;
   font-size: 16px;
-  color: #fbbf24;
+  color: #38bdf8;
   background: rgba(0, 0, 0, 0.5);
   padding: 1px 8px;
   border-radius: 8px;
@@ -89,7 +363,7 @@
   background: rgba(0, 0, 0, 0.6);
 }
 
-/* ===================== LÁ BÀI – CHỒNG LÊN NHAU ===================== */
+/* ===================== LÁ BÀI ===================== */
 .xd-cards {
   display: flex;
   flex-wrap: nowrap;
@@ -103,39 +377,36 @@
   background-color: transparent !important;
   border-radius: 5px !important;
   margin-left: -30px !important;
-  width: 80px;                    /* giữ đúng chiều rộng mặc định */
-  aspect-ratio: 80 / 112;          /* tỉ lệ chuẩn, khóa khung hình */
-  height: auto;                   /* chiều cao tự động theo tỉ lệ */
-  flex-shrink: 0;                 /* không cho co lại */
+  width: 80px;
+  aspect-ratio: 80 / 112;
+  height: auto;
+  flex-shrink: 0;
 }
 .xd-cards .card:first-child {
   margin-left: 0 !important;
 }
 
-/* ===================== TIỀN CƯỢC (GÓC DƯỚI PHẢI) ===================== */
+/* ===================== TIỀN CƯỢC ===================== */
 .xd-bet-badge {
   position: absolute;
   bottom: 10px;
   right: 12px;
   padding: 4px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(251, 191, 36, 0.5);
-  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251,191,36,0.5);
+  background: rgba(251,191,36,0.12);
   color: #fbbf24;
-  font-family: "Science Gothic", sans-serif;
-  font-weight: 500;
   font-size: 12px;
   pointer-events: none;
 }
 
-/* ===================== KẾT QUẢ NEON TO GIỮA BÀI ===================== */
+/* ===================== KẾT QUẢ NEON ===================== */
 .xd-result-overlay {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 20;
-  font-family: "Science Gothic", sans-serif;
   font-weight: 500;
   font-size: 20px;
   white-space: nowrap;
@@ -182,7 +453,7 @@
   text-shadow: 0 0 10px #fff, 0 0 20px #ef4444;
 }
 
-/* ===================== ĐẶT CƯỢC & ACTIONS ===================== */
+/* ===================== BET ROW ===================== */
 .xd-bet-row {
   display: flex;
   gap: 8px;
@@ -192,7 +463,7 @@
   justify-content: center;
 }
 .xd-bet-row label {
-  color: #cbd5e1;
+  color: #94a3b8;
   font-weight: 700;
   font-size: 13px;
 }
@@ -200,25 +471,34 @@
   width: 120px;
   padding: 8px 12px;
   border-radius: 10px;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  background: rgba(0, 0, 0, 0.3);
-  color: #e0f2fe;
-  font-family: "Science Gothic", sans-serif;
-  font-weight: 500;
+  border: 1.5px solid rgba(148,163,184,0.15);
+  background: rgba(15,23,42,0.6);
+  color: #fbbf24;
+  font-weight: 600;
+  font-family: inherit;
   text-align: center;
+  outline: none;
+}
+.xd-bet-row input:focus {
+  border-color: #22d3ee;
 }
 .xd-bet-row button {
   padding: 8px 16px;
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-weight: 500;
-  font-family: "Science Gothic", sans-serif;
+  font-weight: 700;
+  font-family: inherit;
   font-size: 13px;
   background: linear-gradient(135deg, #34d399, #059669);
   color: #fff;
+  transition: all 0.2s;
+}
+.xd-bet-row button:hover {
+  box-shadow: 0 0 12px rgba(52,211,153,0.3);
 }
 
+/* ===================== ACTIONS ===================== */
 .xd-actions {
   display: flex;
   gap: 10px;
@@ -231,7 +511,6 @@
   border: none;
   cursor: pointer;
   font-weight: 500;
-  font-family: "Science Gothic", sans-serif;
   font-size: 13px;
 }
 .btn-hit  { background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #fff; }
@@ -241,3 +520,71 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ===================== BACK TO MENU BUTTON ===================== */
+.xd-back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 10px 24px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(251,191,36,0.15);
+  background: rgba(15,23,42,0.4);
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.25s;
+}
+.xd-back-btn:hover {
+  border-color: #fbbf24;
+  background: rgba(251,191,36,0.08);
+  color: #fbbf24;
+  transform: translateY(-1px);
+}
+.xd-back-btn:active {
+  transform: scale(0.96);
+}
+
+/* ===== NÚT XÉT BÀI NEON (giống xidach-mp) ===== */
+.xd-check-btn-neon {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  padding: 5px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #ef4444;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 15px #ef4444, 0 0 30px rgba(239,68,68,0.6);
+  text-shadow: 0 0 5px rgba(255,255,255,0.5);
+  animation: neonPulse 0.8s infinite alternate;
+  z-index: 30;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.xd-check-btn-neon:active {
+  transform: scale(0.94);
+}
+@keyframes neonPulse {
+  from { box-shadow: 0 0 10px #ef4444, 0 0 20px rgba(239,68,68,0.4); }
+  to { box-shadow: 0 0 25px #ef4444, 0 0 50px rgba(239,68,68,0.8); }
+}
+
+/* ===== NÚT HÀNH ĐỘNG CẦM CÁI (Rút / Xét Tất / Vòng mới) ===== */
+.xd-actions button.xd-act-btn {
+  padding: 14px 0;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.xd-act-blue   { background: #38bdf8; color: #fff; }
+.xd-act-orange { background: #f97316; color: #fff; }
+.xd-act-yellow { background: #fbbf24; color: #1f1f1f; }
+.xd-act-purple { background: #a78bfa; color: #fff; }

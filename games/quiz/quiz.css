@@ -17,7 +17,7 @@
 
 .qz-logo { font-size: 52px; margin-bottom: 10px; }
 .qz-title {
-  font-family: 'Orbitron', monospace; font-size: 24px; font-weight: 900;
+  font-size: 24px; font-weight: 900;
   color: #e0f2fe; margin-bottom: 6px; text-align: center;
 }
 .qz-sub { color: #7dd3fc; font-size: 13px; margin-bottom: 16px; text-align: center; }
@@ -32,10 +32,9 @@
   display: flex; justify-content: space-between; align-items: center;
   padding: 7px 16px; font-size: 13px; font-weight: 600;
   color: #94a3b8; border-bottom: 1px solid rgba(56,189,248,0.08);
-  font-family: 'Nunito', sans-serif;
 }
 .qz-pp-row:last-child { border-bottom: none; }
-.qz-pp-row span { color: #38bdf8; font-family: 'Orbitron', monospace; font-size: 12px; }
+.qz-pp-row span { color: #38bdf8; font-size: 12px; }
 .qz-pp-row.safe {
   background: rgba(251,191,36,0.08);
   color: #fbbf24; border-left: 3px solid #fbbf24;
@@ -90,7 +89,7 @@
 }
 .qz-pts-label { font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; }
 .qz-pts-val {
-  font-family: 'Orbitron', monospace; font-size: 16px;
+  font-size: 16px;
   font-weight: 900; color: #34d399;
 }
 
@@ -99,7 +98,7 @@
 .qz-timer-svg { width: 44px; height: 44px; }
 #qz-timer {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 900; color: #38bdf8;
+  font-size: 13px; font-weight: 900; color: #38bdf8;
 }
 
 /* ===== LIFELINES ===== */
@@ -111,7 +110,7 @@
   border: 1px solid rgba(56,189,248,0.3);
   background: rgba(56,189,248,0.07); color: #7dd3fc;
   font-size: 11px; font-weight: 700; cursor: pointer;
-  transition: all 0.2s; font-family: 'Nunito', sans-serif;
+  transition: all 0.2s;
   white-space: nowrap; text-align: center;
 }
 .qz-ll:hover:not(:disabled) { background: rgba(56,189,248,0.18); color: #e0f2fe; }
@@ -145,7 +144,7 @@
   background: rgba(255,255,255,0.03); color: #e0f2fe;
   font-size: 13px; font-weight: 600; cursor: pointer;
   transition: all 0.18s; text-align: left;
-  font-family: 'Nunito', sans-serif; line-height: 1.4;
+  line-height: 1.4;
 }
 .qz-opt:hover:not(:disabled) { border-color: #38bdf8; background: rgba(56,189,248,0.1); }
 .qz-opt.correct { border-color: #34d399; background: rgba(52,211,153,0.15); color: #34d399; }
@@ -173,7 +172,7 @@
 .qz-ladder-row {
   display: flex; justify-content: space-between; align-items: center;
   padding: 5px 9px; border-radius: 8px;
-  font-size: 11px; font-weight: 700; font-family: 'Nunito', sans-serif;
+  font-size: 11px; font-weight: 700;
   color: #64748b; background: rgba(255,255,255,0.02);
   border: 1px solid transparent; transition: all 0.25s;
 }
@@ -190,7 +189,7 @@
   color: #34d399; background: rgba(52,211,153,0.07);
   border-color: rgba(52,211,153,0.2); opacity: 0.7;
 }
-.qz-ladder-pts { color: #38bdf8; font-family: 'Orbitron', monospace; font-size: 10px; }
+.qz-ladder-pts { color: #38bdf8; font-size: 10px; }
 .qz-ladder-row.safe .qz-ladder-pts { color: #fbbf24; }
 .qz-ladder-row.current .qz-ladder-pts { color: #38bdf8; }
 .qz-ladder-row.done .qz-ladder-pts { color: #34d399; }
@@ -202,13 +201,13 @@
 }
 .qz-res-emoji { font-size: 72px; margin-bottom: 12px; }
 .qz-res-title {
-  font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900;
+  font-size: 22px; font-weight: 900;
   color: #e0f2fe; text-align: center; margin-bottom: 8px;
 }
 .qz-res-msg { color: #7dd3fc; font-size: 14px; text-align: center; margin-bottom: 24px; }
 .qz-res-stats { display: flex; justify-content: center; gap: 28px; margin-bottom: 28px; }
 .qz-res-stat { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-.qz-res-val { font-family: 'Orbitron', monospace; font-size: 30px; font-weight: 900; color: #38bdf8; }
+.qz-res-val { font-size: 30px; font-weight: 900; color: #38bdf8; }
 .qz-res-val.green { color: #34d399; }
 .qz-res-stat > span:last-child { color: #7dd3fc; font-size: 12px; font-weight: 600; }
 

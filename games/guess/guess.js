@@ -196,13 +196,13 @@ const Guess = {
     this.attempts.push({ val, result: val < this.secret ? 'low' : 'high' });
 
     if (val < this.secret) {
-      hint.textContent = val + ' — Nhỏ hơn!';
+      hint.textContent = 'Số cần tìm nhỏ hơn ' + val;
       hint.className = 'gs-hint low';
       if (val > this.rangeMin) this.rangeMin = val;
       badge.classList.add('low');
       badge.textContent = val + ' ↑';
     } else {
-      hint.textContent = val + ' — Lớn hơn!';
+      hint.textContent = 'Số cần tìm lớn hơn ' + val;
       hint.className = 'gs-hint high';
       if (val < this.rangeMax) this.rangeMax = val;
       badge.classList.add('high');

@@ -170,6 +170,8 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+button, input, textarea, select { font-family: inherit; }
+
 body {
   font-family: "Science Gothic", sans-serif;
   font-weight: 300;
@@ -777,7 +779,7 @@ body.has-bottom-nav { padding-bottom: 58px !important; }
 .bc-status.result-win .stat-score { color: #86efac; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
 .bc-status.result-lose .stat-score { color: #fca5a5; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
 .stat-bet {
-  font-family: "Orbitron", "Science Gothic", sans-serif;
+  font-family: "Science Gothic", sans-serif;
   font-weight: 500;
   font-size: 15px;
   color: #fbbf24;
@@ -803,7 +805,7 @@ body.has-bottom-nav { padding-bottom: 58px !important; }
   transition: color 0.3s;
 }
 .stat-profit {
-  font-family: "Orbitron", "Science Gothic", sans-serif;
+  font-family: "Science Gothic", sans-serif;
   font-weight: 500;
   font-size: 15px;
   text-align: right;

@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VTWorld — Bầu Cua</title>
+    <link rel="stylesheet" href="../../style.css"/>
     <link rel="stylesheet" href="../../status-bar.css">
     <link rel="stylesheet" href="baucua.css">
     <link rel="stylesheet" href="../../quests.css">
-    <style>@import url('https://fonts.googleapis.com/css2?family=Science+Gothic:wght@100..900&display=swap');</style>
     <script src="../../top-nav.js"></script>
     <script src="../../bottom-nav.js"></script>
     <script src="../../fullscreen.js"></script>
@@ -20,7 +20,39 @@
 
     <div id="top-nav-root"></div>
 
-    <div class="game-container">
+    <!-- ===== SPLASH / MENU SCREEN ===== -->
+    <div class="bc-splash-screen active" id="bc-splash">
+        <div class="bc-splash-content">
+            <div class="bc-splash-logo">🎲</div>
+            <h1 class="bc-splash-title">Bầu Cua</h1>
+            <p class="bc-splash-sub">Đặt cược linh vật và quay xúc xắc để trúng thưởng!</p>
+            <div class="bc-splash-rules">
+                <div class="bc-splash-rule">
+                    <span class="bc-splash-rule-icon">🦞</span>
+                    <span class="bc-splash-rule-text">6 linh vật trên bàn cược</span>
+                </div>
+                <div class="bc-splash-rule">
+                    <span class="bc-splash-rule-icon">🎲</span>
+                    <span class="bc-splash-rule-text">3 viên xúc xắc mỗi lượt</span>
+                </div>
+                <div class="bc-splash-rule">
+                    <span class="bc-splash-rule-icon">💰</span>
+                    <span class="bc-splash-rule-text">Trúng 1 mặt x1, 2 mặt x2, 3 mặt x3</span>
+                </div>
+                <div class="bc-splash-rule">
+                    <span class="bc-splash-rule-icon">🐾</span>
+                    <span class="bc-splash-rule-text">Pet buff tăng thêm % tiền thắng</span>
+                </div>
+            </div>
+            <button class="bc-splash-btn" id="bc-btn-start">
+                <svg class="bc-splash-btn-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <span>Chơi Ngay</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== GAME SCREEN ===== -->
+    <div class="game-container" id="bc-game">
         <!-- STATUS BAR -->
         <div class="bc-status" id="bc-status">
             <span class="stat-bet" id="bc-round">0</span>
