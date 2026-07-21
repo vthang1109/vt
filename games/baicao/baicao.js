@@ -65,6 +65,7 @@ class BaiCao {
             gameScreen.style.display = '';
             statusBar.style.display = '';
             document.getElementById('bc-bet-row').style.display = 'flex';
+            this.placeBet();
         });
     }
 
