@@ -1,5 +1,11 @@
 /* baicao.css — chỉ override/bổ sung, layout chính dùng xidach.css */
 
+/* Phòng trường hợp .xd-screen dùng align-items:center làm bàn bị co hẹp (giống lỗi tienlen/catte) */
+#bc-game-screen .xd-table {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* ===== SPLASH / MENU SCREEN ===== */
 .bc-menu-glow {
   position: absolute;

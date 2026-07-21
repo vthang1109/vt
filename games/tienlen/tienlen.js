@@ -674,6 +674,7 @@ function loadPetBuff() {
 }
 const playBtn = document.getElementById('play-btn');
 const passBtn = document.getElementById('pass-btn');
+const newRoundBtn = document.getElementById('new-round-btn');
 const myHandEl = document.getElementById('my-hand');
 const tableEl = document.getElementById('table-combo');
 const resultBox = document.getElementById('result-box');
@@ -813,6 +814,12 @@ function render() {
     seat.classList.toggle('active-turn', state.turn === i && !state.over);
     seat.classList.toggle('seat-passed', state.seatStatus[i] === 'passed');
     seat.classList.toggle('seat-played', state.seatStatus[i] === 'played');
+    const statusEl = document.getElementById('tl-status-' + i);
+    if (statusEl) {
+      if (state.seatStatus[i] === 'passed') { statusEl.textContent = 'Bỏ lượt'; statusEl.className = 'seat-status pass-status'; }
+      else if (state.seatStatus[i] === 'played') { statusEl.textContent = 'Đã đánh'; statusEl.className = 'seat-status play-status'; }
+      else { statusEl.textContent = ''; statusEl.className = 'seat-status'; }
+    }
   }
   // Ghế người chơi (seat-0): hiển thị avatar + timer ring
   const seat0 = seatEls[0];
@@ -828,6 +835,12 @@ function render() {
   seat0.classList.toggle('active-turn', state.turn === 0 && !state.over);
   seat0.classList.toggle('seat-passed', state.seatStatus[0] === 'passed');
   seat0.classList.toggle('seat-played', state.seatStatus[0] === 'played');
+  const status0 = document.getElementById('tl-status-0');
+  if (status0) {
+    if (state.seatStatus[0] === 'passed') { status0.textContent = 'Bỏ lượt'; status0.className = 'seat-status pass-status'; }
+    else if (state.seatStatus[0] === 'played') { status0.textContent = 'Đã đánh'; status0.className = 'seat-status play-status'; }
+    else { status0.textContent = ''; status0.className = 'seat-status'; }
+  }
 
   if (state.over) {
     clearTurnTimer();
@@ -841,6 +854,7 @@ function render() {
   const myTurn = state.turn === 0 && !state.over;
   playBtn.style.display = myTurn ? '' : 'none';
   passBtn.style.display = myTurn ? '' : 'none';
+  newRoundBtn.style.display = state.over ? '' : 'none';
   playBtn.disabled = !myTurn || state.selected.size === 0;
   passBtn.disabled = !myTurn || !state.tableCombo;
   const canBeatTable = myTurn && state.tableCombo && enumerateCombos(state.hands[0]).some(c => canBeat(c, state.tableCombo));
@@ -909,6 +923,17 @@ passBtn.addEventListener('click', () => {
   const res = passTurn(0);
   if (!res.ok) { window.showToast?.(res.msg, 'warn'); return; }
   afterPlayerAction();
+});
+
+newRoundBtn.addEventListener('click', () => {
+  clearTurnTimer();
+  lastTimerTurn = null;
+  gameScreen.classList.remove('active');
+  gameScreen.style.display = 'none';
+  statusBarEl.style.display = 'none';
+  resultBox.style.display = 'none';
+  tlMenu.classList.add('active');
+  tlMenu.style.display = 'flex';
 });
 
 

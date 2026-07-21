@@ -285,7 +285,7 @@ class BauCua {
         });
 
         document.querySelectorAll('.bc-tile').forEach(t => {
-            t.classList.remove('has-bet');
+            t.classList.remove('has-bet', 'win-flash', 'lose-flash');
             const betEl = t.querySelector('[data-bet]');
             betEl.textContent = '0';
         });
@@ -323,9 +323,9 @@ class BauCua {
         // Reset dice
         this.resetDice();
         
-        // Xóa hiệu ứng hot
+        // Xóa hiệu ứng hot + flash
         document.querySelectorAll('.bc-tile').forEach(t => {
-            t.classList.remove('hot');
+            t.classList.remove('hot', 'win-flash', 'lose-flash');
             const multEl = t.querySelector('[data-mult]');
             if (multEl) multEl.style.display = 'none';
         });
@@ -408,6 +408,9 @@ class BauCua {
                     multEl.textContent = 'x' + (resCounts[id] + 1);
                     multEl.style.display = 'block';
                 }
+            }
+            if (this.bets[id] > 0) {
+                t.classList.add(resCounts[id] > 0 ? 'win-flash' : 'lose-flash');
             }
         });
 

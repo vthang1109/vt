@@ -195,6 +195,12 @@ function render(r){
       t.classList.remove('hot'); 
       mult.style.display = 'none'; 
     }
+
+    if (isResult && myBet > 0) {
+      t.classList.add(counts[k] > 0 ? 'win-flash' : 'lose-flash');
+    } else {
+      t.classList.remove('win-flash', 'lose-flash');
+    }
     t.classList.toggle('disabled', !isBetting);
   });
 
@@ -345,7 +351,7 @@ window.clearMyBets = async function(){
     if (window.TopNav) window.TopNav.setPoints(_myBalance);
     
     document.querySelectorAll('.bc-tile').forEach(t => {
-      t.classList.remove('has-bet');
+      t.classList.remove('has-bet', 'win-flash', 'lose-flash');
       const betEl = t.querySelector('[data-bet]');
       betEl.textContent = '0';
     });
@@ -386,7 +392,7 @@ window.hostNext = async function(){
   
   _lastProfit = 0;
   document.querySelectorAll('.bc-tile').forEach(t => {
-    t.classList.remove('has-bet');
+    t.classList.remove('has-bet', 'win-flash', 'lose-flash');
     const betEl = t.querySelector('[data-bet]');
     betEl.textContent = '0';
   });

@@ -596,6 +596,17 @@ function renderSeat(el, r, gs, oppUid, myUid) {
 
   el.classList.toggle('seat-passed', !!(gs.whoPassedThisRound || []).includes(oppUid));
   el.querySelector('.seat-timer-fg')?.classList.remove('timer-warn');
+
+  const statusEl = el.querySelector('.seat-status');
+  if (statusEl) {
+    if ((gs.whoPassedThisRound || []).includes(oppUid)) {
+      statusEl.textContent = 'Bỏ lượt'; statusEl.className = 'seat-status pass-status';
+    } else if (gs.phase === 'playing' && gs.lastPlayer === oppUid && gs.tableCombo) {
+      statusEl.textContent = 'Đã đánh'; statusEl.className = 'seat-status play-status';
+    } else {
+      statusEl.textContent = ''; statusEl.className = 'seat-status';
+    }
+  }
 }
 
 function renderResultBox(r, gs, uid) {

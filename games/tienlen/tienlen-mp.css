@@ -185,6 +185,8 @@
 .seat.finished .tlmp-card-count { color: #fbbf24; }
 .seat.passed .tlmp-card-count { color: #f87171; }
 
+.seat .seat-status { bottom: -32px; }
+
 /* ===== HAND LAYOUT (fix xếp dọc) ===== */
 .tlmp-hand {
   display: flex;
