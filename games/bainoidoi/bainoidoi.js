@@ -32,9 +32,32 @@ class BaiNoiDoi {
     await new Promise(r => { const u = onAuthStateChanged(auth, user => { u(); if (user) r(); else location.href = 'index.html'; }); });
     this.listenBalance();
     this.refreshBuffCache();
+    this.setupSplash();
     this.bindEvents();
-    document.getElementById('bc-bet-row').style.display = 'flex';
     window.game = this;
+  }
+
+  setupSplash() {
+    const playBtn = document.getElementById('bnd-play-btn');
+    const menu = document.getElementById('bnd-menu');
+    const gameScreen = document.getElementById('bnd-game-screen');
+    const statusBar = document.getElementById('bc-status');
+    const betInputMenu = document.getElementById('bnd-bet-input-menu');
+    const betInput = document.getElementById('bc-bet-input');
+
+    if (!playBtn || !menu || !gameScreen) return;
+
+    playBtn.addEventListener('click', () => {
+      if (betInput && betInputMenu) {
+        betInput.value = betInputMenu.value;
+      }
+      menu.classList.remove('active');
+      menu.style.display = 'none';
+      gameScreen.classList.add('active');
+      gameScreen.style.display = '';
+      statusBar.style.display = '';
+      document.getElementById('bc-bet-row').style.display = 'flex';
+    });
   }
 
   listenBalance() {

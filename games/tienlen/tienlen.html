@@ -22,6 +22,40 @@
   <div id="top-nav-root"></div>
   <div class="tl-wrap">
 
+    <!-- ===== MENU SCREEN ===== -->
+    <div id="tl-menu" class="tl-screen active">
+      <!-- Floating decorative cards -->
+      <div class="tl-menu-glow"></div>
+      <div class="tl-floating-card tl-fc-1">🂡</div>
+      <div class="tl-floating-card tl-fc-2">🂱</div>
+      <div class="tl-floating-card tl-fc-3">🃁</div>
+
+      <div class="tl-logo"><img src="../../assets/icons/tienlen.png" alt="Tiến Lên" class="tl-logo-img"/></div>
+      <h1 class="tl-title">Tiến Lên</h1>
+      <p class="tl-sub">Chặn bài — chặt heo — về nhất thắng cả ván!</p>
+
+      <!-- Glass card container -->
+      <div class="tl-menu-card">
+
+        <!-- Mode selector -->
+        <div class="tl-mode-chips">
+          <button type="button" class="tl-mode-chip" data-mode="an_tat">Nhất ăn tất</button>
+          <button type="button" class="tl-mode-chip" data-mode="nhi_ba_tu">Nhất Nhì Ba Tư</button>
+          <button type="button" class="tl-mode-chip" data-mode="dem_la">Đếm lá</button>
+        </div>
+
+        <!-- Bet + Play -->
+        <div class="tl-menu-bet-row">
+          <input type="number" id="tl-bet-input" value="100" min="10" step="10"/>
+          <button class="tl-play-btn" id="tl-play-btn">
+            <span class="tl-play-icon">▶</span>
+            Chơi Ngay
+          </button>
+        </div>
+
+      </div>
+    </div>
+
     <!-- STATUS BAR -->
     <div class="bc-status" id="bc-status" style="display:none">
       <span class="stat-bet" id="tl-bet">0</span>
@@ -32,23 +66,8 @@
       <span class="stat-profit zero" id="tl-profit">+0</span>
     </div>
 
-    <!-- SETUP BAR (compact, always shown when not playing) -->
-    <div id="setup-bar" class="tl-setup-bar">
-      <div class="tl-setup-inner">
-        <div class="tl-mode-chips">
-          <button type="button" class="tl-mode-chip" data-mode="an_tat">Nhất ăn tất</button>
-          <button type="button" class="tl-mode-chip" data-mode="nhi_ba_tu">Nhất Nhì Ba Tư</button>
-          <button type="button" class="tl-mode-chip" data-mode="dem_la">Đếm lá</button>
-        </div>
-        <div class="tl-setup-row">
-          <input type="number" id="tl-bet-input" value="100" min="10" step="10"/>
-          <button id="start-btn" class="btn-deal tl-start-btn">✅ BẮT ĐẦU</button>
-        </div>
-      </div>
-    </div>
-
     <!-- GAME SCREEN -->
-    <div id="game-screen" style="display:none">
+    <div id="game-screen" class="tl-screen" style="display:none">
       <div class="table-area">
         <div class="seat seat-top" id="seat-2">
           <div class="seat-ring">

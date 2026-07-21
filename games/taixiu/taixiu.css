@@ -1,4 +1,155 @@
 /* ===== TÀI XỈU — ĐỒNG BỘ BẦU CUA ===== */
+
+/* ===== SPLASH / MENU ===== */
+.tx-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  animation: txFadeUp 0.4s ease both;
+}
+.tx-screen.active { display: flex; }
+
+@keyframes txFadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.tx-menu-glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(251,191,36,0.1), transparent 70%);
+  pointer-events: none;
+  animation: txGlowPulse 3s ease-in-out infinite;
+}
+@keyframes txGlowPulse {
+  0%,100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.12); }
+}
+
+#tx-menu {
+  position: relative;
+  padding: 20px 20px 40px;
+  gap: 0;
+}
+#tx-menu.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tx-logo {
+  font-size: 72px;
+  margin-bottom: 8px;
+  animation: txFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(251,191,36,0.4));
+}
+@keyframes txFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.tx-title {
+  font-size: 36px;
+  font-weight: 900;
+  color: #fbbf24;
+  text-align: center;
+  margin: 0 0 6px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 40px rgba(251,191,36,0.5), 0 2px 4px rgba(0,0,0,0.3);
+}
+.tx-sub {
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 28px;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.tx-menu-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(15,23,42,0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(148,163,184,0.08);
+  border-radius: 20px;
+  padding: 24px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.tx-chip-presets {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.preset-chip {
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(148,163,184,0.15);
+  background: rgba(0,0,0,0.25);
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.preset-chip:hover {
+  border-color: rgba(251,191,36,0.4);
+  color: #fbbf24;
+}
+.preset-chip.active {
+  border-color: #fbbf24;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #000;
+  box-shadow: 0 4px 16px rgba(251,191,36,0.3);
+}
+
+.tx-play-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #000;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(251,191,36,0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  width: 100%;
+}
+.tx-play-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 35px rgba(251,191,36,0.55), 0 0 50px rgba(251,191,36,0.2);
+}
+.tx-play-btn:active {
+  transform: scale(0.97) translateY(0);
+}
+.tx-play-icon { font-size: 18px; }
+
+@media (max-width: 480px) {
+  .tx-title { font-size: 28px; }
+  .tx-logo { font-size: 60px; }
+  .tx-menu-card { padding: 20px 16px 16px; }
+  .preset-chip { padding: 8px 14px; font-size: 12px; }
+}
+
 body {
     background: radial-gradient(circle at center, #1e293b, #070b14);
     min-height: 100vh;

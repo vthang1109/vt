@@ -38,10 +38,34 @@ class BaiCao {
 
         this.listenBalance();
         this.refreshBuffCache();
+        this.setupSplash();
         this.renderEmpty();
         this.bindEvents();
-        document.getElementById('bc-bet-row').style.display = 'flex';
         window.game = this;
+    }
+
+    setupSplash() {
+        const playBtn = document.getElementById('bc-play-btn');
+        const menu = document.getElementById('bc-menu');
+        const gameScreen = document.getElementById('bc-game-screen');
+        const statusBar = document.getElementById('bc-status');
+        const betInputMenu = document.getElementById('bc-bet-input-menu');
+        const betInput = document.getElementById('bc-bet-input');
+
+        if (!playBtn || !menu || !gameScreen) return;
+
+        playBtn.addEventListener('click', () => {
+            // Copy bet value from menu to game
+            if (betInput && betInputMenu) {
+                betInput.value = betInputMenu.value;
+            }
+            menu.classList.remove('active');
+            menu.style.display = 'none';
+            gameScreen.classList.add('active');
+            gameScreen.style.display = '';
+            statusBar.style.display = '';
+            document.getElementById('bc-bet-row').style.display = 'flex';
+        });
     }
 
     listenBalance() {

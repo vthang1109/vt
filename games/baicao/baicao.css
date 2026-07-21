@@ -1,5 +1,161 @@
 /* baicao.css — chỉ override/bổ sung, layout chính dùng xidach.css */
 
+/* ===== SPLASH / MENU SCREEN ===== */
+.bc-menu-glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(34,197,94,0.1), transparent 70%);
+  pointer-events: none;
+  animation: bcGlowPulse 3s ease-in-out infinite;
+}
+@keyframes bcGlowPulse {
+  0%,100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.12); }
+}
+
+.bc-floating-card {
+  position: absolute;
+  font-size: 48px;
+  opacity: 0.1;
+  pointer-events: none;
+  animation: bcCardDrift 10s ease-in-out infinite;
+}
+.bc-fc-1 { top: 5%; left: 3%; animation-delay: 0s; }
+.bc-fc-2 { top: 8%; right: 3%; animation-delay: 2.5s; }
+.bc-fc-3 { bottom: 20%; left: 5%; animation-delay: 5s; }
+
+@keyframes bcCardDrift {
+  0%,100% { transform: translateY(0) rotate(-6deg); opacity: 0.07; }
+  25% { transform: translateY(-10px) rotate(3deg); opacity: 0.14; }
+  50% { transform: translateY(5px) rotate(10deg); opacity: 0.1; }
+  75% { transform: translateY(-5px) rotate(-3deg); opacity: 0.14; }
+}
+
+#bc-menu {
+  position: relative;
+  padding: 20px 20px 40px;
+  gap: 0;
+}
+#bc-menu.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bc-logo {
+  font-size: 72px;
+  margin-bottom: 8px;
+  animation: bcFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(34,197,94,0.4));
+}
+@keyframes bcFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.bc-title {
+  font-size: 36px;
+  font-weight: 900;
+  color: #34d399;
+  text-align: center;
+  margin: 0 0 6px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 40px rgba(34,197,94,0.5), 0 2px 4px rgba(0,0,0,0.3);
+}
+.bc-sub {
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 28px;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.bc-menu-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(15,23,42,0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(148,163,184,0.08);
+  border-radius: 20px;
+  padding: 24px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.bc-menu-bet-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.bc-menu-bet-row input {
+  flex: 1;
+  padding: 14px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(148,163,184,0.1);
+  background: rgba(0,0,0,0.25);
+  color: #34d399;
+  font-size: 15px;
+  font-weight: 600;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  min-width: 0;
+}
+.bc-menu-bet-row input:focus {
+  border-color: #22d3ee;
+  box-shadow: 0 0 20px rgba(34,211,238,0.12);
+}
+.bc-menu-bet-row input::placeholder {
+  color: #475569;
+}
+
+.bc-play-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  color: #fff;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(52,211,153,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+.bc-play-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 35px rgba(52,211,153,0.55), 0 0 50px rgba(52,211,153,0.2);
+}
+.bc-play-btn:active {
+  transform: scale(0.97) translateY(0);
+}
+.bc-play-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .bc-title { font-size: 28px; }
+  .bc-logo { font-size: 60px; }
+  .bc-menu-card { padding: 20px 16px 16px; }
+  .bc-floating-card { font-size: 36px; }
+}
+
 /* ===================== HAND TYPE (chữ trơn, không khung) ===================== */
 .xd-score-inline.plain {
   background: none;

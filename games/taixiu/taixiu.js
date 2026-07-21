@@ -22,9 +22,42 @@ class TaiXiu {
         await this.listenBalance();
         await this.refreshBuffCache();
         this.ready = true;
+        this.setupSplash();
         this.bindEvents();
         this.updateStatusBar(null, null, null);
         window.txGame = this;
+    }
+
+    setupSplash() {
+        const playBtn = document.getElementById('tx-play-btn');
+        const menu = document.getElementById('tx-menu');
+        const gameScreen = document.getElementById('tx-game-screen');
+        if (!playBtn || !menu || !gameScreen) return;
+        
+        // Handle preset chip selection
+        document.querySelectorAll('#tx-menu .preset-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('#tx-menu .preset-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+            });
+        });
+
+        playBtn.addEventListener('click', () => {
+            // Sync selected chip value to game
+            const activeChip = document.querySelector('#tx-menu .preset-chip.active');
+            if (activeChip) {
+                const amt = parseInt(activeChip.dataset.amt);
+                document.querySelectorAll('.chip[data-amt]').forEach(c => {
+                    c.classList.remove('active');
+                    if (parseInt(c.dataset.amt) === amt) c.classList.add('active');
+                });
+                if (window.txGame) window.txGame.currentChip = amt;
+            }
+            menu.classList.remove('active');
+            menu.style.display = 'none';
+            gameScreen.classList.add('active');
+            gameScreen.style.display = '';
+        });
     }
 
     async refreshBuffCache() {

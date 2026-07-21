@@ -20,34 +20,59 @@
   <div id="top-nav-root"></div>
 
   <div class="slot-wrap">
-    <!-- STATUS BAR đồng bộ bầu cua / tài xỉu -->
-    <div class="bc-status" id="bc-status">
-      <span class="stat-bet" id="slot-bet-total">0</span>
-      <span class="stat-score" id="slot-result-mid">--</span>
-      <span class="stat-profit zero" id="slot-profit">+0</span>
-    </div>
+    <!-- ===== SPLASH / MENU ===== -->
+    <div id="slot-menu" class="slot-screen active">
+      <div class="slot-menu-glow"></div>
+      <div class="slot-floating-card slot-fc-1">🎰</div>
+      <div class="slot-floating-card slot-fc-2">💎</div>
+      <div class="slot-floating-card slot-fc-3">🍒</div>
 
-    <!-- KHUNG CHÍNH -->
-    <div class="slot-card">
-      <!-- JACKPOT -->
-      <div class="slot-jackpot" id="slot-jackpot-container">
-        <span class="jp-label jp-777"><span>7</span><span>7</span><span>7</span></span>
-        <span class="jp-value" id="slot-jackpot-value">1.000〄</span>
-      </div>
+      <div class="slot-logo">🎰</div>
+      <h1 class="slot-title">Nổ Hũ</h1>
+      <p class="slot-sub">Quay số trúng thưởng — Jackpot đang chờ bạn!</p>
 
-      <!-- SLOT MACHINE -->
-      <div class="slot-machine">
-        <div class="slot-reels" id="slot-reels">
-          <div class="slot-reel" id="reel-0">🍊</div>
-          <div class="slot-reel" id="reel-1">🍊</div>
-          <div class="slot-reel" id="reel-2">🍊</div>
+      <div class="slot-menu-card">
+        <div class="slot-menu-bet-row">
+          <input type="number" id="slot-bet-input-menu" value="50" min="10" step="10"/>
+          <button class="slot-play-btn" id="slot-play-btn">
+            <span class="slot-play-icon">▶</span>
+            Chơi Ngay
+          </button>
         </div>
       </div>
+    </div>
 
-      <!-- ĐẶT CƯỢC & QUAY -->
-      <div class="slot-bet-row">
-        <input id="slot-bet-input" type="number" min="50" step="50" value="50"/>
-        <button id="btn-spin" onclick="window.game.spin()">🎰 QUAY</button>
+    <!-- GAME SCREEN -->
+    <div id="slot-game-screen" class="slot-screen" style="display:none">
+      <!-- STATUS BAR -->
+      <div class="bc-status" id="bc-status">
+        <span class="stat-bet" id="slot-bet-total">0</span>
+        <span class="stat-score" id="slot-result-mid">--</span>
+        <span class="stat-profit zero" id="slot-profit">+0</span>
+      </div>
+
+      <!-- KHUNG CHÍNH -->
+      <div class="slot-card">
+        <!-- JACKPOT -->
+        <div class="slot-jackpot" id="slot-jackpot-container">
+          <span class="jp-label jp-777"><span>7</span><span>7</span><span>7</span></span>
+          <span class="jp-value" id="slot-jackpot-value">1.000〄</span>
+        </div>
+
+        <!-- SLOT MACHINE -->
+        <div class="slot-machine">
+          <div class="slot-reels" id="slot-reels">
+            <div class="slot-reel" id="reel-0">🍊</div>
+            <div class="slot-reel" id="reel-1">🍊</div>
+            <div class="slot-reel" id="reel-2">🍊</div>
+          </div>
+        </div>
+
+        <!-- ĐẶT CƯỢC & QUAY -->
+        <div class="slot-bet-row">
+          <input id="slot-bet-input" type="number" min="50" step="50" value="50"/>
+          <button id="btn-spin" onclick="window.game.spin()">🎰 QUAY</button>
+        </div>
       </div>
     </div>
   </div>

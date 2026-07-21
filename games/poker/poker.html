@@ -20,37 +20,61 @@
   <div id="top-nav-root"></div>
 
   <div class="pk-wrap">
+    <!-- ===== SPLASH / MENU ===== -->
+    <div id="pk-menu" class="pk-screen active">
+      <div class="pk-menu-glow"></div>
+      <div class="pk-floating-card pk-fc-1">🂠</div>
+      <div class="pk-floating-card pk-fc-2">🂡</div>
+      <div class="pk-floating-card pk-fc-3">🃏</div>
+
+      <div class="pk-logo">♠</div>
+      <h1 class="pk-title">Poker Texas Hold'em</h1>
+      <p class="pk-sub">So bài với máy — Call, Fold, All-in — Ai mạnh hơn thắng!</p>
+
+      <div class="pk-menu-card">
+        <div class="pk-menu-bet-row">
+          <input type="number" id="pk-bet-input-menu" value="100" min="50" step="50"/>
+          <button class="pk-play-btn" id="pk-play-btn">
+            <span class="pk-play-icon">▶</span>
+            Chơi Ngay
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- STATUS BAR -->
-    <div class="bc-status" id="bc-status">
+    <div class="bc-status" id="bc-status" style="display:none">
       <span class="stat-bet" id="bc-bet-stat"></span>
       <span class="stat-score-wrap"><span class="stat-score" id="bc-status-msg"></span></span>
       <span class="stat-profit zero" id="bc-profit-stat"></span>
     </div>
 
-    <!-- BET ROW -->
-    <div class="xd-bet-row" id="bc-bet-row">
-      <input id="bc-bet-input" type="number" min="50" step="50" value="100"/>
-      <button id="btn-place-bet">✅ Đặt cược</button>
-    </div>
-
     <!-- GAME SCREEN -->
-    <div class="pk-table" id="pk-table">
-      <div class="pk-seat dealer">
-        <div class="pk-seat-head">🤖 Máy</div>
-        <div class="pk-cards-row"><div class="pk-card-back">🂠🂠</div></div>
+    <div id="pk-game-screen" class="pk-screen" style="display:none">
+      <!-- BET ROW -->
+      <div class="xd-bet-row" id="bc-bet-row">
+        <input id="bc-bet-input" type="number" min="50" step="50" value="100"/>
+        <button id="btn-place-bet">✅ Đặt cược</button>
       </div>
-      <!-- pot hiển thị trong bài chung, do JS render -->
-      <div class="pk-seat me">
-        <div class="pk-seat-head">Bạn</div>
-        <div class="pk-cards-row"></div>
-      </div>
-    </div>
 
-    <div class="pk-info" id="pk-info">Đặt cược để bắt đầu!</div>
-    <div class="pk-actions" id="pk-actions" style="display:none">
-      <button class="btn-hit" id="pk-call">✅ Theo (Call)</button>
-      <button class="btn-stand" id="pk-fold">🏳️ Bỏ (Fold)</button>
-      <button class="pk-btn-raise" id="pk-allin">🔥 All-in</button>
+      <div class="pk-table" id="pk-table">
+        <div class="pk-seat dealer">
+          <div class="pk-seat-head">🤖 Máy</div>
+          <div class="pk-cards-row"><div class="pk-card-back">🂠🂠</div></div>
+        </div>
+        <!-- pot hiển thị trong bài chung, do JS render -->
+        <div class="pk-seat me">
+          <div class="pk-seat-head">Bạn</div>
+          <div class="pk-cards-row"></div>
+        </div>
+      </div>
+
+      <div class="pk-info" id="pk-info">Đặt cược để bắt đầu!</div>
+      <div class="pk-actions" id="pk-actions" style="display:none">
+        <button class="btn-hit" id="pk-call">✅ Theo (Call)</button>
+        <button class="btn-stand" id="pk-fold">🏳️ Bỏ (Fold)</button>
+        <button class="pk-btn-raise" id="pk-allin">🔥 All-in</button>
+      </div>
     </div>
   </div>
 

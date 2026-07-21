@@ -20,38 +20,63 @@
   <div id="top-nav-root"></div>
 
   <div class="bnd-wrap">
+    <!-- ===== SPLASH / MENU ===== -->
+    <div id="bnd-menu" class="xd-screen active">
+      <div class="bnd-menu-glow"></div>
+      <div class="bnd-floating-card bnd-fc-1">🃏</div>
+      <div class="bnd-floating-card bnd-fc-2">🂠</div>
+      <div class="bnd-floating-card bnd-fc-3">🎭</div>
+
+      <div class="bnd-logo">🎭</div>
+      <h1 class="bnd-title">Bài Nói Dối</h1>
+      <p class="bnd-sub">Đánh bài nói dối — tố cáo kẻ lừa! Ai hết bài trước thắng!</p>
+
+      <div class="bnd-menu-card">
+        <div class="bnd-menu-bet-row">
+          <input type="number" id="bnd-bet-input-menu" value="100" min="50" step="50"/>
+          <button class="bnd-play-btn" id="bnd-play-btn">
+            <span class="bnd-play-icon">▶</span>
+            Chơi Ngay
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- STATUS BAR -->
-    <div class="bc-status" id="bc-status">
+    <div class="bc-status" id="bc-status" style="display:none">
       <span class="stat-bet" id="bc-bet-stat"></span>
       <span class="stat-score-wrap"><span class="stat-score" id="bc-status-msg"></span></span>
       <span class="stat-profit zero" id="bc-profit-stat"></span>
     </div>
 
-    <!-- BET ROW -->
-    <div class="xd-bet-row" id="bc-bet-row">
-      <input id="bc-bet-input" type="number" min="50" step="50" value="100"/>
-      <button id="btn-place-bet">✅ Đặt cược</button>
-    </div>
+    <!-- GAME SCREEN -->
+    <div id="bnd-game-screen" class="xd-screen" style="display:none">
+      <!-- BET ROW -->
+      <div class="xd-bet-row" id="bc-bet-row">
+        <input id="bc-bet-input" type="number" min="50" step="50" value="100"/>
+        <button id="btn-place-bet">✅ Đặt cược</button>
+      </div>
 
-    <!-- GAME -->
-    <div class="bnd-table" id="bnd-table">
-      <div class="bnd-row">
-        <div class="bnd-seat dealer"><span>🤖 Máy · <strong>0</strong> lá</span></div>
+      <!-- GAME -->
+      <div class="bnd-table" id="bnd-table">
+        <div class="bnd-row">
+          <div class="bnd-seat dealer"><span>🤖 Máy · <strong>0</strong> lá</span></div>
+        </div>
+        <div class="bnd-pile"><div class="bnd-pile-label">Chưa có bài</div></div>
+        <div class="bnd-row">
+          <div class="bnd-seat me"><span>Bạn · <strong>0</strong> lá</span></div>
+        </div>
       </div>
-      <div class="bnd-pile"><div class="bnd-pile-label">Chưa có bài</div></div>
-      <div class="bnd-row">
-        <div class="bnd-seat me"><span>Bạn · <strong>0</strong> lá</span></div>
+      <div class="bnd-status" id="bnd-status">Đặt cược để bắt đầu!</div>
+      <div class="bnd-hand" id="bnd-hand"></div>
+      <div class="bnd-actions" id="bnd-actions" style="display:none">
+        <button class="bnd-act-play" id="bnd-play-btn">📥 Đánh bài</button>
+        <button class="bnd-act-call" id="bnd-call-btn">🔍 Tố cáo!</button>
       </div>
-    </div>
-    <div class="bnd-status" id="bnd-status">Đặt cược để bắt đầu!</div>
-    <div class="bnd-hand" id="bnd-hand"></div>
-    <div class="bnd-actions" id="bnd-actions" style="display:none">
-      <button class="bnd-act-play" id="bnd-play-btn">📥 Đánh bài</button>
-      <button class="bnd-act-call" id="bnd-call-btn">🔍 Tố cáo!</button>
-    </div>
-    <div class="bnd-declare" id="bnd-declare" style="display:none">
-      <span style="color:#7dd3fc;font-size:13px">Nói dối là đánh lá:</span>
-      <div class="bnd-declare-options" id="bnd-declare-options"></div>
+      <div class="bnd-declare" id="bnd-declare" style="display:none">
+        <span style="color:#7dd3fc;font-size:13px">Nói dối là đánh lá:</span>
+        <div class="bnd-declare-options" id="bnd-declare-options"></div>
+      </div>
     </div>
   </div>
 

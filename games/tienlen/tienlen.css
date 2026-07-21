@@ -10,66 +10,215 @@
 .stat-profit.timer-color { color: #fbbf24; }
 .stat-profit.timer-color.negative { color: #ef4444; }
 
-/* ===================== SETUP BAR (compact) ===================== */
-.tl-setup-bar {
-  text-align: center;
-  margin-bottom: 14px;
+/* ===================== SCREENS ===================== */
+.tl-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  animation: tlFadeUp 0.4s ease both;
 }
-.tl-setup-inner {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 16px;
-  padding: 16px;
+.tl-screen.active { display: flex; }
+
+@keyframes tlFadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================== MENU ===================== */
+.tl-menu-glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(52,211,153,0.1), transparent 70%);
+  pointer-events: none;
+  animation: tlGlowPulse 3s ease-in-out infinite;
+}
+@keyframes tlGlowPulse {
+  0%,100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.12); }
+}
+
+.tl-floating-card {
+  position: absolute;
+  font-size: 48px;
+  opacity: 0.1;
+  pointer-events: none;
+  animation: tlCardDrift 10s ease-in-out infinite;
+}
+.tl-fc-1 { top: 5%; left: 3%; animation-delay: 0s; }
+.tl-fc-2 { top: 8%; right: 3%; animation-delay: 2.5s; }
+.tl-fc-3 { bottom: 20%; left: 5%; animation-delay: 5s; }
+
+@keyframes tlCardDrift {
+  0%,100% { transform: translateY(0) rotate(-6deg); opacity: 0.07; }
+  25% { transform: translateY(-10px) rotate(3deg); opacity: 0.14; }
+  50% { transform: translateY(5px) rotate(10deg); opacity: 0.1; }
+  75% { transform: translateY(-5px) rotate(-3deg); opacity: 0.14; }
+}
+
+#tl-menu {
+  position: relative;
+  padding: 20px 20px 40px;
+  gap: 0;
+}
+#tl-menu.active {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
 }
-.tl-mode-chips {
+
+.tl-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  animation: tlFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(52,211,153,0.4));
+}
+.tl-logo-img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+}
+.tl-logo-img:hover {
+  transform: scale(1.1) rotate(-3deg);
+}
+@keyframes tlFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.tl-title {
+  font-size: 36px;
+  font-weight: 900;
+  color: #34d399;
+  text-align: center;
+  margin: 0 0 6px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 40px rgba(52,211,153,0.5), 0 2px 4px rgba(0,0,0,0.3);
+}
+.tl-sub {
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 28px;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+/* Glass card container */
+.tl-menu-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(15,23,42,0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(148,163,184,0.08);
+  border-radius: 20px;
+  padding: 24px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+/* Mode chips in menu */
+#tl-menu .tl-mode-chips {
   display: flex;
   gap: 8px;
   justify-content: center;
   flex-wrap: wrap;
 }
-.tl-mode-chip {
-  padding: 6px 14px;
+#tl-menu .tl-mode-chip {
+  padding: 10px 14px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: #9fc7b8;
-  font-family: "Science Gothic", sans-serif;
-  transition: all 0.2s;
+  background: rgba(0,0,0,0.2);
+  border: 1.5px solid rgba(148,163,184,0.1);
+  color: #64748b;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
 }
-.tl-mode-chip:hover { background: rgba(255,255,255,0.1); }
-.tl-mode-chip.selected { background: rgba(251,191,36,0.15); border-color: #fbbf24; color: #fbbf24; }
+#tl-menu .tl-mode-chip:hover {
+  border-color: rgba(52,211,153,0.4);
+  color: #34d399;
+  background: rgba(52,211,153,0.06);
+  transform: translateY(-1px);
+}
+#tl-menu .tl-mode-chip.selected {
+  border-color: #34d399;
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(52,211,153,0.3);
+  transform: translateY(-1px);
+}
 
-.tl-setup-row {
+/* Bet + Play row */
+.tl-menu-bet-row {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  align-items: center;
+}
+.tl-menu-bet-row input {
+  flex: 1;
+  padding: 14px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(148,163,184,0.1);
+  background: rgba(0,0,0,0.25);
+  color: #34d399;
+  font-size: 15px;
+  font-weight: 600;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  min-width: 0;
+}
+.tl-menu-bet-row input:focus {
+  border-color: #22d3ee;
+  box-shadow: 0 0 20px rgba(34,211,238,0.12);
+}
+.tl-menu-bet-row input::placeholder {
+  color: #475569;
+}
+
+.tl-play-btn {
+  display: flex;
   align-items: center;
   justify-content: center;
-}
-.tl-setup-row input {
-  width: 120px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(56,189,248,0.3);
-  background: rgba(0,0,0,0.3);
-  color: #fbbf24;
-  font-weight: 700;
-  text-align: center;
-  font-family: "Science Gothic", sans-serif;
-  font-size: 15px;
-}
-.tl-start-btn {
-  padding: 10px 24px;
-  border-radius: 10px;
-  font-size: 14px;
+  gap: 10px;
+  padding: 16px 24px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  color: #fff;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(52,211,153,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  flex-shrink: 0;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.tl-play-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 35px rgba(52,211,153,0.55), 0 0 50px rgba(52,211,153,0.2);
+}
+.tl-play-btn:active {
+  transform: scale(0.97) translateY(0);
+}
+.tl-play-icon {
+  flex-shrink: 0;
+  font-size: 14px;
 }
 
 /* ===================== BÀN CHƠI ===================== */

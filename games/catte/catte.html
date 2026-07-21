@@ -22,6 +22,27 @@
   <div id="top-nav-root"></div>
   <div class="ct-wrap">
 
+    <!-- ===== SPLASH / MENU ===== -->
+    <div id="ct-menu" class="ct-screen active">
+      <div class="ct-floating-card ct-fc-1">🂠</div>
+      <div class="ct-floating-card ct-fc-2">🂱</div>
+      <div class="ct-floating-card ct-fc-3">🃁</div>
+
+      <div class="ct-logo">🃏</div>
+      <h1 class="ct-title">Cát Tê</h1>
+      <p class="ct-sub">6 lá · 6 vòng · Cùng chất lớn hơn hoặc úp bài · Vào tùng</p>
+
+      <div class="ct-menu-card">
+        <div class="ct-menu-bet-row">
+          <input type="number" id="ct-bet-input-menu" value="100" min="10" step="10"/>
+          <button class="ct-play-btn" id="ct-play-btn">
+            <span class="ct-play-icon">▶</span>
+            Bắt Đầu
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- STATUS BAR -->
     <div class="bc-status" id="bc-status" style="display:none">
       <span class="stat-bet" id="ct-bet">0</span>
@@ -32,24 +53,8 @@
       <span class="stat-profit zero" id="ct-profit">+0</span>
     </div>
 
-    <!-- SETUP BAR -->
-    <div id="setup-bar" class="tl-setup-bar">
-      <div class="tl-setup-inner">
-        <div class="ct-mode-chips">
-          <button type="button" class="ct-mode-chip selected" data-mode="thuong">Cát Tê</button>
-        </div>
-        <div class="tl-setup-row">
-          <input type="number" id="ct-bet-input" value="100" min="10" step="10"/>
-          <button id="start-btn" class="btn-deal tl-start-btn">BẮT ĐẦU</button>
-        </div>
-        <div class="ct-rule-summary">
-          6 lá/người · 6 vòng · Cùng chất &amp; lớn hơn hoặc <b>Úp bài</b> · Vào tùng
-        </div>
-      </div>
-    </div>
-
     <!-- GAME SCREEN -->
-    <div id="game-screen" style="display:none">
+    <div id="game-screen" class="ct-screen" style="display:none">
       <div class="table-area">
         <div class="ct-round-display" id="ct-round-display">Vòng <span id="ct-round-num">1</span>/4</div>
         <div class="seat seat-top" id="seat-2">

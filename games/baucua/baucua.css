@@ -231,20 +231,16 @@ body {
 /* ===== BOARD ===== */
 .bc-board-wrap {
     display: flex;
-    gap: 10px;
-    margin-bottom: 14px;
-    align-items: stretch;
+    justify-content: center;
+    margin-bottom: 8px;
 }
 
 .bc-board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    flex: 0 0 90%;
-    max-width: 90%;
-}
-@media (min-width: 600px) { 
-    .bc-board { grid-template-columns: repeat(6, 1fr); } 
+    width: 100%;
+    max-width: 420px;
 }
 
 .bc-tile { 
@@ -299,28 +295,29 @@ body {
     text-shadow: 0 0 8px rgba(52,211,153,.6); 
 }
 
-/* Chips bên phải */
-.bc-chips-side {
+/* Hàng chọn chip */
+.bc-chips-row {
     display: flex;
-    flex-direction: column;
     gap: 8px;
-    flex: 1;
-    min-width: 50px;
     justify-content: center;
+    margin: 0 auto 12px;
+    max-width: 420px;
+    width: 100%;
 }
 .bc-chip {
-    padding: 10px 4px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.1);
+    padding: 12px 0;
+    border-radius: 12px;
+    border: 1.5px solid rgba(255,255,255,0.1);
     background: #1e293b;
     color: #fff;
-    font-weight: 400;
+    font-weight: 700;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 14px;
     transition: all .2s;
     text-align: center;
-    width: 100%;
     flex: 1;
+    min-width: 50px;
+    max-width: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -427,21 +424,14 @@ body {
         border-radius: 18px; 
     }
     .bc-dice { gap: 12px; }
-    .bc-board-wrap { flex-direction: column; }
-    .bc-board { flex: 1; max-width: 100%; }
-    .bc-chips-side { 
-        flex-direction: row; 
-        justify-content: center; 
-        flex-wrap: wrap; 
-        gap: 6px; 
-    }
+    .bc-chips-row { gap: 6px; }
     .bc-chip { 
         flex: 1; 
-        min-width: 50px; 
-        max-width: 80px; 
-        min-height: 36px; 
-        padding: 6px 8px; 
-        font-size: 11px; 
+        min-width: 44px; 
+        max-width: 70px; 
+        min-height: 38px; 
+        padding: 8px 4px; 
+        font-size: 12px; 
     }
     .bc-splash-title { font-size: 28px; }
     .bc-splash-logo { font-size: 64px; }

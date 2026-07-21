@@ -330,10 +330,36 @@ function runAiTurn(playerIdx, onDone) {
   }, 2000);
 }
 
+// ── SPLASH → GAME ──
+function setupSplash() {
+  const playBtn = document.getElementById('ct-play-btn');
+  const menu = document.getElementById('ct-menu');
+  const gameScr = document.getElementById('game-screen');
+  const statusBar = document.getElementById('bc-status');
+  const betInputMenu = document.getElementById('ct-bet-input-menu');
+
+  if (!playBtn || !menu || !gameScr) return;
+
+  playBtn.addEventListener('click', () => {
+    const globalBetInput = document.getElementById('ct-bet-input');
+    if (globalBetInput && betInputMenu) {
+      globalBetInput.value = betInputMenu.value;
+    }
+    menu.classList.remove('active');
+    menu.style.display = 'none';
+    gameScr.classList.add('active');
+    gameScr.style.display = '';
+    statusBar.style.display = '';
+    // Kích hoạt game ngay
+    const bet = parseInt(globalBetInput?.value || 100);
+    newGame(bet, buffPct);
+    render();
+    maybeRunAi();
+  });
+}
+
 // ── GIAO DIỆN ──
-const setupBar = document.getElementById('setup-bar');
 const gameScreen = document.getElementById('game-screen');
-const startBtn = document.getElementById('start-btn');
 const betInput = document.getElementById('ct-bet-input');
 const playBtn = document.getElementById('play-btn');
 const foldBtn = document.getElementById('fold-btn');
@@ -677,8 +703,13 @@ function updateStatusBar() {
 }
 
 window.backToSetup = function backToSetup() {
+  const menu = document.getElementById('ct-menu');
+  gameScreen.classList.remove('active');
   gameScreen.style.display = 'none';
-  setupBar.style.display = '';
+  if (menu) {
+    menu.classList.add('active');
+    menu.style.display = '';
+  }
   statusBarEl.style.display = 'none';
   newGameBtn.style.display = 'none';
   menuBtn.style.display = 'none';
@@ -747,12 +778,6 @@ function afterAiStep() {
   maybeRunAi();
 }
 
-// ── EVENTS ──
-onAuthStateChanged(auth, (user) => {
-  if (!user) { location.href = 'index.html'; return; }
-  loadPetBuff();
-});
-
 function loadPetBuff() {
   if (!buffLoadPromise) {
     buffLoadPromise = getActiveBuff()
@@ -762,18 +787,11 @@ function loadPetBuff() {
   return buffLoadPromise;
 }
 
-startBtn.addEventListener('click', async () => {
-  const bet = Math.max(10, parseInt(betInput.value, 10) || 100);
+// Setup splash after auth
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { location.href = 'index.html'; return; }
   await loadPetBuff();
-  payoutSettled = false;
-  clearTrickFreeze();
-  newGame(bet, buffPct);
-  lastTimerTurn = null;
-  setupBar.style.display = 'none';
-  gameScreen.style.display = '';
-  statusBarEl.style.display = '';
-  render();
-  maybeRunAi();
+  setupSplash();
 });
 
 playBtn.addEventListener('click', () => {

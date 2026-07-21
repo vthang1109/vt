@@ -642,12 +642,11 @@ function forfeitIfAbandoned() {
 window.addEventListener('pagehide', forfeitIfAbandoned);
 window.addEventListener('beforeunload', forfeitIfAbandoned);
 
-const setupBar = document.getElementById('setup-bar');
+const tlMenu = document.getElementById('tl-menu');
 const gameScreen = document.getElementById('game-screen');
-const startBtn = document.getElementById('start-btn');
-const modeChips = document.querySelectorAll('.tl-mode-chip');
+const playBtnMenu = document.getElementById('tl-play-btn');
+const modeChips = document.querySelectorAll('#tl-menu .tl-mode-chip');
 const betInput = document.getElementById('tl-bet-input');
-
 
 let selectedMode = 'an_tat';
 let activeBuffPct = 0;
@@ -880,7 +879,7 @@ function afterAiStep() {
   }
 }
 
-startBtn.addEventListener('click', async () => {
+playBtnMenu.addEventListener('click', async () => {
   currentMode = selectedMode || 'an_tat';
   currentBet = Math.max(10, parseInt(betInput.value, 10) || 100);
   await loadPetBuff();
@@ -888,8 +887,10 @@ startBtn.addEventListener('click', async () => {
   newGame(currentMode, currentBet, currentBuffPct);
   payoutSettled = false;
   lastTimerTurn = null;
-  setupBar.style.display = 'none';
-  gameScreen.style.display = '';
+  tlMenu.classList.remove('active');
+  tlMenu.style.display = 'none';
+  gameScreen.classList.add('active');
+  gameScreen.style.display = 'flex';
   statusBarEl.style.display = '';
   render();
   maybeRunAi();

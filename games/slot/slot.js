@@ -40,8 +40,6 @@ class SlotGame {
       if (window.TopNav) TopNav.setPoints(this.balance);
     });
 
-    this.updateStatusBar(0, '--', null);
-
     // ===== TẠO DOCUMENT JACKPOT NẾU CHƯA CÓ =====
     try {
       const snap = await getDoc(JACKPOT_DOC_REF);
@@ -62,7 +60,25 @@ class SlotGame {
     });
 
     this.refreshBuffCache();
+    this.setupSplash();
     window.game = this;
+  }
+
+  setupSplash() {
+    const playBtn = document.getElementById('slot-play-btn');
+    const menu = document.getElementById('slot-menu');
+    const gameScreen = document.getElementById('slot-game-screen');
+    const betInputMenu = document.getElementById('slot-bet-input-menu');
+    const betInput = document.getElementById('slot-bet-input');
+    if (!playBtn || !menu || !gameScreen) return;
+    playBtn.addEventListener('click', () => {
+      if (betInput && betInputMenu) betInput.value = betInputMenu.value;
+      menu.classList.remove('active');
+      menu.style.display = 'none';
+      gameScreen.classList.add('active');
+      gameScreen.style.display = '';
+      this.updateStatusBar(0, '--', null);
+    });
   }
 
   async refreshBuffCache() {

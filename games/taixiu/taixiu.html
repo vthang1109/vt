@@ -22,57 +22,80 @@
     <div id="top-nav-root"></div>
 
     <div class="game-container">
-        <!-- STATUS BAR: cược | tổng điểm | lời/tiền -->
-        <div class="bc-status" id="bc-status">
-            <span class="stat-bet" id="tx-bet">0</span>
-            <div class="stat-score-wrap">
-                <span class="stat-score" id="total-score">--</span>
-                <span class="stat-score-sub" id="tx-side-detail"></span>
+        <!-- ===== SPLASH / MENU ===== -->
+        <div id="tx-menu" class="tx-screen active">
+            <div class="tx-menu-glow"></div>
+
+            <div class="tx-logo">🎲</div>
+            <h1 class="tx-title">Tài Xỉu</h1>
+            <p class="tx-sub">Đoán tổng 3 mặt xúc xắc — Tài (11-18) hay Xỉu (3-10)?</p>
+
+            <div class="tx-menu-card">
+                <div class="tx-chip-presets" id="tx-chip-presets">
+                    <button class="preset-chip" data-amt="100">100</button>
+                    <button class="preset-chip active" data-amt="500">500</button>
+                    <button class="preset-chip" data-amt="1000">1k</button>
+                    <button class="preset-chip" data-amt="5000">5k</button>
+                </div>
+                <button class="tx-play-btn" id="tx-play-btn">
+                    <span class="tx-play-icon">🎲</span>
+                    Vào Chơi
+                </button>
             </div>
-            <span class="stat-profit zero" id="tx-profit">+0</span>
         </div>
 
-        <!-- Bát lắc -->
-        <div class="bowl-wrap">
-            <div id="bowl" class="bowl">
-                <div id="bowl-lid" class="bowl-lid"></div>
-                <div id="dice-container" class="dices">
-                    <xuc-xac id="dice-0" value="1"></xuc-xac>
-                    <div class="dice-row">
-                        <xuc-xac id="dice-1" value="1"></xuc-xac>
-                        <xuc-xac id="dice-2" value="1"></xuc-xac>
+        <!-- GAME SCREEN -->
+        <div id="tx-game-screen" class="tx-screen" style="display:none">
+            <!-- STATUS BAR: cược | tổng điểm | lời/tiền -->
+            <div class="bc-status" id="bc-status">
+                <span class="stat-bet" id="tx-bet">0</span>
+                <div class="stat-score-wrap">
+                    <span class="stat-score" id="total-score">--</span>
+                    <span class="stat-score-sub" id="tx-side-detail"></span>
+                </div>
+                <span class="stat-profit zero" id="tx-profit">+0</span>
+            </div>
+
+            <!-- Bát lắc -->
+            <div class="bowl-wrap">
+                <div id="bowl" class="bowl">
+                    <div id="bowl-lid" class="bowl-lid"></div>
+                    <div id="dice-container" class="dices">
+                        <xuc-xac id="dice-0" value="1"></xuc-xac>
+                        <div class="dice-row">
+                            <xuc-xac id="dice-1" value="1"></xuc-xac>
+                            <xuc-xac id="dice-2" value="1"></xuc-xac>
+                        </div>
                     </div>
                 </div>
+                <div class="bowl-hint">👆 Nhấn vào bát để lắc</div>
             </div>
-            <div class="bowl-hint">👆 Nhấn vào bát để lắc</div>
-        </div>
 
-        <!-- Bàn cược -->
-        <div class="bet-board">
-            <div class="bet-card tai" data-id="tai">
-                <span class="bet-label">TÀI</span>
-                <span class="emoji">🔴</span>
-                <div class="bet-info">11 – 18</div>
-                <div class="my-bet" id="bet-tai">0</div>
+            <!-- Bàn cược -->
+            <div class="bet-board">
+                <div class="bet-card tai" data-id="tai">
+                    <span class="bet-label">TÀI</span>
+                    <span class="emoji">🔴</span>
+                    <div class="bet-info">11 – 18</div>
+                    <div class="my-bet" id="bet-tai">0</div>
+                </div>
+                <div class="bet-card xiu" data-id="xiu">
+                    <span class="bet-label">XỈU</span>
+                    <span class="emoji">🔵</span>
+                    <div class="bet-info">3 – 10</div>
+                    <div class="my-bet" id="bet-xiu">0</div>
+                </div>
             </div>
-            <div class="bet-card xiu" data-id="xiu">
-                <span class="bet-label">XỈU</span>
-                <span class="emoji">🔵</span>
-                <div class="bet-info">3 – 10</div>
-                <div class="my-bet" id="bet-xiu">0</div>
+
+            <!-- Chips + Xoá cùng hàng -->
+            <div class="chip-row">
+                <button class="chip" data-amt="100">100</button>
+                <button class="chip" data-amt="500">500</button>
+                <button class="chip active" data-amt="1000">1k</button>
+                <button class="chip" data-amt="5000">5k</button>
+                <button id="btn-clear" class="chip-clear">🗑️</button>
             </div>
         </div>
-
-        <!-- Chips + Xoá cùng hàng -->
-        <div class="chip-row">
-            <button class="chip" data-amt="100">100</button>
-            <button class="chip" data-amt="500">500</button>
-            <button class="chip active" data-amt="1000">1k</button>
-            <button class="chip" data-amt="5000">5k</button>
-            <button id="btn-clear" class="chip-clear">🗑️</button>
-        </div>
-
-
     </div>
 
     <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>

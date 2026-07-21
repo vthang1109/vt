@@ -23,8 +23,30 @@
   <div id="top-nav-root"></div>
 
   <div class="xd-wrap">
+    <!-- ===== SPLASH / MENU ===== -->
+    <div id="bc-menu" class="xd-screen active">
+      <div class="bc-menu-glow"></div>
+      <div class="bc-floating-card bc-fc-1">🂠</div>
+      <div class="bc-floating-card bc-fc-2">🂡</div>
+      <div class="bc-floating-card bc-fc-3">🃁</div>
+
+      <div class="bc-logo">🃏</div>
+      <h1 class="bc-title">Bài Cào</h1>
+      <p class="bc-sub">So điểm 3 lá — Sáp, Liêng, Đồng Hoa — ăn tiền!</p>
+
+      <div class="bc-menu-card">
+        <div class="bc-menu-bet-row">
+          <input type="number" id="bc-bet-input-menu" value="100" min="50" step="50"/>
+          <button class="bc-play-btn" id="bc-play-btn">
+            <span class="bc-play-icon">▶</span>
+            Chơi Ngay
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- STATUS BAR (đồng bộ xidach) -->
-    <div class="bc-status" id="bc-status">
+    <div class="bc-status" id="bc-status" style="display:none">
       <span class="stat-bet" id="bc-bet-stat"></span>
       <span class="stat-score-wrap">
         <span class="stat-score" id="bc-status-msg"></span>
@@ -33,17 +55,19 @@
     </div>
 
     <!-- TABLE -->
-    <div class="xd-table" id="xd-table"></div>
+    <div id="bc-game-screen" class="xd-screen" style="display:none">
+      <div class="xd-table" id="xd-table"></div>
 
-    <!-- BET ROW (nằm dưới bàn) -->
-    <div class="xd-bet-row" id="bc-bet-row">
-      <input id="bc-bet-input" type="number" min="50" step="50" value="100"/>
-      <button id="btn-place-bet">✅ Đặt cược</button>
-    </div>
+      <!-- BET ROW (nằm dưới bàn) -->
+      <div class="xd-bet-row" id="bc-bet-row">
+        <input id="bc-bet-input" type="number" min="50" step="50" value="100"/>
+        <button id="btn-place-bet">✅ Đặt cược</button>
+      </div>
 
-    <!-- ACTIONS -->
-    <div class="xd-actions">
-      <button id="btn-flip" class="btn-hit" style="display:none">🃏 Mở bài</button>
+      <!-- ACTIONS -->
+      <div class="xd-actions">
+        <button id="btn-flip" class="btn-hit" style="display:none">🃏 Mở bài</button>
+      </div>
     </div>
   </div>
 
