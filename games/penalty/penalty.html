@@ -8,6 +8,18 @@
   <link rel="stylesheet" href="../../status-bar.css"/>
   <link rel="stylesheet" href="penalty.css"/>
   <link rel="stylesheet" href="../../quests.css"/>
+  <style>
+    html, body {
+      height: auto !important;
+      min-height: 100%;
+      overflow-y: auto !important;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+    #bg-canvas, .orb { position: fixed; pointer-events: none; }
+    .pt-wrap { overflow: visible; touch-action: pan-y; }
+  </style>
   <script src="../../top-nav.js"></script>
   <script src="../../bottom-nav.js"></script>
   <script src="../../fullscreen.js"></script>
@@ -26,30 +38,6 @@
       <div class="pt-menu-glow"></div>
       <div class="pt-logo"><img src="../../assets/icons/wc.png" alt="" style="width:64px;height:auto;vertical-align:middle"/></div>
       <h1 class="pt-title">Football Cup</h1>
-      <!-- Continue saved progress: League + Cup riêng, cùng hàng -->
-      <div class="pt-continue-row" id="pt-continue-row">
-        <div class="pt-continue-card" id="pt-continue-card-league" style="display:none">
-          <div class="pt-continue-info">
-            <span class="pt-continue-label">📊 League ...</span>
-            <span class="pt-continue-desc" id="pt-continue-desc-league"></span>
-          </div>
-          <div class="pt-continue-btns">
-            <button class="pt-continue-btn" id="pt-continue-btn-league">▶ Tiếp tục</button>
-            <button class="pt-discard-btn" id="pt-discard-btn-league" title="Xóa tiến trình">✕</button>
-          </div>
-        </div>
-        <div class="pt-continue-card" id="pt-continue-card-cup" style="display:none">
-          <div class="pt-continue-info">
-            <span class="pt-continue-label">🏆 Cúp ...</span>
-            <span class="pt-continue-desc" id="pt-continue-desc-cup"></span>
-          </div>
-          <div class="pt-continue-btns">
-            <button class="pt-continue-btn" id="pt-continue-btn-cup">▶️ Tiếp tục</button>
-            <button class="pt-discard-btn" id="pt-discard-btn-cup" title="Xóa tiến trình">✕</button>
-          </div>
-        </div>
-      </div>
-
       <!-- Mode selection (3 nút riêng, không chung khung) -->
       <div class="pt-mode-row" id="pt-mode-row"></div>
 
@@ -76,6 +64,30 @@
           </span>
           <span class="pt-country-name" id="pt-country-name">Việt Nam</span>
           <svg class="pt-country-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+      <!-- Continue saved progress: League + Cup riêng, cùng hàng -->
+      <div class="pt-continue-row" id="pt-continue-row">
+        <div class="pt-continue-card" id="pt-continue-card-league" style="display:none">
+          <div class="pt-continue-info">
+            <span class="pt-continue-label">📊 League ...</span>
+            <span class="pt-continue-desc" id="pt-continue-desc-league"></span>
+          </div>
+          <div class="pt-continue-btns">
+            <button class="pt-continue-btn" id="pt-continue-btn-league">▶ Tiếp tục</button>
+            <button class="pt-discard-btn" id="pt-discard-btn-league" title="Xóa tiến trình">✕</button>
+          </div>
+        </div>
+        <div class="pt-continue-card" id="pt-continue-card-cup" style="display:none">
+          <div class="pt-continue-info">
+            <span class="pt-continue-label">🏆 Cúp ...</span>
+            <span class="pt-continue-desc" id="pt-continue-desc-cup"></span>
+          </div>
+          <div class="pt-continue-btns">
+            <button class="pt-continue-btn" id="pt-continue-btn-cup">▶️ Tiếp tục</button>
+            <button class="pt-discard-btn" id="pt-discard-btn-cup" title="Xóa tiến trình">✕</button>
+          </div>
         </div>
       </div>
 

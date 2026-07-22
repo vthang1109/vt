@@ -434,9 +434,6 @@ class PenaltyGame {
       if(e.target===e.currentTarget)this.closeCountryPopup();
     });
 
-    // 2P
-    document.getElementById('pt-2p-toggle').addEventListener('change',e=>{this.state.is2Player=e.target.checked});
-
     // Play
     document.getElementById('pt-play-btn').addEventListener('click',()=>{
       const btn=document.getElementById('pt-play-btn');
