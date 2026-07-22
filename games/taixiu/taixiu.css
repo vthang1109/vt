@@ -48,6 +48,11 @@
   animation: txFloat 3s ease-in-out infinite;
   filter: drop-shadow(0 0 30px rgba(251,191,36,0.4));
 }
+.tx-logo-img {
+  width: 72px;
+  height: 72px;
+  display: block;
+}
 @keyframes txFloat {
   0%,100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
@@ -148,6 +153,7 @@
   .tx-logo { font-size: 60px; }
   .tx-menu-card { padding: 20px 16px 16px; }
   .preset-chip { padding: 8px 14px; font-size: 12px; }
+  .tx-logo-img { width: 60px; height: 60px; }
 }
 
 body {
@@ -155,7 +161,6 @@ body {
     min-height: 100vh;
     margin: 0;
     overflow-y: auto;
-    font-family: 'Science Gothic', sans-serif;
     color: white;
 }
 #bg-canvas {
@@ -256,6 +261,7 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 15px;
     margin-bottom: 14px;
+    width: 100%;
 }
 .bet-card {
     background: rgba(15,23,42,0.6);
@@ -280,7 +286,6 @@ body {
     position: absolute;
     top: 10px;
     left: 14px;
-    font-family: 'Science Gothic', sans-serif;
     font-size: 20px;
     font-weight: 500;
     color: #fff;
@@ -293,7 +298,6 @@ body {
     font-size: 16px;
     font-weight: 500;
     color: #e2e8f0;
-    font-family: 'Science Gothic', sans-serif;
     margin-top: 2px;
 }
 .my-bet {
@@ -304,7 +308,6 @@ body {
     border-radius: 10px;
     font-size: 14px;
     font-weight: 500;
-    font-family: 'Science Gothic', sans-serif;
     display: inline-block;
 }
 
@@ -315,6 +318,7 @@ body {
     gap: 8px;
     margin-bottom: 10px;
     flex-wrap: wrap;
+    width: 100%;
 }
 .chip {
     padding: 10px 14px;
@@ -324,7 +328,6 @@ body {
     color: #fff;
     cursor: pointer;
     font-weight: 400;
-    font-family: 'Science Gothic', sans-serif;
     transition: 0.2s;
 }
 .chip.active {
@@ -341,7 +344,6 @@ body {
     color: #cbd5e1;
     cursor: pointer;
     font-weight: 400;
-    font-family: 'Science Gothic', sans-serif;
     font-size: 15px;
     transition: 0.2s;
 }

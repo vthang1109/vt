@@ -49,7 +49,9 @@ class Poker {
       gameScreen.classList.add('active');
       gameScreen.style.display = '';
       statusBar.style.display = '';
-      document.getElementById('bc-bet-row').style.display = 'flex';
+      document.getElementById('bc-bet-row').style.display = 'none';
+      // Auto place bet ngay khi vào game, không cần bấm Đặt cược
+      this.placeBet();
     });
   }
 
@@ -64,9 +66,13 @@ class Poker {
 
   bindEvents() {
     document.getElementById('btn-place-bet').addEventListener('click', () => this.placeBet());
-    document.getElementById('pk-call').addEventListener('click', () => this.call());
-    document.getElementById('pk-fold').addEventListener('click', () => this.fold());
-    document.getElementById('pk-allin').addEventListener('click', () => this.allIn());
+    // Event delegation — các nút pk-call/pk-fold được renderTable() tạo sau
+    document.getElementById('pk-game-screen').addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      if (btn.id === 'pk-call') this.call();
+      if (btn.id === 'pk-fold') this.fold();
+    });
   }
 
   placeBet() {
@@ -90,6 +96,7 @@ class Poker {
     this.phase = 'playing';
     this._cachedWinner = null;
 
+    this.betSettled = false;
     document.getElementById('bc-bet-row').style.display = 'none';
     document.getElementById('bc-status').className = 'bc-status';
     document.getElementById('bc-bet-stat').textContent = this.currentBet.toLocaleString('vi-VN');
@@ -101,19 +108,21 @@ class Poker {
 
     this.renderTable();
     this.showActions();
-    this.pkInfo('Lượt của bạn:');
+    document.getElementById('pk-info').textContent = '';
+    this.hideAiTag();
   }
 
   pkInfo(msg) { document.getElementById('pk-info').textContent = msg; }
-
-  async call() {
-    if (this.phase !== 'playing') return;
-    this.pot += this.currentBet;
-    document.getElementById('pk-actions').style.display = 'none';
-    await this.nextStage();
+  showAiTag() {
+    const tag = document.getElementById('pk-ai-tag');
+    if (tag) tag.style.display = 'block';
+  }
+  hideAiTag() {
+    const tag = document.getElementById('pk-ai-tag');
+    if (tag) tag.style.display = 'none';
   }
 
-  async allIn() {
+  async call() {
     if (this.phase !== 'playing') return;
     this.pot += this.currentBet;
     document.getElementById('pk-actions').style.display = 'none';
@@ -160,13 +169,14 @@ class Poker {
     const aiCalls = strength > 500 || Math.random() < 0.3 || this.community.length === 0;
     
     if (!aiCalls) {
+      this.hideAiTag();
       await this.delay(500);
       await this.endRound('player');
       return;
     }
     
     this.pot += this.currentBet;
-    this.pkInfo('🤖 Máy theo cược');
+    this.showAiTag();
     await this.delay(800);
     
     if (this.stage === 'river') {
@@ -232,8 +242,16 @@ class Poker {
     document.getElementById('pk-info').innerHTML += `<div style="margin-top:6px;font-size:16px">${won ? '🎉' : winner === 'ai' ? '😢' : '🤝'} ${won ? 'Bạn thắng!' : winner === 'ai' ? 'Máy thắng!' : 'Hòa!'}</div>`;
     
     this.phase = 'betting';
-    document.getElementById('bc-bet-row').style.display = 'flex';
-    this.pkInfo('Đặt cược để chơi tiếp!');
+    // Tự động chơi ván tiếp theo với cùng mức cược
+    this.pkInfo('Ván mới...');
+    await this.delay(1200);
+    // Kiểm tra còn đủ điểm không
+    if (this.currentBet > this.balance) {
+      this.pkInfo('Hết điểm! Không thể chơi tiếp');
+      document.getElementById('bc-bet-row').style.display = 'flex';
+      return;
+    }
+    this.startGame(this.currentBet);
   }
 
   evaluateHand(cards) {
@@ -309,7 +327,7 @@ class Poker {
 
     const aiLabel = showAI 
       ? this.ai.cards.map(c => renderCardUI(c)).join('') 
-      : '<div class="pk-card-back">🂠🂠</div>';
+      : this.ai.cards.map(() => renderCardUI()).join('');
 
     // Pot hiển thị trong label bài chung
     const potLabel = this.pot > 0 ? ` · Pot ${this.pot.toLocaleString('vi-VN')}〄` : '';
@@ -331,8 +349,9 @@ class Poker {
     document.getElementById('pk-table').innerHTML = `
       <div class="pk-seat dealer">
         ${winnerOverlay.dealer}
+        <div id="pk-ai-tag" class="pk-ai-tag" style="display:none">Theo</div>
         <div class="pk-seat-head">
-          <span class="pk-seat-name">🤖 Máy <span class="pk-score-inline">${aiScore}</span></span>
+          <span class="pk-seat-name">Máy <span class="pk-score-inline">${aiScore}</span></span>
         </div>
         <div class="pk-cards-row">${aiLabel}</div>
         ${dealerBetBadge}
@@ -347,6 +366,11 @@ class Poker {
         </div>
         <div class="pk-cards-row">${this.player.cards.map(c => renderCardUI(c)).join('')}</div>
         ${playerBetBadge}
+      </div>
+
+      <div class="pk-actions" id="pk-actions" style="display:none">
+        <button class="btn-hit" id="pk-call">✅ Theo (Call)</button>
+        <button class="btn-stand" id="pk-fold">🏳️ Bỏ (Fold)</button>
       </div>`;
   }
 

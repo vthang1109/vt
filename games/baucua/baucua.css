@@ -65,6 +65,11 @@ body {
     animation: bcSplashFloat 2.5s ease-in-out infinite;
     filter: drop-shadow(0 0 40px rgba(251,191,36,0.4));
 }
+.bc-splash-logo-img {
+    width: 80px;
+    height: 80px;
+    display: block;
+}
 @keyframes bcSplashFloat {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-12px); }
@@ -435,6 +440,7 @@ body {
     }
     .bc-splash-title { font-size: 28px; }
     .bc-splash-logo { font-size: 64px; }
+    .bc-splash-logo-img { width: 64px; height: 64px; }
     .bc-splash-rule { padding: 12px 14px; }
     .bc-splash-rule-icon { font-size: 22px; width: 34px; }
     .bc-splash-rule-text { font-size: 13px; }

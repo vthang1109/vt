@@ -51,6 +51,11 @@
   animation: ctFloat 3s ease-in-out infinite;
   filter: drop-shadow(0 0 30px rgba(56,189,248,0.4));
 }
+.ct-logo-img {
+  width: 72px;
+  height: 72px;
+  display: block;
+}
 @keyframes ctFloat {
   0%,100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
@@ -148,6 +153,7 @@
   .ct-logo { font-size: 60px; }
   .ct-menu-card { padding: 20px 16px 16px; }
   .ct-floating-card { font-size: 36px; }
+  .ct-logo-img { width: 60px; height: 60px; }
 }
 
 /* ===== TABLE ===== */

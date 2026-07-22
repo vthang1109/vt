@@ -38,6 +38,12 @@
   pointer-events: none;
   animation: slotCardDrift 10s ease-in-out infinite;
 }
+.slot-fc-img {
+  width: 52px;
+  height: 52px;
+  display: block;
+  filter: drop-shadow(0 0 8px rgba(251,191,36,0.5));
+}
 .slot-fc-1 { top: 5%; left: 3%; animation-delay: 0s; }
 .slot-fc-2 { top: 8%; right: 3%; animation-delay: 2.5s; }
 .slot-fc-3 { bottom: 20%; left: 5%; animation-delay: 5s; }
@@ -65,6 +71,11 @@
   margin-bottom: 8px;
   animation: slotFloat 3s ease-in-out infinite;
   filter: drop-shadow(0 0 30px rgba(251,191,36,0.4));
+}
+.slot-logo-img {
+  width: 80px;
+  height: 80px;
+  display: block;
 }
 @keyframes slotFloat {
   0%,100% { transform: translateY(0); }
@@ -163,6 +174,8 @@
   .slot-logo { font-size: 60px; }
   .slot-menu-card { padding: 20px 16px 16px; }
   .slot-floating-card { font-size: 32px; }
+  .slot-logo-img { width: 60px; height: 60px; }
+  .slot-fc-img { width: 40px; height: 40px; }
 }
 
 body {
@@ -170,7 +183,6 @@ body {
   min-height: 100vh;
   margin: 0;
   overflow-y: auto;
-  font-family: 'Science Gothic', sans-serif;
   color: white;
 }
 #bg-canvas {
@@ -228,7 +240,6 @@ body {
   justify-content: center;
   gap: 6px;
   margin-bottom: 8px;
-  font-family: 'Science Gothic', sans-serif;
   font-size: 44px;
   font-weight: 500;
   letter-spacing: 2px;
@@ -241,7 +252,6 @@ body {
   font-size: 28px;
   font-weight: 500;
   color: #ffd700;
-  font-family: 'Science Gothic', sans-serif;
   text-shadow: 0 0 20px #fbbf24, 0 0 40px #f59e0b;
 }
 
@@ -306,7 +316,6 @@ body {
   border: 1px solid rgba(56,189,248,0.3);
   background: rgba(0,0,0,0.3);
   color: #e0f2fe;
-  font-family: 'Science Gothic', sans-serif;
   font-weight: 500;
   text-align: center;
 }
@@ -316,7 +325,6 @@ body {
   border: 2px solid #ffffff;
   cursor: pointer;
   font-weight: 500;
-  font-family: 'Science Gothic', sans-serif;
   font-size: 15px;
   background: linear-gradient(180deg, #ffe27a 0%, #f5c518 45%, #d4960a 100%);
   color: #000000;
@@ -341,7 +349,6 @@ body {
   background: rgba(239,68,68,0.1);
   color: #f87171;
   font-weight: 500;
-  font-family: 'Science Gothic', sans-serif;
   cursor: pointer;
 }
 

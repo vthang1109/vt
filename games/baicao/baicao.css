@@ -58,6 +58,11 @@
   animation: bcFloat 3s ease-in-out infinite;
   filter: drop-shadow(0 0 30px rgba(34,197,94,0.4));
 }
+.bc-logo-img {
+  width: 72px;
+  height: 72px;
+  display: block;
+}
 @keyframes bcFloat {
   0%,100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
@@ -160,6 +165,7 @@
   .bc-logo { font-size: 60px; }
   .bc-menu-card { padding: 20px 16px 16px; }
   .bc-floating-card { font-size: 36px; }
+  .bc-logo-img { width: 60px; height: 60px; }
 }
 
 /* ===================== HAND TYPE (chữ trơn, không khung) ===================== */

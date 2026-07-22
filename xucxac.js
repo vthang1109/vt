@@ -28,7 +28,7 @@ class XucXac extends HTMLElement {
   }
 
   render() {
-    const cssURL = 'xucxac.css';
+    const cssURL = '/xucxac.css';
     const faceClass = `face-${this._value}`;
     const pipCount = this._value;
     let pipsHTML = '';
