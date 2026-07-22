@@ -24,25 +24,23 @@
     <!-- ===== MENU / LOBBY SCREEN ===== -->
     <div id="pt-menu" class="pt-screen active">
       <div class="pt-menu-glow"></div>
-      <div class="pt-logo">⚽</div>
-      <h1 class="pt-title">Penalty Shootout</h1>
-      <p class="pt-sub">Chọn đội, chọn giải đấu và bước lên chấm 11m!</p>
-
+      <div class="pt-logo"><img src="../../assets/icons/wc.png" alt="" style="width:64px;height:auto;vertical-align:middle"/></div>
+      <h1 class="pt-title">Football Cup</h1>
       <!-- Continue saved progress: League + Cup riêng, cùng hàng -->
       <div class="pt-continue-row" id="pt-continue-row">
         <div class="pt-continue-card" id="pt-continue-card-league" style="display:none">
           <div class="pt-continue-info">
-            <span class="pt-continue-label">📊 League dở dang</span>
+            <span class="pt-continue-label">📊 League ...</span>
             <span class="pt-continue-desc" id="pt-continue-desc-league"></span>
           </div>
           <div class="pt-continue-btns">
-            <button class="pt-continue-btn" id="pt-continue-btn-league">▶️ Tiếp tục</button>
+            <button class="pt-continue-btn" id="pt-continue-btn-league">▶ Tiếp tục</button>
             <button class="pt-discard-btn" id="pt-discard-btn-league" title="Xóa tiến trình">✕</button>
           </div>
         </div>
         <div class="pt-continue-card" id="pt-continue-card-cup" style="display:none">
           <div class="pt-continue-info">
-            <span class="pt-continue-label">🏆 Cúp dở dang</span>
+            <span class="pt-continue-label">🏆 Cúp ...</span>
             <span class="pt-continue-desc" id="pt-continue-desc-cup"></span>
           </div>
           <div class="pt-continue-btns">
@@ -78,14 +76,6 @@
           </span>
           <span class="pt-country-name" id="pt-country-name">Việt Nam</span>
           <svg class="pt-country-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-
-        <!-- 2 Player toggle -->
-        <div class="pt-2p-toggle">
-          <label>
-            <input type="checkbox" id="pt-2p-toggle"/>
-            👥 2 người chơi (cùng máy)
-          </label>
         </div>
       </div>
 

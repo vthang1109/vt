@@ -108,31 +108,31 @@ const COUNTRIES = {
 // ============================
 const TOURNAMENT_CONFIGS = {
   worldcup: {
-    id:'worldcup', name:'FIFA World Cup', icon:'🏆', region:null,
+    id:'worldcup', name:'FIFA WC', icon:'🏆', region:null,
     teamCount:16, groups:4, advancePerGroup:2,
     knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
     pointsWin:500, pointsLose:100,
   },
   euro: {
-    id:'euro', name:'UEFA Euro', icon:'🇪🇺', region:'chau_eu',
+    id:'euro', name:'Euro', icon:'🇪🇺', region:'chau_eu',
     teamCount:16, groups:4, advancePerGroup:2,
     knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
     pointsWin:400, pointsLose:80,
   },
   copa: {
-    id:'copa', name:'Copa América', icon:'🌎', region:'chau_my',
+    id:'copa', name:'Copa A', icon:'🌎', region:'chau_my',
     teamCount:16, groups:4, advancePerGroup:2,
     knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
     pointsWin:400, pointsLose:80,
   },
   afcon: {
-    id:'afcon', name:'Africa Cup', icon:'🌍', region:'chau_phi',
+    id:'afcon', name:'CAN', icon:'🌍', region:'chau_phi',
     teamCount:16, groups:4, advancePerGroup:2,
     knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
     pointsWin:400, pointsLose:80,
   },
   asiancup: {
-    id:'asiancup', name:'Asian Cup', icon:'🌏', region:'chau_a',
+    id:'asiancup', name:'AFC', icon:'🌏', region:'chau_a',
     teamCount:16, groups:4, advancePerGroup:2,
     knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
     pointsWin:400, pointsLose:80,
@@ -146,23 +146,23 @@ const CUP_TOURNAMENTS = Object.values(TOURNAMENT_CONFIGS);
 // ============================
 const LEAGUE_CONFIGS = {
   world: {
-    id:'world', name:'World League', icon:'🌐', region:null,
+    id:'world', name:'World', icon:'🌐', region:null,
     teamCount:8, pointsWin:200, pointsDraw:80, pointsLose:50,
   },
   eu: {
-    id:'eu', name:'EU League', icon:'🇪🇺', region:'chau_eu',
+    id:'eu', name:'EU', icon:'🇪🇺', region:'chau_eu',
     teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40,
   },
   copa: {
-    id:'copa', name:'Copa League', icon:'🌎', region:'chau_my',
+    id:'copa', name:'America', icon:'🌎', region:'chau_my',
     teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40,
   },
   africa: {
-    id:'africa', name:'A League', icon:'🌍', region:'chau_phi',
+    id:'africa', name:'African', icon:'🌍', region:'chau_phi',
     teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40,
   },
   asia: {
-    id:'asia', name:'Asian League', icon:'🌏', region:'chau_a',
+    id:'asia', name:'Asian', icon:'🌏', region:'chau_a',
     teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40,
   },
 };
