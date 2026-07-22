@@ -14,18 +14,18 @@
   // ========== 1. CSS: Prevent pull-to-refresh & scroll ==========
   const style = document.createElement('style');
   style.textContent = `
-    /* Prevent pull-to-refresh on all game pages */
-    html, body {
+    /* Prevent pull-to-refresh only while in fullscreen mode */
+    html.vt-fs-active, body.vt-fs-active {
       overscroll-behavior: none !important;
       -webkit-overflow-scrolling: auto;
       overflow: hidden;
       height: 100%;
       width: 100%;
     }
-    /* Game containers must NOT scroll */
-    .game-wrap, [class$="-container"], [class*="-container"],
-    .ms-container, .pong-container, .bb-play-area,
-    .g2048-container, .fs-canvas-wrap {
+    /* Game containers must NOT scroll while in fullscreen mode */
+    .vt-fs-active .game-wrap, .vt-fs-active [class$="-container"], .vt-fs-active [class*="-container"],
+    .vt-fs-active .ms-container, .vt-fs-active .pong-container, .vt-fs-active .bb-play-area,
+    .vt-fs-active .g2048-container, .vt-fs-active .fs-canvas-wrap {
       overscroll-behavior: none !important;
       touch-action: none;
     }
@@ -86,13 +86,18 @@
   `;
   document.head.appendChild(style);
 
-  // ========== 2. JS: Prevent pull-to-refresh ==========
+  // ========== 2. JS: Prevent pull-to-refresh (only while in fullscreen) ==========
   let lastTouchY = 0;
   let preventPullRefresh = true;
 
-  // Block pull-to-refresh: prevent default on touchmove when at top
+  function isFullscreenActive() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  // Block pull-to-refresh: prevent default on touchmove, only in fullscreen mode
   document.addEventListener('touchmove', function(e) {
     if (!preventPullRefresh) return;
+    if (!isFullscreenActive()) return;
     // Always prevent to block pull-to-refresh
     e.preventDefault();
   }, { passive: false });
@@ -102,8 +107,9 @@
     lastTouchY = e.touches[0].clientY;
   }, { passive: true });
 
-  // Prevent wheel/trackpad pull-to-refresh
+  // Prevent wheel/trackpad pull-to-refresh, only in fullscreen mode
   document.addEventListener('wheel', function(e) {
+    if (!isFullscreenActive()) return;
     if (e.deltaY < 0 && window.scrollY <= 0) {
       e.preventDefault();
     }
@@ -187,16 +193,20 @@
         setTimeout(() => hint.classList.remove('show'), 3000);
         // Add class to body for CSS selectors
         document.body.classList.add('vt-fs-active');
+        document.documentElement.classList.add('vt-fs-active');
       } else {
         document.body.classList.remove('vt-fs-active');
+        document.documentElement.classList.remove('vt-fs-active');
       }
     });
     document.addEventListener('webkitfullscreenchange', function() {
       const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
       if (isFS) {
         document.body.classList.add('vt-fs-active');
+        document.documentElement.classList.add('vt-fs-active');
       } else {
         document.body.classList.remove('vt-fs-active');
+        document.documentElement.classList.remove('vt-fs-active');
       }
     });
 
