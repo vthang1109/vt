@@ -61,6 +61,12 @@
         <div class="pt-tournament-row" id="pt-tournament-row"></div>
       </div>
 
+      <!-- League selection (chỉ cho League) -->
+      <div class="pt-panel" id="pt-league-panel" style="display:none">
+        <div class="pt-panel-label">📊 Chọn giải League</div>
+        <div class="pt-tournament-row" id="pt-league-row"></div>
+      </div>
+
       <!-- Tùy chỉnh: đội tuyển + 2 người chơi -->
       <div class="pt-panel">
         <div class="pt-panel-label">⚙️ Tùy chỉnh</div>
@@ -228,13 +234,8 @@
         <button class="pt-btn-quit" onclick="penaltyGame.quitToMenu()">🚪 Rời</button>
       </div>
 
-      <!-- Result — hiển thị thẳng trên trang, không popup -->
+      <!-- Result — chỉ còn 2 nút hành động, kết quả đã hiện ở banner giữa sân -->
       <div class="pt-result-overlay" id="pt-result-overlay" style="display:none">
-        <div class="pt-result-card">
-          <div class="pt-result-emoji" id="pt-result-emoji">🏆</div>
-          <div class="pt-result-title" id="pt-result-title">Bạn thắng!</div>
-          <div class="pt-result-score" id="pt-result-score">3 - 1</div>
-        </div>
         <div class="pt-actions" id="pt-result-actions">
           <button class="pt-btn-start" onclick="penaltyGame.onMatchDone()">Hoàn thành</button>
           <button class="pt-btn-quit" onclick="penaltyGame.quitToMenu()">Về menu</button>

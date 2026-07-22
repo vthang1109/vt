@@ -109,8 +109,8 @@ const COUNTRIES = {
 const TOURNAMENT_CONFIGS = {
   worldcup: {
     id:'worldcup', name:'FIFA World Cup', icon:'🏆', region:null,
-    teamCount:32, groups:8, advancePerGroup:2,
-    knockoutRoundNames:['Vòng 1/8','Tứ kết','Bán kết','Chung kết'],
+    teamCount:16, groups:4, advancePerGroup:2,
+    knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
     pointsWin:500, pointsLose:100,
   },
   euro: {
@@ -121,13 +121,13 @@ const TOURNAMENT_CONFIGS = {
   },
   copa: {
     id:'copa', name:'Copa América', icon:'🌎', region:'chau_my',
-    teamCount:12, groups:3, advancePerGroup:2, extraQualifiers:2,
+    teamCount:16, groups:4, advancePerGroup:2,
     knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
     pointsWin:400, pointsLose:80,
   },
   afcon: {
     id:'afcon', name:'Africa Cup', icon:'🌍', region:'chau_phi',
-    teamCount:12, groups:3, advancePerGroup:2, extraQualifiers:2,
+    teamCount:16, groups:4, advancePerGroup:2,
     knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
     pointsWin:400, pointsLose:80,
   },
@@ -141,6 +141,60 @@ const TOURNAMENT_CONFIGS = {
 
 const CUP_TOURNAMENTS = Object.values(TOURNAMENT_CONFIGS);
 
+// ============================
+// LEAGUE CONFIGURATIONS (5 giải)
+// ============================
+const LEAGUE_CONFIGS = {
+  world: {
+    id:'world', name:'World League', icon:'🌐', region:null,
+    teamCount:8, pointsWin:200, pointsDraw:80, pointsLose:50,
+  },
+  eu: {
+    id:'eu', name:'EU League', icon:'🇪🇺', region:'chau_eu',
+    teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40,
+  },
+  copa: {
+    id:'copa', name:'Copa League', icon:'🌎', region:'chau_my',
+    teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40,
+  },
+  africa: {
+    id:'africa', name:'A League', icon:'🌍', region:'chau_phi',
+    teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40,
+  },
+  asia: {
+    id:'asia', name:'Asian League', icon:'🌏', region:'chau_a',
+    teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40,
+  },
+};
+const LEAGUE_LIST = Object.values(LEAGUE_CONFIGS);
+
+// Circle-method round-robin: trả về mảng các vòng, mỗi vòng là mảng cặp đấu {home,away,result}
+// Đảm bảo mỗi đội đá đúng 1 trận/vòng, và mọi cặp gặp nhau đúng 1 lần.
+function buildRoundRobin(n){
+  let arr=[...Array(n).keys()];
+  const hasBye = n%2!==0;
+  if(hasBye) arr.push(-1);
+  const total=arr.length;
+  const numRounds=total-1;
+  const half=total/2;
+  const rounds=[];
+  for(let r=0;r<numRounds;r++){
+    const round=[];
+    for(let i=0;i<half;i++){
+      const a=arr[i],b=arr[total-1-i];
+      if(a!==-1&&b!==-1){
+        round.push(r%2===0?{home:a,away:b,result:null}:{home:b,away:a,result:null});
+      }
+    }
+    rounds.push(round);
+    const fixed=arr[0];
+    const rest=arr.slice(1);
+    rest.unshift(rest.pop());
+    arr=[fixed,...rest];
+  }
+  return rounds;
+}
+
 const MODES = [
   { id:'nhanh',  name:'Giao hữu', icon:'⚡', desc:'Đá 1 trận',        label:'Đá Penalty!' },
   { id:'league', name:'League', icon:'📊', desc:'Đấu bảng xếp hạng', label:'Bắt đầu League!' },
@@ -149,8 +203,13 @@ const MODES = [
 
 const ZONES = ['top-left','top-center','top-right','mid-left','mid-center','mid-right','bot-left','bot-center','bot-right'];
 const AI_ACCURACY = 0.35;
-const SAVE_KEY_LEAGUE = 'vt_penalty_save_league_v1';
-const SAVE_KEY_CUP = 'vt_penalty_save_cup_v1';
+// Mỗi giải (League hoặc Cup) có tiến trình lưu riêng biệt theo configId
+// → 5 League + 5 Cup = 10 tiến trình độc lập, không đè lên nhau.
+function saveKeyFor(mode, configId){
+  if(mode==='league') return 'vt_penalty_save_league_'+(configId||'world')+'_v1';
+  if(mode==='cup') return 'vt_penalty_save_cup_'+(configId||'worldcup')+'_v1';
+  return null;
+}
 
 // ============================
 // HELPERS
@@ -180,6 +239,13 @@ function simAIPenalty() {
   return [h, a];
 }
 
+// Khi người chơi vừa đá xong 1 trận, scoreboard trong game luôn là [điểm mình, điểm đối thủ]
+// — nhưng lịch đấu có thể xếp mình là "away". Hàm này quy đổi về đúng [homeGoals, awayGoals]
+// để mọi logic thắng/thua/BXH phía sau (vốn đọc result[0]=home, result[1]=away) luôn chính xác.
+function orientMatchScore(fixture, playerGoals, oppGoals){
+  return fixture.home===0 ? [playerGoals, oppGoals] : [oppGoals, playerGoals];
+}
+
 // ============================
 // GAME CLASS
 // ============================
@@ -187,15 +253,16 @@ class PenaltyGame {
   constructor() {
     this.state = {
       modeId: 'nhanh',
-      playerCountry: getAllCountries()[0],
+      playerCountry: getAllCountries().find(c=>c.code==='vn') || getAllCountries()[0],
       aiCountry: this.randomCountry(null),
       tournament: CUP_TOURNAMENTS[0],
+      league: LEAGUE_LIST[0],
       is2Player: false,
       // match state
       round:0, maxRounds:5, scores:[0,0], history:[], _dotsBaseP:0, _dotsBaseA:0,
       currentShooter:'player', phase:'idle', shotLocked:false, _pendingAiZone:null,
       // league
-      leagueTeams:[], leagueFixtures:[], leagueTable:{}, leagueMatchIdx:0, leagueResults:[],
+      leagueTeams:[], leagueTable:{}, leagueRounds:[], leagueRoundIdx:0,
       // cup
       cupConfig: null,
       cupTeams: [],
@@ -214,7 +281,7 @@ class PenaltyGame {
   _init() {
     onAuthStateChanged(auth, u=>{
       if(!u){location.href='../../index.html';return}
-      this.renderModes(); this.renderTournaments(); this.renderFlags(); this.bindEvents(); this.showMenu();
+      this.renderModes(); this.renderTournaments(); this.renderLeagues(); this.renderFlags(); this.bindEvents(); this.showMenu();
     });
   }
 
@@ -238,6 +305,12 @@ class PenaltyGame {
     c.innerHTML=CUP_TOURNAMENTS.map((t,i)=>`<button class="pt-tournament-btn ${i===0?'selected':''}" data-id="${t.id}">${t.icon} ${t.name}</button>`).join('');
   }
 
+  renderLeagues() {
+    const c=document.getElementById('pt-league-row');
+    if(!c)return;
+    c.innerHTML=LEAGUE_LIST.map((l,i)=>`<button class="pt-tournament-btn ${i===0?'selected':''}" data-id="${l.id}">${l.icon} ${l.name}</button>`).join('');
+  }
+
   renderFlags(query) {
     const c=document.getElementById('pt-flag-grid');
     if(!c)return;
@@ -245,6 +318,9 @@ class PenaltyGame {
     if(this.state.modeId==='cup'){
       const tour=this.state.tournament;
       countries=tour.region?getRegionCountries(tour.region):getAllCountries();
+    }else if(this.state.modeId==='league'){
+      const lg=this.state.league;
+      countries=lg&&lg.region?getRegionCountries(lg.region):getAllCountries();
     }else{
       countries=getAllCountries();
     }
@@ -307,20 +383,31 @@ class PenaltyGame {
       const b=e.target.closest('.pt-mode-btn');if(!b)return;
       document.querySelectorAll('.pt-mode-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');
       this.state.modeId=b.dataset.mode;
-      const show=this.state.modeId==='cup';
-      document.getElementById('pt-tournament-panel').style.display=show?'':'none';
-      const btn=document.getElementById('pt-play-btn');
-      const m=MODES.find(x=>x.id===this.state.modeId);
-      btn.innerHTML=`<svg class="pt-play-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span>${m?m.label:'Đá Penalty!'}</span>`;
+      const showCup=this.state.modeId==='cup';
+      const showLeague=this.state.modeId==='league';
+      document.getElementById('pt-tournament-panel').style.display=showCup?'':'none';
+      const lp=document.getElementById('pt-league-panel');
+      if(lp)lp.style.display=showLeague?'':'none';
+      this._updateContinueCard();
+      this._updatePlayButton();
       this.renderFlags();
     });
 
     // Tournaments
     document.getElementById('pt-tournament-row').addEventListener('click',e=>{
       const b=e.target.closest('.pt-tournament-btn');if(!b)return;
-      document.querySelectorAll('.pt-tournament-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');
+      document.querySelectorAll('#pt-tournament-row .pt-tournament-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');
       this.state.tournament=CUP_TOURNAMENTS.find(t=>t.id===b.dataset.id)||CUP_TOURNAMENTS[0];
-      if(this.state.modeId==='cup')this.renderFlags();
+      if(this.state.modeId==='cup'){this.renderFlags();this._updateContinueCard();this._updatePlayButton();}
+    });
+
+    // Leagues
+    const lgRow=document.getElementById('pt-league-row');
+    if(lgRow)lgRow.addEventListener('click',e=>{
+      const b=e.target.closest('.pt-tournament-btn');if(!b)return;
+      document.querySelectorAll('#pt-league-row .pt-tournament-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');
+      this.state.league=LEAGUE_LIST.find(l=>l.id===b.dataset.id)||LEAGUE_LIST[0];
+      if(this.state.modeId==='league'){this.renderFlags();this._updateContinueCard();this._updatePlayButton();}
     });
 
     // Flags (in modal)
@@ -351,17 +438,26 @@ class PenaltyGame {
     document.getElementById('pt-2p-toggle').addEventListener('change',e=>{this.state.is2Player=e.target.checked});
 
     // Play
-    document.getElementById('pt-play-btn').addEventListener('click',()=>this.startMode());
+    document.getElementById('pt-play-btn').addEventListener('click',()=>{
+      const btn=document.getElementById('pt-play-btn');
+      if(btn.dataset.continue==='1'){
+        const mode=this.state.modeId;
+        const configId = mode==='league' ? this.state.league.id : this.state.tournament.id;
+        this.restoreProgress(mode, configId);
+      }else{
+        this.startMode();
+      }
+    });
 
     // Continue saved progress (League + Cup riêng)
     const cbL=document.getElementById('pt-continue-btn-league');
-    if(cbL)cbL.addEventListener('click',()=>this.restoreProgress('league'));
+    if(cbL)cbL.addEventListener('click',()=>this.restoreProgress('league', this.state.league.id));
     const dbL=document.getElementById('pt-discard-btn-league');
-    if(dbL)dbL.addEventListener('click',(e)=>{e.stopPropagation();this.clearProgress('league');this._updateContinueCard();});
+    if(dbL)dbL.addEventListener('click',(e)=>{e.stopPropagation();this.clearProgress('league', this.state.league.id);this._updateContinueCard();this._updatePlayButton();});
     const cbC=document.getElementById('pt-continue-btn-cup');
-    if(cbC)cbC.addEventListener('click',()=>this.restoreProgress('cup'));
+    if(cbC)cbC.addEventListener('click',()=>this.restoreProgress('cup', this.state.tournament.id));
     const dbC=document.getElementById('pt-discard-btn-cup');
-    if(dbC)dbC.addEventListener('click',(e)=>{e.stopPropagation();this.clearProgress('cup');this._updateContinueCard();});
+    if(dbC)dbC.addEventListener('click',(e)=>{e.stopPropagation();this.clearProgress('cup', this.state.tournament.id);this._updateContinueCard();this._updatePlayButton();});
 
     // In-game — shoot or defend
     document.getElementById('pt-goal-grid').addEventListener('click',e=>{
@@ -398,6 +494,7 @@ class PenaltyGame {
     document.getElementById('pt-match-info').style.display='none';
     document.getElementById('pt-debug-actions').style.display='none';
     this._updateContinueCard();
+    this._updatePlayButton();
   }
 
   showScreen(id){
@@ -446,41 +543,39 @@ class PenaltyGame {
   }
 
   // ===== LEAGUE =====
+  // Vòng đấu (round) chứa nhiều cặp cùng lúc. Đội mình đá cặp nào trong vòng thì
+  // các cặp còn lại của CÙNG vòng đó tự động resolve (AI vs AI) ngay khi mình đá xong.
   startLeague(){
-    const top=getTopCountries(getAllCountries(), 7, this.state.playerCountry.code);
+    const config=this.state.league||LEAGUE_LIST[0];
+    const pool=config.region?getRegionCountries(config.region):getAllCountries();
+    const n=config.teamCount||8;
+    const top=getTopCountries(pool, n-1, this.state.playerCountry.code);
     const teams=[this.state.playerCountry,...shuffle(top)];
     this.state.leagueTeams=teams;
-    this.state.leagueResults=[];this.state.leagueMatchIdx=0;
 
-    const fixtures=[];
-    for(let i=0;i<teams.length;i++){
-      for(let j=i+1;j<teams.length;j++){
-        fixtures.push({home:i,away:j,result:null});
-      }
-    }
-    shuffle(fixtures);
-    const playerFixtures=fixtures.filter(f=>f.home===0||f.away===0);
-    const aiFixtures=fixtures.filter(f=>f.home!==0&&f.away!==0);
-    this.state.leagueFixtures=[...playerFixtures,...aiFixtures];
+    this.state.leagueRounds=buildRoundRobin(teams.length);
+    this.state.leagueRoundIdx=0;
 
     this.state.leagueTable={};
-    teams.forEach((t,i)=>{this.state.leagueTable[i]={name:t.name,flag:t.flag,p:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}});
+    teams.forEach((t,i)=>{this.state.leagueTable[i]={name:t.name,flag:t.flag,code:t.code,p:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}});
 
     this.state._mode='league';
     this.renderLeagueView();
   }
 
   renderLeagueView(){
+    const config=this.state.league||LEAGUE_LIST[0];
     const table=this.state.leagueTable;
     const teams=this.state.leagueTeams;
-    const fix=this.state.leagueFixtures;
-    const played=fix.filter(f=>f.result!==null).length;
-    const total=fix.length;
+    const rounds=this.state.leagueRounds;
+    const totalMatches=rounds.reduce((s,r)=>s+r.length,0);
+    const played=rounds.reduce((s,r)=>s+r.filter(f=>f.result!==null).length,0);
+    const roundIdx=this.state.leagueRoundIdx;
 
     document.getElementById('pt-overview-header').innerHTML=`
-      <span class="pt-ov-icon">📊</span>
-      <span class="pt-ov-title">League · ${teams.length} đội</span>
-      <span class="pt-ov-sub">Trận ${played}/${total}</span>
+      <span class="pt-ov-icon">${config.icon}</span>
+      <span class="pt-ov-title">${config.name} · ${teams.length} đội</span>
+      <span class="pt-ov-sub">Vòng ${Math.min(roundIdx+1,rounds.length)}/${rounds.length} · Trận ${played}/${totalMatches}</span>
     `;
 
     const entries=Object.entries(table).sort((a,b)=>b[1].pts-a[1].pts||(b[1].gd-a[1].gd));
@@ -497,7 +592,7 @@ class PenaltyGame {
     html+=`</tbody></table>`;
     document.getElementById('pt-league-table').innerHTML=html;
 
-    const allDone=fix.every(f=>f.result!==null);
+    const allDone=roundIdx>=rounds.length;
     document.getElementById('pt-league-next').style.display=allDone?'none':'';
     if(allDone){this.endLeague();}else{this.saveProgress();}
 
@@ -505,27 +600,40 @@ class PenaltyGame {
   }
 
   playLeagueMatch(){
-    const fix=this.state.leagueFixtures;
-    let idx=this.state.leagueMatchIdx;
-    while(idx<fix.length&&fix[idx].result!==null)idx++;
-    if(idx>=fix.length){this.renderLeagueView();return}
-    this.state.leagueMatchIdx=idx;
-    const f=fix[idx];
-    const home=this.state.leagueTeams[f.home],away=this.state.leagueTeams[f.away];
+    const rounds=this.state.leagueRounds;
+    let rIdx=this.state.leagueRoundIdx;
+    if(rIdx>=rounds.length){this.renderLeagueView();return}
+    const round=rounds[rIdx];
+    const pMatchIdx=round.findIndex(f=>f.result===null&&(f.home===0||f.away===0));
 
-    if(f.home===0||f.away===0){
-      const opp=f.home===0?away:home;
-      const label=`📊 League · Vòng ${idx+1}`;
-      this.showMatch(opp,label, {type:'league', matchIdx:idx});
-    }else{
-      const [hGoal,aGoal]=simAIPenalty();
-      f.result=[hGoal,aGoal];
-      this.updateLeagueTable(f.home,hGoal,aGoal);
-      this.updateLeagueTable(f.away,aGoal,hGoal);
-      this.state.leagueMatchIdx=idx+1;
-      window.showToast(`⚡ ${flagImg(home.code, home.name)} ${home.name} ${hGoal}-${aGoal} ${flagImg(away.code, away.name)} ${away.name}`,'info');
+    if(pMatchIdx===-1){
+      // Vòng này mình được nghỉ (bye) hoặc đã đá xong → tự resolve nốt rồi sang vòng sau
+      this._resolveRoundRest(rIdx,-1);
+      this.state.leagueRoundIdx=rIdx+1;
       this.renderLeagueView();
+      return;
     }
+
+    const f=round[pMatchIdx];
+    const home=this.state.leagueTeams[f.home],away=this.state.leagueTeams[f.away];
+    const opp=f.home===0?away:home;
+    const label=`${this.state.league.icon} ${this.state.league.name} · Vòng ${rIdx+1}`;
+    this.showMatch(opp,label, {type:'league', roundIdx:rIdx, matchIdx:pMatchIdx});
+  }
+
+  // Tự động resolve các cặp còn lại trong vòng rIdx (trừ cặp excludeIdx, đã/đang được người chơi đá)
+  _resolveRoundRest(rIdx,excludeIdx){
+    const round=this.state.leagueRounds[rIdx];
+    if(!round)return;
+    round.forEach((f,i)=>{
+      if(i===excludeIdx||f.result!==null)return;
+      const [h,a]=simAIPenalty();
+      f.result=[h,a];
+      this.updateLeagueTable(f.home,h,a);
+      this.updateLeagueTable(f.away,a,h);
+      const home=this.state.leagueTeams[f.home],away=this.state.leagueTeams[f.away];
+      window.showToast(`⚡ ${flagImg(home.code, home.name)} ${home.name} ${h}-${a} ${flagImg(away.code, away.name)} ${away.name}`,'info');
+    });
   }
 
   updateLeagueTable(teamIdx,scored,conceded){
@@ -538,17 +646,19 @@ class PenaltyGame {
   }
 
   endLeague(){
+    const config=this.state.league||LEAGUE_LIST[0];
     const entries=Object.entries(this.state.leagueTable).sort((a,b)=>b[1].pts-a[1].pts||(b[1].gd-a[1].gd));
     const winner=parseInt(entries[0][0]);
     const isWin=winner===0;
+    const rank=entries.findIndex(e=>parseInt(e[0])===0)+1;
     const ov=document.getElementById('pt-overview-header');
-    ov.innerHTML=`<span class="pt-ov-icon">🏆</span><span class="pt-ov-title">${isWin?'Vô địch!':'Hạng '+entries.findIndex(e=>parseInt(e[0])===0)+1}</span>`;
+    ov.innerHTML=`<span class="pt-ov-icon">🏆</span><span class="pt-ov-title">${config.name} · ${isWin?'Vô địch!':'Hạng '+rank}</span>`;
     document.getElementById('pt-league-next').style.display='none';
 
-    const pts=isWin?200:50;
-    addPoints('Penalty League',isWin?'Vô địch League':'Hết League',pts).catch(()=>{});
+    const pts=isWin?(config.pointsWin||200):(config.pointsLose||50);
+    addPoints('Penalty '+config.name,isWin?'Vô địch '+config.name:'Hết '+config.name,pts).catch(()=>{});
     if(window.VTQuests)window.VTQuests.trackEarn(pts);
-    this.clearProgress('league');
+    this.clearProgress('league', config.id);
   }
 
   // ===================================================================
@@ -1156,7 +1266,7 @@ class PenaltyGame {
     if (isWin) {
       window.showToast(`🏆 Chức vô địch ${config.name} thuộc về ${flagImg(teams[0].code, teams[0].name)} ${teams[0].name}!`, 'success');
     }
-    this.clearProgress('cup');
+    this.clearProgress('cup', config.id);
   }
 
   // ===================================================================
@@ -1277,6 +1387,7 @@ class PenaltyGame {
     this.state._lastMatchResult=isWin?'win':isDraw?'draw':'lose';
     this.state._lastMatchScore=[ps,as];
 
+    this.renderStatusBar();
     this._displayResultOverlay();
     this.saveProgress();
 
@@ -1289,15 +1400,7 @@ class PenaltyGame {
   }
 
   _displayResultOverlay(){
-    const ps=this.state.scores[0],as=this.state.scores[1];
-    const isWin=ps>as,isDraw=ps===as;
-    const overlay=document.getElementById('pt-result-overlay');
-    overlay.style.display='';
-    const emoji=isWin?'🏆':isDraw?'🤝':'😢';
-    const title=isWin?'Thắng!':isDraw?'Hòa!':'Thua!';
-    document.getElementById('pt-result-emoji').textContent=emoji;
-    document.getElementById('pt-result-title').textContent=title;
-    document.getElementById('pt-result-score').textContent=`${ps} - ${as}`;
+    document.getElementById('pt-result-overlay').style.display='';
     document.getElementById('pt-actions').style.display='none';
     document.getElementById('pt-match-done-btn').style.display='none';
   }
@@ -1337,25 +1440,31 @@ class PenaltyGame {
     if (mode === 'nhanh') {
       this.showMenu();
     } else if (mode === 'league') {
-      const fix = this.state.leagueFixtures;
-      const idx = this.state.leagueMatchIdx;
-      const f = fix[idx];
+      const rIdx = ctx ? ctx.roundIdx : this.state.leagueRoundIdx;
+      const mIdx = ctx ? ctx.matchIdx : -1;
+      const round = this.state.leagueRounds[rIdx];
+      const f = round ? round[mIdx] : null;
       if (f) {
-        const score = this.state._lastMatchScore;
-        f.result = score;
-        this.updateLeagueTable(f.home, score[0], score[1]);
-        this.updateLeagueTable(f.away, score[1], score[0]);
+        const raw = this.state._lastMatchScore;
+        const oriented = orientMatchScore(f, raw[0], raw[1]);
+        f.result = oriented;
+        this.updateLeagueTable(f.home, oriented[0], oriented[1]);
+        this.updateLeagueTable(f.away, oriented[1], oriented[0]);
       }
-      this.state.leagueMatchIdx = idx + 1;
+      // Đá xong cặp của mình → các cặp còn lại trong vòng này tự resolve luôn
+      this._resolveRoundRest(rIdx, mIdx);
+      this.state.leagueRoundIdx = rIdx + 1;
+      this.state.phase='idle'; this.state._matchContext=null;
       this.renderLeagueView();
     } else if (mode === 'cup') {
       if (ctx && ctx.type === 'cup-group') {
         const group = this.state.cupGroups[ctx.groupIdx];
         const match = group.matches[ctx.matchIdx];
-        const score = this.state._lastMatchScore;
-        match.result = score;
-        this._updateCupGroupTable(ctx.groupIdx, match.home, score[0], score[1]);
-        this._updateCupGroupTable(ctx.groupIdx, match.away, score[1], score[0]);
+        const raw = this.state._lastMatchScore;
+        const oriented = orientMatchScore(match, raw[0], raw[1]);
+        match.result = oriented;
+        this._updateCupGroupTable(ctx.groupIdx, match.home, oriented[0], oriented[1]);
+        this._updateCupGroupTable(ctx.groupIdx, match.away, oriented[1], oriented[0]);
         this.state.cupGroupMatchPtr++;
         // Auto-simulate AI matches in same round
         const playerGroup = this.state.cupGroups[ctx.groupIdx];
@@ -1366,14 +1475,16 @@ class PenaltyGame {
           }
         }
         if (roundIdx >= 0) this._simulateGroupRound(roundIdx);
+        this.state.phase='idle'; this.state._matchContext=null;
         this.renderGroupStage();
       } else if (ctx && ctx.type === 'cup-knockout') {
         const round = this.state.cupKnockoutRounds[ctx.roundIdx];
         const match = round.matches[ctx.matchIdx];
-        const score = this.state._lastMatchScore;
-        match.result = score;
+        const raw = this.state._lastMatchScore;
+        match.result = orientMatchScore(match, raw[0], raw[1]);
         // Chỉ simulate các trận AI còn lại trong cùng vòng (ví dụ đá Tứ kết xong, hiện hết Tứ kết)
         this._simulateKnockoutRound(ctx.roundIdx);
+        this.state.phase='idle'; this.state._matchContext=null;
         this.renderKnockoutStage();
       } else {
         this.showMenu();
@@ -1636,17 +1747,21 @@ class PenaltyGame {
   // ===== SAVE / RESUME PROGRESS =====
   saveProgress(){
     const mode=this.state._mode;
-    const key = mode==='league' ? SAVE_KEY_LEAGUE : mode==='cup' ? SAVE_KEY_CUP : null;
+    const configId = mode==='league' ? (this.state.league&&this.state.league.id)
+                    : mode==='cup' ? (this.state.cupConfig&&this.state.cupConfig.id)
+                    : null;
+    const key = saveKeyFor(mode, configId);
     if(!key)return; // 'nhanh' không lưu tiến trình
     try{
       const s=this.state;
       const data={
         modeId:s.modeId, playerCountry:s.playerCountry, aiCountry:s.aiCountry,
-        tournamentId:s.tournament?s.tournament.id:null, is2Player:s.is2Player,
+        tournamentId:s.tournament?s.tournament.id:null,
+        leagueId:s.league?s.league.id:null, is2Player:s.is2Player,
         round:s.round, maxRounds:s.maxRounds, scores:s.scores, history:s.history,
         currentShooter:s.currentShooter, phase:s.phase, _pendingAiZone:s._pendingAiZone,
-        leagueTeams:s.leagueTeams, leagueFixtures:s.leagueFixtures, leagueTable:s.leagueTable,
-        leagueMatchIdx:s.leagueMatchIdx, leagueResults:s.leagueResults,
+        leagueTeams:s.leagueTeams, leagueTable:s.leagueTable,
+        leagueRounds:s.leagueRounds, leagueRoundIdx:s.leagueRoundIdx,
         cupConfigId:s.cupConfig?s.cupConfig.id:null, cupTeams:s.cupTeams, cupGroups:s.cupGroups,
         cupGroupMatchQueue:s.cupGroupMatchQueue, cupGroupMatchPtr:s.cupGroupMatchPtr,
         cupQualifiers:s.cupQualifiers, cupPhase:s.cupPhase, cupKnockoutRounds:s.cupKnockoutRounds,
@@ -1659,8 +1774,8 @@ class PenaltyGame {
     }catch(e){}
   }
 
-  loadProgress(mode){
-    const key = mode==='league' ? SAVE_KEY_LEAGUE : mode==='cup' ? SAVE_KEY_CUP : null;
+  loadProgress(mode, configId){
+    const key = saveKeyFor(mode, configId);
     if(!key)return null;
     try{
       const raw=localStorage.getItem(key);
@@ -1668,24 +1783,25 @@ class PenaltyGame {
     }catch(e){return null}
   }
 
-  clearProgress(mode){
-    const key = mode==='league' ? SAVE_KEY_LEAGUE : mode==='cup' ? SAVE_KEY_CUP : null;
+  clearProgress(mode, configId){
+    const key = saveKeyFor(mode, configId);
     if(!key)return;
     try{localStorage.removeItem(key)}catch(e){}
   }
 
-  restoreProgress(mode){
-    const d=this.loadProgress(mode);
+  restoreProgress(mode, configId){
+    const d=this.loadProgress(mode, configId);
     if(!d||!d._mode)return false;
     Object.assign(this.state,{
       modeId:d.modeId, playerCountry:d.playerCountry, aiCountry:d.aiCountry,
       tournament: d.tournamentId ? (TOURNAMENT_CONFIGS[d.tournamentId]||this.state.tournament) : this.state.tournament,
+      league: d.leagueId ? (LEAGUE_CONFIGS[d.leagueId]||this.state.league) : this.state.league,
       is2Player:d.is2Player,
       round:d.round, maxRounds:d.maxRounds, scores:d.scores, history:d.history,
       currentShooter:d.currentShooter, phase:d.phase, _pendingAiZone:d._pendingAiZone,
       shotLocked:false,
-      leagueTeams:d.leagueTeams, leagueFixtures:d.leagueFixtures, leagueTable:d.leagueTable,
-      leagueMatchIdx:d.leagueMatchIdx, leagueResults:d.leagueResults,
+      leagueTeams:d.leagueTeams, leagueTable:d.leagueTable,
+      leagueRounds:d.leagueRounds||[], leagueRoundIdx:d.leagueRoundIdx||0,
       cupConfig: d.cupConfigId ? (TOURNAMENT_CONFIGS[d.cupConfigId]||null) : null,
       cupTeams:d.cupTeams, cupGroups:d.cupGroups, cupGroupMatchQueue:d.cupGroupMatchQueue,
       cupGroupMatchPtr:d.cupGroupMatchPtr, cupQualifiers:d.cupQualifiers, cupPhase:d.cupPhase,
@@ -1697,9 +1813,14 @@ class PenaltyGame {
 
     document.querySelectorAll('.pt-mode-btn').forEach(x=>x.classList.toggle('selected',x.dataset.mode===this.state.modeId));
     if(this.state.tournament){
-      document.querySelectorAll('.pt-tournament-btn').forEach(x=>x.classList.toggle('selected',x.dataset.id===this.state.tournament.id));
+      document.querySelectorAll('#pt-tournament-row .pt-tournament-btn').forEach(x=>x.classList.toggle('selected',x.dataset.id===this.state.tournament.id));
       const tp=document.getElementById('pt-tournament-panel');
       if(tp)tp.style.display=this.state.modeId==='cup'?'':'none';
+    }
+    if(this.state.league){
+      document.querySelectorAll('#pt-league-row .pt-tournament-btn').forEach(x=>x.classList.toggle('selected',x.dataset.id===this.state.league.id));
+      const lp=document.getElementById('pt-league-panel');
+      if(lp)lp.style.display=this.state.modeId==='league'?'':'none';
     }
     this.renderFlags();
 
@@ -1739,13 +1860,17 @@ class PenaltyGame {
     this._updateContinueCardFor('cup');
   }
 
+  // Mỗi giải (5 League + 5 Cup = 10 tiến trình riêng) chỉ hiện thẻ "tiếp tục"
+  // khi người chơi ĐANG chọn đúng mode + đúng giải đó — không hiện tràn lan ngay khi vào menu.
   _updateContinueCardFor(mode){
     const card=document.getElementById('pt-continue-card-'+mode);
     if(!card)return;
-    const d=this.loadProgress(mode);
+    if(this.state.modeId!==mode){card.style.display='none';return}
+    const configId = mode==='league' ? this.state.league.id : this.state.tournament.id;
+    const d=this.loadProgress(mode, configId);
     if(d && d._mode===mode){
       card.style.display='';
-      const modeName = mode==='league' ? '📊 League' : `🏆 ${(TOURNAMENT_CONFIGS[d.cupConfigId]||{}).name||'Cúp'}`;
+      const modeName = mode==='league' ? `${(LEAGUE_CONFIGS[configId]||{}).icon||'📊'} ${(LEAGUE_CONFIGS[configId]||{}).name||'League'}` : `🏆 ${(TOURNAMENT_CONFIGS[configId]||{}).name||'Cúp'}`;
       const pc=d.playerCountry||{},ac=d.aiCountry||{},sc=d.scores||[0,0];
       const desc=document.getElementById('pt-continue-desc-'+mode);
       if(desc)desc.innerHTML=`${modeName} · ${flagImg(pc.code,pc.name,14)} ${pc.name||''} vs ${flagImg(ac.code,ac.name,14)} ${ac.name||''} · ${sc[0]}-${sc[1]}`;
@@ -1753,6 +1878,29 @@ class PenaltyGame {
       card.style.display='none';
     }
   }
+
+  // Đổi nhãn nút "Đá Penalty!" thành "Tiếp tục (x-y)" khi giải đang chọn có tiến trình dở dang
+  _updatePlayButton(){
+    const btn=document.getElementById('pt-play-btn');
+    if(!btn)return;
+    const mode=this.state.modeId;
+    const m=MODES.find(x=>x.id===mode);
+    let label=m?m.label:'Đá Penalty!';
+    let hasContinue=false;
+    if(mode==='league'||mode==='cup'){
+      const configId = mode==='league' ? this.state.league.id : this.state.tournament.id;
+      const d=this.loadProgress(mode, configId);
+      if(d && d._mode===mode){
+        hasContinue=true;
+        const sc=d.scores||[0,0];
+        const cfgName = mode==='league' ? (LEAGUE_CONFIGS[configId]||{}).name : (TOURNAMENT_CONFIGS[configId]||{}).name;
+        label=`▶️ Tiếp tục ${cfgName||''} (${sc[0]}-${sc[1]})`;
+      }
+    }
+    btn.innerHTML=`<svg class="pt-play-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span>${label}</span>`;
+    btn.dataset.continue=hasContinue?'1':'';
+  }
+
 
   // ===== NEW MATCH (Đá lại) =====
   newMatch(){
