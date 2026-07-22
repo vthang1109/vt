@@ -106,11 +106,35 @@ const COUNTRIES = {
 // ============================
 // TOURNAMENT CONFIGURATIONS
 // ============================
+const FIFA_CODE3 = {
+  ad:'AND',ae:'UAE',af:'AFG',al:'ALB',am:'ARM',ao:'ANG',ar:'ARG',at:'AUT',au:'AUS',az:'AZE',
+  ba:'BIH',bd:'BAN',be:'BEL',bf:'BFA',bg:'BUL',bh:'BHR',bi:'BDI',bj:'BEN',bm:'BER',bn:'BRU',
+  bo:'BOL',br:'BRA',bs:'BAH',bt:'BHU',bw:'BOT',bz:'BLZ',ca:'CAN',cd:'COD',cf:'CTA',cg:'CGO',
+  ch:'SUI',ci:'CIV',cl:'CHI',cm:'CMR',cn:'CHN',co:'COL',cr:'CRC',cu:'CUB',cv:'CPV',cw:'CUW',
+  cy:'CYP',cz:'CZE',de:'GER',dj:'DJI',dk:'DEN',do:'DOM',dz:'ALG',ec:'ECU',ee:'EST',eg:'EGY',
+  er:'ERI',es:'ESP',et:'ETH',fi:'FIN',fo:'FRO',fr:'FRA',ga:'GAB',gb:'ENG',ge:'GEO',gh:'GHA',
+  gi:'GIB',gm:'GAM',gn:'GUI',gq:'EQG',gr:'GRE',gt:'GUA',gy:'GUY',hk:'HKG',hn:'HON',hr:'CRO',
+  ht:'HAI',hu:'HUN',id:'IDN',ie:'IRL',il:'ISR',in:'IND',iq:'IRQ',ir:'IRN',is:'ISL',it:'ITA',
+  jm:'JAM',jo:'JOR',jp:'JPN',ke:'KEN',kg:'KGZ',kh:'CAM',km:'COM',kp:'PRK',kr:'KOR',la:'LAO',
+  lb:'LIB',lk:'SRI',lr:'LBR',ls:'LES',lt:'LTU',lu:'LUX',lv:'LVA',ly:'LBY',ma:'MAR',md:'MDA',
+  me:'MNE',mg:'MAD',mk:'MKD',ml:'MLI',mm:'MYA',mn:'MGL',mr:'MTN',mt:'MLT',mu:'MRI',mv:'MDV',
+  mw:'MWI',mx:'MEX',my:'MAS',mz:'MOZ',ne:'NIG',ng:'NGA',ni:'NCA',nl:'NED',no:'NOR',np:'NEP',
+  om:'OMA',pa:'PAN',pe:'PER',ph:'PHI',pk:'PAK',pl:'POL',ps:'PLE',pt:'POR',py:'PAR',qa:'QAT',
+  ro:'ROU',rs:'SRB',rw:'RWA',sa:'KSA',sc:'SEY',sd:'SDN',se:'SWE',sg:'SGP',si:'SVN',sk:'SVK',
+  sl:'SLE',sm:'SMR',sn:'SEN',so:'SOM',sr:'SUR',ss:'SSD',sv:'ESA',sy:'SYR',sz:'SWZ',td:'CHA',
+  tg:'TOG',th:'THA',tj:'TJK',tl:'TLS',tm:'TKM',tn:'TUN',tr:'TUR',tt:'TRI',tw:'TPE',ua:'UKR',
+  ug:'UGA',us:'USA',uy:'URU',uz:'UZB',ve:'VEN',vn:'VIE',xk:'KVX',ye:'YEM',za:'RSA',zm:'ZAM',
+  zw:'ZIM',
+};
+function abbr3(team){
+  return (team && FIFA_CODE3[team.code]) || (team ? team.name.slice(0,3).toUpperCase() : '');
+}
+
 const TOURNAMENT_CONFIGS = {
   worldcup: {
     id:'worldcup', name:'FIFA WC', icon:'🏆', region:null,
-    teamCount:16, groups:4, advancePerGroup:2,
-    knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
+    teamCount:16, groups:8, advancePerGroup:2,
+    knockoutRoundNames:['Vòng 16 đội','Tứ kết','Bán kết','Chung kết'],
     pointsWin:500, pointsLose:100,
   },
   euro: {
@@ -576,14 +600,15 @@ class PenaltyGame {
     `;
 
     const entries=Object.entries(table).sort((a,b)=>b[1].pts-a[1].pts||(b[1].gd-a[1].gd));
-    let html=`<table class="pt-lt"><thead><tr><th>#</th><th>Đội</th><th>Tr</th><th>T</th><th>H</th><th>B</th><th>BT</th><th>BB</th><th>HS</th><th>Đ</th></tr></thead><tbody>`;
+    let html=`<table class="pt-lt"><thead><tr><th>#</th><th>Đội</th><th>TR</th><th>THB</th><th>BT</th><th>HS</th><th>Đ</th></tr></thead><tbody>`;
     entries.forEach(([idx,row],i)=>{
       const t=teams[parseInt(idx)];
       const isPlayer=parseInt(idx)===0;
       html+=`<tr class="${isPlayer?'pt-lt-player':''}">
         <td>${i+1}</td><td class="pt-lt-name">${flagImg(t.code, t.name)} ${row.name}</td>
-        <td>${row.p}</td><td>${row.w}</td><td>${row.d}</td><td>${row.l}</td>
-        <td>${row.gf}</td><td>${row.ga}</td><td>${row.gd}</td><td class="pt-lt-pts">${row.pts}</td>
+        <td>${row.p}</td>
+        <td class="pt-lt-thb"><span class="pt-thb-w">${row.w}</span><span class="pt-thb-d">${row.d}</span><span class="pt-thb-l">${row.l}</span></td>
+        <td class="pt-lt-gold">${row.gf}</td><td class="pt-lt-gold">${row.gd}</td><td class="pt-lt-pts pt-lt-gold">${row.pts}</td>
       </tr>`;
     });
     html+=`</tbody></table>`;
@@ -841,7 +866,7 @@ class PenaltyGame {
     const groupComplete = group.matches.every(m => m.result !== null);
 
     let html = `<table class="pt-gt">
-      <thead><tr><th>#</th><th>Đội</th><th>Tr</th><th>T</th><th>H</th><th>B</th><th>BT</th><th>BB</th><th>HS</th><th>Đ</th></tr></thead><tbody>`;
+      <thead><tr><th>#</th><th>Đội</th><th>TR</th><th>THB</th><th>BT</th><th>HS</th><th>Đ</th></tr></thead><tbody>`;
 
     sorted.forEach((row, i) => {
       const ti = row.teamIdx;
@@ -855,9 +880,10 @@ class PenaltyGame {
       html += `<tr class="${isPlayer?'pt-gt-player':''} ${showQual?'pt-gt-qual':eliminatedClass}">
         <td>${i+1}</td>
         <td class="pt-gt-name">${flagImg(t.code, t.name)} ${t.name}</td>
-        <td>${row.p}</td><td>${row.w}</td><td>${row.d}</td><td>${row.l}</td>
-        <td>${row.gf}</td><td>${row.ga}</td><td>${row.gd}</td>
-        <td class="pt-gt-pts">${row.pts}</td>
+        <td>${row.p}</td>
+        <td class="pt-gt-thb"><span class="pt-thb-w">${row.w}</span><span class="pt-thb-d">${row.d}</span><span class="pt-thb-l">${row.l}</span></td>
+        <td class="pt-gt-gold">${row.gf}</td><td class="pt-gt-gold">${row.gd}</td>
+        <td class="pt-gt-pts pt-gt-gold">${row.pts}</td>
       </tr>`;
     });
 
@@ -1135,19 +1161,18 @@ class PenaltyGame {
         const hTeam = m.home !== null && m.home !== undefined ? teams[m.home] : null;
         const aTeam = m.away !== null && m.away !== undefined ? teams[m.away] : null;
         const hasPlayer = m.home === 0 || m.away === 0;
-        let resStr = isDone ? `${m.result[0]}-${m.result[1]}` : '⏳';
+        let resStr = isDone ? `${m.result[0]}-${m.result[1]}` : 'vs';
 
         html += `<div class="pt-kr-match ${isDone ? 'done' : ''} ${hasPlayer ? 'pt-kr-player' : ''}">
           <div class="pt-kr-teams">
             <span class="pt-kr-team ${m.home === 0 ? 'pt-highlight' : ''} ${isDone && m.result[0] > m.result[1] ? 'pt-kr-winner' : ''}">
-              ${hTeam ? flagImg(hTeam.code, hTeam.name) + ' ' + hTeam.name : '⚪ TBD'}
+              ${hTeam ? flagImg(hTeam.code, hTeam.name) + ' ' + abbr3(hTeam) : '⚪ TBD'}
             </span>
-            <span class="pt-kr-vs">vs</span>
-            <span class="pt-kr-team ${m.away === 0 ? 'pt-highlight' : ''} ${isDone && m.result[1] > m.result[0] ? 'pt-kr-winner' : ''}">
-              ${aTeam ? flagImg(aTeam.code, aTeam.name) + ' ' + aTeam.name : '⚪ TBD'}
+            <span class="pt-kr-vs">${resStr}</span>
+            <span class="pt-kr-team pt-kr-team-away ${m.away === 0 ? 'pt-highlight' : ''} ${isDone && m.result[1] > m.result[0] ? 'pt-kr-winner' : ''}">
+              ${aTeam ? abbr3(aTeam) + ' ' + flagImg(aTeam.code, aTeam.name) : 'TBD ⚪'}
             </span>
           </div>
-          <div class="pt-kr-result">${resStr}</div>
         </div>`;
       });
 

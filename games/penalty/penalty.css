@@ -1873,19 +1873,26 @@
 }
 .pt-kr-team {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 2px 4px;
   border-radius: 4px;
 }
+.pt-kr-team-away {
+  justify-content: flex-end;
+}
 .pt-kr-team.pt-kr-winner {
   color: #4ade80;
   font-weight: 900;
 }
 .pt-kr-vs {
-  color: #475569;
-  font-size: 9px;
+  color: #fbbf24;
+  font-size: 13px;
+  font-weight: 900;
   flex-shrink: 0;
 }
 .pt-kr-result {
@@ -1980,3 +1987,7 @@
   width:26px;height:26px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);
   background:rgba(255,255,255,0.06);color:#94a3b8;cursor:pointer;font-size:12px;flex-shrink:0;
 }
+.pt-thb-w{color:#4ade80;font-weight:700}
+.pt-thb-d{color:#f8fafc;font-weight:700}
+.pt-thb-l{color:#f87171;font-weight:700}
+.pt-lt-gold, .pt-gt-gold{color:#fbbf24;font-weight:700}
