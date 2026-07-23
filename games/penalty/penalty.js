@@ -133,7 +133,7 @@ function abbr3(team){
 const TOURNAMENT_CONFIGS = {
   worldcup: {
     id:'worldcup', name:'FIFA WC', icon:'🏆', region:null,
-    teamCount:16, groups:8, advancePerGroup:2,
+    teamCount:32, groups:8, advancePerGroup:2,
     knockoutRoundNames:['Vòng 16 đội','Tứ kết','Bán kết','Chung kết'],
     pointsWin:500, pointsLose:100,
   },
