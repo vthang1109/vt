@@ -77,7 +77,10 @@ onAuthStateChanged(auth, async (user) => {
     statusMidEl.textContent = '⚠️ Không tìm thấy phòng. Quay lại danh sách.';
     return;
   }
-  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(async () => {
+    window.__navigated = true;
+    await window.quitGame?.();
+  });
   initRoom();
 
   const chatName = await getMyNickname(db, myUid, user.email);
@@ -92,13 +95,15 @@ onAuthStateChanged(auth, async (user) => {
   updateNavPoints();
 });
 
-window.addEventListener('pagehide', () => window.quitGame?.());
+window.addEventListener('pagehide', () => { if (!window.__navigated) window.quitGame?.(); });
 
 // ============================================================
 //  UPDATE ROOM ID TRÊN TOP NAV
 // ============================================================
+function mi(n, s) { return `<span class="material-symbols-outlined" style="font-size:${s||'inherit'};line-height:1;vertical-align:middle">${n}</span>`; }
+
 function updateNavRoom(roomCode) {
-  if (window.TopNav && window.TopNav.setRoomId) window.TopNav.setRoomId(roomCode, '♟️');
+  if (window.TopNav && window.TopNav.setRoomId) window.TopNav.setRoomId(roomCode, mi('grid_on','14px'));
 }
 
 // ============================================================
@@ -934,7 +939,24 @@ window.quitGame = async function() {
       }
 
       if (data.hostUid === myUid && !forfeited) {
-        await deleteDoc(doc(db, 'rooms', roomId));
+        // Chuyển chủ phòng cho người kế tiếp thay vì xoá phòng
+        const remaining = (data.members || []).filter(u => u !== myUid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db, 'rooms', roomId));
+        } else {
+          const newHost = remaining[0];
+          const mi = data.memberInfo || {};
+          delete mi[myUid];
+          const wInfo = { ...(data.waitingMemberInfo || {}) };
+          delete wInfo[myUid];
+          await updateDoc(doc(db, 'rooms', roomId), {
+            hostUid: newHost,
+            members: arrayRemove(myUid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(myUid),
+            waitingMemberInfo: wInfo
+          });
+        }
       } else {
         const remaining = (data.members || []).filter(u => u !== myUid);
         if (remaining.length === 0) {

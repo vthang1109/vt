@@ -153,4 +153,4 @@ class TruthOrDareGame {
 // Khởi tạo game
 window.game = new TruthOrDareGame();
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){var c=document.getElementById('tt-card');if(c){var l=c.querySelector('.tt-card-label'),t=c.querySelector('.tt-card-text');if(l)l.textContent='THẬT';if(t)t.textContent='Hãy chọn Thật hoặc Thách để bắt đầu!'}})}},100);

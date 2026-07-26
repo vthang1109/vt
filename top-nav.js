@@ -126,13 +126,16 @@ window.TopNav = (() => {
         </div>
       </div>
       <div class="vt-rs-section">
-        <div class="vt-rs-label">THÀNH VIÊN</div>
+        <div class="vt-rs-label">THÀNH VIÊN (${members.length})</div>
         ${members.map(uid => {
           const info = memberInfo[uid] || { name: '?' };
           const isMe = auth.currentUser && uid === auth.currentUser.uid;
+          const avHtml = info.avatarUrl
+            ? `<img src="${escHtmlRs(info.avatarUrl)}" class="vt-rs-av-img" />`
+            : `<div class="vt-rs-av">${escHtmlRs((info.name||'?')[0].toUpperCase())}</div>`;
           return `<div class="vt-rs-member">
-            <div class="vt-rs-av">${escHtmlRs((info.name||'?')[0].toUpperCase())}</div>
-            <div class="vt-rs-name">${escHtmlRs(info.name)}${isMe ? ' (bạn)' : ''}</div>
+            ${avHtml}
+            <div class="vt-rs-name">${escHtmlRs(info.name)}${isMe ? ' <span class="vt-rs-you">(bạn)</span>' : ''}${uid === _roomData.hostUid ? ' 👑' : ''}</div>
             ${!isMe ? `<button class="vt-rs-kick" data-uid="${uid}">Kick</button>` : ''}
           </div>`;
         }).join('') || '<div class="vt-rs-empty">Chưa có thành viên</div>'}
@@ -398,7 +401,9 @@ window.TopNav = (() => {
     .vt-rs-toggle.on::after { left:20px; }
     .vt-rs-member, .vt-rs-friend { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; background:rgba(255,255,255,.03); margin-bottom:6px; }
     .vt-rs-av { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#a78bfa,#7c3aed); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:12px; flex-shrink:0; }
+    .vt-rs-av-img { width:32px; height:32px; border-radius:50%; object-fit:cover; flex-shrink:0; border:1px solid rgba(167,139,250,.3); }
     .vt-rs-name { flex:1; font-size:13px; color:#e0f2fe; font-weight:600; font-family:"Science Gothic",sans-serif; }
+    .vt-rs-you { color:#fbbf24; font-size:12px; font-weight:700; }
     .vt-rs-kick, .vt-rs-invite { padding:5px 12px; border-radius:8px; border:none; font-size:11px; font-weight:700; cursor:pointer; font-family:"Science Gothic", sans-serif; flex-shrink:0; }
     .vt-rs-kick { background:#ef4444; color:#fff; }
     .vt-rs-kick:hover { background:#dc2626; }
@@ -557,15 +562,8 @@ window.TopNav = (() => {
         leaveBtn.onclick = () => {
           dd.classList.remove('open');
           btn.classList.remove('open');
-          if (confirm('Rời phòng và thoát game?')) {
-            // Ưu tiên gọi cleanup riêng của game (vd: quitGame) nếu có,
-            // để gỡ khỏi room.members trước khi điều hướng.
-            if (typeof window.quitGame === 'function') {
-              window.quitGame();
-            } else {
-              window.location.href = '/app/rooms.html';
-            }
-          }
+          window.__navigated = true;
+          window.location.href = '/app/rooms.html';
         };
       }
       const settingsBtn = document.getElementById('vtDdRoomSettings');
@@ -611,7 +609,8 @@ function setPoints(pts) {
     btn.onclick = () => {
       document.getElementById('vtNavDropdown')?.classList.remove('open');
       document.getElementById('vtHamburger')?.classList.remove('open');
-      callback();
+      window.__navigated = true;
+      if (typeof callback === 'function') callback();
     };
   }
 

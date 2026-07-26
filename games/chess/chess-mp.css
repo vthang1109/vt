@@ -240,6 +240,12 @@
   color: #94a3b8;
 }
 
+/* ===== NÚT VÁN MỚI / ĐỔI CƯỢC (nhỏ gọn) ===== */
+.chess-actions .chess-act-btn.chess-act-yellow {
+  padding: 8px 16px !important;
+  font-size: 12px !important;
+}
+
 /* ===================== MODAL ĐỀ NGHỊ HÒA ===================== */
 .chess-modal-overlay {
   display: none;

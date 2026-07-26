@@ -767,7 +767,9 @@ async function settlePayout(result) {
 
   if (delta !== 0) {
     try {
-      await addPoints('Casino', 'Thắng Cờ Tướng', delta + buffBonus, false);
+      await                    // Admin force
+                    if (window.__ADMIN_FORCED_RESULT === 'lose') { delta = -Math.abs(100); }
+                    addPoints('Casino', 'Thắng Cờ Tướng', delta + buffBonus, false);
       // TopNav tự cập nhật realtime qua subscribeBalance, không cần setPoints tay.
       if (buffBonus > 0) {
         const petLabel = activePet ? `${activePet.emoji} ${activePet.name}` : '🐾 Pet';
@@ -807,4 +809,4 @@ resetBtn.addEventListener('click', backToSetup);
 buildLevelStrip();
 
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){var s=document.getElementById('setup-screen'),g=document.getElementById('game-screen');if(s)s.style.display='';if(g)g.style.display='none'}})}},100);

@@ -9,6 +9,7 @@ import {
   addDoc, serverTimestamp, deleteDoc, arrayUnion, arrayRemove, setDoc,
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { subscribeUserData } from '../points.js';
 import { initProfileCard } from '../profile-card.js';
 
 // ===== FIREBASE CONFIG =====
@@ -32,6 +33,23 @@ const canvas = document.getElementById('bg-canvas');
 if (canvas) {
   const ctx = canvas.getContext('2d');
   let particles = [];
+  
+  // Màu particles theo theme — đồng bộ với data-theme đã set từ initTheme
+  // lRgb: RGB string cho line, lAlpha: base opacity cho line (sẽ nhân với (1-d/100))
+  (function initParticleColors() {
+    const initThemeId = document.body.getAttribute('data-theme') || 'blue';
+    const initColors = {
+      blue:   { p: 'rgba(56,189,248,0.5)', lRgb: '56,189,248', lAlpha: 0.07 },
+      pink:   { p: 'rgba(232,67,147,0.4)', lRgb: '232,67,147', lAlpha: 0.06 },
+      purple: { p: 'rgba(167,139,250,0.4)', lRgb: '167,139,250', lAlpha: 0.06 },
+      green:  { p: 'rgba(16,185,129,0.4)', lRgb: '16,185,129', lAlpha: 0.06 },
+      orange: { p: 'rgba(249,115,22,0.4)', lRgb: '249,115,22', lAlpha: 0.06 },
+      dark:   { p: 'rgba(148,163,184,0.3)', lRgb: '148,163,184', lAlpha: 0.04 }
+    };
+    const ic = initColors[initThemeId] || initColors.blue;
+    window.__vtParticleColors = { p: ic.p, lRgb: ic.lRgb, lAlpha: ic.lAlpha };
+  })();
+  
   const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
   resize();
   window.addEventListener('resize', resize);
@@ -41,17 +59,21 @@ if (canvas) {
   }
   (function draw() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
+    const pc = window.__vtParticleColors || { p: 'rgba(56,189,248,0.5)', lRgb: '56,189,248', lAlpha: 0.07 };
     particles.forEach(p => {
       p.x += p.vx; p.y += p.vy;
       if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
       if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0;
       ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle='rgba(56,189,248,0.5)'; ctx.fill();
+      ctx.fillStyle=pc.p; ctx.fill();
     });
     for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
       const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
-      if(d<100){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y);
-        ctx.strokeStyle=`rgba(56,189,248,${0.07*(1-d/100)})`; ctx.lineWidth=.5; ctx.stroke(); }
+      if(d<100){
+        const lineAlpha = Math.max(0, pc.lAlpha * (1 - d / 100));
+        ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(${pc.lRgb}, ${lineAlpha})`; ctx.lineWidth=.5; ctx.stroke();
+      }
     }
     requestAnimationFrame(draw);
   })();
@@ -105,6 +127,28 @@ let _otherReadTime   = null;
 let _readUnsubscribe = null;
 let _lastMessages    = [];
 let _currentRoomId   = null;
+
+// ===== SENDER THEME CACHE (per-user theme cho từng tin nhắn) =====
+let _senderThemeCache = {};
+let _pendingThemeFetches = {};
+
+async function _getSenderTheme(uid) {
+  if (_senderThemeCache[uid]) return _senderThemeCache[uid];
+  if (_pendingThemeFetches[uid]) return _pendingThemeFetches[uid];
+  _pendingThemeFetches[uid] = (async () => {
+    try {
+      const snap = await getDoc(doc(db, 'users', uid));
+      if (snap.exists()) {
+        const theme = snap.data().chatTheme || 'blue';
+        _senderThemeCache[uid] = theme;
+        return theme;
+      }
+    } catch(e) {}
+    _senderThemeCache[uid] = 'blue';
+    return 'blue';
+  })();
+  return _pendingThemeFetches[uid];
+}
 
 // ===== FIRESTORE HELPERS =====
 function getDmId(uid1, uid2) { return [uid1, uid2].sort().join('_'); }
@@ -351,9 +395,9 @@ onAuthStateChanged(auth, async (user) => {
 // ===== INIT =====
 async function _initChat() {
   _listenFriendRequests(_currentUser.uid);
-  onSnapshot(doc(db, 'users', _currentUser.uid), async (snap) => {
-    if (!snap.exists()) return;
-    const friendUids = snap.data().friends || [];
+  subscribeUserData(async (data) => {
+    if (!data) return;
+    const friendUids = data.friends || [];
     const friends = [];
     for (const fuid of friendUids) {
       const fs = await getDoc(doc(db, 'users', fuid));
@@ -373,8 +417,51 @@ async function _initChat() {
     window.showToast('❌ Lỗi tạo room chat: ' + e.message, 'error');
   }
 
-  // ===== SỬA: Sự kiện xoá toàn bộ tin nhắn =====
-  document.getElementById('clearMessagesBtn')?.addEventListener('click', async function() {
+  // ===== Lưu theme chat lên Firestore (đồng bộ giữa các thiết bị) =====
+  window.saveChatThemeToFirestore = async function(themeId) {
+    if (!_currentUser) return;
+    try {
+      await updateDoc(doc(db, 'users', _currentUser.uid), {
+        chatTheme: themeId
+      });
+    } catch(e) {
+      console.warn('Failed to save chat theme:', e);
+    }
+  };
+
+  // ===== Lắng nghe theme từ Firestore (đồng bộ từ thiết bị khác) =====
+  // Chỉ áp dụng theme cho chat window (header + input + send), không ảnh hưởng sidebar
+  subscribeUserData((data) => {
+    if (!data) return;
+    const ftTheme = data.chatTheme;
+    if (ftTheme && ftTheme !== localStorage.getItem('vt_chat_theme')) {
+      localStorage.setItem('vt_chat_theme', ftTheme);
+      // Cập nhật lớp theme trên chat window
+      const cw = document.getElementById('chatWindow');
+      if (cw) {
+        ['blue','pink','purple','green','orange','dark'].forEach(t => cw.classList.remove('cw-theme-' + t));
+        cw.classList.add('cw-theme-' + ftTheme);
+      }
+      // Cập nhật particle colors
+      const colors = {
+        blue:   { p: 'rgba(56,189,248,0.5)', lRgb: '56,189,248', lAlpha: 0.07 },
+        pink:   { p: 'rgba(232,67,147,0.4)', lRgb: '232,67,147', lAlpha: 0.06 },
+        purple: { p: 'rgba(167,139,250,0.4)', lRgb: '167,139,250', lAlpha: 0.06 },
+        green:  { p: 'rgba(16,185,129,0.4)', lRgb: '16,185,129', lAlpha: 0.06 },
+        orange: { p: 'rgba(249,115,22,0.4)', lRgb: '249,115,22', lAlpha: 0.06 },
+        dark:   { p: 'rgba(148,163,184,0.3)', lRgb: '148,163,184', lAlpha: 0.04 }
+      };
+      if (window.__vtParticleColors) {
+        const c = colors[ftTheme] || colors.blue;
+        window.__vtParticleColors.p = c.p;
+        window.__vtParticleColors.lRgb = c.lRgb;
+        window.__vtParticleColors.lAlpha = c.lAlpha;
+      }
+    }
+  });
+
+  // ===== SỬA: Xoá toàn bộ tin nhắn (gọi từ settings dropdown) =====
+  window.clearCurrentMessages = async function() {
     if (!_currentRoomId || currentConvoId === 'server') {
       window.showToast('Không thể xoá tin nhắn server.', 'warn');
       return;
@@ -382,9 +469,7 @@ async function _initChat() {
     if (!confirm('Xoá tất cả tin nhắn của bạn trong cuộc trò chuyện này?')) return;
     try {
       await clearMessages(_currentRoomId);
-      // Cập nhật lại danh sách tin nhắn
       if (_chatUnsubscribe) {
-        // onSnapshot sẽ tự cập nhật, nhưng để chắc chắn, lọc lại tin nhắn hiện tại
         _lastMessages = _lastMessages.filter(m => m.senderUid !== _currentUser.uid || 
           (m.hiddenFor && m.hiddenFor.includes(_currentUser.uid)));
         renderMessages(_lastMessages);
@@ -393,7 +478,8 @@ async function _initChat() {
       console.error(e);
       window.showToast('❌ Lỗi xoá tin nhắn.', 'error');
     }
-  });
+  };
+
 
   const isMobile = window.innerWidth <= 640;
   if (!isMobile) {
@@ -410,6 +496,21 @@ function renderMessages(messages) {
     return;
   }
   box.innerHTML = '';
+  
+  // Thu thập các senderUid chưa có theme, fetch bất đồng bộ
+  const unknownUids = [...new Set(messages
+    .filter(m => m.senderUid && m.senderUid !== _currentUser?.uid && !_senderThemeCache[m.senderUid])
+    .map(m => m.senderUid)
+  )];
+  if (unknownUids.length) {
+    Promise.all(unknownUids.map(uid => _getSenderTheme(uid))).then(() => {
+      // Re-render với theme đúng sau khi fetch xong
+      if (_lastMessages.length && _currentUser) {
+        renderMessages(_lastMessages);
+      }
+    });
+  }
+
   messages.forEach(m => {
     // Kiểm tra tin nhắn đã bị xoá mềm
     const isDeleted = m.isDeleted === true;
@@ -445,11 +546,17 @@ function renderMessages(messages) {
 
     const isMe = _currentUser && m.senderUid === _currentUser.uid;
     const div = document.createElement('div');
-    div.className = 'cwm-msg ' + (isMe ? 'mine-msg' : 'other-msg');
+    const senderTheme = isMe
+      ? (localStorage.getItem('vt_chat_theme') || 'blue')
+      : (_senderThemeCache[m.senderUid] || 'blue');
+    div.className = 'cwm-msg ' + (isMe ? 'mine-msg' : 'other-msg') + ' cwm-theme-' + senderTheme;
     
     let seenHtml = '';
-    if (isMe && _otherReadTime !== null && m.ms && m.ms <= _otherReadTime) {
-      seenHtml = ' <span class="seen-status" style="font-size:10px;color:#34d399;font-weight:700;">✓ Đã xem</span>';
+    if (isMe) {
+      const isSeen = _otherReadTime !== null && m.ms && m.ms <= _otherReadTime;
+      const checkIcon = isSeen ? '✓✓' : '✓';
+      const checkColor = isSeen ? '#34d399' : 'rgba(255,255,255,0.3)';
+      seenHtml = ` <span class="seen-status" style="font-size:11px;color:${checkColor};font-weight:700;transition:color 0.3s">${checkIcon}</span>`;
     }
 
     const msgId = m.id || '';
@@ -534,17 +641,15 @@ window.openConvo = function(uid, name, avatarChar, type) {
   _otherReadTime = null;
   _lastMessages = [];
 
-  const clearBtn = document.getElementById('clearMessagesBtn');
-  const ptsBtn = document.getElementById('sendPointsBtn');
-  const profBtn = document.getElementById('viewProfileBtn');
-  if (type === 'server') {
-    clearBtn.style.display = 'none';
-    ptsBtn.style.display = 'none';
-    if (profBtn) profBtn.style.display = 'none';
-  } else {
-    clearBtn.style.display = 'inline-block';
-    ptsBtn.style.display = 'inline-flex';
-    if (profBtn) profBtn.style.display = 'inline-flex';
+  // Show/hide settings dropdown options (gear menu)
+  const sdClear = document.getElementById('sd-clear-msgs');
+  const sdPoints = document.getElementById('sd-send-points');
+  const isDm = type !== 'server';
+  if (sdClear) sdClear.classList.toggle('hidden', !isDm);
+  if (sdPoints) sdPoints.classList.toggle('hidden', !isDm);
+
+  // Read receipt subscription (only for DM)
+  if (isDm) {
     const roomId = getDmId(_currentUser.uid, uid);
     _readUnsubscribe = listenReadReceipt(roomId, uid, (time) => {
       _otherReadTime = time;

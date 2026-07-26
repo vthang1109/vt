@@ -24,10 +24,10 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 
 // ============================================================
-//  TẠO ROOM ID NGẪU NHIÊN 6 CHỮ SỐ
+//  TẠO ROOM ID NGẪU NHIÊN 4 CHỮ SỐ
 // ============================================================
 export function generateRoomId() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
 // ============================================================

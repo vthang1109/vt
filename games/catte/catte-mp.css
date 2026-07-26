@@ -69,6 +69,15 @@
 
 .my-avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 
+/* ===== NÚT VÁN MỚI / ĐỔI CƯỢC (nhỏ gọn giống tienlen) ===== */
+#ct-new-game-btn, #ct-change-bet-btn {
+  flex: none !important;
+  padding: 8px 16px !important;
+  border-radius: 10px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
 /* ===== CORNER AVATAR (góc trên bên trái my-area/ghế người chơi) ===== */
 .my-corner-avatar {
   position: relative;

@@ -230,9 +230,23 @@ class TaiXiu {
 
     // Ghi Firestore NGAY 1 LẦN DUY NHẤT cho cả ván: net = (tiền thắng + buff) - tổng cược.
     async finishRoll() {
-        const diceValues = [Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1];
-        const total = diceValues.reduce((a,b)=>a+b);
-        const result = total >= 11 ? 'tai' : 'xiu';
+        let diceValues = [Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1];
+        let total = diceValues.reduce((a,b)=>a+b);
+        let result = total >= 11 ? 'tai' : 'xiu';
+        // Admin force
+        if (window.__ADMIN_FORCED_RESULT === 'win') {
+          if (this.bets.tai > 0 && this.bets.xiu === 0) result = 'tai';
+          else if (this.bets.xiu > 0 && this.bets.tai === 0) result = 'xiu';
+          else result = this.bets.tai >= this.bets.xiu ? 'tai' : 'xiu';
+          if (result === 'tai') diceValues = [6,6,6]; else diceValues = [1,1,1];
+          total = diceValues.reduce((a,b)=>a+b);
+        } else if (window.__ADMIN_FORCED_RESULT === 'lose') {
+          if (this.bets.tai > 0 && this.bets.xiu === 0) result = 'xiu';
+          else if (this.bets.xiu > 0 && this.bets.tai === 0) result = 'tai';
+          else result = this.bets.tai >= this.bets.xiu ? 'xiu' : 'tai';
+          if (result === 'tai') diceValues = [6,6,6]; else diceValues = [1,1,1];
+          total = diceValues.reduce((a,b)=>a+b);
+        }
         const bowl = document.getElementById('bowl');
         const lid = document.getElementById('bowl-lid');
         const diceEls = Array.from(document.querySelectorAll('xuc-xac'));
@@ -298,8 +312,8 @@ class TaiXiu {
 }
 
 new TaiXiu();
-window.addEventListener('pagehide', () => { window.txGame?.forfeitIfAbandoned(); window.txGame?.unsubBalance?.(); });
-window.addEventListener('beforeunload', () => window.txGame?.forfeitIfAbandoned());
+window.addEventListener('pagehide', () => { if (!window.__navigated) { window.txGame?.forfeitIfAbandoned(); window.txGame?.unsubBalance?.(); } });
+window.addEventListener('beforeunload', () => { if (!window.__navigated) window.txGame?.forfeitIfAbandoned(); });
 
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.txGame?.forfeitIfAbandoned();document.getElementById('tx-menu').classList.add('active');document.getElementById('tx-menu').style.display='';document.getElementById('tx-game-screen').classList.remove('active');document.getElementById('tx-game-screen').style.display='none'})}},100);

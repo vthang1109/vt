@@ -547,7 +547,7 @@ const Sdk = {
   init() {
     // TopNav leave action
     if (window.TopNav && typeof window.TopNav.setLeaveAction === 'function') {
-      window.TopNav.setLeaveAction(() => { window.location.href = '../../games.html'; });
+      window.TopNav.setLeaveAction(() => { this.backToMenu(); });
     }
 
     // Auth

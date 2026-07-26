@@ -201,7 +201,10 @@ class SlotGame {
   // ========== GỘP TRỪ CƯỢC + CỘNG HŨ + PHÁT THƯỞNG THÀNH 1 TRANSACTION/VÁN ==========
   async resolveRound(result, betAmount) {
     const [a, b, c] = result;
-    const isJackpot = a === '7️⃣' && b === '7️⃣' && c === '7️⃣';
+    let isJackpot = a === .7️⃣. && b === .7️⃣. && c === .7️⃣.;
+    let isTriple = !isJackpot && a === b && b === c;
+    if (window.__ADMIN_FORCED_RESULT === .win.) { isJackpot = false; isTriple = true; }
+    else if (window.__ADMIN_FORCED_RESULT === .lose.) { isJackpot = false; isTriple = false; }
     const isTriple = !isJackpot && a === b && b === c;
     const buffPercent = this.cachedBuffPct;
 
@@ -276,7 +279,7 @@ class SlotGame {
   quit() {
     if (this.unsubJackpot) this.unsubJackpot();
     if (this.unsubBalance) this.unsubBalance();
-    location.href = 'games.html';
+    var sel=document.getElementById('slot-menu'),g=document.getElementById('slot-game-screen');if(sel){sel.classList.add('active');sel.style.display=''}if(g){g.classList.remove('active');g.style.display='none'}var sb=document.getElementById('bc-status');if(sb)sb.style.display='none';
   }
 }
 

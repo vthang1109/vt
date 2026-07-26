@@ -4,6 +4,7 @@ import {
   doc, getDoc, updateDoc, onSnapshot, serverTimestamp, deleteDoc, arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { initRoomChat, getMyNickname } from '../../room-chat.js';
 
 // ============================================================
 //  STATE
@@ -71,12 +72,18 @@ onAuthStateChanged(auth, async (user) => {
     statusEl.innerHTML = '⚠️ Không tìm thấy phòng. Quay lại danh sách.';
     return;
   }
-  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(async () => {
+    window.__navigated = true;
+    await window.quitGame?.();
+  });
   initRoom();
   updateNavPoints();
+  getMyNickname(db, myUid, user.email).then(myName => {
+    initRoomChat({ db, roomId, uid: myUid, getName: () => myName });
+  });
 });
 
-window.addEventListener('pagehide', () => window.quitGame?.());
+window.addEventListener('pagehide', () => { if (!window.__navigated) window.quitGame?.(); });
 
 // ============================================================
 //  UPDATE NAV POINTS
@@ -783,7 +790,24 @@ window.quitGame = async function() {
       }
 
       if (data.hostUid === myUid && !forfeited) {
-        await deleteDoc(doc(db, 'rooms', roomId));
+        // Chuyển chủ phòng cho người kế tiếp thay vì xoá phòng
+        const remaining = (data.members || []).filter(u => u !== myUid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db, 'rooms', roomId));
+        } else {
+          const newHost = remaining[0];
+          const mi = data.memberInfo || {};
+          delete mi[myUid];
+          const wInfo = { ...(data.waitingMemberInfo || {}) };
+          delete wInfo[myUid];
+          await updateDoc(doc(db, 'rooms', roomId), {
+            hostUid: newHost,
+            members: arrayRemove(myUid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(myUid),
+            waitingMemberInfo: wInfo
+          });
+        }
       } else {
         const remaining = (data.members || []).filter(u => u !== myUid);
         if (remaining.length === 0) {

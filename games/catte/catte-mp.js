@@ -6,7 +6,7 @@ import { getFirestore, doc, updateDoc, onSnapshot, deleteDoc, arrayRemove, incre
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { createDeck, renderCardUI } from '../../cards.js';
 import { getActiveBuff } from '../../pet.js';
-import { initRoomChat, getMyNickname } from '../../room-chat.js';
+import { initRoomChat, getMyNickname, showRoomDeletedPopup } from '../../room-chat.js';
 import { subscribeUserData } from '../../points.js';
 
 const fbConfig = {
@@ -93,16 +93,21 @@ function applyAvatar(el, r, uid) {
   }
 }
 
+function mi(n, s) { return `<span class="material-symbols-outlined" style="font-size:${s||'inherit'};line-height:1;vertical-align:middle">${n}</span>`; }
+
 function updateNavRoom(code) {
   if (!code || !window.TopNav?.setRoomId) return;
-  window.TopNav.setRoomId(code, '♣️');
+  window.TopNav.setRoomId(code, `<img src="../../assets/icons/catte.png" style="height:14px;width:14px;vertical-align:middle;border-radius:2px">`);
 }
 
 // ========== AUTH ==========
 onAuthStateChanged(auth, async (u) => {
   if (!u) { location.href = '../../index.html'; return; }
   _user = u;
-  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(async () => {
+    window.__navigated = true;
+    await window.quitGame?.();
+  });
   _unsubMe = subscribeUserData((data) => {
     if (data) {
       _myBalance = data.points || 0;
@@ -117,14 +122,14 @@ onAuthStateChanged(auth, async (u) => {
   }
 });
 
-window.addEventListener('pagehide', () => window.quitGame?.());
+window.addEventListener('pagehide', () => { if (!window.__navigated) window.quitGame?.(); });
 
 // ========== ROOM LISTENER ==========
 function start() {
   if (_unsub) _unsub();
   _unsub = onSnapshot(doc(db, 'rooms', ROOM_ID), (snap) => {
     if (!snap.exists()) {
-      document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">Phòng đã bị xoá.</div>';
+      showRoomDeletedPopup();
       return;
     }
     const r = snap.data();
@@ -226,7 +231,7 @@ function renderBetZone(r, gs, isHost, uid, members) {
   zone.style.display = '';
 
   if (members.length < 2) {
-    zone.innerHTML = `<div class="ctmp-bet-waiting">⏳ Đang chờ người chơi... (${members.length}/4)</div>`;
+    zone.innerHTML = `<div class="ctmp-bet-waiting">${mi('hourglass_empty')} Đang chờ người chơi... (${members.length}/4)</div>`;
     return;
   }
 
@@ -246,27 +251,27 @@ function renderBetZone(r, gs, isHost, uid, members) {
             <button onclick="quickBet(500)">500</button>
             <button onclick="quickBet(1000)">1000</button>
           </div>
-          <button class="ctmp-bet-confirm" onclick="hostSetBet()">${betAmount ? '🔄 Đổi cược' : '✅ Đặt cược'}</button>
+          <button class="ctmp-bet-confirm" onclick="hostSetBet()">${betAmount ? `${mi('refresh')} Đổi cược` : `${mi('check_circle')} Đặt cược`}</button>
         </div>
         ${betAmount ? `<div class="ctmp-bet-status">Đã xác nhận ${confirmedCount}/${members.length}${myConfirmed ? '' : ' · Bạn chưa xác nhận'}</div>` : ''}
-        ${betAmount && !myConfirmed ? `<button class="ctmp-bet-confirm" onclick="confirmBet()">✅ Xác nhận ${betAmount.toLocaleString('vi-VN')}đ</button>` : ''}
+        ${betAmount && !myConfirmed ? `<button class="ctmp-bet-confirm" onclick="confirmBet()">${mi('check_circle')} Xác nhận ${betAmount.toLocaleString('vi-VN')}đ</button>` : ''}
       </div>`;
     return;
   }
 
   if (!betAmount) {
-    zone.innerHTML = `<div class="ctmp-bet-waiting">⏳ Đang chờ chủ phòng chọn mức cược...</div>`;
+    zone.innerHTML = `<div class="ctmp-bet-waiting">${mi('hourglass_empty')} Đang chờ chủ phòng chọn mức cược...</div>`;
   } else if (!myConfirmed) {
     zone.innerHTML = `
       <div class="ctmp-bet-card">
         <div class="label">Chủ phòng đặt cược</div>
         <div class="amount">${betAmount.toLocaleString('vi-VN')}đ</div>
-        <button class="ctmp-bet-confirm" onclick="confirmBet()">✅ Xác nhận</button>
+        <button class="ctmp-bet-confirm" onclick="confirmBet()">${mi('check_circle')} Xác nhận</button>
       </div>`;
   } else {
     zone.innerHTML = `
       <div class="ctmp-bet-card">
-        <div class="label">✅ Đã xác nhận ${betAmount.toLocaleString('vi-VN')}đ</div>
+        <div class="label">${mi('check_circle')} Đã xác nhận ${betAmount.toLocaleString('vi-VN')}đ</div>
         <div class="ctmp-bet-status">Đã xác nhận ${confirmedCount}/${members.length}</div>
       </div>`;
   }
@@ -394,13 +399,13 @@ function renderSeat(el, r, gs, oppUid, myUid) {
 function renderResultBox(r, gs, uid) {
   const winners = gs.winners || [];
   if (!winners.length) {
-    return `<div class="result-box"><div class="emoji">🚫</div><div class="title">Ván đã huỷ</div></div>`;
+    return `<div class="result-box"><div class="emoji">${mi('block','28px')}</div><div class="title">Ván đã huỷ</div></div>`;
   }
-  const names = winners.map(w => esc(shortName(r, w, uid))).join(', ');
   const iWon = winners.includes(uid);
+  const name = esc(shortName(r, winners[0], uid));
   return `<div class="result-box">
-    <div class="emoji">${iWon ? '🏆' : '😔'}</div>
-    <div class="title">${names} thắng ${gs.maxWins || 0} vòng!</div>
+    <div class="emoji">${iWon ? mi('emoji_events','32px') : mi('sentiment_dissatisfied','28px')}</div>
+    <div class="title">${esc(name)} về Nhất!</div>
   </div>`;
 }
 
@@ -440,8 +445,11 @@ function renderMyArea(r, gs, uid) {
   if (gs.phase === 'result') {
     const isHost = r.hostUid === uid;
     actEl.innerHTML = isHost
-      ? `<button id="ct-new-game-btn" onclick="hostNextRound()">🔄 Ván mới</button>`
-      : `<div class="ctmp-waiting-text">⏳ Chờ chủ phòng bắt đầu ván mới...</div>`;
+      ? `<div style="display:flex;gap:8px;justify-content:center">
+          <button id="ct-new-game-btn" onclick="hostNextRound()">${mi('refresh')} Ván mới</button>
+          <button id="ct-change-bet-btn" onclick="hostChangeBet()">${mi('settings')} Đổi cược</button>
+        </div>`
+      : `<div class="ctmp-waiting-text">${mi('hourglass_empty')} Chờ chủ phòng bắt đầu ván mới...</div>`;
     return;
   }
 
@@ -665,6 +673,33 @@ function renderWaitingList(r) {
   }
 }
 
+window.hostChangeBet = async function () {
+  const r = _room;
+  if (!r || r.hostUid !== _user.uid) return;
+  
+  const gs = r.gameState || {};
+  const updates = {
+    'gameState.phase': 'betting',
+    'gameState.seats': [],
+    'gameState.hands': {},
+    'gameState.turn': null,
+    'gameState.round': 0,
+    'gameState.currentTrick': null,
+    'gameState.trickWins': {},
+    'gameState.tungChecked': false,
+    'gameState.survivors': null,
+    'gameState.deadPlayers': null,
+    'gameState.results': null,
+    'gameState.winners': null,
+    'gameState.maxWins': null,
+    'gameState.lastActionMsg': null,
+    'gameState.betConfirmed': {},
+    'gameState.cycle': (gs.cycle || 0) + 1
+  };
+  
+  await updateDoc(doc(db, 'rooms', ROOM_ID), updates);
+};
+
 window.hostNextRound = async function () {
   const r = _room;
   if (!r || r.hostUid !== _user.uid) return;
@@ -826,7 +861,24 @@ window.quitGame = async function () {
         await forfeitMatch(r, gs, _user.uid);
       }
       if (r.hostUid === _user.uid) {
-        await deleteDoc(doc(db, 'rooms', ROOM_ID));
+        // Chuyển chủ phòng cho người kế tiếp thay vì xoá phòng
+        const remaining = (r.members || []).filter(u => u !== _user.uid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db, 'rooms', ROOM_ID));
+        } else {
+          const newHost = remaining[0];
+          const mi = r.memberInfo || {};
+          delete mi[_user.uid];
+          const wInfo = { ...(r.waitingMemberInfo || {}) };
+          delete wInfo[_user.uid];
+          await updateDoc(doc(db, 'rooms', ROOM_ID), {
+            hostUid: newHost,
+            members: arrayRemove(_user.uid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(_user.uid),
+            waitingMemberInfo: wInfo
+          });
+        }
       } else {
         const remaining = (r.members || []).filter(u => u !== _user.uid);
         if (remaining.length === 0) {

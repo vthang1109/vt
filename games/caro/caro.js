@@ -380,6 +380,9 @@ function checkWin(r, c, player) {
 //  XỬ LÝ KẾT QUẢ
 // ============================================================
 async function handleWin(player) {
+  // Admin force
+  if (window.__ADMIN_FORCED_RESULT === 'win') player = 1;
+  else if (window.__ADMIN_FORCED_RESULT === 'lose') player = 2;
   const isMe = player === 1;
   if (player === 1) { scores.p1++; document.getElementById('score-p1').textContent = scores.p1; }
   else              { scores.p2++; document.getElementById('score-p2').textContent = scores.p2; }
@@ -446,4 +449,4 @@ onAuthStateChanged(auth, async (user) => {
   petBuff = await getActiveBuff();
 });
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){showScreen('screen-type')})}},100);

@@ -119,6 +119,12 @@
 
 .xq-wait-host { font-family: 'Science Gothic', sans-serif; font-weight: 400; font-size: 13px; color: #94a3b8; }
 
+/* ===== NÚT VÁN MỚI / ĐỔI CƯỢC (nhỏ gọn) ===== */
+.xq-actions .xq-act-btn.xq-act-yellow {
+  padding: 8px 16px !important;
+  font-size: 12px !important;
+}
+
 /* ===================== MODAL ĐỀ NGHỊ HÒA ===================== */
 .xq-modal-overlay {
   display: none; position: fixed; inset: 0; z-index: 9999;

@@ -539,6 +539,12 @@ function computeFinalNet() {
   if (state.finalNet !== undefined) return state.finalNet;
   const ranking = [...state.finished];
   for (let i = 0; i < 4; i++) if (!ranking.includes(i)) ranking.push(i);
+  // Admin force
+  if (window.__ADMIN_FORCED_RESULT === 'win') {
+    if (ranking[0] !== 0) { ranking.splice(ranking.indexOf(0), 1); ranking.unshift(0); }
+  } else if (window.__ADMIN_FORCED_RESULT === 'lose') {
+    if (ranking[ranking.length - 1] !== 0) { ranking.splice(ranking.indexOf(0), 1); ranking.push(0); }
+  }
   const myRank = ranking.indexOf(0);
   const bet = state.betAmount || 100;
   const isWinner = myRank === 0;
@@ -639,8 +645,8 @@ function forfeitIfAbandoned() {
   addPoints('Casino', `Tiến Lên [${MODE_LABELS[state.mode]}] out phòng - mất cược`, -bet, false)
     .catch(e => console.error(e));
 }
-window.addEventListener('pagehide', forfeitIfAbandoned);
-window.addEventListener('beforeunload', forfeitIfAbandoned);
+window.addEventListener('pagehide', () => { if (!window.__navigated) forfeitIfAbandoned(); });
+window.addEventListener('beforeunload', () => { if (!window.__navigated) forfeitIfAbandoned(); });
 
 const tlMenu = document.getElementById('tl-menu');
 const gameScreen = document.getElementById('game-screen');
@@ -938,4 +944,4 @@ newRoundBtn.addEventListener('click', () => {
 
 
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){forfeitIfAbandoned();var m=document.getElementById('tl-menu'),g=document.getElementById('tl-game'),s=document.getElementById('bc-status'),r=document.getElementById('tl-result-box');if(g){g.classList.remove('active');g.style.display='none'}if(s)s.style.display='none';if(r)r.style.display='none';if(m){m.classList.add('active')}})}},100);

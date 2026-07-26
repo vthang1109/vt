@@ -56,7 +56,7 @@ const Pong = {
     if (window.TopNav && typeof window.TopNav.setLeaveAction === 'function') {
       window.TopNav.setLeaveAction(() => {
         this.stopGame();
-        window.location.href = '../../games.html';
+        this.showMenu();
       });
     }
 
@@ -467,7 +467,9 @@ const Pong = {
     // Award points + pet buff toast
     if (canAward) {
       try {
-        await addPoints('Pong', 'Thắng ván Pong', totalPts);
+        await                // Admin force
+                if (window.__ADMIN_FORCED_RESULT === 'lose') { totalPts = Math.max(0, totalPts - 1000); }
+                addPoints('Pong', 'Thắng ván Pong', totalPts);
         if (buffBonus > 0 && window.showToast) {
           window.showToast(`${petLabel} +${buffBonus.toLocaleString('vi-VN')}đ (${buffPct}%)!`, 'success');
         }

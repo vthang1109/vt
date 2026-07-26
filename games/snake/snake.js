@@ -2121,9 +2121,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // TopNav
   if (window.TopNav && typeof window.TopNav.setLeaveAction === 'function') {
     window.TopNav.setLeaveAction(() => {
-      isPlaying = false;
-      if (gameLoop) clearTimeout(gameLoop);
-      window.location.href = '../../games.html';
+      showMenu();
     });
   }
 

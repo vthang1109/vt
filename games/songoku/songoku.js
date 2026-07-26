@@ -1730,4 +1730,4 @@ const Game = (() => {
 document.addEventListener('DOMContentLoaded', () => Game.init());
 
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){var m=document.getElementById('modeScreen');if(m)m.classList.add('active')})}},100);

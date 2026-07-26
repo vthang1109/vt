@@ -6,9 +6,12 @@
 //   const myName = await getMyNickname(db, _user.uid, _user.email);
 //   initRoomChat({ db, roomId: ROOM_ID, uid: _user.uid, getName: () => myName });
 // ============================================================
-import { collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let _chatUnsub = null;
+let _roomUnsub = null;
+let _prevMembers = [];
+let _prevWaiting = [];
 let _initialized = false;
 let _nicknameCache = {}; // cache theo uid để tránh getDoc lặp lại nhiều lần
 
@@ -85,16 +88,27 @@ function injectStyles() {
 .rc-bubble{padding:8px 12px;border-radius:18px;font-size:13.5px;line-height:1.4;word-break:break-word;display:inline-block;max-width:100%}
 .rc-row.other .rc-bubble{background:#162236;color:#dce8f5;border:1px solid rgba(0,170,255,.18);border-bottom-left-radius:4px}
 .rc-row.me .rc-bubble{background:linear-gradient(135deg,#00aeff,#0050d8);color:#fff;border-bottom-right-radius:4px;box-shadow:0 0 14px rgba(0,160,255,.45)}
+.rc-row.me .rc-bubble-wrap .rc-time{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:10px;color:rgba(255,255,255,.55);margin-top:2px;padding:0 4px}
+.rc-row.me .rc-seen-check{font-size:10px;color:#34d399;font-weight:700}
+.rc-row.me .rc-seen-check.delivered{color:rgba(255,255,255,.45)}
 .rc-msg.sys{align-self:center;color:#6c7a93;font-size:11.5px;font-style:italic;background:rgba(255,255,255,.04);padding:4px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.06)}
-#rc-inputrow{display:flex;gap:8px;padding:10px;border-top:1px solid rgba(0,170,255,.2);background:#0a0e1a;flex-shrink:0}
+#rc-inputrow{display:flex;gap:6px;padding:10px;border-top:1px solid rgba(0,170,255,.2);background:#0a0e1a;flex-shrink:0;align-items:center}
 #rc-input{flex:1;background:#131b2e;border:1px solid rgba(0,170,255,.2);border-radius:20px;padding:10px 14px;color:#e6f4ff;font-size:13.5px;outline:none}
 #rc-input:focus{border-color:rgba(0,170,255,.55)}
 #rc-input::placeholder{color:#5a6786}
+#rc-emoji-btn{background:none;border:none;color:#7fe3ff;font-size:20px;cursor:pointer;flex-shrink:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .15s;line-height:1}
+#rc-emoji-btn:hover{background:rgba(0,170,255,.12)}
+#rc-emoji-picker{display:none;position:absolute;bottom:100%;left:10px;background:#131b2e;border:1px solid rgba(0,170,255,.25);border-radius:14px;padding:10px;width:260px;max-height:200px;overflow-y:auto;flex-wrap:wrap;gap:4px;box-shadow:0 -4px 20px rgba(0,0,0,.5);z-index:10}
+#rc-emoji-picker.open{display:flex}
+#rc-emoji-picker span{width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border-radius:8px;transition:background .12s}
+#rc-emoji-picker span:hover{background:rgba(0,170,255,.15)}
 #rc-send{background:radial-gradient(circle at 30% 30%,#1cc8ff,#0050d8 70%);border:none;color:#fff;border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(0,170,255,.55)}
 #rc-send:active{transform:scale(.93)}
 `;
   document.head.appendChild(style);
 }
+
+const EMOJIS = ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','😉','😊','😇','🥰','😍','🤩','😘','😗','😚','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🥴','😵','🤯','🥳','🥺','😢','😭','😤','😠','😡','🤬','💀','☠️','💩','🤡','👹','👺','👻','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿','😾','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','👍','👎','👊','✊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏','✌️','🤞','🤟','🤘','👌','🤌','🤏','💪','🦾','🦵','🦶','👂','🦻','👃','🧠','🦷','🦴','👀','👅','👄','🔥','⭐','🌟','✨','💥','💫','💦','💨','🎉','🎊','🎈','🎁','🎀','🪄','💎','👑','🏆','🥇','🥈','🥉','🏅','🎯','🎲','🎮','🕹️','🎭','🎨','🎵','🎶','🎤','🎧','📱','💻','⌨️','🖥️','🖱️','💾','📀','📷','📸','📹','🎥','📽️','☀️','🌤️','⛅','🌥️','☁️','🌦️','🌧️','⛈️','🌩️','🌨️','❄️','☃️','🌬️','💨','🌪️','🌫️','🌈','☔','⚡','🔥','💧','🌊']
 
 function clampToViewport(x, y, w, h) {
   const maxX = window.innerWidth - w - 8;
@@ -110,8 +124,10 @@ export function initRoomChat({ db, roomId, uid, getName }) {
   _state.getName = getName;
 
   if (_initialized) {
-    // Đã khởi tạo UI rồi (vd. điều hướng SPA sang phòng khác) -> chỉ cần
-    // huỷ subscription cũ và mở subscription mới với roomId/uid mới.
+    // Đã khởi tạo UI rồi -> cập nhật room listener cho roomId mới
+    if (_roomUnsub) { _roomUnsub(); _roomUnsub = null; }
+    _prevMembers = [];
+    _prevWaiting = [];
     subscribeChat();
     return;
   }
@@ -131,11 +147,36 @@ export function initRoomChat({ db, roomId, uid, getName }) {
       <span id="rc-close">✕</span>
     </div>
     <div id="rc-msgs"></div>
-    <div id="rc-inputrow">
+    <div id="rc-inputrow" style="position:relative">
+      <button id="rc-emoji-btn">😊</button>
+      <div id="rc-emoji-picker"></div>
       <input id="rc-input" maxlength="200" placeholder="Nhắn gì đó..." />
       <button id="rc-send">➤</button>
     </div>`;
   document.body.appendChild(panel);
+
+  // Populate emoji picker
+  const picker = document.getElementById('rc-emoji-picker');
+  EMOJIS.forEach(e => {
+    const span = document.createElement('span');
+    span.textContent = e;
+    span.onclick = () => {
+      const inp = document.getElementById('rc-input');
+      inp.value += e;
+      inp.focus();
+      picker.classList.remove('open');
+    };
+    picker.appendChild(span);
+  });
+  document.getElementById('rc-emoji-btn').onclick = (e) => {
+    e.stopPropagation();
+    picker.classList.toggle('open');
+  };
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#rc-emoji-btn') && !e.target.closest('#rc-emoji-picker')) {
+      picker.classList.remove('open');
+    }
+  });
 
   let savedPos = null;
   try { savedPos = JSON.parse(localStorage.getItem('rc-fab-pos') || 'null'); } catch {}
@@ -170,12 +211,33 @@ export function initRoomChat({ db, roomId, uid, getName }) {
     panel.style.top = clamped.y + 'px';
   }
 
+  function updateMyReadReceipt() {
+    if (!_state.db || !_state.roomId || !_state.uid) return;
+    try {
+      setDoc(doc(_state.db, 'rooms', _state.roomId, 'readReceipts', _state.uid), {
+        lastReadAt: serverTimestamp()
+      }, { merge: true }).catch(() => {});
+    } catch(e) {}
+  }
+
+  function reRenderMsgsAsSeen() {
+    // Đánh dấu tất cả tin nhắn của mình là "đã xem" (✓✓)
+    const checks = msgsEl.querySelectorAll('.rc-row.me .rc-seen-check');
+    checks.forEach(el => {
+      el.classList.remove('delivered');
+      el.textContent = '✓✓';
+      el.style.color = '#34d399';
+    });
+  }
+
   function openPanel() {
     isOpen = true;
     panel.classList.add('open');
     positionPanel();
     unread = 0;
     setBadge();
+    updateMyReadReceipt();
+    reRenderMsgsAsSeen();
     setTimeout(() => document.getElementById('rc-input')?.focus(), 50);
     scrollBottom();
   }
@@ -245,15 +307,64 @@ export function initRoomChat({ db, roomId, uid, getName }) {
   });
 
   // expose internal helpers used by subscribeChat()
+  // Auto-scroll tracking
+  let _isNearBottom = true;
+  const msgsEl = document.getElementById('rc-msgs');
+  msgsEl.addEventListener('scroll', () => {
+    const threshold = 80;
+    _isNearBottom = (msgsEl.scrollHeight - msgsEl.scrollTop - msgsEl.clientHeight) < threshold;
+  });
+
   window.__rc_unread_inc = () => { unread++; setBadge(); };
   window.__rc_scroll = scrollBottom;
 
   function scrollBottom() {
-    const msgsEl = document.getElementById('rc-msgs');
-    requestAnimationFrame(() => { msgsEl.scrollTop = msgsEl.scrollHeight; });
+    if (!_isNearBottom) return;
+    requestAnimationFrame(() => {
+      msgsEl.scrollTop = msgsEl.scrollHeight;
+    });
   }
 
+  // Listen to room doc for join/leave notifications
+  _roomUnsub = onSnapshot(doc(_state.db, 'rooms', _state.roomId), (snap) => {
+    if (!snap.exists()) return;
+    const d = snap.data();
+    const members = d.members || [];
+    const waiting = d.waitingMembers || [];
+    const allNow = [...members, ...waiting];
+
+    if (_prevMembers.length > 0) {
+      // Detect new arrivals
+      const joined = allNow.filter(u => !_prevMembers.includes(u) && !_prevWaiting.includes(u) && u !== _state.uid);
+      joined.forEach(uid => {
+        const info = d.memberInfo?.[uid] || d.waitingMemberInfo?.[uid] || {};
+        const name = info.name || uid.slice(0, 6);
+        addSysMsg(`🟢 ${esc(name)} đã vào phòng`);
+      });
+      // Detect leavers
+      const left = _prevMembers.filter(u => !members.includes(u) && !waiting.includes(u) && u !== _state.uid);
+      left.forEach(uid => {
+        const info = d.memberInfo?.[uid] || d.waitingMemberInfo?.[uid] || {};
+        const name = info.name || uid.slice(0, 6);
+        addSysMsg(`🔴 ${esc(name)} đã rời phòng`);
+      });
+    }
+    _prevMembers = [...members];
+    _prevWaiting = [...waiting];
+  });
+
   subscribeChat();
+}
+
+function addSysMsg(text) {
+  const msgsEl = document.getElementById('rc-msgs');
+  if (!msgsEl) return;
+  const div = document.createElement('div');
+  div.className = 'rc-msg sys';
+  div.style.alignSelf = 'center';
+  div.textContent = text;
+  msgsEl.appendChild(div);
+  window.__rc_scroll && window.__rc_scroll();
 }
 
 function renderMsg(m) {
@@ -275,11 +386,22 @@ function renderMsg(m) {
   const initial = esc(String(senderName || '?').trim().charAt(0).toUpperCase() || '?');
   const avatarHtml = me ? '' : `<div class="rc-avatar" style="background:${avatarColor(senderName)}">${initial}</div>`;
 
+  // Seen/delivered check
+  let timeHtml = '';
+  if (me) {
+    const isSeen = m._seen || false;
+    const checkIcon = isSeen
+      ? '<span class="rc-seen-check">✓✓</span>'
+      : '<span class="rc-seen-check delivered">✓</span>';
+    timeHtml = `<div class="rc-time">${checkIcon}</div>`;
+  }
+
   row.innerHTML = `
     ${avatarHtml}
     <div class="rc-bubble-wrap">
       <div class="rc-name">${esc(senderName)}</div>
       <div class="rc-bubble">${esc(m.text)}</div>
+      ${timeHtml}
     </div>`;
   msgsEl.appendChild(row);
 }
@@ -295,11 +417,18 @@ function subscribeChat() {
   const q = query(chatCol, orderBy('createdAt', 'desc'), limit(50));
   let firstLoad = true;
 
+  const panelEl = document.getElementById('rc-panel');
+  const isPanelOpen = () => panelEl?.classList.contains('open');
+
   _chatUnsub = onSnapshot(q, (snap) => {
     if (firstLoad) {
       msgsEl.innerHTML = '';
       const all = snap.docs.slice().reverse();
-      all.forEach(d => renderMsg(d.data()));
+      all.forEach(d => {
+        const m = d.data();
+        m._seen = isPanelOpen();
+        renderMsg(m);
+      });
       firstLoad = false;
       window.__rc_scroll && window.__rc_scroll();
       return;
@@ -307,6 +436,7 @@ function subscribeChat() {
     const added = snap.docChanges().filter(c => c.type === 'added').map(c => c.doc);
     added.forEach(d => {
       const m = d.data();
+      m._seen = isPanelOpen();
       renderMsg(m);
       const m2uid = m.senderUid ?? m.uid;
       if (!isMe(m2uid)) {
@@ -317,13 +447,33 @@ function subscribeChat() {
   });
 }
 
+// ===== POPUP PHÒNG ĐÃ BỊ XOÁ (dùng cho game MP) =====
+export function showRoomDeletedPopup() {
+  // Chỉ tạo 1 lần
+  if (document.getElementById('rc-deleted-overlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'rc-deleted-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = `
+    <div style="background:linear-gradient(160deg,rgba(15,23,42,.98),rgba(7,16,32,.98));border:1px solid rgba(167,139,250,.25);border-radius:22px;padding:28px 24px;max-width:360px;width:90%;text-align:center;">
+      <div style="font-size:44px;margin-bottom:10px">🗑️</div>
+      <div style="color:#e0f2fe;font-weight:700;font-size:20px;margin-bottom:8px">Phòng đã bị xoá</div>
+      <div style="color:#94a3b8;font-size:14px;margin-bottom:20px;line-height:1.4">Phòng này đã bị chủ phòng xoá hoặc đã hết hạn.</div>
+      <button onclick="window.location.href='/app/rooms.html'" style="padding:10px 28px;border-radius:10px;border:none;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(124,58,237,.4);transition:transform .15s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">✕ Đóng</button>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
 export function destroyRoomChat() {
   if (_chatUnsub) { _chatUnsub(); _chatUnsub = null; }
+  if (_roomUnsub) { _roomUnsub(); _roomUnsub = null; }
   document.getElementById('rc-fab')?.remove();
   document.getElementById('rc-panel')?.remove();
   document.getElementById('rc-style')?.remove();
   delete window.__rc_unread_inc;
   delete window.__rc_scroll;
   _initialized = false;
+  _prevMembers = [];
+  _prevWaiting = [];
   _state = { db: null, roomId: null, uid: null, getName: null };
 }

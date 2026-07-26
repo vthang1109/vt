@@ -830,4 +830,4 @@ class BlockBlast {
 
 new BlockBlast();
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){var sb=document.getElementById('game-status');if(sb)sb.style.display='';var sc=document.getElementById('bb-score');if(sc)sc.textContent='0';var su=document.getElementById('bb-sub');if(su)su.textContent='Sẵn sàng';var p=document.getElementById('bb-profit');if(p){p.textContent='';p.className='stat-profit zero'}var hs=document.getElementById('bb-highscore');if(hs)hs.textContent='🏆 0'})}},100);

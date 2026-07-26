@@ -205,7 +205,10 @@ class BaiCao {
     // Ghi Firestore NGAY 1 LẦN DUY NHẤT cho cả ván: net = lời/lỗ thực tế
     // (không còn trừ cược lúc đặt + cộng thắng lúc kết thúc như trước — gộp lại thành 1 lượt ghi).
     async endRound() {
-        const result = this.compareHands();
+        let result = this.compareHands();
+        // Admin force (nếu đang ở chế độ test)
+        if (window.__ADMIN_FORCED_RESULT === 'win') result = 'win';
+        else if (window.__ADMIN_FORCED_RESULT === 'lose') result = 'lose';
         let multiplier = 0, net = 0, buffBonus = 0, buffPct = 0, petLabel = '🐾 Pet';
         if (result === 'win') {
             multiplier = this.player.special === 'SAP' ? 4 : (this.player.special === 'LIENG' ? 3 : (this.player.special === 'DONG_HOA' ? 3 : 2));
@@ -351,8 +354,8 @@ class BaiCao {
 }
 
 new BaiCao();
-window.addEventListener('pagehide', () => { window.game?.forfeitIfAbandoned(); window.game?.unsubBalance?.(); });
-window.addEventListener('beforeunload', () => window.game?.forfeitIfAbandoned());
+window.addEventListener('pagehide', () => { if (!window.__navigated) { window.game?.forfeitIfAbandoned(); window.game?.unsubBalance?.(); } });
+window.addEventListener('beforeunload', () => { if (!window.__navigated) window.game?.forfeitIfAbandoned(); });
 
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.game?.forfeitIfAbandoned();document.getElementById('bc-menu').classList.add('active');document.getElementById('bc-menu').style.display='';document.getElementById('bc-game-screen').classList.remove('active');document.getElementById('bc-game-screen').style.display='none';var sb=document.getElementById('bc-status');if(sb)sb.style.display='none'})}},100);

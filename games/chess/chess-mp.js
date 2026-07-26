@@ -5,7 +5,7 @@ import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.
 import { getFirestore, doc, updateDoc, onSnapshot, deleteDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getPetById } from '../../pet.js';
-import { initRoomChat, getMyNickname } from '../../room-chat.js';
+import { initRoomChat, getMyNickname, showRoomDeletedPopup } from '../../room-chat.js';
 import { subscribeUserData, addPoints } from '../../points.js';
 
 const fbConfig = {
@@ -68,9 +68,11 @@ function esc(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+function mi(n, s) { return `<span class="material-symbols-outlined" style="font-size:${s||'inherit'};line-height:1;vertical-align:middle">${n}</span>`; }
+
 function updateNavRoom(roomCode) {
   if (!roomCode) return;
-  if (window.TopNav && window.TopNav.setRoomId) window.TopNav.setRoomId(roomCode, '♟️');
+  if (window.TopNav && window.TopNav.setRoomId) window.TopNav.setRoomId(roomCode, mi('gps_fixed','14px'));
 }
 
 // Chuyển tọa độ ô hiển thị (r,c) -> ô cờ thực, có tính đến việc bàn cờ xoay
@@ -115,7 +117,10 @@ function flashInvalidSquare(sq) {
 onAuthStateChanged(auth, async (u) => {
   if (!u) { location.href = 'index.html'; return; }
   _user = u;
-  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(async () => {
+    window.__navigated = true;
+    await window.quitGame?.();
+  });
   _unsubMe = subscribeUserData((data) => {
     if (data) {
       _myBalance = data.points || 0;
@@ -135,14 +140,14 @@ onAuthStateChanged(auth, async (u) => {
   }
 });
 
-window.addEventListener('pagehide', () => window.quitGame?.());
+window.addEventListener('pagehide', () => { if (!window.__navigated) window.quitGame?.(); });
 
 /* ========== FIREBASE LISTENER ========== */
 function start() {
   if (_unsub) _unsub();
   _unsub = onSnapshot(doc(db, 'rooms', ROOM_ID), (snap) => {
     if (!snap.exists()) {
-      document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">Phòng đã bị xoá.</div>';
+      showRoomDeletedPopup();
       return;
     }
     const r = snap.data();
@@ -738,7 +743,24 @@ window.quitGame = async function() {
       }
 
       if (r.hostUid === _user.uid && !forfeited) {
-        await deleteDoc(doc(db, 'rooms', ROOM_ID));
+        // Chuyển chủ phòng cho người kế tiếp thay vì xoá phòng
+        const remaining = (r.members || []).filter(u => u !== _user.uid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db, 'rooms', ROOM_ID));
+        } else {
+          const newHost = remaining[0];
+          const mi = r.memberInfo || {};
+          delete mi[_user.uid];
+          const wInfo = { ...(r.waitingMemberInfo || {}) };
+          delete wInfo[_user.uid];
+          await updateDoc(doc(db, 'rooms', ROOM_ID), {
+            hostUid: newHost,
+            members: arrayRemove(_user.uid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(_user.uid),
+            waitingMemberInfo: wInfo
+          });
+        }
       } else {
         const remaining = (r.members || []).filter(u => u !== _user.uid);
         if (remaining.length === 0) {

@@ -1029,53 +1029,6 @@
   100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
-/* ===== DEBUG ACTIONS ===== */
-.pt-debug-actions {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  margin-top: 6px;
-  opacity: 0.3;
-  transition: opacity 0.3s;
-}
-.pt-debug-actions:hover {
-  opacity: 1;
-}
-.pt-debug-actions button {
-  padding: 5px 12px;
-  border-radius: 8px;
-  border: 1px dashed rgba(148,163,184,0.2);
-  cursor: pointer;
-  font-weight: 600;
-  font-family: 'Science Gothic', sans-serif;
-  font-size: 10px;
-  transition: all 0.2s;
-  background: rgba(15,23,42,0.3);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-.pt-debug-actions button:hover {
-  transform: translateY(-1px);
-}
-.pt-btn-debug-win {
-  color: #4ade80;
-  border-color: rgba(74,222,128,0.2) !important;
-}
-.pt-btn-debug-win:hover {
-  background: rgba(74,222,128,0.08);
-  border-color: rgba(74,222,128,0.4) !important;
-  box-shadow: 0 0 12px rgba(74,222,128,0.15);
-}
-.pt-btn-debug-lose {
-  color: #f87171;
-  border-color: rgba(239,68,68,0.2) !important;
-}
-.pt-btn-debug-lose:hover {
-  background: rgba(239,68,68,0.08);
-  border-color: rgba(239,68,68,0.4) !important;
-  box-shadow: 0 0 12px rgba(239,68,68,0.15);
-}
-
 /* ===== RESULT OVERLAY ===== */
 .pt-result-overlay {
   width: 100%;

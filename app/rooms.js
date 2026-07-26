@@ -3,10 +3,11 @@ import { db, auth } from '../points.js';
 import {
   collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
   query, where, onSnapshot, serverTimestamp, addDoc, arrayUnion, arrayRemove,
-  orderBy, limit
+  limit
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { initProfileCard } from '../profile-card.js';
+import { initRoomChat, getMyNickname, destroyRoomChat } from '../room-chat.js';
 
 const GAMES = {
   // === CASINO ===
@@ -30,19 +31,61 @@ let _user = null;
 let _myProfile = null;
 let _unsubRooms = null;
 let _unsubRoom = null;
-let _unsubChat = null;
 let _currentRoomId = null;
 
 function $(id){ return document.getElementById(id); }
 function setText(id, text){ const el = document.getElementById(id); if (el) el.textContent = text; }
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function genCode(){ return String(Math.floor(100000 + Math.random() * 900000)); }
+
+const GAME_PNGS = {
+  baucua: 'baucua', xidach: 'xidach', baicao: 'baicao', catte: 'catte', tienlen: 'tienlen'
+};
+function gameIconHtml(id) {
+  const png = GAME_PNGS[id];
+  if (png) return `<img src="../assets/icons/${png}.png" style="width:20px;height:20px;border-radius:4px;vertical-align:middle">`;
+  return GAMES[id]?.icon || '🎮';
+}
+function genCode(){ return String(Math.floor(1000 + Math.random() * 9000)); }
 function toast(msg, type='info'){
   if (window.showToast) return window.showToast(msg, type);
   const c = document.createElement('div');
   c.style.cssText='position:fixed;top:20px;right:20px;z-index:99999;padding:12px 18px;border-radius:12px;background:#0b1f3a;border:1px solid #38bdf8;color:#e0f2fe;font-weight:700;font-family:Nunito,sans-serif';
   c.textContent = msg; document.body.appendChild(c); setTimeout(()=>c.remove(),2800);
 }
+
+// ── INFO MODAL (dùng cho phòng bị xoá / bị kick) ──
+let _infoModalCallback = null;
+
+window.openInfoModal = function(title, message, onClose) {
+  _infoModalCallback = onClose || null;
+  const modal = $('infoModal');
+  const titleEl = document.getElementById('infoModalTitle');
+  const bodyEl = document.getElementById('infoModalBody');
+  if (!modal) return;
+  if (titleEl) titleEl.textContent = title;
+  if (bodyEl) bodyEl.innerHTML = message;
+  modal.classList.add('open');
+};
+
+window.closeInfoModal = function() {
+  const modal = $('infoModal');
+  if (modal) modal.classList.remove('open');
+  if (typeof _infoModalCallback === 'function') {
+    const cb = _infoModalCallback;
+    _infoModalCallback = null;
+    cb();
+  }
+};
+
+// Đóng modal khi click ra ngoài (module script chạy sau khi DOM đã parse)
+(function(){
+  const modal = document.getElementById('infoModal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) window.closeInfoModal();
+    });
+  }
+})();
 
 function showDebugError(stage, err){
   console.error('[rooms.js] lỗi ở giai đoạn:', stage, err);
@@ -129,7 +172,7 @@ function startListeningPublicRooms(){
       const div = document.createElement('div');
       div.className = 'rm-card';
       div.innerHTML = `
-        <div class="rm-icon">${game.icon}</div>
+        <div class="rm-icon">${gameIconHtml(r.gameType)}</div>
         <div class="rm-info">
           <div class="rm-name">${escHtml(r.name || 'Phòng không tên')} ${r.password ? '🔒' : ''} ${isPlaying ? '<span class="rm-badge-playing">ĐANG CHƠI</span>' : ''}</div>
           <div class="rm-meta">
@@ -186,6 +229,7 @@ window.selectCategory = function(cat){
     b.classList.toggle('active', b.dataset.cat === cat);
   });
   renderGameSelect();
+  updateRoomNameFromGame();
   // Cập nhật max players nếu vượt quá giới hạn của game đầu tiên trong danh mục
   var first = Object.values(GAMES).find(function(g){return g.category===cat && g.ready});
   if(first&&$('cr-max')){
@@ -202,13 +246,20 @@ function renderGameSelect(){
   games.forEach(function(g){
     var o = document.createElement('option');
     o.value = g.id;
-    o.textContent = g.icon + ' ' + g.name + (g.ready ? '' : ' (sắp ra mắt)');
+    o.innerHTML = gameIconHtml(g.id) + ' ' + g.name + (g.ready ? '' : ' (sắp ra mắt)');
+    o.style.fontSize = '13px';
     if (!g.ready) o.disabled = true;
     sel.appendChild(o);
   });
   // Select first ready game
   var first = games.find(function(g){return g.ready});
   if(first)sel.value=first.id;
+}
+
+function updateRoomNameFromGame(){
+  var sel = $('cr-game');
+  var gameName = GAMES[sel?.value]?.name || 'Game';
+  $('cr-name').value = gameName + ' - ' + (_myProfile.nickname || 'tôi');
 }
 
 window.openCreateModal = function(){
@@ -218,9 +269,11 @@ window.openCreateModal = function(){
     b.classList.toggle('active', b.dataset.cat === 'casino');
   });
   renderGameSelect();
-  $('cr-name').value = (_myProfile.nickname || 'Phòng') + ' của ' + (_myProfile.nickname || 'tôi');
+  updateRoomNameFromGame();
   $('cr-pw').value = '';
   $('cr-max').value = 4;
+  // Cập nhật tên phòng tự động khi đổi game
+  $('cr-game').onchange = updateRoomNameFromGame;
 };
 window.closeCreateModal = function(){ $('createModal').classList.remove('open'); };
 
@@ -256,14 +309,14 @@ window.openJoinByCode = function(){
   $('joinModal').classList.add('open');
   $('jc-code').value='';
   $('jc-pw').value='';
-  $('jc-code').placeholder = 'Nhập 6 số';
+  $('jc-code').placeholder = 'Nhập 4 số';
 };
 window.closeJoinModal = function(){ $('joinModal').classList.remove('open'); };
 
 window.doJoinByCode = async function(){
   const code = $('jc-code').value.trim();
   const pw = $('jc-pw').value.trim();
-  if (!code || code.length !== 6 || isNaN(code)) { toast('Mã phòng phải là 6 chữ số!', 'warn'); return; }
+  if (!code || code.length !== 4 || isNaN(code)) { toast('Mã phòng phải là 4 chữ số!', 'warn'); return; }
   try {
     const q = query(collection(db, 'rooms'), where('code','==',code));
     const snap = await getDocs(q);
@@ -326,19 +379,20 @@ function enterLobby(roomId){
   $('listView').style.display = 'none';
 
   if (_unsubRoom) _unsubRoom();
-  if (_unsubChat) _unsubChat();
 
   _unsubRoom = onSnapshot(doc(db,'rooms',roomId), (snap) => {
     if (!snap.exists()){
-      toast('Phòng đã bị xoá', 'warn');
-      leaveLobby();
+      window.openInfoModal('🗑️ Phòng đã bị xoá', 'Phòng này đã bị chủ phòng xoá hoặc đã hết hạn.', function(){
+        leaveLobby();
+      });
       return;
     }
     const data = snap.data();
     const stillIn = (data.members||[]).includes(_user.uid) || (data.waitingMembers||[]).includes(_user.uid);
     if (!stillIn) {
-      toast('Bạn đã bị kick khỏi phòng', 'warn');
-      backToList();
+      window.openInfoModal('🚫 Bạn đã bị kick', 'Chủ phòng đã đưa bạn ra khỏi phòng này.', function(){
+        backToList();
+      });
       return;
     }
     renderLobby(data);
@@ -352,33 +406,16 @@ function enterLobby(roomId){
     }
   });
 
-  _unsubChat = onSnapshot(
-    query(collection(db,'rooms',roomId,'chat'), orderBy('createdAt'), limit(80)),
-    (snap) => {
-      const box = $('lobby-chat-msgs');
-      box.innerHTML = '';
-      if (!snap.size){
-        box.innerHTML = '<div class="lc-sys">Hãy chào mọi người 👋</div>';
-      }
-      snap.forEach(d => {
-        const m = d.data();
-        const isMe = m.senderUid === _user.uid;
-        const div = document.createElement('div');
-        div.className = 'lc-msg ' + (isMe ? 'mine' : 'other');
-        div.innerHTML = isMe
-          ? `<span class="lc-bubble">${escHtml(m.text)}</span>`
-          : `<span class="lc-name">${escHtml(m.senderName)}</span><span class="lc-bubble">${escHtml(m.text)}</span>`;
-        box.appendChild(div);
-      });
-      box.scrollTop = box.scrollHeight;
-    }
-  );
+  // Dùng room-chat.js thay cho chat cũ
+  getMyNickname(db, _user.uid, _user.email).then(myName => {
+    initRoomChat({ db, roomId, uid: _user.uid, getName: () => myName });
+  });
 }
 
 function renderLobby(r){
   const g = GAMES[r.gameType] || {};
   $('lobby-title').textContent = r.name;
-  $('lobby-game').textContent = (g.icon || '🎮') + ' ' + (g.name || r.gameType);
+  $('lobby-game').innerHTML = gameIconHtml(r.gameType) + ' ' + escHtml(g.name || r.gameType);
   $('lobby-code').textContent = '#' + r.code;
   const waitingCount = (r.waitingMembers||[]).length;
   $('lobby-count').textContent = (r.members||[]).length + '/' + r.maxPlayers + (waitingCount ? ' (+' + waitingCount + ' chờ)' : (r.status === 'playing' ? ' (đang chơi)' : ''));
@@ -423,10 +460,10 @@ div.innerHTML = `
   if (btnDelete) {
     btnDelete.style.display = (isHost || isAdmin) ? 'inline-block' : 'none';
   }
-  // Room settings button (host only)
-  const btnSettings = $('btn-room-settings');
-  if (btnSettings) {
-    btnSettings.style.display = isHost ? 'inline-block' : 'none';
+  // Gear settings button (host and admin only)
+  const gearBtn = $('btn-room-settings');
+  if (gearBtn) {
+    gearBtn.style.display = (isHost || isAdmin) ? 'flex' : 'none';
   }
 
   if (isHost){
@@ -435,7 +472,7 @@ div.innerHTML = `
     const allReady = (r.members||[]).filter(u => u !== r.hostUid).every(u => (r.memberInfo||{})[u]?.ready);
     const enough = (r.members||[]).length >= 2;
     btnStart.disabled = !(allReady && enough);
-    btnStart.textContent = enough ? (allReady ? '🚀 Bắt đầu' : '⏳ Chờ sẵn sàng') : '⏳ Cần 2 người';
+    btnStart.textContent = enough ? (allReady ? 'Bắt đầu' : '⏳ Chờ sẵn sàng') : '⏳ Cần 2 người';
   } else {
     btnStart.style.display = 'none';
     btnReady.style.display = 'inline-block';
@@ -527,10 +564,11 @@ window.startGame = async function(){
 };
 
 window.leaveLobby = async function(){
-  if (!_currentRoomId) { backToList(); return; }
-  try {
-    await removeUserFromRoom();
-  } catch(e){ console.error(e); }
+  if (_currentRoomId && _user) {
+    try {
+      await removeUserFromRoom();
+    } catch(e){ console.error(e); }
+  }
   backToList();
 };
 
@@ -544,8 +582,24 @@ async function removeUserFromRoom() {
   if (!snap.exists()) return;
   const data = snap.data();
   if (data.hostUid === _user.uid) {
-    // Chủ phòng rời: xoá phòng hoàn toàn
-    await deleteDoc(doc(db,'rooms',_currentRoomId));
+    // Chủ phòng rời: chuyển chủ cho người kế tiếp thay vì xoá phòng
+    const remaining = (data.members || []).filter(u => u !== _user.uid);
+    if (remaining.length === 0) {
+      await deleteDoc(doc(db,'rooms',_currentRoomId));
+    } else {
+      const newHost = remaining[0];
+      const memberInfo = data.memberInfo || {};
+      delete memberInfo[_user.uid];
+      const wInfo = data.waitingMemberInfo || {};
+      delete wInfo[_user.uid];
+      await updateDoc(doc(db,'rooms',_currentRoomId), {
+        hostUid: newHost,
+        members: arrayRemove(_user.uid),
+        memberInfo,
+        waitingMembers: arrayRemove(_user.uid),
+        waitingMemberInfo: wInfo
+      });
+    }
   } else {
     const memberInfo = data.memberInfo || {};
     delete memberInfo[_user.uid];
@@ -593,7 +647,7 @@ window.deleteAllRooms = async function() {
     console.error(e);
     toast('Xoá thất bại: ' + (e.message || ''), 'error');
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '🗑️ Xoá tất cả'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Xoá tất cả'; }
   }
 };
 
@@ -612,7 +666,7 @@ window.deleteRoom = async function() {
 
 function backToList(){
   if (_unsubRoom) { _unsubRoom(); _unsubRoom = null; }
-  if (_unsubChat) { _unsubChat(); _unsubChat = null; }
+  destroyRoomChat();
   _currentRoomId = null;
   window.__navigated = false;
   $('lobbyView').style.display = 'none';
@@ -622,19 +676,7 @@ function backToList(){
 // ── AUTO CLEANUP khi tắt tab (không chạy khi đang navigate sang game) ──
 window.addEventListener('pagehide', () => {
   if (!window.__navigated && _currentRoomId && _user) {
-    leaveLobby().catch(() => {});
+    removeUserFromRoom().catch(() => {});
   }
 });
 
-window.sendLobbyChat = async function(){
-  const input = $('lobby-chat-input');
-  const text = input.value.trim();
-  if (!text || !_currentRoomId) return;
-  input.value = '';
-  await addDoc(collection(db,'rooms',_currentRoomId,'chat'), {
-    text,
-    senderUid: _user.uid,
-    senderName: _myProfile.nickname || _user.email.split('@')[0],
-    createdAt: serverTimestamp()
-  });
-};

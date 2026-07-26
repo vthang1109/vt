@@ -501,7 +501,7 @@ class PenaltyGame {
     if(kn)kn.addEventListener('click',()=>this.playKnockoutMatch());
 
     setTimeout(()=>{
-      if(window.TopNav?.setLeaveAction)window.TopNav.setLeaveAction(()=>window.location.href='../../games.html');
+      if(window.TopNav?.setLeaveAction)window.TopNav.setLeaveAction(()=>this.showScreen('pt-menu'));
     },100);
   }
 
@@ -513,7 +513,6 @@ class PenaltyGame {
     });
     document.getElementById('pt-result-overlay').style.display='none';
     document.getElementById('pt-match-info').style.display='none';
-    document.getElementById('pt-debug-actions').style.display='none';
     this._updateContinueCard();
     this._updatePlayButton();
   }
@@ -544,8 +543,6 @@ class PenaltyGame {
     document.getElementById('pt-actions').style.display='none';
     document.getElementById('pt-match-done-btn').style.display='none';
     this.renderStatusBar();
-    // Show debug buttons when match starts
-    document.getElementById('pt-debug-actions').style.display = 'flex';
     this.startRound();
   }
 
@@ -1403,6 +1400,22 @@ class PenaltyGame {
   endMatch(){
     this.state.phase='finished';
     this.state.shotLocked=true;
+    // Admin force win/lose via __ADMIN_FORCED_RESULT
+    if (window.__ADMIN_FORCED_RESULT === 'win') {
+      this.state.scores = [5, 0];
+      this.state.history = [];
+      for (let i = 0; i < 5; i++) {
+        this.state.history.push({ shooter: 'player', result: 'goal' });
+        this.state.history.push({ shooter: 'ai', result: 'saved' });
+      }
+    } else if (window.__ADMIN_FORCED_RESULT === 'lose') {
+      this.state.scores = [0, 5];
+      this.state.history = [];
+      for (let i = 0; i < 5; i++) {
+        this.state.history.push({ shooter: 'player', result: 'saved' });
+        this.state.history.push({ shooter: 'ai', result: 'goal' });
+      }
+    }
     const ps=this.state.scores[0],as=this.state.scores[1];
     const isWin=ps>as,isDraw=ps===as;
 
@@ -1425,33 +1438,6 @@ class PenaltyGame {
     document.getElementById('pt-result-overlay').style.display='';
     document.getElementById('pt-actions').style.display='none';
     document.getElementById('pt-match-done-btn').style.display='none';
-  }
-
-  // ===== DEBUG: Force win/lose immediately =====
-  debugWin(){
-    if (this.state.phase === 'finished') return;
-    this.state.shotLocked = true;
-    this.state.scores = [5, 0];
-    this.state.history = [];
-    for (let i = 0; i < 5; i++) {
-      this.state.history.push({ shooter: 'player', result: 'goal' });
-      this.state.history.push({ shooter: 'ai', result: 'saved' });
-    }
-    this.renderStatusBar();
-    this.endMatch();
-  }
-
-  debugLose(){
-    if (this.state.phase === 'finished') return;
-    this.state.shotLocked = true;
-    this.state.scores = [0, 5];
-    this.state.history = [];
-    for (let i = 0; i < 5; i++) {
-      this.state.history.push({ shooter: 'player', result: 'saved' });
-      this.state.history.push({ shooter: 'ai', result: 'goal' });
-    }
-    this.renderStatusBar();
-    this.endMatch();
   }
 
   onMatchDone(){
@@ -1865,7 +1851,6 @@ class PenaltyGame {
     const mi=document.getElementById('pt-match-info');
     mi.style.display=this.state._matchContext?'':'none';
     document.getElementById('pt-match-label').innerHTML=this.state._matchLabel||'';
-    document.getElementById('pt-debug-actions').style.display='flex';
     this.renderStatusBar();
     this.resetKeeperPos();
     this._resetBall();

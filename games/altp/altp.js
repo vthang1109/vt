@@ -328,4 +328,4 @@ window.altp.cycleSpeed = function () {
   const i = SPEED_CYCLE.indexOf(_speed);
   _speed = SPEED_CYCLE[(i + 1) % SPEED_CYCLE.length];
 };
-window.altp.quitToLobby = function () { location.href = '../../games.html'; };
+window.altp.quitToLobby = function () { document.getElementById('btn-start').style.display = 'inline-block'; document.getElementById('altp-lifelines').style.display = 'none'; document.getElementById('altp-qbox').style.display = 'none'; document.getElementById('altp-options').style.display = 'none'; window.altp.resetGame?.(); };

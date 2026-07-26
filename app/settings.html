@@ -7,80 +7,115 @@
   <link rel="stylesheet" href="../style.css" />
   <style>
     /* ===== SETTINGS PAGE ===== */
-    .settings-page { min-height: 100vh; position: relative; z-index: 1; padding: 30px 16px 40px; }
-    .settings-hero { text-align: center; padding: 20px 0 30px; }
+    .settings-page { min-height: 100vh; position: relative; z-index: 1; padding: 10px 16px 40px; }
+    .settings-hero { text-align: center; padding: 20px 0 30px; animation: fadeUp .6s both; }
     .settings-hero h1 { font-family: 'Science Gothic', sans-serif; font-size: 28px; font-weight: 500; color: #e0f2fe; }
-    .settings-hero h1 span { color: #38bdf8; }
+    .settings-hero h1 span { color: #38bdf8; text-shadow: 0 0 24px rgba(56,189,248,.6); }
+    .settings-hero p { color:#7dd3fc;font-weight:600;font-size:13px; }
 
     .settings-card {
       max-width: 600px; margin: 0 auto 20px;
-      background: rgba(255,255,255,0.03); border: 1px solid rgba(56,189,248,0.12);
-      border-radius: 16px; padding: 16px 20px;
-      transition: border-color 0.2s;
+      background: rgba(15,23,42,0.75); backdrop-filter: blur(12px);
+      border: 1px solid rgba(56,189,248,0.10);
+      border-radius: 18px; padding: 16px 20px;
+      transition: all 0.3s; animation: fadeUp .4s both;
     }
-    .settings-card:hover { border-color: rgba(56,189,248,0.3); }
+    .settings-card:nth-of-type(1) { animation-delay: .05s; }
+    .settings-card:nth-of-type(2) { animation-delay: .1s; }
+    .settings-card:nth-of-type(3) { animation-delay: .15s; }
+    .settings-card:nth-of-type(4) { animation-delay: .2s; }
+    .settings-card:nth-of-type(5) { animation-delay: .25s; }
+    .settings-card:hover {
+      border-color: rgba(56,189,248,0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
 
     .settings-item {
       display: flex; align-items: center; justify-content: space-between;
       padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
     }
     .settings-item:last-child { border-bottom: none; }
-    .settings-label { font-family: 'Science Gothic', sans-serif; font-weight: 400; color: #cbd5e1; font-size: 15px; }
+    .settings-label { font-family: 'Science Gothic', sans-serif; font-weight: 500; color: #e0f2fe; font-size: 14px; }
     .settings-label .icon { margin-right: 10px; }
-    .settings-value { font-family: 'Science Gothic', sans-serif; font-weight: 600; color: #94a3b8; font-size: 14px; }
-
-    .settings-toggle {
-      width: 44px; height: 24px; background: #1e293b; border-radius: 12px;
-      cursor: pointer; position: relative; transition: background 0.3s;
-      flex-shrink: 0; border: none;
+    .settings-value {
+      font-family: 'Science Gothic', sans-serif; font-weight: 600; color: #7dd3fc; font-size: 14px;
+      background: rgba(56,189,248,0.06); padding: 4px 12px; border-radius: 8px;
     }
-    .settings-toggle.on { background: #0288D1; }
+
+    /* ===== TOGGLE NÂNG CẤP ===== */
+    .settings-toggle {
+      width: 48px; height: 26px; background: #1e293b; border-radius: 13px;
+      cursor: pointer; position: relative; transition: background 0.3s, box-shadow 0.3s;
+      flex-shrink: 0; border: none; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .settings-toggle.on { background: linear-gradient(135deg, #0288D1, #38bdf8); box-shadow: 0 0 12px rgba(56,189,248,0.35); }
     .settings-toggle::after {
       content: ''; position: absolute; top: 2px; left: 2px;
-      width: 20px; height: 20px; border-radius: 50%; background: #fff;
-      transition: transform 0.3s;
+      width: 22px; height: 22px; border-radius: 50%; background: #fff;
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
     }
-    .settings-toggle.on::after { transform: translateX(20px); }
+    .settings-toggle.on::after { transform: translateX(22px); }
+    .settings-toggle:active::after { transform: scale(0.9); }
+    .settings-toggle.on:active::after { transform: translateX(22px) scale(0.9); }
 
+    /* ===== BUTTONS ===== */
     .settings-btn {
-      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25);
-      color: #f87171; padding: 8px 18px; border-radius: 10px;
-      font-weight: 500; font-size: 13px; cursor: pointer;
-      transition: all 0.2s; font-family: 'Science Gothic', sans-serif;
+      padding: 7px 16px; border-radius: 10px;
+      font-weight: 600; font-size: 12px; cursor: pointer;
+      transition: all 0.25s; font-family: 'Science Gothic', sans-serif;
+      border: 1px solid rgba(239,68,68,0.3);
+      background: rgba(239,68,68,0.10); color: #f87171;
     }
-    .settings-btn:hover { background: rgba(239,68,68,0.2); transform: scale(0.97); }
-    .settings-btn.primary { background: rgba(56,189,248,0.12); border-color: rgba(56,189,248,0.25); color: #38bdf8; }
+    .settings-btn:hover { background: rgba(239,68,68,0.2); transform: translateY(-1px); }
+    .settings-btn:active { transform: scale(0.96); }
+    .settings-btn.primary {
+      background: rgba(56,189,248,0.10); border-color: rgba(56,189,248,0.3); color: #38bdf8;
+    }
     .settings-btn.primary:hover { background: rgba(56,189,248,0.2); }
 
-    .settings-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 6px 0; }
+    .settings-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(56,189,248,0.2), transparent);
+      margin: 8px 0;
+    }
 
-    .logout-btn { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+    .logout-btn {
+      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #f87171;
+    }
     .logout-btn:hover { background: rgba(239,68,68,0.25); }
 
-    /* Admin card - chỉ hiện khi là admin */
+    /* ===== ADMIN CARD (chỉ hiện nếu admin) ===== */
     .admin-card {
       max-width: 600px; margin: 0 auto 20px;
       background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.03));
       border: 2px solid rgba(251,191,36,0.3);
-      border-radius: 16px; padding: 16px 20px;
-      transition: all 0.3s;
-      cursor: pointer;
+      border-radius: 18px; padding: 16px 20px;
+      transition: all 0.3s; cursor: pointer;
       display: none; /* Ẩn mặc định, sẽ hiện khi admin */
+      animation: fadeUp .4s both;
+      position: relative; overflow: hidden;
     }
+    .admin-card::before {
+      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: conic-gradient(from 0deg, transparent, rgba(251,191,36,0.03), transparent, rgba(251,191,36,0.03), transparent);
+      animation: adminSpin 8s linear infinite;
+    }
+    @keyframes adminSpin { to { transform: rotate(360deg); } }
     .admin-card:hover {
       border-color: rgba(251,191,36,0.6);
-      box-shadow: 0 0 30px rgba(251,191,36,0.1);
+      box-shadow: 0 0 30px rgba(251,191,36,0.10);
       transform: translateY(-2px);
     }
     .admin-card .admin-header {
-      display: flex; align-items: center; gap: 12px;
+      display: flex; align-items: center; gap: 12px; position: relative; z-index: 1;
     }
-    .admin-card .admin-icon {
-      font-size: 28px;
-    }
+    .admin-card .admin-icon { font-size: 28px; }
     .admin-card .admin-title {
       font-family: 'Science Gothic', sans-serif;
-      font-size: 16px; font-weight: 500; color: #fbbf24;
+      font-size: 16px; font-weight: 600; color: #fbbf24;
+      text-shadow: 0 0 12px rgba(251,191,36,0.3);
     }
     .admin-card .admin-desc {
       color: #94a3b8; font-size: 13px; font-weight: 600;
@@ -88,90 +123,93 @@
     }
     .admin-card .admin-arrow {
       margin-left: auto; color: #fbbf24; font-size: 20px;
+      transition: transform 0.3s;
     }
+    .admin-card:hover .admin-arrow { transform: translateX(4px); }
 
-    /* Change Password Modal */
+    /* ===== CHANGE PASSWORD MODAL ===== */
     .pw-modal-overlay {
       position: fixed; inset: 0; z-index: 99999;
       background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
       display: none; align-items: center; justify-content: center;
-      animation: fadeIn 0.25s ease;
     }
     .pw-modal-overlay.open { display: flex; }
+    .pw-modal-overlay.open .pw-modal-box { animation: fadeUp 0.3s both; }
     .pw-modal-box {
-      background: linear-gradient(145deg, #1a2744, #0f172a);
-      border: 1px solid rgba(56,189,248,0.2);
-      border-radius: 24px; padding: 30px;
+      background: linear-gradient(160deg, rgba(15,23,42,.98), rgba(7,16,32,.98));
+      border: 1px solid rgba(167,139,250,.25);
+      border-radius: 22px; padding: 28px;
       max-width: 420px; width: 90%;
       box-shadow: 0 20px 60px rgba(0,0,0,0.8);
     }
     .pw-modal-box h3 {
       color: #e0f2fe; font-size: 20px; margin-bottom: 8px;
+      font-family: 'Science Gothic', sans-serif; font-weight: 500;
     }
-    .pw-modal-box p {
-      color: #7dd3fc; font-size: 13px; margin-bottom: 20px;
-    }
+    .pw-modal-box p { color: #7dd3fc; font-size: 13px; margin-bottom: 20px; font-weight: 600; }
     .pw-input {
       width: 100%; padding: 12px 16px; border-radius: 12px;
-      border: 1px solid rgba(56,189,248,0.25);
+      border: 1px solid rgba(167,139,250,0.2);
       background: rgba(0,0,0,0.3); color: #e0f2fe;
-      font-size: 15px; outline: none;
+      font-size: 14px; outline: none;
       box-sizing: border-box; margin-bottom: 12px;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s; font-family: 'Science Gothic', sans-serif;
     }
-    .pw-input:focus { border-color: #38bdf8; }
+    .pw-input:focus { border-color: rgba(167,139,250,0.5); }
     .pw-input::placeholder { color: #475569; }
-    .pw-error {
-      color: #f87171; font-size: 13px; min-height: 20px;
-      margin-bottom: 8px;
-    }
-    .pw-success {
-      color: #34d399; font-size: 13px; min-height: 20px;
-      margin-bottom: 8px;
-    }
-    .pw-btn-row {
-      display: flex; gap: 10px;
-    }
+    .pw-error { color: #f87171; font-size: 13px; min-height: 20px; margin-bottom: 8px; }
+    .pw-success { color: #34d399; font-size: 13px; min-height: 20px; margin-bottom: 8px; }
+
+    .pw-btn-row { display: flex; gap: 10px; }
     .pw-btn {
-      flex: 1; padding: 12px; border-radius: 12px;
+      flex: 1; padding: 11px; border-radius: 12px;
       font-weight: 700; cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s; border: none;
+      font-size: 14px; transition: all 0.2s; border: none;
+      font-family: 'Science Gothic', sans-serif;
     }
-    .pw-btn:hover { transform: scale(0.97); }
-    .pw-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .pw-btn:hover { transform: translateY(-1px); }
+    .pw-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
     .pw-btn-cancel {
-      border: 1px solid rgba(255,255,255,0.1);
-      background: none; color: #94a3b8;
+      border: 1px solid rgba(167,139,250,0.3);
+      background: rgba(167,139,250,0.06); color: #a78bfa;
     }
-    .pw-btn-cancel:hover { background: rgba(255,255,255,0.05); }
+    .pw-btn-cancel:hover { background: rgba(167,139,250,0.12); }
     .pw-btn-submit {
-      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
-      color: #fff;
+      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+      color: #fff; box-shadow: 0 4px 14px rgba(124,58,237,.4);
     }
-    .pw-btn-submit:hover { box-shadow: 0 4px 20px rgba(56,189,248,0.4); }
+    .pw-btn-submit:hover { box-shadow: 0 8px 22px rgba(124,58,237,.5); }
 
     .pw-strength {
       height: 4px; border-radius: 2px;
       margin: -6px 0 14px; transition: all 0.3s;
       background: #1e293b;
     }
-    .pw-strength.weak { background: #ef4444; width: 33%; }
-    .pw-strength.medium { background: #fbbf24; width: 66%; }
-    .pw-strength.strong { background: #34d399; width: 100%; }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .pw-strength.weak { background: linear-gradient(90deg, #ef4444, #f87171); width: 33%; }
+    .pw-strength.medium { background: linear-gradient(90deg, #fbbf24, #facc15); width: 66%; }
+    .pw-strength.strong { background: linear-gradient(90deg, #34d399, #6ee7b7); width: 100%; }
 
     /* Dark/Light theme */
-    body.light-mode .settings-card { background: rgba(255,255,255,0.06); border-color: rgba(0,0,0,0.1); }
+    body.light-mode .settings-card { background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border-color: rgba(0,0,0,0.08); }
+    body.light-mode .settings-card:hover { border-color: rgba(56,189,248,0.3); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
     body.light-mode .settings-label { color: #1e293b; }
-    body.light-mode .settings-value { color: #475569; }
+    body.light-mode .settings-value { color: #0284c7; background: rgba(2,132,199,0.06); }
+    body.light-mode .settings-toggle { background: #cbd5e1; }
+    body.light-mode .settings-toggle.on { background: linear-gradient(135deg, #0288D1, #38bdf8); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 500px) {
+      .settings-hero h1 { font-size: 22px; }
+      .settings-card { padding: 12px 14px; }
+      .settings-label { font-size: 13px; }
+      .admin-card .admin-title { font-size: 14px; }
+    }
   </style>
 </head>
 <body data-bottom-nav="home">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
   <div id="top-nav-root"></div>
 
   <div class="settings-page">
@@ -284,6 +322,26 @@
   </div>
 
   <!-- Scripts -->
+  <script>
+    // Background particles
+    (function(){
+      const canvas = document.getElementById('bg-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resize(); window.addEventListener('resize', resize);
+      for (let i = 0; i < 40; i++) particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4, r:Math.random()*1.5+.5 });
+      function draw() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach(p => { p.x+=p.vx; p.y+=p.vy; if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0; if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba(56,189,248,0.4)'; ctx.fill(); });
+        for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) { const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y,d=Math.sqrt(dx*dx+dy*dy); if(d<120){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(56,189,248,${.06*(1-d/120)})`;ctx.lineWidth=.5;ctx.stroke();} }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+  </script>
+
   <script src="../top-nav.js"></script>
   <script src="../bottom-nav.js"></script>
   <script type="module">

@@ -1,5 +1,5 @@
 // shop.js — Gacha Thú Cưng + Shop Danh Hiệu
-import { db, auth } from '../points.js';
+import { db, auth, subscribeUserData } from '../points.js';
 import { doc, runTransaction, onSnapshot, arrayUnion, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doGacha } from '../pet.js';
@@ -349,9 +349,8 @@ document.addEventListener('DOMContentLoaded', function() {
       if (shopActiveTab === 'title') renderTitleGrid();
     });
 
-    onSnapshot(doc(db, 'users', user.uid), function(snap) {
-      if (!snap.exists()) return;
-      const d = snap.data();
+    subscribeUserData(function(d) {
+      if (!d) return;
       myPoints        = d.points      || 0;
       myOwnedTitleIds = d.ownedTitles || [];
       // activeTitle giờ là JSON array [id1, id2] hoặc string cũ

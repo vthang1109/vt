@@ -2,9 +2,11 @@
 // ===== BÀI CÀO MULTIPLAYER =====
 // ============================================================
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, updateDoc, onSnapshot, deleteDoc, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { subscribeUserData } from '../../points.js';
 import { createDeck, renderCardUI } from '../../cards.js';
+import { initRoomChat, getMyNickname, showRoomDeletedPopup } from '../../room-chat.js';
 import { getActiveBuff, getPetById, getTierById } from '../../pet.js';
 
 const fbConfig = {
@@ -24,6 +26,7 @@ let _user = null, _unsub = null, _unsubMe = null, _myBalance = 0;
 let _notifiedRound = 0;
 let _endingRound = false;
 let _betConfirmed = false;
+let _cachedRoomData = null;   // cache from onSnapshot để tránh getDoc rời
 
 if (!ROOM_ID) document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">⚠️ Thiếu mã phòng.</div>';
 
@@ -102,14 +105,20 @@ function esc(s) {
 onAuthStateChanged(auth, async (u) => {
   if (!u) { location.href = 'index.html'; return; }
   _user = u;
-  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
-  _unsubMe = onSnapshot(doc(db, 'users', _user.uid), (s) => {
-    if (s.exists()) {
-      _myBalance = s.data().points || 0;
-      if (window.TopNav) window.TopNav.setPoints(_myBalance);
-    }
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(async () => {
+    window.__navigated = true;
+    await window.quitGame?.();
   });
-  if (ROOM_ID) start();
+  _unsubMe = subscribeUserData((data) => {
+    _myBalance = data?.points || 0;
+    if (window.TopNav) window.TopNav.setPoints(_myBalance);
+  });
+  if (ROOM_ID) {
+    start();
+    getMyNickname(db, _user.uid, _user.email).then(myName => {
+      initRoomChat({ db, roomId: ROOM_ID, uid: _user.uid, getName: () => myName });
+    });
+  }
 });
 
 // ========== FIREBASE LISTENER ==========
@@ -117,10 +126,11 @@ function start() {
   if (_unsub) _unsub();
   _unsub = onSnapshot(doc(db, 'rooms', ROOM_ID), (snap) => {
     if (!snap.exists()) {
-      document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">Phòng đã bị xoá.</div>';
+      showRoomDeletedPopup();
       return;
     }
     const r = snap.data();
+    _cachedRoomData = snap;  // cache để dùng trong actions thay getDoc
     updateNavRoom(r.code || '------');
     if (r.gameType !== 'baicao' || !r.gameState) return;
     render(r);
@@ -128,17 +138,8 @@ function start() {
 }
 
 function updateNavRoom(roomCode) {
-  if (!roomCode) return;
-  const logo = document.querySelector('.vt-top-nav .vt-nav-logo');
-  if (!logo) return;
-  let roomEl = logo.querySelector('.bc-room-id');
-  if (!roomEl) {
-    roomEl = document.createElement('span');
-    roomEl.className = 'bc-room-id';
-    logo.innerHTML = '';
-    logo.appendChild(roomEl);
-  }
-  roomEl.innerHTML = `<span class="room-icon">🃏</span> #${roomCode}`;
+  if (!roomCode || !window.TopNav?.setRoomId) return;
+  window.TopNav.setRoomId(roomCode, `<img src="../../assets/icons/baicao.png" style="height:14px;width:14px;vertical-align:middle;border-radius:2px">`);
 }
 
 // ========== RENDER ==========
@@ -399,8 +400,8 @@ function buildDealUpdates(r, betAmount, nextRound) {
 
 // ========== HÀNH ĐỘNG ==========
 window.confirmBet = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
+  const snap = _cachedRoomData;
+  if (!snap || !snap.exists()) return;
   const r = snap.data();
   if (r.hostUid !== _user.uid) return;
   if (r.gameState?.betConfirmed) return;
@@ -415,8 +416,8 @@ window.confirmBet = async function() {
 };
 
 window.revealOne = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
+  const snap = _cachedRoomData;
+  if (!snap || !snap.exists()) return;
   const r = snap.data();
   const gs = r.gameState;
   if (gs.phase !== 'playing') return;
@@ -435,16 +436,14 @@ window.revealOne = async function() {
 };
 
 window.revealAll = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
+  const snap = _cachedRoomData;
+  if (!snap || !snap.exists()) return;
   const r = snap.data();
   const gs = r.gameState;
   if (gs.phase !== 'playing') return;
   
-  const revealed = gs.revealed?.[_user.uid] || [];
-  const newRevealed = [true, true, true];
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
-    [`gameState.revealed.${_user.uid}`]: newRevealed
+    [`gameState.revealed.${_user.uid}`]: [true, true, true]
   });
   
   // Kiểm tra xem tất cả đã mở hết chưa (host tự động kết thúc)
@@ -465,8 +464,9 @@ function isFullyRevealed(r) {
 }
 
 async function checkAllRevealed() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
+  // Dùng cached room data thay getDoc — onSnapshot update realtime
+  const snap = _cachedRoomData;
+  if (!snap || !snap.exists()) return;
   const r = snap.data();
   const gs = r.gameState;
   if (gs.phase !== 'playing') return;
@@ -477,8 +477,8 @@ async function checkAllRevealed() {
 }
 
 window.hostEndRound = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
+  const snap = _cachedRoomData;
+  if (!snap || !snap.exists()) return;
   const r = snap.data();
   if (r.hostUid !== _user.uid) return;
   const gs = r.gameState;
@@ -516,29 +516,25 @@ window.hostEndRound = async function() {
     'gameState.dealerDelta': dealerDelta
   });
 
-  // Xử lý điểm cho host
+  // Xử lý điểm cho host (dùng _myBalance đã cache từ subscribeUserData)
   if (dealerDelta !== 0) {
-    const us = await getDoc(doc(db, 'users', _user.uid));
-    const cur = us.exists() ? (us.data().points || 0) : 0;
-    await updateDoc(doc(db, 'users', _user.uid), { points: cur + dealerDelta });
+    await updateDoc(doc(db, 'users', _user.uid), { points: Math.max(0, _myBalance + dealerDelta) });
     if (window.VTQuests && dealerDelta > 0) window.VTQuests.trackEarn(dealerDelta);
   }
 
-  // Xử lý điểm cho người chơi
+  // Xử lý điểm cho người chơi (dùng increment thay getDoc + update)
   for (const [uid, res] of Object.entries(results)) {
     if (uid === _user.uid) continue;
     if (res.delta !== 0) {
-      const us = await getDoc(doc(db, 'users', uid));
-      const cur = us.exists() ? (us.data().points || 0) : 0;
-      await updateDoc(doc(db, 'users', uid), { points: cur + res.delta });
+      await updateDoc(doc(db, 'users', uid), { points: increment(res.delta) });
     }
   }
 
 };
 
 window.hostNewRound = async function() {
-  const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-  if (!snap.exists()) return;
+  const snap = _cachedRoomData;
+  if (!snap || !snap.exists()) return;
   const r = snap.data();
   if (r.hostUid !== _user.uid) return;
 
@@ -551,11 +547,28 @@ window.hostNewRound = async function() {
 // ========== QUIT ==========
 window.quitGame = async function() {
   try {
-    const snap = await getDoc(doc(db, 'rooms', ROOM_ID));
-    if (snap.exists()) {
-      const r = snap.data();
+    // Dùng cached room data thay getDoc
+    if (_cachedRoomData && _cachedRoomData.exists()) {
+      const r = _cachedRoomData.data();
       if (r.hostUid === _user.uid) {
-        await deleteDoc(doc(db, 'rooms', ROOM_ID));
+        // Chuyển chủ phòng cho người kế tiếp thay vì xoá phòng
+        const remaining = (r.members || []).filter(u => u !== _user.uid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db, 'rooms', ROOM_ID));
+        } else {
+          const newHost = remaining[0];
+          const mi = r.memberInfo || {};
+          delete mi[_user.uid];
+          const wInfo = { ...(r.waitingMemberInfo || {}) };
+          delete wInfo[_user.uid];
+          await updateDoc(doc(db, 'rooms', ROOM_ID), {
+            hostUid: newHost,
+            members: arrayRemove(_user.uid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(_user.uid),
+            waitingMemberInfo: wInfo
+          });
+        }
       } else {
         const remaining = (r.members || []).filter(u => u !== _user.uid);
         if (remaining.length === 0) {
@@ -578,4 +591,4 @@ window.quitGame = async function() {
   location.href = '../../app/rooms.html';
 };
 
-window.addEventListener('pagehide', () => window.quitGame?.());
+window.addEventListener('pagehide', () => { if (!window.__navigated) window.quitGame?.(); });

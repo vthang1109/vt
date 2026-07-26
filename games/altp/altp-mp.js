@@ -5,8 +5,9 @@
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove, increment, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { subscribeUserData } from '../../points.js';
 import { getActiveBuff } from '../../pet.js';
-import { initRoomChat, getMyNickname } from '../../room-chat.js';
+import { initRoomChat, getMyNickname, showRoomDeletedPopup } from '../../room-chat.js';
 import { play, playOnce, stopAll } from '../../assets/sound.js';
 
 const fbConfig = {
@@ -34,8 +35,8 @@ let _myPhoneMsg = null;        // per-player phone message (local)
 let _lastRoundTimer = 0;  // track which round the timer was started for
 
 // Clean up
-window.addEventListener('pagehide', () => window.quitGame?.());
-window.addEventListener('beforeunload', () => window.quitGame?.());
+window.addEventListener('pagehide', () => { if (!window.__navigated) window.quitGame?.(); });
+window.addEventListener('beforeunload', () => { if (!window.__navigated) window.quitGame?.(); });
 
 // ========== BẢNG THƯỞNG OFFLINE (15 câu) — đồng bộ với altp.js ==========
 const PRIZE_TABLE = [10, 20, 40, 70, 100, 150, 300, 600, 1200, 2000, 3000, 4000, 5500, 7500, 10000];
@@ -100,12 +101,13 @@ function computeGrandTotal(gs, uid) {
 onAuthStateChanged(auth, async (u) => {
   if (!u) { location.href = 'index.html'; return; }
   _user = u;
-  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
-  _unsubMe = onSnapshot(doc(db, 'users', _user.uid), (s) => {
-    if (s.exists()) {
-      _myActivePet = s.data().activePet || null;
-      if (window.TopNav) window.TopNav.setPoints(s.data().points || 0);
-    }
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(async () => {
+    window.__navigated = true;
+    await window.quitGame?.();
+  });
+  _unsubMe = subscribeUserData((data) => {
+    _myActivePet = data?.activePet || null;
+    if (window.TopNav) window.TopNav.setPoints(data?.points || 0);
   });
   if (ROOM_ID) {
     start();
@@ -121,17 +123,8 @@ onAuthStateChanged(auth, async (u) => {
 
 // ========== UPDATE NAV ROOM ==========
 function updateNavRoom(roomCode) {
-  if (!roomCode) return;
-  const logo = document.querySelector('.vt-top-nav .vt-nav-logo');
-  if (!logo) return;
-  let roomEl = logo.querySelector('.vt-room-id');
-  if (!roomEl) {
-    roomEl = document.createElement('span');
-    roomEl.className = 'vt-room-id';
-    logo.innerHTML = '';
-    logo.appendChild(roomEl);
-  }
-  roomEl.textContent = `#${roomCode}`;
+  if (!roomCode || !window.TopNav?.setRoomId) return;
+  window.TopNav.setRoomId(roomCode, `<img src="../../assets/icons/altp.png" style="height:14px;width:14px;vertical-align:middle;border-radius:2px">`);
 }
 
 // ========== TIMER ==========
@@ -177,7 +170,7 @@ function start() {
   if (_unsub) _unsub();
   _unsub = onSnapshot(doc(db, 'rooms', ROOM_ID), (snap) => {
     if (!snap.exists()) {
-      document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">Phòng đã bị xoá.</div>';
+      showRoomDeletedPopup();
       return;
     }
     const r = snap.data();
@@ -944,7 +937,24 @@ window.quitGame = async function() {
     const r = _room;
     if (r) {
       if (r.hostUid === _user.uid) {
-        await deleteDoc(doc(db, 'rooms', ROOM_ID));
+        // Chuyển chủ phòng cho người kế tiếp thay vì xoá phòng
+        const remaining = (r.members || []).filter(u => u !== _user.uid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db, 'rooms', ROOM_ID));
+        } else {
+          const newHost = remaining[0];
+          const mi = r.memberInfo || {};
+          delete mi[_user.uid];
+          const wInfo = { ...(r.waitingMemberInfo || {}) };
+          delete wInfo[_user.uid];
+          await updateDoc(doc(db, 'rooms', ROOM_ID), {
+            hostUid: newHost,
+            members: arrayRemove(_user.uid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(_user.uid),
+            waitingMemberInfo: wInfo
+          });
+        }
       } else {
         const remaining = (r.members || []).filter(u => u !== _user.uid);
         if (remaining.length === 0) {

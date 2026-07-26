@@ -374,7 +374,32 @@ class BauCua {
 
     // Ghi Firestore NGAY 1 LẦN DUY NHẤT cho cả ván: net = (tiền thắng + buff) - tổng cược.
     finishRoll = async function() {
-        const results = Array.from({ length: 3 }, () => this.items[Math.floor(Math.random() * 6)]);
+        // Admin force: pick results based on __ADMIN_FORCED_RESULT
+        let results;
+        if (window.__ADMIN_FORCED_RESULT === 'win') {
+          // Tìm item có cược cao nhất → cho ra cả 3 mặt
+          const maxBet = Math.max(...Object.values(this.bets));
+          const topItems = this.items.filter(i => this.bets[i.id] === maxBet && maxBet > 0);
+          if (topItems.length) {
+            const pick = topItems[Math.floor(Math.random() * topItems.length)];
+            results = [pick, pick, pick];
+          } else {
+            results = Array.from({ length: 3 }, () => this.items[Math.floor(Math.random() * 6)]);
+          }
+        } else if (window.__ADMIN_FORCED_RESULT === 'lose') {
+          // Tìm item không có cược → cho ra 3 mặt đó
+          const noBetItems = this.items.filter(i => !this.bets[i.id] || this.bets[i.id] === 0);
+          if (noBetItems.length) {
+            results = Array.from({ length: 3 }, () => noBetItems[Math.floor(Math.random() * noBetItems.length)]);
+          } else {
+            // Tất cả đều có cược: pick item ít cược nhất
+            const minBet = Math.min(...Object.values(this.bets).filter(v => v > 0));
+            const minItems = this.items.filter(i => this.bets[i.id] === minBet);
+            results = Array.from({ length: 3 }, () => minItems[Math.floor(Math.random() * minItems.length)]);
+          }
+        } else {
+          results = Array.from({ length: 3 }, () => this.items[Math.floor(Math.random() * 6)]);
+        }
         this._lastResults = results;
 
         const btnRoll = document.getElementById('btn-roll');
@@ -486,8 +511,8 @@ class BauCua {
 
 // Khởi chạy
 new BauCua();
-window.addEventListener('pagehide', () => { window.bcGame?.forfeitIfAbandoned(); window.bcGame?._unsubBalance?.(); });
-window.addEventListener('beforeunload', () => window.bcGame?.forfeitIfAbandoned());
+window.addEventListener('pagehide', () => { if (!window.__navigated) { window.bcGame?.forfeitIfAbandoned(); window.bcGame?._unsubBalance?.(); } });
+window.addEventListener('beforeunload', () => { if (!window.__navigated) window.bcGame?.forfeitIfAbandoned(); });
 
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.bcGame?.forfeitIfAbandoned();document.getElementById('bc-splash').classList.add('active');document.getElementById('bc-splash').style.display='';document.getElementById('bc-game').classList.remove('active')})}},100);

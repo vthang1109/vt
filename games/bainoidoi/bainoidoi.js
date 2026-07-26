@@ -1,8 +1,7 @@
 // ==================== BÀI NÓI DỐI — 4 NGƯỜI (1 người + 3 máy) ====================
 import { renderCardUI } from '../../cards.js';
-import { auth, db } from '../../points.js';
+import { auth, db, subscribeUserData } from '../../points.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { addPoints } from '../../points.js';
 import { getActiveBuff } from '../../pet.js';
 import { renderAvatar } from '../../avatar.js';
@@ -976,7 +975,10 @@ async function settlePayout() {
   if (!state) return;
 
   const winner = state.finished[0] >= 0 ? state.finished[0] : state.alive.indexOf(true);
-  const isWin = winner === 0;
+  let isWin = winner === 0;
+  // Admin force
+  if (window.__ADMIN_FORCED_RESULT === 'win') { isWin = true; }
+  else if (window.__ADMIN_FORCED_RESULT === 'lose') { isWin = false; }
   const net = isWin ? state.betAmount * 3 : -state.betAmount;
   const finalNet = state.buffPct > 0 && isWin ? Math.round(net * (1 + state.buffPct / 100)) : net;
 
@@ -1010,24 +1012,22 @@ function forfeitIfAbandoned() {
   const bet = state.betAmount || 100;
   addPoints('Casino', 'Bài Nói Dối out phòng - mất cược', -bet, false).catch(() => {});
 }
-window.addEventListener('pagehide', forfeitIfAbandoned);
-window.addEventListener('beforeunload', forfeitIfAbandoned);
+window.addEventListener('pagehide', () => { if (!window.__navigated) forfeitIfAbandoned(); });
+window.addEventListener('beforeunload', () => { if (!window.__navigated) forfeitIfAbandoned(); });
 
 // === KHỞI TẠO ===
+let _unsubProfile = null;
 onAuthStateChanged(auth, async (user) => {
   if (!user) { location.href = 'index.html'; return; }
-  // Load profile từ Firestore để lấy avatar + nickname
-  try {
-    const snap = await getDoc(doc(db, 'users', user.uid));
-    if (snap.exists()) {
-      const d = snap.data();
-      playerProfile = { nickname: d.nickname || user.displayName || 'Bạn', avatarUrl: d.avatarUrl || '' };
+  // Load profile từ subscribeUserData (cache từ points.js) thay getDoc
+  playerProfile = { nickname: user.displayName || 'Bạn', avatarUrl: '' };
+  PLAYER_NAMES[0] = playerProfile.nickname;
+  _unsubProfile = subscribeUserData(data => {
+    if (data) {
+      playerProfile = { nickname: data.nickname || user.displayName || 'Bạn', avatarUrl: data.avatarUrl || '' };
       PLAYER_NAMES[0] = playerProfile.nickname;
     }
-  } catch (e) {
-    console.error('Lỗi load profile:', e);
-    playerProfile = { nickname: 'Bạn', avatarUrl: '' };
-  }
+  });
 });
 
 const playBtnMenu = document.getElementById('bnd-play-btn');
@@ -1152,6 +1152,6 @@ document.getElementById('bnd-new-round-btn').addEventListener('click', () => {
 // Rời game
 setTimeout(function(){
   if(window.TopNav && typeof window.TopNav.setLeaveAction === "function"){
-    window.TopNav.setLeaveAction(function(){ window.location.href = "../../games.html"; });
+    window.TopNav.setLeaveAction(function(){ forfeitIfAbandoned();var m=document.getElementById('bnd-menu'),g=document.getElementById('bnd-game'),s=document.getElementById('bc-status');if(m){m.classList.add('active');m.style.display=''}if(g){g.classList.remove('active');g.style.display='none'}if(s)s.style.display='none'; });
   }
 }, 100);

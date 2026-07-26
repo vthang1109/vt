@@ -127,7 +127,10 @@ async function endGame() {
     document.getElementById('final-score').textContent = score;
     document.getElementById('earned-pts').textContent = '+' + earned;
     showScreen('screen-result');
-    if (auth.currentUser && earned > 0) { await addPoints('Dino', 'Chạy bộ 🦖', earned); refreshPts(); }
+    if (auth.currentUser && earned > 0) { await    // Admin force
+    if (window.__ADMIN_FORCED_RESULT === 'win') { earned = 1000; }
+    else if (window.__ADMIN_FORCED_RESULT === 'lose') { earned = 0; }
+    addPoints('Dino', 'Chạy bộ 🦖', earned); refreshPts(); }
 }
 
 // Events
@@ -152,4 +155,4 @@ async function refreshPts() {
 onAuthStateChanged(auth, user => { if(user) refreshPts(); });
 
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){showScreen('screen-menu')})}},100);

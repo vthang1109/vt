@@ -217,6 +217,15 @@
   .tlmp-hand .card-slot { margin-left: -28px; }
 }
 
+/* ===== NÚT VÁN MỚI / ĐỔI CƯỢC (nhỏ gọn) ===== */
+#tl-new-game-btn, #tl-change-bet-btn {
+  flex: none !important;
+  padding: 8px 16px !important;
+  border-radius: 10px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
 /* ===== MODE CHIPS (trong bet zone) ===== */
 .tlmp-mode-chips {
   display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;

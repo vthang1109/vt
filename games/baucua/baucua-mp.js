@@ -1,7 +1,9 @@
 // ===== BẦU CUA MULTIPLAYER =====
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, updateDoc, onSnapshot, deleteDoc, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { subscribeUserData } from '../../points.js';
+import { initRoomChat, getMyNickname, showRoomDeletedPopup } from '../../room-chat.js';
 
 const firebaseConfig = { apiKey:"AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY", authDomain:"lienquan-fake.firebaseapp.com", projectId:"lienquan-fake", storageBucket:"lienquan-fake.firebasestorage.app", messagingSenderId:"782694799992", appId:"1:782694799992:web:2d8e4a28626c3bbae8ab8d" };
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
@@ -17,7 +19,7 @@ const SYMBOLS = [
 ];
 
 const ROOM_ID = new URLSearchParams(location.search).get('room');
-let _user = null, _unsub = null;
+let _user = null, _unsub = null, _unsubMe = null;
 let _chip = 500;
 let _myBalance = 0;
 let _settled = false;
@@ -27,37 +29,61 @@ let _myBets = {};
 let _lastProfit = 0;
 let _isProcessingBet = false;
 let _isInitialBalanceSet = false;
+let _cachedRoomData = null;   // cache from onSnapshot
 
 if (!ROOM_ID) document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">⚠️ Thiếu mã phòng.</div>';
 
 onAuthStateChanged(auth, async (u) => {
   if (!u){ location.href='index.html'; return; }
   _user = u;
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(async () => {
+    window.__navigated = true;
+    await window.quitGame?.();
+  });
   buildBoard();
   bindChips();
   
-  const snap = await getDoc(doc(db,'users',_user.uid));
-  if (snap.exists()) {
-    _myBalance = snap.data().points || 0;
-    _isInitialBalanceSet = true;
-    if (window.TopNav) window.TopNav.setPoints(_myBalance);
-  }
+  // Dùng subscribeUserData thay getDoc — chia sẻ listener chung từ points.js
+  _unsubMe = subscribeUserData((data) => {
+    if (data) {
+      _myBalance = data.points || 0;
+      _isInitialBalanceSet = true;
+      if (window.TopNav) window.TopNav.setPoints(_myBalance);
+    }
+  });
   
-  if (ROOM_ID) start();
+  if (ROOM_ID) {
+    start();
+    getMyNickname(db, _user.uid, _user.email).then(myName => {
+      initRoomChat({ db, roomId: ROOM_ID, uid: _user.uid, getName: () => myName });
+    });
+  }
 });
 
+function start(){
+  if (_unsub) _unsub();
+  _unsub = onSnapshot(doc(db,'rooms',ROOM_ID), (snap) => {
+    if (!snap.exists()){ showRoomDeletedPopup(); return; }
+    const r = snap.data();
+    _cachedRoomData = snap;  // cache để dùng trong actions thay getDoc
+    // Bị host kick khỏi phòng → đẩy ra ngoài ngay
+    if (!(r.members||[]).includes(_user.uid)) {
+      window.__navigated = true;
+      if (window.showToast) window.showToast('Bạn đã bị kick khỏi phòng', 'error');
+      setTimeout(() => { location.href = '../../app/rooms.html'; }, 800);
+      return;
+    }
+    const roomCode = r.code || '------';
+    updateNavWithRoom(roomCode);
+    if (r.gameType !== 'baucua') return;
+    if (!r.gameState) return;
+    render(r);
+  });
+}
+
 function updateNavWithRoom(roomCode) {
-  if (!roomCode) return;
-  const logo = document.querySelector('.vt-top-nav .vt-nav-logo');
-  if (!logo) return;
-  let roomEl = logo.querySelector('.vt-room-id');
-  if (!roomEl) {
-    roomEl = document.createElement('span');
-    roomEl.className = 'vt-room-id';
-    logo.innerHTML = '';
-    logo.appendChild(roomEl);
-  }
-  roomEl.innerHTML = `<span class="room-icon">🎲</span> #${roomCode}`;
+  if (!roomCode || !window.TopNav?.setRoomId) return;
+  window.TopNav.setRoomId(roomCode, `<img src="../../assets/icons/baucua.png" style="height:14px;width:14px;vertical-align:middle;border-radius:2px">`);
 }
 
 function buildBoard(){
@@ -87,25 +113,7 @@ function bindChips(){
   });
 }
 
-function start(){
-  if (_unsub) _unsub();
-  _unsub = onSnapshot(doc(db,'rooms',ROOM_ID), (snap) => {
-    if (!snap.exists()){ document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">Phòng đã bị xoá.</div>'; return; }
-    const r = snap.data();
-    // Bị host kick khỏi phòng → đẩy ra ngoài ngay
-    if (!(r.members||[]).includes(_user.uid)) {
-      window.__navigated = true; // chặn quitGame chạy lại ở pagehide
-      if (window.showToast) window.showToast('Bạn đã bị kick khỏi phòng', 'error');
-      setTimeout(() => { location.href = '../../app/rooms.html'; }, 800);
-      return;
-    }
-    const roomCode = r.code || '------';
-    updateNavWithRoom(roomCode);
-    if (r.gameType !== 'baucua') return;
-    if (!r.gameState) return;
-    render(r);
-  });
-}
+
 
 function updateStatusBar(stake, phase, profit) {
   const statusEl = document.getElementById('bc-status');
@@ -289,19 +297,17 @@ async function placeBet(k){
   _isProcessingBet = true;
   
   try {
-    const snap = await getDoc(doc(db,'rooms',ROOM_ID));
-    if (!snap.exists()) { _isProcessingBet = false; return; }
-    const r = snap.data();
+    // Dùng cached room data thay getDoc
+    if (!_cachedRoomData || !_cachedRoomData.exists()) { _isProcessingBet = false; return; }
+    const r = _cachedRoomData.data();
     if (r.gameState?.phase !== 'betting') { _isProcessingBet = false; return; }
     
     const cur = (r.gameState.bets?.[_user.uid]?.[k]) || 0;
     const newBet = cur + _chip;
-    const newBalance = _myBalance - _chip;
-    
-    await updateDoc(doc(db,'users',_user.uid), { points: newBalance });
+    await updateDoc(doc(db,'users',_user.uid), { points: increment(-_chip) });
     await updateDoc(doc(db,'rooms',ROOM_ID), { [`gameState.bets.${_user.uid}.${k}`]: newBet });
     
-    _myBalance = newBalance;
+    _myBalance -= _chip;
     if (window.TopNav) window.TopNav.setPoints(_myBalance);
     if (window.VTQuests) window.VTQuests.trackPlay('baucua');
     
@@ -333,21 +339,18 @@ window.clearMyBets = async function(){
   _isProcessingBet = true;
   
   try {
-    const snap = await getDoc(doc(db,'rooms',ROOM_ID));
-    if (!snap.exists()) { _isProcessingBet = false; return; }
-    const r = snap.data();
+    if (!_cachedRoomData || !_cachedRoomData.exists()) { _isProcessingBet = false; return; }
+    const r = _cachedRoomData.data();
     if (r.gameState?.phase !== 'betting') { _isProcessingBet = false; return; }
     
     const myBets = r.gameState.bets?.[_user.uid] || {};
     const refund = Object.values(myBets).reduce((a,b) => a+b, 0);
     if (refund === 0) { _isProcessingBet = false; return; }
     
-    const newBalance = _myBalance + refund;
-    
-    await updateDoc(doc(db,'users',_user.uid), { points: newBalance });
+    await updateDoc(doc(db,'users',_user.uid), { points: increment(refund) });
     await updateDoc(doc(db,'rooms',ROOM_ID), { [`gameState.bets.${_user.uid}`]: {} });
     
-    _myBalance = newBalance;
+    _myBalance += refund;
     if (window.TopNav) window.TopNav.setPoints(_myBalance);
     
     document.querySelectorAll('.bc-tile').forEach(t => {
@@ -361,9 +364,8 @@ window.clearMyBets = async function(){
 };
 
 window.hostRoll = async function(){
-  const snap = await getDoc(doc(db,'rooms',ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  if (!_cachedRoomData || !_cachedRoomData.exists()) return;
+  const r = _cachedRoomData.data();
   if (r.hostUid !== _user.uid) return;
   if (r.gameState.phase !== 'betting') return;
   
@@ -379,9 +381,8 @@ window.hostRoll = async function(){
 };
 
 window.hostNext = async function(){
-  const snap = await getDoc(doc(db,'rooms',ROOM_ID));
-  if (!snap.exists()) return;
-  const r = snap.data();
+  if (!_cachedRoomData || !_cachedRoomData.exists()) return;
+  const r = _cachedRoomData.data();
   if (r.hostUid !== _user.uid) return;
   await updateDoc(doc(db,'rooms',ROOM_ID), {
     'gameState.phase':'betting',
@@ -414,9 +415,8 @@ async function settleMyResult(gs, counts){
   try {
     if (payout > 0){
       const net = payout - stake;
-      const newBalance = _myBalance + payout;
-      await updateDoc(doc(db,'users',_user.uid), { points: newBalance });
-      _myBalance = newBalance;
+      await updateDoc(doc(db,'users',_user.uid), { points: increment(payout) });
+      _myBalance += payout;
       if (window.TopNav) window.TopNav.setPoints(_myBalance);
       _lastProfit = net;
       if (window.VTQuests && net > 0) window.VTQuests.trackEarn(net);
@@ -429,18 +429,33 @@ async function settleMyResult(gs, counts){
 
 window.quitGame = async function(){
   try {
-    const snap = await getDoc(doc(db,'rooms',ROOM_ID));
-    if (snap.exists()){
-      const r = snap.data();
+    if (_cachedRoomData && _cachedRoomData.exists()) {
+      const r = _cachedRoomData.data();
       if (r.gameState?.phase === 'betting'){
         const myBets = r.gameState.bets?.[_user.uid] || {};
         const refund = Object.values(myBets).reduce((a,b) => a+b, 0);
         if (refund > 0){
-          await updateDoc(doc(db,'users',_user.uid), { points: _myBalance + refund });
+          await updateDoc(doc(db,'users',_user.uid), { points: increment(refund) });
         }
       }
       if (r.hostUid === _user.uid) {
-        await deleteDoc(doc(db,'rooms',ROOM_ID));
+        // Chuyển chủ phòng cho người kế tiếp thay vì xoá phòng
+        const remaining = (r.members || []).filter(u => u !== _user.uid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db,'rooms',ROOM_ID));
+        } else {
+          const newHost = remaining[0];
+          const mi = r.memberInfo||{}; delete mi[_user.uid];
+          const wInfo = { ...(r.waitingMemberInfo || {}) };
+          delete wInfo[_user.uid];
+          await updateDoc(doc(db,'rooms',ROOM_ID), {
+            hostUid: newHost,
+            members: arrayRemove(_user.uid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(_user.uid),
+            waitingMemberInfo: wInfo
+          });
+        }
       } else {
         const remaining = (r.members || []).filter(u => u !== _user.uid);
         if (remaining.length === 0) {
@@ -462,6 +477,6 @@ window.quitGame = async function(){
   location.href='../../app/rooms.html';
 };
 
-window.addEventListener('pagehide', () => window.quitGame?.());
+window.addEventListener('pagehide', () => { if (!window.__navigated) window.quitGame?.(); });
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }

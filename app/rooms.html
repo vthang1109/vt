@@ -35,7 +35,7 @@
     <div class="rooms-toolbar">
       <button class="btn-primary" onclick="openCreateModal()">➕ Tạo phòng mới</button>
       <button class="btn-secondary" onclick="openJoinByCode()">🔑 Vào bằng mã</button>
-      <button class="btn-delete-all" id="btn-delete-all" onclick="deleteAllRooms()" style="display:none">🗑️ Xoá tất cả</button>
+      <button class="btn-delete-all" id="btn-delete-all" onclick="deleteAllRooms()" style="display:none">Xoá tất cả</button>
     </div>
 
     <div class="rooms-section">
@@ -50,8 +50,11 @@
   <div id="lobbyView" class="lobby-page" style="display:none">
     <div class="lobby-card">
       <div class="lobby-head">
-        <button class="lobby-back" onclick="leaveLobby()">← Rời phòng</button>
-        <span class="lobby-code" id="lobby-code">#------</span>
+        <button class="lobby-back" onclick="leaveLobby()">← Quay lại</button>
+        <div class="lobby-head-right">
+          <span class="lobby-code" id="lobby-code">#------</span>
+          <button class="lobby-gear" id="btn-room-settings" onclick="openRoomSettings()" title="Cài đặt phòng">⚙️</button>
+        </div>
       </div>
       <div class="lobby-title-wrap">
         <h2 id="lobby-title">Phòng</h2>
@@ -67,20 +70,12 @@
 
       <div class="lobby-actions">
         <button class="btn-ready" id="btn-ready" onclick="toggleReady()">✅ Sẵn sàng</button>
-        <button class="btn-start" id="btn-start" onclick="startGame()" style="display:none">🚀 Bắt đầu</button>
-        <button class="btn-secondary" id="btn-room-settings" onclick="openRoomSettings()" style="display:none;flex:1">⚙️ Cài đặt</button>
-        <button class="btn-delete" id="btn-delete-room" onclick="deleteRoom()" style="display:none">🗑️ Xoá phòng</button>
+        <button class="btn-start" id="btn-start" onclick="startGame()" style="display:none">Bắt đầu</button>
+        <button class="btn-delete" id="btn-delete-room" onclick="deleteRoom()" style="display:none">Xoá</button>
       </div>
     </div>
 
-    <div class="lobby-chat">
-      <div class="lc-head">💬 Chat trong phòng</div>
-      <div class="lc-msgs" id="lobby-chat-msgs"></div>
-      <div class="lc-input-row">
-        <input id="lobby-chat-input" placeholder="Nhập tin nhắn..." onkeydown="if(event.key==='Enter')sendLobbyChat()"/>
-        <button onclick="sendLobbyChat()">➤</button>
-      </div>
-    </div>
+    <!-- Chat được inject bởi room-chat.js (nút tròn float) -->
   </div>
 
   <!-- ===== CREATE MODAL ===== -->
@@ -107,11 +102,22 @@
   <div id="joinModal" class="modal-overlay" onclick="if(event.target===this)closeJoinModal()">
     <div class="modal-box" style="max-width:380px">
       <div class="modal-header"><span>🔑 Vào bằng mã</span><button class="modal-close" onclick="closeJoinModal()">✕</button></div>
-      <label class="rm-label">Mã phòng (6 ký tự)</label>
-      <input id="jc-code" class="input" maxlength="6" placeholder="VD: 123456" style="font-family:'Science Gothic', sans-serif;letter-spacing:3px;font-size:18px;text-align:center"/>
+      <label class="rm-label">Mã phòng (4 số)</label>
+      <input id="jc-code" class="input" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="VD: 1234" style="font-family:'Science Gothic', sans-serif;letter-spacing:3px;font-size:18px;text-align:center"/>
       <label class="rm-label">Mật khẩu (nếu có)</label>
       <input id="jc-pw" class="input" maxlength="20" placeholder="Để trống nếu phòng không khoá"/>
       <button class="btn-primary" style="width:100%;margin-top:14px" onclick="doJoinByCode()">Vào phòng</button>
+    </div>
+  </div>
+
+  <!-- ===== INFO MODAL (phòng bị xoá / bị kick) ===== -->
+  <div id="infoModal" class="modal-overlay">
+    <div class="modal-box" style="max-width:360px;text-align:center">
+      <div class="modal-header" style="justify-content:center">
+        <span id="infoModalTitle">⚠️ Thông báo</span>
+      </div>
+      <div style="padding:16px 0 8px;font-size:15px;color:#e0f2fe" id="infoModalBody"></div>
+      <button class="btn-primary" style="margin-top:12px;width:100%" onclick="closeInfoModal()">✕ Đóng</button>
     </div>
   </div>
 

@@ -401,4 +401,4 @@ class UongDi {
 
 window.udGame = new UongDi();
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){var c=document.getElementById('ud-card');if(c)c.classList.remove('flipped');var d=document.getElementById('ud-drawn');if(d)d.textContent='0';var t=document.getElementById('ud-type');if(t)t.textContent='--';var tl=document.getElementById('ud-cat-label');if(tl)tl.textContent='';var r=document.getElementById('ud-remaining');if(r)r.textContent='0 lá'}})}},100);

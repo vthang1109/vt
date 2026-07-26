@@ -4,9 +4,10 @@
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { subscribeUserData } from '../../points.js';
 import { createDeck, renderCardUI } from '../../cards.js';
 import { getActiveBuff, getPetById, getTierById } from '../../pet.js';
-import { initRoomChat, getMyNickname } from '../../room-chat.js';
+import { initRoomChat, getMyNickname, showRoomDeletedPopup } from '../../room-chat.js';
 
 const fbConfig = {
   apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -161,13 +162,14 @@ function updateNavRoom(roomCode) {
 onAuthStateChanged(auth, async (u) => {
   if (!u) { location.href = 'index.html'; return; }
   _user = u;
-  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(() => window.quitGame());
-  _unsubMe = onSnapshot(doc(db, 'users', _user.uid), (s) => {
-    if (s.exists()) {
-      _myBalance = s.data().points || 0;
-      _myActivePet = s.data().activePet || null;
-      if (window.TopNav) window.TopNav.setPoints(_myBalance);
-    }
+  if (window.TopNav && window.TopNav.setLeaveAction) window.TopNav.setLeaveAction(async () => {
+    window.__navigated = true;
+    await window.quitGame?.();
+  });
+  _unsubMe = subscribeUserData((data) => {
+    _myBalance = data?.points || 0;
+    _myActivePet = data?.activePet || null;
+    if (window.TopNav) window.TopNav.setPoints(_myBalance);
   });
   if (ROOM_ID) {
     start();
@@ -181,14 +183,14 @@ onAuthStateChanged(auth, async (u) => {
   }
 });
 
-window.addEventListener('pagehide', () => window.quitGame?.());
+window.addEventListener('pagehide', () => { if (!window.__navigated) window.quitGame?.(); });
 
 /* ========== FIREBASE LISTENER ========== */
 function start() {
   if (_unsub) _unsub();
   _unsub = onSnapshot(doc(db, 'rooms', ROOM_ID), (snap) => {
     if (!snap.exists()) {
-      document.body.innerHTML = '<div style="color:#fff;text-align:center;padding:60px">Phòng đã bị xoá.</div>';
+      showRoomDeletedPopup();
       return;
     }
     const r = snap.data();
@@ -957,7 +959,24 @@ window.quitGame = async function() {
         await updateDoc(doc(db, 'users', _user.uid), { points: increment(-myBet) });
       }
       if (r.hostUid === _user.uid) {
-        await deleteDoc(doc(db, 'rooms', ROOM_ID));
+        // Chuyển chủ phòng cho người kế tiếp thay vì xoá phòng
+        const remaining = (r.members || []).filter(u => u !== _user.uid);
+        if (remaining.length === 0) {
+          await deleteDoc(doc(db, 'rooms', ROOM_ID));
+        } else {
+          const newHost = remaining[0];
+          const mi = r.memberInfo || {};
+          delete mi[_user.uid];
+          const wInfo = { ...(r.waitingMemberInfo || {}) };
+          delete wInfo[_user.uid];
+          await updateDoc(doc(db, 'rooms', ROOM_ID), {
+            hostUid: newHost,
+            members: arrayRemove(_user.uid),
+            memberInfo: mi,
+            waitingMembers: arrayRemove(_user.uid),
+            waitingMemberInfo: wInfo
+          });
+        }
       } else {
         const remaining = (r.members || []).filter(u => u !== _user.uid);
         if (remaining.length === 0) {

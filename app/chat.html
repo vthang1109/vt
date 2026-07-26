@@ -97,9 +97,16 @@
         <span class="cw-name" id="chatWinName">Chat toàn server</span>
         <span class="cw-status">● Online</span>
       </div>
-      <!-- Thêm nút xoá tất cả tin nhắn -->
-      <button id="clearMessagesBtn" class="cw-clear-btn" style="display:none; background:none; border:none; color:#f87171; cursor:pointer; font-size:18px; padding:0 6px;" title="Xoá tất cả tin nhắn">🗑</button>
-      <button id="sendPointsBtn" class="cw-pts-btn" onclick="sendPointsToCurrent()" style="display:none">💸 Gửi điểm</button>
+      <!-- Settings gear (theme + xoá + gửi điểm) -->
+      <div style="position:relative; flex-shrink:0;">
+        <button id="settingsBtn" class="settings-btn" onclick="toggleSettingsDropdown()" title="Cài đặt">⚙️</button>
+        <div id="settingsDropdown" class="settings-dropdown">
+          <button class="sd-option" id="sd-theme-btn" onclick="openThemePopup()">🎨 Giao diện</button>
+          <div class="sd-divider"></div>
+          <button class="sd-option danger" id="sd-clear-msgs" onclick="clearCurrentMessages()">🗑 Xoá tin nhắn</button>
+          <button class="sd-option gold" id="sd-send-points" onclick="sendPointsToCurrent()">💸 Gửi điểm</button>
+        </div>
+      </div>
     </div>
 
     <!-- Messages -->
@@ -118,13 +125,139 @@
     </div>
   </div>
 
+  <!-- THEME POPUP MODAL -->
+  <div id="themePopupOverlay" class="tp-overlay" onclick="closeThemePopup()">
+    <div class="tp-modal" onclick="event.stopPropagation()">
+      <div class="tp-header">
+        <span class="tp-title">🎨 Chọn giao diện</span>
+        <button class="tp-close" onclick="closeThemePopup()">✕</button>
+      </div>
+      <div class="tp-grid">
+        <button class="tp-theme" data-theme-val="blue" onclick="setChatTheme('blue')">
+          <span class="tp-dot tp-dot-blue"></span>
+          <span class="tp-name">Neon Xanh</span>
+        </button>
+        <button class="tp-theme" data-theme-val="pink" onclick="setChatTheme('pink')">
+          <span class="tp-dot tp-dot-pink"></span>
+          <span class="tp-name">Hồng Ngọc</span>
+        </button>
+        <button class="tp-theme" data-theme-val="purple" onclick="setChatTheme('purple')">
+          <span class="tp-dot tp-dot-purple"></span>
+          <span class="tp-name">Tím Huyền</span>
+        </button>
+        <button class="tp-theme" data-theme-val="green" onclick="setChatTheme('green')">
+          <span class="tp-dot tp-dot-green"></span>
+          <span class="tp-name">Xanh Lá</span>
+        </button>
+        <button class="tp-theme" data-theme-val="orange" onclick="setChatTheme('orange')">
+          <span class="tp-dot tp-dot-orange"></span>
+          <span class="tp-name">Cam Lửa</span>
+        </button>
+        <button class="tp-theme" data-theme-val="dark" onclick="setChatTheme('dark')">
+          <span class="tp-dot tp-dot-dark"></span>
+          <span class="tp-name">Tối Đen</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div><!-- end chat-layout -->
 <!-- Scripts -->
 <script type="module" src="chat.js"></script>
-<script type="module" src="../send-points.js"></script>
-<script>
-  // Sidebar tab switch
-  window.sidebarTab = function(tab) {
+<script type="module" src="../send-points.js"></script>  <script>
+    // ===== SETTINGS DROPDOWN =====
+    window.toggleSettingsDropdown = function() {
+      document.getElementById('settingsDropdown').classList.toggle('open');
+      document.getElementById('settingsBtn').classList.toggle('open');
+    };
+
+    // ===== THEME POPUP =====
+    window.openThemePopup = function() {
+      document.getElementById('themePopupOverlay').classList.add('open');
+      document.getElementById('settingsDropdown').classList.remove('open');
+      document.getElementById('settingsBtn').classList.remove('open');
+      // Cập nhật active state trong popup
+      const active = localStorage.getItem('vt_chat_theme') || 'blue';
+      document.querySelectorAll('#themePopupOverlay .tp-theme').forEach(o => {
+        o.classList.toggle('active', o.dataset.themeVal === active);
+      });
+    };
+    window.closeThemePopup = function() {
+      document.getElementById('themePopupOverlay').classList.remove('open');
+    };
+    // Đóng popup bằng Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const ov = document.getElementById('themePopupOverlay');
+        if (ov && ov.classList.contains('open')) ov.classList.remove('open');
+      }
+    });
+
+    window.setChatTheme = function(themeId) {
+      // Lưu vào localStorage
+      localStorage.setItem('vt_chat_theme', themeId);
+      // Áp dụng theme cho CHAT WINDOW — không ảnh hưởng sidebar/tabs
+      const cw = document.getElementById('chatWindow');
+      if (cw) {
+        ['blue','pink','purple','green','orange','dark'].forEach(t => cw.classList.remove('cw-theme-' + t));
+        cw.classList.add('cw-theme-' + themeId);
+      }
+      // Đóng dropdown & popup
+      document.getElementById('settingsDropdown')?.classList.remove('open');
+      document.getElementById('settingsBtn')?.classList.remove('open');
+      document.getElementById('themePopupOverlay')?.classList.remove('open');
+      // Cập nhật active state trong popup
+      document.querySelectorAll('#themePopupOverlay .tp-theme').forEach(o => {
+        o.classList.toggle('active', o.dataset.themeVal === themeId);
+      });
+      // Đổi màu particles
+      const colors = {
+        blue:   { p: 'rgba(56,189,248,0.5)', lRgb: '56,189,248', lAlpha: 0.07 },
+        pink:   { p: 'rgba(232,67,147,0.4)', lRgb: '232,67,147', lAlpha: 0.06 },
+        purple: { p: 'rgba(167,139,250,0.4)', lRgb: '167,139,250', lAlpha: 0.06 },
+        green:  { p: 'rgba(16,185,129,0.4)', lRgb: '16,185,129', lAlpha: 0.06 },
+        orange: { p: 'rgba(249,115,22,0.4)', lRgb: '249,115,22', lAlpha: 0.06 },
+        dark:   { p: 'rgba(148,163,184,0.3)', lRgb: '148,163,184', lAlpha: 0.04 }
+      };
+      if (!window.__vtParticleColors) {
+        window.__vtParticleColors = {};
+      }
+      const c = colors[themeId] || colors.blue;
+      window.__vtParticleColors.p = c.p;
+      window.__vtParticleColors.lRgb = c.lRgb;
+      window.__vtParticleColors.lAlpha = c.lAlpha;
+      // Lưu lên Firestore (đồng bộ giữa các thiết bị)
+      if (window.saveChatThemeToFirestore) {
+        window.saveChatThemeToFirestore(themeId);
+      }
+    };
+    // Đóng dropdown khi click ra ngoài
+    document.addEventListener('click', function(e) {
+      const dd = document.getElementById('settingsDropdown');
+      const btn = document.getElementById('settingsBtn');
+      if (dd && btn && !dd.contains(e.target) && !btn.contains(e.target)) {
+        dd.classList.remove('open');
+        btn.classList.remove('open');
+      }
+    });
+
+    // Khôi phục theme đã lưu (dùng setChatTheme để đồng bộ cả particles + chat window)
+    (function initTheme() {
+      const saved = localStorage.getItem('vt_chat_theme') || 'blue';
+      if (typeof window.setChatTheme === 'function') {
+        window.setChatTheme(saved);
+      } else {
+        // Fallback: apply lớp theme trực tiếp lên chat window
+        const cw = document.getElementById('chatWindow');
+        if (cw) cw.classList.add('cw-theme-' + saved);
+        setTimeout(() => {
+          if (typeof window.setChatTheme === 'function') window.setChatTheme(saved);
+        }, 200);
+      }
+    })();
+
+    // Sidebar tab switch
+    window.sidebarTab = function(tab) {
     document.querySelectorAll('.stab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
     document.querySelectorAll('.sidebar-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
     if (tab === 'friends') {
@@ -174,7 +307,7 @@
     window.openSendPointsModal && window.openSendPointsModal(uid, name);
   };
 
-  // Patch openConvo → mobile slide + nút gửi điểm
+  // Patch openConvo → mobile slide + show/hide settings options
   (function() {
     const tryPatch = setInterval(() => {
       if (typeof window.openConvo === 'function' && !window.openConvo.__patched) {
@@ -189,11 +322,12 @@
             document.getElementById('chatWindow').classList.add('cw-active');
             document.getElementById('cwBack').style.display = 'flex';
           }
-          // Nút gửi điểm và xoá tin nhắn
-          const btn = document.getElementById('sendPointsBtn');
-          const clearBtn = document.getElementById('clearMessagesBtn');
-          if (btn) btn.style.display = window.currentConvoUid ? 'inline-flex' : 'none';
-          if (clearBtn) clearBtn.style.display = window.currentConvoUid ? 'inline-block' : 'none';
+          // Show/hide options trong settings dropdown
+          const sdClear = document.getElementById('sd-clear-msgs');
+          const sdPoints = document.getElementById('sd-send-points');
+          const isDm = !!window.currentConvoUid;
+          if (sdClear) sdClear.classList.toggle('hidden', !isDm);
+          if (sdPoints) sdPoints.classList.toggle('hidden', !isDm);
           return r;
         };
         window.openConvo.__patched = true;

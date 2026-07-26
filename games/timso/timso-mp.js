@@ -4,6 +4,7 @@ import {
   doc, getDoc, updateDoc, onSnapshot, deleteDoc, arrayRemove, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { initRoomChat, getMyNickname } from '../../room-chat.js';
 
 // === STATE ===
 var roomId = null, roomData = null, myUid = null, myName = 'Bạn', myPts = 0;
@@ -37,11 +38,14 @@ onAuthStateChanged(auth, async function(user){
   var params=new URLSearchParams(window.location.search);
   roomId=params.get('room');
   if(!roomId){var a=$('mp-app');if(a)a.innerHTML='<p style="color:#fff;text-align:center;padding:60px">Thiếu mã phòng</p>';return}
-  if(window.TopNav&&window.TopNav.setLeaveAction)window.TopNav.setLeaveAction(function(){window.quitGame()});
+  if(window.TopNav&&window.TopNav.setLeaveAction)window.TopNav.setLeaveAction(async function(){window.__navigated=true;await window.quitGame?.()});
   listen();
+  getMyNickname(db, myUid, user.email).then(function(nm){
+    initRoomChat({db:db, roomId:roomId, uid:myUid, getName:function(){return nm}});
+  });
 });
 
-window.addEventListener('pagehide',function(){if(window.quitGame)window.quitGame()});
+window.addEventListener('pagehide',function(){if(!window.__navigated&&window.quitGame)window.quitGame()});
 
 // === LISTEN ===
 function listen(){
@@ -57,7 +61,7 @@ function listen(){
 function render(){
   if(!roomData)return;
   var r=roomData, mem=r.members||[], mInfo=r.memberInfo||{}, gs=r.gameState||{}, phase=gs.phase||'lobby', isHost=r.hostUid===myUid;
-  if(window.TopNav&&window.TopNav.setRoomId&&r.code)window.TopNav.setRoomId(r.code,'🔢');
+  if(window.TopNav&&window.TopNav.setRoomId&&r.code)window.TopNav.setRoomId(r.code,'<span class="material-symbols-outlined" style="font-size:14px;line-height:1;vertical-align:middle">search</span>');
   p1Uid=mem[0]||null; p2Uid=mem[1]||null;
 
   // === WAITING ===
@@ -453,7 +457,15 @@ window.quitGame=async function(){
     var snap=await getDoc(doc(db,'rooms',roomId));
     if(snap.exists()){
       var r=snap.data();
-      if(r.hostUid===myUid){await deleteDoc(doc(db,'rooms',roomId))}else{
+      if(r.hostUid===myUid){
+        // Chuyển chủ phòng cho người kế tiếp thay vì xoá phòng
+        var rem=(r.members||[]).filter(function(u){return u!==myUid});
+        if(rem.length===0){await deleteDoc(doc(db,'rooms',roomId))}else{
+          var newHost=rem[0];
+          var mi=Object.assign({},r.memberInfo||{}); delete mi[myUid];
+          await updateDoc(doc(db,'rooms',roomId),{hostUid:newHost,members:arrayRemove(myUid),memberInfo:mi})
+        }
+      }else{
         var rem=(r.members||[]).filter(function(u){return u!==myUid});
         if(rem.length===0){await deleteDoc(doc(db,'rooms',roomId))}else{
           var mi=Object.assign({},r.memberInfo||{}); delete mi[myUid];

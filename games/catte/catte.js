@@ -738,7 +738,10 @@ async function settlePayout() {
   const net = currentNet;
   try {
     if (net !== 0) {
-      await addPoints('Casino', net > 0 ? 'Thắng Cát Tê' : 'Thua Cát Tê', net, false);
+      // Admin force
+    if (window.__ADMIN_FORCED_RESULT === 'win') { net = Math.abs(state.bet || 100); }
+    else if (window.__ADMIN_FORCED_RESULT === 'lose') { net = -Math.abs(state.bet || 100); }
+    await addPoints('Casino', net > 0 ? 'Thắng Cát Tê' : 'Thua Cát Tê', net, false);
     }
   } catch (e) {
     console.error(e);
@@ -751,8 +754,8 @@ function forfeitIfAbandoned() {
   const bet = state.bet || 100;
   addPoints('Casino', 'Cát Tê out - mất cược', -bet, false).catch(() => {});
 }
-window.addEventListener('pagehide', forfeitIfAbandoned);
-window.addEventListener('beforeunload', forfeitIfAbandoned);
+window.addEventListener('pagehide', () => { if (!window.__navigated) forfeitIfAbandoned(); });
+window.addEventListener('beforeunload', () => { if (!window.__navigated) forfeitIfAbandoned(); });
 
 // ── ACTION HANDLERS ──
 function afterPlayerAction() {
@@ -829,4 +832,4 @@ foldBtn.addEventListener('click', () => {
   afterPlayerAction();
 });
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){forfeitIfAbandoned();var m=document.getElementById('ct-menu'),g=document.getElementById('ct-game');if(m){m.classList.add('active');m.style.display=''}if(g){g.classList.remove('active');g.style.display='none'}})}},100);

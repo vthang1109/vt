@@ -197,6 +197,9 @@ class Poker {
     if (ph.rank > ah.rank) winner = 'player';
     else if (ah.rank > ph.rank) winner = 'ai';
     else winner = 'draw';
+    // Admin force
+    if (window.__ADMIN_FORCED_RESULT === 'win') winner = 'player';
+    else if (window.__ADMIN_FORCED_RESULT === 'lose') winner = 'ai';
     this._cachedWinner = winner;
     
     this.pkInfo(`Bạn: <strong>${ph.name}</strong> | Máy: <strong>${ah.name}</strong>`);
@@ -394,8 +397,8 @@ class Poker {
 }
 
 new Poker();
-window.addEventListener('pagehide', () => { window.game?.forfeitIfAbandoned(); window.game?.unsubBalance?.(); });
-window.addEventListener('beforeunload', () => window.game?.forfeitIfAbandoned());
+window.addEventListener('pagehide', () => { if (!window.__navigated) { window.game?.forfeitIfAbandoned(); window.game?.unsubBalance?.(); } });
+window.addEventListener('beforeunload', () => { if (!window.__navigated) window.game?.forfeitIfAbandoned(); });
 
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.game?.forfeitIfAbandoned();document.getElementById('pk-menu').classList.add('active');document.getElementById('pk-menu').style.display='';document.getElementById('pk-game-screen').classList.remove('active');document.getElementById('pk-game-screen').style.display='none'})}},100);

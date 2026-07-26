@@ -553,7 +553,10 @@ class XiDach {
     async endPlayerMode() {
         const dStat = this.getHandStatus(this.dealer.hand);
         const pStat = this.getHandStatus(this.players[0].hand);
-        const { res, delta } = this.resolveOne(pStat, dStat, this.currentBet);
+        let { res, delta } = this.resolveOne(pStat, dStat, this.currentBet);
+        // Admin force
+        if (window.__ADMIN_FORCED_RESULT === 'win') { res = 'THẮNG'; delta = this.currentBet * 2; }
+        else if (window.__ADMIN_FORCED_RESULT === 'lose') { res = 'THUA'; delta = 0; }
 
         this.players[0].result = res;
         if (!this.dealerResult) {
@@ -635,6 +638,9 @@ class XiDach {
                     }
                 } catch {}
             }
+            // Admin force
+            if (window.__ADMIN_FORCED_RESULT === 'win') { dealerNet = Math.abs(this.currentBet) * this.botPlayers.length; totalNet = dealerNet; this.dealerResult = 'THẮNG'; }
+            else if (window.__ADMIN_FORCED_RESULT === 'lose') { dealerNet = -Math.abs(this.currentBet) * this.botPlayers.length; totalNet = dealerNet; this.dealerResult = 'THUA'; }
             try {
                 await addPoints('Casino', dealerNet > 0 ? 'Thắng Xì Dách (Cầm cái)' : 'Thua Xì Dách (Cầm cái)', totalNet, false);
             } catch(e){}
@@ -824,5 +830,5 @@ class XiDach {
 }
 
 new XiDach();
-window.addEventListener('pagehide', () => window.game?.forfeitIfAbandoned());
-window.addEventListener('beforeunload', () => window.game?.forfeitIfAbandoned());
+window.addEventListener('pagehide', () => { if (!window.__navigated) window.game?.forfeitIfAbandoned(); });
+window.addEventListener('beforeunload', () => { if (!window.__navigated) window.game?.forfeitIfAbandoned(); });

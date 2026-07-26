@@ -889,4 +889,4 @@ class FruitSlash {
 
 new FruitSlash();
 // Rời game
-setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){window.location.href="../../games.html"})}},100);
+setTimeout(function(){if(window.TopNav&&typeof window.TopNav.setLeaveAction==="function"){window.TopNav.setLeaveAction(function(){var o=document.getElementById('fs-overlay'),r=document.getElementById('fs-result'),c=document.getElementById('fs-canvas');if(o)o.style.display='flex';if(r)r.style.display='none';if(c)c.style.display='none';var sc=document.getElementById('fs-score');if(sc)sc.textContent='0';var su=document.getElementById('fs-sub');if(su)su.textContent='Sẵn sàng';var p=document.getElementById('fs-profit');if(p){p.textContent='+0';p.className='stat-profit zero'}var h=document.getElementById('fs-highscore');if(h)h.textContent='🏆 0';var com=document.getElementById('fs-combo');if(com)com.textContent='🔥 x1'})}},100);

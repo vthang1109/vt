@@ -116,7 +116,7 @@ const G2048 = {
     if (window.TopNav && typeof window.TopNav.setLeaveAction === 'function') {
       window.TopNav.setLeaveAction(() => {
         this.stopTimer();
-        window.location.href = '../../games.html';
+        this.showMenu();
       });
     }
 

@@ -100,7 +100,7 @@ async function getFriendStatus(myUid, otherUid) {
 
 async function sendFriendRequest(uid) {
   const myUid = _getMyUid();
-  await setDoc(doc(_db, 'friendRequests', uid, 'requests', myUid), { fromUid: myUid, createdAt: serverTimestamp() });
+  await setDoc(doc(_db, 'friendRequests', uid, 'requests', myUid), { fromUid: myUid, toUid: uid, createdAt: serverTimestamp() });
   window.showToast ? window.showToast('Đã gửi lời mời kết bạn', 'success') : null;
   showProfileCard(uid);
 }

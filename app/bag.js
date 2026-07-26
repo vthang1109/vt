@@ -1,9 +1,9 @@
 // bag.js – Túi đồ: Pet, Vật phẩm
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import {
-  getPetById, disassemblePet, redeemShard,
+import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { subscribeUserData } from '../points.js';
+import { getPetById, disassemblePet, redeemShard,
   PET_POOL, SHARD_COST
 } from '../pet.js';
 import { getOwnedTitles, getTitleById } from '../titles.js';
@@ -48,9 +48,8 @@ onAuthStateChanged(auth, user => {
   if (!user) { location.href = 'index.html'; return; }
   currentUser = user;
 
-  onSnapshot(doc(db, 'users', user.uid), snap => {
-    if (!snap.exists()) return;
-    const d = snap.data();
+  subscribeUserData(d => {
+    if (!d) return;
 
     // Điểm top-nav
     if (window.TopNav?.setPoints) TopNav.setPoints(d.points || 0);

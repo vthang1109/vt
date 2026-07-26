@@ -11,6 +11,10 @@
   <link rel="stylesheet" href="../../status-bar.css"/>
   <link rel="stylesheet" href="catte.css"/>
   <link rel="stylesheet" href="catte-mp.css"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <style>
+    .material-symbols-outlined { font-size:inherit; line-height:1; vertical-align:middle; }
+  </style>
   <style>
     .tlmp-waiting-list {
       position:absolute;bottom:8px;right:8px;
@@ -27,6 +31,7 @@
   </style>
   <script src="../../top-nav.js"></script>
   <script src="../../bottom-nav.js"></script>
+  <script src="../../admin-toggle.js"></script>
   <script type="module" src="../../quests.js"></script>
 </head>
 <body data-bottom-nav="games">
@@ -92,7 +97,7 @@
 
       <!-- GHẾ CHỜ -->
       <div id="ctmp-waiting-list" class="tlmp-waiting-list" style="display:none">
-        <div class="tlmp-waiting-title">⏳ Ghế chờ</div>
+        <div class="tlmp-waiting-title"><span class="material-symbols-outlined" style="font-size:11px;line-height:1;vertical-align:middle">hourglass_empty</span> Ghế chờ</div>
         <div class="tlmp-waiting-names" id="ctmp-waiting-names"></div>
       </div>
 
