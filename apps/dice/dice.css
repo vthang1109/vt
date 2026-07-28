@@ -1,0 +1,220 @@
+/* ===== DICE APP ===== */
+.dice-page {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 16px 80px;
+}
+
+.dice-hero {
+  text-align: center;
+  padding: 32px 20px 24px;
+  animation: fadeUp 0.7s both;
+}
+.dice-hero h1 {
+  font-family: 'Science Gothic', sans-serif;
+  font-size: clamp(28px, 7vw, 42px);
+  font-weight: 500;
+  color: #e0f2fe;
+  margin-bottom: 6px;
+}
+.dice-hero h1 span { color: #fbbf24; text-shadow: 0 0 30px rgba(251,191,36,0.5); }
+.dice-hero p { color: #7dd3fc; font-size: 13px; font-weight: 600; }
+
+/* Status bar */
+.dice-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 16px;
+  background: rgba(15,23,42,0.7);
+  border: 1px solid rgba(251,191,36,0.2);
+  margin-bottom: 24px;
+  animation: fadeUp 0.7s 0.1s both;
+}
+
+/* Dice area */
+.dice-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  animation: fadeUp 0.7s 0.15s both;
+}
+.dice-container {
+  display: flex;
+  gap: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+.dice-face {
+  width: 100px;
+  height: 100px;
+  background: #fff;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 900;
+  color: #1e293b;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 -2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.15s;
+}
+.dice-face.rolling {
+  animation: diceRoll 0.1s infinite;
+}
+@keyframes diceRoll {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(5deg) scale(1.05); }
+  50% { transform: rotate(0deg) scale(1); }
+  75% { transform: rotate(-5deg) scale(1.05); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+.dice-face.result-anim {
+  animation: diceResult 0.4s ease;
+}
+@keyframes diceResult {
+  0% { transform: scale(0.5) rotate(-180deg); opacity: 0; }
+  50% { transform: scale(1.15) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.dice-hint {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Modes */
+.dice-modes {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+  animation: fadeUp 0.7s 0.2s both;
+}
+.dice-mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(251,191,36,0.12);
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: 'Science Gothic', sans-serif;
+  min-width: 90px;
+}
+.dice-mode-btn:hover {
+  border-color: rgba(251,191,36,0.4);
+  background: rgba(251,191,36,0.05);
+}
+.dice-mode-btn.active {
+  border-color: #fbbf24;
+  background: rgba(251,191,36,0.1);
+  color: #fbbf24;
+  box-shadow: 0 0 20px rgba(251,191,36,0.15);
+}
+.dm-icon { font-size: 24px; }
+.dm-name { font-size: 12px; font-weight: 700; }
+
+/* Guess section */
+.dice-guess {
+  animation: fadeUp 0.3s ease both;
+  margin-bottom: 24px;
+}
+.dg-label {
+  text-align: center;
+  color: #7dd3fc;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.dg-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.dg-btn {
+  padding: 12px 8px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(56,189,248,0.15);
+  color: #e0f2fe;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Science Gothic', sans-serif;
+}
+.dg-btn:hover {
+  border-color: rgba(56,189,248,0.5);
+  background: rgba(56,189,248,0.1);
+  transform: translateY(-2px);
+}
+
+/* History */
+.dice-history {
+  animation: fadeUp 0.7s 0.25s both;
+}
+.dh-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #64748b;
+}
+.dh-clear {
+  background: none;
+  border: none;
+  color: #f87171;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Science Gothic', sans-serif;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.dh-clear:hover { background: rgba(248,113,113,0.1); }
+.dh-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.dh-empty {
+  color: #64748b;
+  font-size: 13px;
+  text-align: center;
+  padding: 16px;
+}
+.dh-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  font-size: 13px;
+  color: #cbd5e1;
+}
+.dh-item .dh-num { color: #64748b; font-size: 11px; }
+.dh-item .dh-result { font-weight: 800; }
+.dh-item .dh-guess { color: #7dd3fc; font-size: 11px; }
+
+/* Responsive */
+@media (max-width: 500px) {
+  .dice-face { width: 80px; height: 80px; font-size: 38px; }
+  .dg-grid { grid-template-columns: repeat(4, 1fr); }
+}

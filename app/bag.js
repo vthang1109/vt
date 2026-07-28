@@ -69,7 +69,37 @@ onAuthStateChanged(auth, user => {
     // Danh hiệu
     myPoints = d.points || 0;
     myFriendsCount = (d.friends || []).length;
-    myOwnedTitles = getOwnedTitles({ points: myPoints, friends: myFriendsCount }, d.ownedTitles || []);
+    const petCol = d.petCollection || {};
+    const petCount = Object.values(petCol).reduce((sum, q) => sum + (q || 0), 0);
+    const streak = d.streak || {};
+    const ownedShopIds = d.ownedTitles || [];
+    const us = d.stats || {};
+    const stats = {
+      points: myPoints,
+      friends: myFriendsCount,
+      petsOwned: petCount,
+      streakCurrent: streak.current || 0,
+      titlesOwned: ownedShopIds.length,
+      hasNickname: !!(d.nickname),
+      hasAvatar: !!d.avatarUrl,
+      gamesPlayed: us.gamesPlayed || 0,
+      uniqueGamesPlayed: us.uniqueGamesPlayed || 0,
+      chessGamesPlayed: us.chessGamesPlayed || 0,
+      cardGamesPlayed: us.cardGamesPlayed || 0,
+      smartGamesPlayed: us.smartGamesPlayed || 0,
+      xidachWins: us.xidachWins || 0,
+      xidachSpecials: us.xidachSpecials || 0,
+      casinoGamesPlayed: us.casinoGamesPlayed || 0,
+      slotGamesPlayed: us.slotGamesPlayed || 0,
+      slotWins: us.slotWins || 0,
+      baucuaGamesPlayed: us.baucuaGamesPlayed || 0,
+      baucuaWins: us.baucuaWins || 0,
+      taixiuGamesPlayed: us.taixiuGamesPlayed || 0,
+      taixiuWins: us.taixiuWins || 0,
+      casinoWins: us.casinoWins || 0,
+      totalWins: us.totalWins || 0,
+    };
+    myOwnedTitles = getOwnedTitles(stats, ownedShopIds);
     const [t1, t2] = parseActiveTitles(d.activeTitle);
     myActiveTitleIds = [t1, t2];
     renderTitles();

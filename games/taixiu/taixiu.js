@@ -230,9 +230,19 @@ class TaiXiu {
 
     // Ghi Firestore NGAY 1 LẦN DUY NHẤT cho cả ván: net = (tiền thắng + buff) - tổng cược.
     async finishRoll() {
-        let diceValues = [Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1];
-        let total = diceValues.reduce((a,b)=>a+b);
-        let result = total >= 11 ? 'tai' : 'xiu';
+        // Game Hack force (chọn kết quả từ admin)
+        let diceValues, total, result;
+        if (this._adminForcedRoll) {
+          const f = this._adminForcedRoll;
+          this._adminForcedRoll = null;
+          diceValues = f.values;
+          total = f.total;
+          result = f.result;
+        } else {
+          diceValues = [Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1];
+          total = diceValues.reduce((a,b)=>a+b);
+          result = total >= 11 ? 'tai' : 'xiu';
+        }
         // Admin force
         if (window.__ADMIN_FORCED_RESULT === 'win') {
           if (this.bets.tai > 0 && this.bets.xiu === 0) result = 'tai';
@@ -294,7 +304,10 @@ class TaiXiu {
 
         if (window.VTQuests) {
             window.VTQuests.trackPlay('taixiu');
-            if (net > 0) window.VTQuests.trackEarn(net);
+            if (net > 0) {
+                window.VTQuests.trackEarn(net);
+                window.VTQuests.trackGameWin('taixiu');
+            }
         }
 
         this.isRolling = false;
@@ -312,6 +325,107 @@ class TaiXiu {
 }
 
 new TaiXiu();
+
+// ── ADMIN HACK: CHỌN KẾT QUẢ ────────────────────────────
+if (window.__ADMIN_GAME_HACKS) {
+  window.__ADMIN_GAME_HACKS.push({
+    id: 'taixiu_choose_result',
+    label: 'Chọn kết quả',
+    icon: '⚀',
+    render: (container, closeModal) => {
+      container.innerHTML = `
+        <p style="color:#94a3b8;font-size:12px;margin-bottom:10px;">Chọn kết quả cho ván lắc</p>
+        <div id="txHackStatus" style="color:#34d399;font-size:12px;font-weight:700;margin-bottom:8px;min-height:18px;"></div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-bottom:14px;">
+          <button id="txHackTai" style="
+            flex:1;padding:20px;border-radius:14px;border:2px solid rgba(239,68,68,0.3);
+            background:rgba(239,68,68,0.08);color:#f87171;font-size:18px;font-weight:700;
+            cursor:pointer;transition:all 0.2s;font-family:'Nunito',sans-serif;
+          " onmouseover="this.style.borderColor='rgba(239,68,68,0.6)';this.style.background='rgba(239,68,68,0.15)'"
+             onmouseout="this.style.borderColor='rgba(239,68,68,0.3)';this.style.background='rgba(239,68,68,0.08)'">🔴 TÀI<br><span style="font-size:12px;color:#fca5a5">11-18 điểm</span></button>
+          <button id="txHackXiu" style="
+            flex:1;padding:20px;border-radius:14px;border:2px solid rgba(56,189,248,0.3);
+            background:rgba(56,189,248,0.08);color:#38bdf8;font-size:18px;font-weight:700;
+            cursor:pointer;transition:all 0.2s;font-family:'Nunito',sans-serif;
+          " onmouseover="this.style.borderColor='rgba(56,189,248,0.6)';this.style.background='rgba(56,189,248,0.15)'"
+             onmouseout="this.style.borderColor='rgba(56,189,248,0.3)';this.style.background='rgba(56,189,248,0.08)'">🔵 XỈU<br><span style="font-size:12px;color:#7dd3fc">3-10 điểm</span></button>
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11px;color:#64748b;margin-bottom:6px;">Hoặc nhập tổng điểm cụ thể (3-18):</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input id="txHackTotal" type="number" min="3" max="18" value="11" style="
+              width:80px;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);
+              background:rgba(0,0,0,0.3);color:#e0f2fe;font-size:16px;text-align:center;outline:none;
+            ">
+            <button id="txHackSetTotal" class="green">🎯 Set tổng</button>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+            ${[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18].map(n => `
+              <button class="txHackNum" data-n="${n}" style="
+                width:32px;height:32px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);
+                background:rgba(255,255,255,0.03);color:#94a3b8;font-size:11px;font-weight:600;
+                cursor:pointer;transition:all 0.15s;
+              " onmouseover="this.style.borderColor='rgba(56,189,248,0.3)';this.style.background='rgba(56,189,248,0.08)'"
+                 onmouseout="this.style.borderColor='rgba(255,255,255,0.06)';this.style.background='rgba(255,255,255,0.03)'">${n}</button>
+            `).join('')}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button id="txHackClose" style="flex:1;background:rgba(148,163,184,0.1);color:#94a3b8;border-color:rgba(148,163,184,0.2);">✕ Đóng</button>
+        </div>
+      `;
+
+      const status = document.getElementById('txHackStatus');
+
+      document.getElementById('txHackTai')?.addEventListener('click', () => {
+        const g = window.txGame;
+        if (!g) { if (status) status.textContent = '❌ Game chưa sẵn sàng'; return; }
+        g._adminForcedRoll = { result: 'tai', values: [6,6,6], total: 18 };
+        if (status) status.textContent = '✅ Kết quả: 🔴 TÀI (6+6+6 = 18)'; status.style.color = '#f87171';
+      });
+
+      document.getElementById('txHackXiu')?.addEventListener('click', () => {
+        const g = window.txGame;
+        if (!g) { if (status) status.textContent = '❌ Game chưa sẵn sàng'; return; }
+        g._adminForcedRoll = { result: 'xiu', values: [1,1,1], total: 3 };
+        if (status) status.textContent = '✅ Kết quả: 🔵 XỈU (1+1+1 = 3)'; status.style.color = '#38bdf8';
+      });
+
+      document.getElementById('txHackSetTotal')?.addEventListener('click', () => {
+        const input = document.getElementById('txHackTotal');
+        const total = parseInt(input?.value);
+        if (isNaN(total) || total < 3 || total > 18) { if (status) status.textContent = '⚠️ Nhập số từ 3-18'; return; }
+        const g = window.txGame;
+        if (!g) { if (status) status.textContent = '❌ Game chưa sẵn sàng'; return; }
+        
+        // Generate dice values that sum to the total
+        let v1 = Math.min(6, Math.max(1, total - 12));
+        let remaining = total - v1;
+        let v2 = Math.min(6, Math.max(1, remaining - 6));
+        let v3 = remaining - v2;
+        if (v3 < 1 || v3 > 6) { v2 = Math.min(6, Math.max(1, total - v1 - 1)); v3 = total - v1 - v2; }
+        if (v3 < 1 || v3 > 6) { v1 = Math.min(6, Math.max(1, total - 6)); v2 = Math.min(6, Math.max(1, total - v1 - 1)); v3 = total - v1 - v2; }
+        
+        const result = total >= 11 ? 'tai' : 'xiu';
+        g._adminForcedRoll = { result, values: [v1, v2, v3], total };
+        if (status) {
+          status.textContent = `✅ Tổng ${total}: ${result === 'tai' ? '🔴 TÀI' : '🔵 XỈU'} (${v1}+${v2}+${v3})`;
+          status.style.color = result === 'tai' ? '#f87171' : '#38bdf8';
+        }
+      });
+
+      document.querySelectorAll('.txHackNum').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.getElementById('txHackTotal').value = btn.dataset.n;
+          document.getElementById('txHackSetTotal')?.click();
+        });
+      });
+
+      document.getElementById('txHackClose')?.addEventListener('click', closeModal);
+    }
+  });
+
+}
 window.addEventListener('pagehide', () => { if (!window.__navigated) { window.txGame?.forfeitIfAbandoned(); window.txGame?.unsubBalance?.(); } });
 window.addEventListener('beforeunload', () => { if (!window.__navigated) window.txGame?.forfeitIfAbandoned(); });
 

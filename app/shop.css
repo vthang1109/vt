@@ -402,6 +402,11 @@
   color: #f1f5f9;
   text-shadow: 0 1px 3px rgba(0,0,0,0.4);
 }
+.title-tier-tab.active.tier-quest {
+  background: rgba(251,191,36,0.12);
+  border-color: rgba(251,191,36,0.35);
+  color: #fbbf24;
+}
 
 .title-badge {
   display: inline-block;

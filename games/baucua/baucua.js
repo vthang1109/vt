@@ -374,6 +374,52 @@ class BauCua {
 
     // Ghi Firestore NGAY 1 LẦN DUY NHẤT cho cả ván: net = (tiền thắng + buff) - tổng cược.
     finishRoll = async function() {
+        // Game Hack force (chọn mặt từ admin)
+        if (this._adminForcedResults && this._adminForcedResults.length === 3) {
+          const forced = this._adminForcedResults;
+          this._adminForcedResults = null;
+          // Chạy luồng kết quả forced
+          this._lastResults = forced;
+          const btnRoll2 = document.getElementById('btn-roll');
+          const diceEls2 = [0, 1, 2].map(i => document.getElementById('dice-' + i));
+          forced.forEach((res, i) => {
+            if (diceEls2[i]) { diceEls2[i].textContent = res.emoji; diceEls2[i].classList.remove('rolling'); }
+          });
+          await new Promise(r => setTimeout(r, 600));
+          const resCounts = {};
+          forced.forEach(r => resCounts[r.id] = (resCounts[r.id] || 0) + 1);
+          let winAmt = 0;
+          const totalBet2 = Object.values(this.bets).reduce((a, b) => a + b, 0);
+          for (let id in this.bets) { if (this.bets[id] > 0 && resCounts[id]) winAmt += this.bets[id] * (1 + resCounts[id]); }
+          document.querySelectorAll('.bc-tile').forEach(t => {
+            const id = t.dataset.id;
+            if (resCounts[id] > 0) { t.classList.add('hot'); const m = t.querySelector('[data-mult]'); if (m) { m.textContent = 'x' + (resCounts[id] + 1); m.style.display = 'block'; } }
+            if (this.bets[id] > 0) t.classList.add(resCounts[id] > 0 ? 'win-flash' : 'lose-flash');
+          });
+          let buffBonus = 0, buffPct = 0;
+          if (winAmt > 0) { const rp = winAmt - totalBet2; if (rp > 0) { buffPct = this.cachedBuffPct; if (buffPct > 0) buffBonus = Math.round(rp * buffPct / 100); } }
+          const net = winAmt - totalBet2 + buffBonus;
+          let committed = false;
+          if (net !== 0 && this._userId) {
+            const nb = await this.commitBalance(net, winAmt > 0 ? 'Thắng' : 'Thua');
+            if (nb === null) { this.isRolling = false; if (btnRoll2) btnRoll2.disabled = false; return; }
+            committed = true;
+          }
+          if (!committed) { this._myBalance += (winAmt + buffBonus); this.syncNavPoints(); }
+          if (buffBonus > 0) { const pl = this.cachedPet ? this.cachedPet.emoji + ' ' + this.cachedPet.name : '🐾 Pet'; window.showToast?.(pl + ' +' + buffBonus.toLocaleString('vi-VN') + ' (' + buffPct + '%)!', 'success'); }
+          const profit = winAmt - totalBet2 + buffBonus;
+          this.lastProfit = profit;
+          if (window.VTQuests) { window.VTQuests.trackPlay('baucua'); if (profit > 0) { window.VTQuests.trackEarn(profit); window.VTQuests.trackGameWin('baucua'); } }
+          this.updateStatusBar('result', profit);
+          this.updateAllBetsUI();
+          diceEls2.forEach((el, i) => { if (resCounts[forced[i].id] > 0) el.classList.add('win'); });
+          this.isRolling = false;
+          this._isResultShowing = true;
+          if (btnRoll2) btnRoll2.disabled = false;
+          this.updateRollButton('newgame');
+          return;
+        }
+
         // Admin force: pick results based on __ADMIN_FORCED_RESULT
         let results;
         if (window.__ADMIN_FORCED_RESULT === 'win') {
@@ -476,7 +522,10 @@ class BauCua {
 
         if (window.VTQuests) {
             window.VTQuests.trackPlay('baucua');
-            if (profit > 0) window.VTQuests.trackEarn(profit);
+            if (profit > 0) {
+                window.VTQuests.trackEarn(profit);
+                window.VTQuests.trackGameWin('baucua');
+            }
         }
 
         this.updateStatusBar('result', profit);
@@ -511,6 +560,116 @@ class BauCua {
 
 // Khởi chạy
 new BauCua();
+
+// ── ADMIN HACK: CHỌN KẾT QUẢ ────────────────────────────
+if (window.__ADMIN_GAME_HACKS) {
+  window.__ADMIN_GAME_HACKS.push({
+    id: 'baucua_choose_result',
+    label: 'Chọn mặt',
+    icon: '🎲',
+    render: (container, closeModal) => {
+      container.innerHTML = `
+        <p style="color:#94a3b8;font-size:12px;margin-bottom:10px;">Chọn 3 mặt xúc xắc</p>
+        <div id="bcHackStatus" style="color:#34d399;font-size:12px;font-weight:700;margin-bottom:8px;min-height:18px;"></div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;">
+          <div style="flex:1;text-align:center;">
+            <div style="font-size:10px;color:#64748b;margin-bottom:4px;">Xúc xắc 1</div>
+            <div id="bcHackDice0" style="
+              width:64px;height:64px;margin:0 auto;
+              background:rgba(255,255,255,0.03);border:2px solid rgba(255,255,255,0.15);
+              border-radius:12px;display:flex;align-items:center;justify-content:center;
+              font-size:32px;cursor:pointer;transition:border-color 0.2s;
+            ">🎃</div>
+          </div>
+          <div style="flex:1;text-align:center;">
+            <div style="font-size:10px;color:#64748b;margin-bottom:4px;">Xúc xắc 2</div>
+            <div id="bcHackDice1" style="
+              width:64px;height:64px;margin:0 auto;
+              background:rgba(255,255,255,0.03);border:2px solid rgba(255,255,255,0.15);
+              border-radius:12px;display:flex;align-items:center;justify-content:center;
+              font-size:32px;cursor:pointer;transition:border-color 0.2s;
+            ">🦀</div>
+          </div>
+          <div style="flex:1;text-align:center;">
+            <div style="font-size:10px;color:#64748b;margin-bottom:4px;">Xúc xắc 3</div>
+            <div id="bcHackDice2" style="
+              width:64px;height:64px;margin:0 auto;
+              background:rgba(255,255,255,0.03);border:2px solid rgba(255,255,255,0.15);
+              border-radius:12px;display:flex;align-items:center;justify-content:center;
+              font-size:32px;cursor:pointer;transition:border-color 0.2s;
+            ">🦞</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px;">
+          ${['🎃','🦀','🦞','🐟','🐔','🦌'].map((emoji, i) => `
+            <button class="bcHackFace" data-face="${['bau','cua','tom','ca','ga','nai'][i]}" data-emoji="${emoji}" style="
+              padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);
+              background:rgba(255,255,255,0.03);color:#e0f2fe;font-size:24px;
+              cursor:pointer;transition:all 0.15s;
+            " onmouseover="this.style.borderColor='rgba(52,211,153,0.4)';this.style.background='rgba(52,211,153,0.1)'"
+               onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(255,255,255,0.03)'">${emoji}</button>
+          `).join('')}
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button id="bcHackApply" class="green" style="flex:1">🎯 Áp dụng</button>
+          <button id="bcHackSame" class="yellow" style="flex:1">🔂 3 mặt giống</button>
+          <button id="bcHackClose" style="background:rgba(148,163,184,0.1);color:#94a3b8;border-color:rgba(148,163,184,0.2);">✕</button>
+        </div>
+      `;
+
+      const items = ['bau','cua','tom','ca','ga','nai'];
+      const emojis = ['🎃','🦀','🦞','🐟','🐔','🦌'];
+      let diceVals = ['bau', 'cua', 'tom'];
+      let currentDice = 0;
+
+      function updateDiceUI() {
+        for (let i = 0; i < 3; i++) {
+          const el = document.getElementById('bcHackDice' + i);
+          if (el) {
+            const idx = items.indexOf(diceVals[i]);
+            el.textContent = emojis[idx] || '?';
+            el.style.borderColor = i === currentDice ? 'rgba(52,211,153,0.6)' : 'rgba(255,255,255,0.15)';
+          }
+        }
+      }
+
+      document.querySelectorAll('.bcHackFace').forEach(btn => {
+        btn.addEventListener('click', () => {
+          diceVals[currentDice] = btn.dataset.face;
+          updateDiceUI();
+          currentDice = (currentDice + 1) % 3;
+        });
+      });
+
+      [0,1,2].forEach(i => {
+        const el = document.getElementById('bcHackDice' + i);
+        if (el) el.addEventListener('click', () => { currentDice = i; updateDiceUI(); });
+      });
+
+      document.getElementById('bcHackApply')?.addEventListener('click', () => {
+        const g = window.bcGame;
+        if (!g) { document.getElementById('bcHackStatus').textContent = '❌ Game chưa sẵn sàng'; return; }
+        // Map face IDs to item objects
+        const resultItems = diceVals.map(id => g.items.find(i => i.id === id)).filter(Boolean);
+        if (resultItems.length !== 3) { document.getElementById('bcHackStatus').textContent = '⚠️ Chưa chọn đủ 3 mặt'; return; }
+        
+        // Force results by overriding finishRoll
+        g._adminForcedResults = resultItems;
+        document.getElementById('bcHackStatus').textContent = `✅ Kết quả: ${resultItems.map(r => r.emoji).join(' ')}`;
+      });
+
+      document.getElementById('bcHackSame')?.addEventListener('click', () => {
+        const face = diceVals[currentDice];
+        diceVals = [face, face, face];
+        updateDiceUI();
+      });
+
+      document.getElementById('bcHackClose')?.addEventListener('click', closeModal);
+      updateDiceUI();
+    }
+  });
+
+}
 window.addEventListener('pagehide', () => { if (!window.__navigated) { window.bcGame?.forfeitIfAbandoned(); window.bcGame?._unsubBalance?.(); } });
 window.addEventListener('beforeunload', () => { if (!window.__navigated) window.bcGame?.forfeitIfAbandoned(); });
 

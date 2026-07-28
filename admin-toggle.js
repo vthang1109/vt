@@ -5,11 +5,17 @@
  * Floating button → popup với các công cụ debug:
  *   - Force Win / Force Lose / Normal
  *   - Points: +10k, -10k, set tuỳ ý, reset 10000
+ *   - Game Hacks: các công cụ đặc thù cho từng game
  *   - Debug: Log state, Refund, Auto-play
  * 
  * Globals:
  *   window.__ADMIN_FORCED_RESULT = null | 'win' | 'lose'
+ *   window.__ADMIN_GAME_HACKS = []  — game đăng ký hack qua array này
  */
+
+// Registry cho game-specific hacks
+// Mỗi phần tử: { id, label, icon, render(container) }
+window.__ADMIN_GAME_HACKS = [];
 
 (function() {
   'use strict';
@@ -160,6 +166,9 @@
       <button class="vt-btn green" id="vtEndWin">🔥 Thắng ngay</button>
       <button class="vt-btn red" id="vtEndLose">💀 Thua ngay</button>
     </div>
+
+    <div class="vt-admin-section" id="vtGameHacksSection" style="display:none">🎮 GAME HACKS</div>
+    <div class="vt-admin-row" id="vtGameHacksRow" style="display:none"></div>
 
     <div class="vt-admin-section">ĐIỂM</div>
     <div class="vt-admin-row">
@@ -680,6 +689,8 @@
             setForce(_currentForce);
             // expose auth for debug
             window.auth = auth;
+            updateGameHacks();
+            registerMpAdminHack();
           } else {
             _isAdmin = false;
             btn.classList.remove('visible');
@@ -696,6 +707,85 @@
     });
   }
 
+  // ========== Game Hacks ==========
+  function showGameHackModal(hack) {
+    const existing = document.getElementById('vtHackModal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'vtHackModal';
+    modal.style.cssText = `
+      position:fixed;inset:0;z-index:99999;
+      background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);
+      display:flex;align-items:center;justify-content:center;
+      padding:16px;animation:fadeIn 0.15s ease;
+    `;
+    const box = document.createElement('div');
+    box.style.cssText = `
+      background:linear-gradient(145deg,#1a2744,#0f172a);
+      border:1px solid rgba(167,139,250,0.25);
+      border-radius:20px;padding:20px;
+      max-width:460px;width:100%;max-height:80vh;overflow-y:auto;
+      box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    `;
+    box.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span style="font-size:14px;font-weight:700;color:#e0f2fe;">${hack.icon || '🎮'} ${hack.label}</span>
+        <button id="vtHackClose" style="background:none;border:none;color:#64748b;font-size:18px;cursor:pointer;padding:4px;">✕</button>
+      </div>
+      <div id="vtHackBody"></div>
+    `;
+    modal.appendChild(box);
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    document.body.appendChild(modal);
+
+    document.getElementById('vtHackClose').addEventListener('click', () => modal.remove());
+
+    if (hack.render) {
+      hack.render(document.getElementById('vtHackBody'), () => modal.remove());
+    }
+  }
+
+  function updateGameHacks() {
+    const section = document.getElementById('vtGameHacksSection');
+    const row = document.getElementById('vtGameHacksRow');
+    if (!section || !row) return;
+
+    const hacks = window.__ADMIN_GAME_HACKS || [];
+    if (hacks.length === 0) {
+      section.style.display = 'none';
+      row.style.display = 'none';
+      return;
+    }
+
+    section.style.display = '';
+    row.style.display = '';
+    row.innerHTML = hacks.map(h => `
+      <button class="vt-btn purple" data-hack-id="${h.id}" style="flex:1;min-width:60px">
+        ${h.icon || '⚡'} ${h.label}
+      </button>
+    `).join('');
+
+    row.querySelectorAll('[data-hack-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const hack = hacks.find(h => h.id === btn.dataset.hackId);
+        if (hack) {
+          _popupOpen = false;
+          popup.classList.remove('open');
+          setTimeout(() => showGameHackModal(hack), 200);
+        }
+      });
+    });
+  }
+
+  // Watch for new hacks registered after page load
+  const _origPush = window.__ADMIN_GAME_HACKS.push;
+  window.__ADMIN_GAME_HACKS.push = function(...items) {
+    const result = _origPush.apply(this, items);
+    if (_isAdmin) updateGameHacks();
+    return result;
+  };
+
   // ========== Cleanup on navigate ==========
   window.addEventListener('pagehide', () => {
     if (isAutoPlaying()) {
@@ -709,6 +799,492 @@
       _autoPlayInterval = null;
     }
   });
+
+  // ── MP CARD PICKER HACK (chỉ cho xidach) ──────────────
+  // Chỉ hiển thị với game xidach MP
+  // Kết nối tới cùng Firestore instance của game (points.js) để tránh conflict
+  function registerMpAdminHack() {
+    const roomId = (typeof ROOM_ID !== 'undefined' && ROOM_ID)
+      || new URLSearchParams(window.location.search).get('room');
+    if (!roomId) return;
+
+    let _mpFs = null;
+    let _mpDb = null;
+    let _mpRoomRef = null;
+    let _mpMyUid = null;
+
+    async function ensureMpDb() {
+      if (_mpDb && _mpRoomRef) return;
+      try {
+        if (!_mpFs) {
+          _mpFs = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+        }
+        // Dùng window.auth (set bởi admin toggle) và points.js db (cùng Firebase project)
+        const points = await import('../../points.js');
+        _mpDb = points.db;
+        _mpRoomRef = _mpFs.doc(_mpDb, 'rooms', roomId);
+      } catch (e) {
+        console.warn('MP hack: cannot get db', e);
+      }
+    }
+
+    // Kiểm tra game type trước khi đăng ký hack
+    (async () => {
+      await ensureMpDb();
+      if (!_mpRoomRef) return;
+      try {
+        const snap = await _mpFs.getDoc(_mpRoomRef);
+        if (!snap.exists()) return;
+        const data = snap.data();
+        if (data.gameType !== 'xidach') return;
+
+        window.__ADMIN_GAME_HACKS.push({
+          id: 'mp_admin',
+          label: 'Chọn Bài',
+          icon: '🃏',
+          render: (container, closeModal) => {
+            container.innerHTML = `
+              <p style="color:#94a3b8;font-size:12px;margin-bottom:8px;">Phòng: <b style="color:#e0f2fe">#${roomId}</b></p>
+              <div id="mpPhaseInfo" style="color:#64748b;font-size:10px;margin-bottom:6px;min-height:14px;"></div>
+              <div id="mpCardStatus" style="color:#34d399;font-size:12px;font-weight:700;margin-bottom:8px;min-height:18px;"></div>
+              <div style="display:flex;gap:6px;margin-bottom:8px;">
+                <button id="mpTabInitial" class="vt-btn" data-active="false" style="flex:1;">📋 Bài đầu</button>
+                <button id="mpTabHit" class="vt-btn" data-active="true" style="flex:1;border-color:rgba(52,211,153,0.5);color:#34d399;background:rgba(52,211,153,0.1);">🎯 Rút bài</button>
+              </div>
+              <div id="mpInitialSection" style="margin-bottom:10px;background:rgba(167,139,250,0.06);border-radius:8px;padding:8px;">
+                <div style="font-size:10px;color:#64748b;font-weight:700;margin-bottom:4px;">📋 Bài đầu ván sau (chọn 2 lá)</div>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+                  <span id="mpInitialStatus" style="font-size:9px;color:#fbbf24;flex:1;min-height:14px;"></span>
+                  <button id="mpInitialConfirm" class="vt-btn green" style="display:none;padding:3px 8px;font-size:10px;">✅ Xác nhận</button>
+                </div>
+                <div id="mpInitialCards" style="display:flex;gap:4px;flex-wrap:wrap;min-height:20px;"><span style="color:#64748b;font-size:10px;">Chưa chọn</span></div>
+                <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
+                  <button class="mpQuickBtn" data-combo="19" style="flex:1;padding:4px;border-radius:6px;border:1px solid rgba(52,211,153,0.2);background:rgba(52,211,153,0.06);color:#34d399;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.15s;">19</button>
+                  <button class="mpQuickBtn" data-combo="20" style="flex:1;padding:4px;border-radius:6px;border:1px solid rgba(52,211,153,0.2);background:rgba(52,211,153,0.06);color:#34d399;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.15s;">20</button>
+                  <button class="mpQuickBtn" data-combo="xidach" style="flex:1;padding:4px;border-radius:6px;border:1px solid rgba(167,139,250,0.2);background:rgba(167,139,250,0.06);color:#a78bfa;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.15s;">🎯 Xì Dách</button>
+                  <button class="mpQuickBtn" data-combo="xiban" style="flex:1;padding:4px;border-radius:6px;border:1px solid rgba(251,191,36,0.2);background:rgba(251,191,36,0.06);color:#fbbf24;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.15s;">👑 Xì Bàn</button>
+                  <button class="mpQuickBtn" data-combo="clear" style="flex:1;padding:4px;border-radius:6px;border:1px solid rgba(248,113,113,0.2);background:rgba(248,113,113,0.06);color:#f87171;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.15s;">🗑️ Xoá</button>
+                </div>
+              </div>
+              <div id="mpHitSection" style="margin-bottom:10px;display:block;background:rgba(52,211,153,0.06);border-radius:8px;padding:8px;">
+                <div style="font-size:10px;color:#64748b;font-weight:700;margin-bottom:4px;">🎯 Rút bài (ván hiện tại)</div>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+                  <span id="mpHitStatus" style="font-size:9px;color:#34d399;flex:1;min-height:14px;"></span>
+                  <button id="mpHitConfirm" class="vt-btn green" style="display:none;padding:3px 8px;font-size:10px;">✅ Xác nhận</button>
+                </div>
+                <div id="mpHitCards" style="display:flex;gap:4px;flex-wrap:wrap;min-height:20px;"><span style="color:#64748b;font-size:10px;">Chưa chọn</span></div>
+              </div>
+              <p id="mpGridHint" style="color:#94a3b8;font-size:11px;margin-bottom:8px;">Click lá để thêm rút bài — lá đã dùng ⛔</p>
+              <div id="mpCardGrid"></div>
+              <div style="margin-top:8px;">
+                <button id="mpHackClose" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(148,163,184,0.2);background:none;color:#94a3b8;font-size:11px;cursor:pointer;">✕ Đóng</button>
+              </div>
+            `;
+
+            let activeTab = 'hit'; // mặc định Rút bài
+            let myInitialCards = [];
+            let pendingInitialCards = [];
+            let myHitCards = [];
+            let pendingHitCards = [];
+            let usedCards = new Set();
+            const suits = ['♠', '♣', '♦', '♥'];
+            const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+            function getSuitColor(s) {
+              return s === '♥' || s === '♦' ? '#f87171' : '#94a3b8';
+            }
+
+            function setActiveTab(tab) {
+              activeTab = tab;
+              const tabInit = document.getElementById('mpTabInitial');
+              const tabHit = document.getElementById('mpTabHit');
+              const secInit = document.getElementById('mpInitialSection');
+              const secHit = document.getElementById('mpHitSection');
+              const hint = document.getElementById('mpGridHint');
+              if (tab === 'initial') {
+                tabInit.style.borderColor = 'rgba(167,139,250,0.5)';
+                tabInit.style.color = '#a78bfa';
+                tabInit.style.background = 'rgba(167,139,250,0.1)';
+                tabHit.style.borderColor = 'rgba(255,255,255,0.08)';
+                tabHit.style.color = '#94a3b8';
+                tabHit.style.background = 'rgba(255,255,255,0.04)';
+                secInit.style.display = '';
+                secHit.style.display = 'none';
+                hint.textContent = 'Click lá để thêm vào bài đầu — hiện tất cả 52 lá 🃏';
+              } else {
+                tabHit.style.borderColor = 'rgba(52,211,153,0.5)';
+                tabHit.style.color = '#34d399';
+                tabHit.style.background = 'rgba(52,211,153,0.1)';
+                tabInit.style.borderColor = 'rgba(255,255,255,0.08)';
+                tabInit.style.color = '#94a3b8';
+                tabInit.style.background = 'rgba(255,255,255,0.04)';
+                secHit.style.display = '';
+                secInit.style.display = 'none';
+                hint.textContent = 'Click lá để thêm vào rút bài — lá đã dùng ⛔';
+              }
+              renderMpCardGrid();
+            }
+
+            document.getElementById('mpTabInitial').addEventListener('click', () => setActiveTab('initial'));
+            document.getElementById('mpTabHit').addEventListener('click', () => setActiveTab('hit'));
+
+            // ── Load data from Firestore ──
+            async function loadCardData() {
+              _mpMyUid = window.auth?.currentUser?.uid;
+              if (!_mpMyUid) {
+                document.getElementById('mpCardStatus').textContent = '❌ Chưa đăng nhập';
+                return;
+              }
+              await ensureMpDb();
+              if (!_mpRoomRef) {
+                document.getElementById('mpCardStatus').textContent = '❌ Không kết nối được Firestore';
+                return;
+              }
+              try {
+                const snap = await _mpFs.getDoc(_mpRoomRef);
+                if (!snap.exists()) {
+                  document.getElementById('mpCardStatus').textContent = '❌ Phòng không tồn tại';
+                  return;
+                }
+                const gs = snap.data().gameState || {};
+                const phase = gs.phase || 'betting';
+                document.getElementById('mpPhaseInfo').textContent = `Phase: ${phase}`;
+
+                const preselected = gs.preselectedCards || {};
+                const preselectedHit = gs.preselectedHitCards || {};
+                myInitialCards = preselected[_mpMyUid] || [];
+                myHitCards = preselectedHit[_mpMyUid] || [];
+                pendingHitCards = [];
+
+                // usedCards: các lá đang có trên bàn + đã chọn
+                const hands = gs.hands || {};
+                const allCards = [
+                  ...Object.values(hands).flat(),
+                  ...Object.values(preselected).flat(),
+                  ...Object.values(preselectedHit).flat()
+                ];
+                usedCards = new Set(allCards.map(c => c.v + c.s));
+
+                // Cập nhật UI
+                renderInitialHand();
+                renderHitHand();
+                renderMpCardGrid();
+
+                document.getElementById('mpCardStatus').textContent = `✅ Đã tải: ${myInitialCards.length} lá đầu, ${myHitCards.length} lá rút`;
+              } catch (e) {
+                document.getElementById('mpCardStatus').textContent = '❌ Lỗi tải: ' + e.message;
+              }
+            }
+
+            // ── UI helpers ──
+            function updateInitialConfirmBtn() {
+              const btn = document.getElementById('mpInitialConfirm');
+              const status = document.getElementById('mpInitialStatus');
+              if (!btn || !status) return;
+              if (pendingInitialCards.length === 2) {
+                btn.style.display = '';
+                status.textContent = '📝 2 lá chờ xác nhận';
+              } else {
+                btn.style.display = 'none';
+                status.textContent = myInitialCards.length > 0
+                  ? `✅ ${myInitialCards.length} lá đã lưu`
+                  : 'Chọn 2 lá rồi Xác nhận';
+              }
+            }
+
+            function renderInitialHand() {
+              const el = document.getElementById('mpInitialCards');
+              if (!el) return;
+              const cards = pendingInitialCards.length > 0 ? pendingInitialCards : myInitialCards;
+              if (!cards || cards.length === 0) {
+                el.innerHTML = '<span style="color:#64748b;font-size:10px;">Chưa chọn</span>';
+                updateInitialConfirmBtn();
+                return;
+              }
+              const isPending = pendingInitialCards.length > 0;
+              el.innerHTML = cards.map((card, idx) => `
+                <span class="mp-hand-card" data-idx="${idx}" data-list="initial"
+                  style="display:inline-flex;align-items:center;gap:2px;padding:3px 6px;border-radius:6px;
+                    background:${isPending ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.05)'};
+                    border:1px solid ${isPending ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.08)'};
+                    color:${getSuitColor(card.s)};font-size:13px;font-weight:700;font-family:monospace;
+                    cursor:pointer;transition:all 0.15s;line-height:1;"
+                  title="Xoá ${card.v}${card.s}">${card.v}${card.s} ✕</span>
+              `).join('');
+              updateInitialConfirmBtn();
+              // Gán sự kiện xoá
+              el.querySelectorAll('.mp-hand-card').forEach(cardEl => {
+                cardEl.addEventListener('click', async (e) => {
+                  const idx = parseInt(cardEl.dataset.idx);
+                  if (isNaN(idx)) return;
+                  if (pendingInitialCards.length > 0) {
+                    if (idx >= pendingInitialCards.length) return;
+                    const rm = pendingInitialCards[idx];
+                    pendingInitialCards.splice(idx, 1);
+                    usedCards.delete(rm.v + rm.s);
+                    renderInitialHand();
+                    renderMpCardGrid();
+                    document.getElementById('mpCardStatus').textContent = '🗑️ Đã xoá ' + rm.v + rm.s;
+                    return;
+                  }
+                  // Xoá khỏi Firestore
+                  try {
+                    const sn = await _mpFs.getDoc(_mpRoomRef);
+                    if (!sn.exists()) return;
+                    const gs2 = sn.data().gameState || {};
+                    const cur = gs2.preselectedCards?.[_mpMyUid] || [];
+                    if (idx >= cur.length) return;
+                    const rm = cur[idx];
+                    const upd = [...cur]; upd.splice(idx, 1);
+                    await _mpFs.updateDoc(_mpRoomRef, { ['gameState.preselectedCards.' + _mpMyUid]: upd });
+                    myInitialCards = upd;
+                    usedCards.delete(rm.v + rm.s);
+                    renderInitialHand();
+                    renderMpCardGrid();
+                    document.getElementById('mpCardStatus').textContent = '🗑️ Đã xoá ' + rm.v + rm.s;
+                  } catch (e) {
+                    document.getElementById('mpCardStatus').textContent = '❌ Lỗi: ' + e.message;
+                  }
+                });
+              });
+            }
+
+            function updateHitConfirmBtn() {
+              const btn = document.getElementById('mpHitConfirm');
+              const status = document.getElementById('mpHitStatus');
+              if (!btn || !status) return;
+              if (pendingHitCards.length > 0) {
+                btn.style.display = '';
+                status.textContent = '📝 ' + pendingHitCards.length + ' lá chờ xác nhận';
+              } else {
+                btn.style.display = 'none';
+                status.textContent = myHitCards.length > 0
+                  ? '✅ ' + myHitCards.length + ' lá đã rút'
+                  : 'Chọn lá muốn rút rồi Xác nhận';
+              }
+            }
+
+            function renderHitHand() {
+              const el = document.getElementById('mpHitCards');
+              if (!el) return;
+              const cards = pendingHitCards.length > 0 ? pendingHitCards : myHitCards;
+              if (!cards || cards.length === 0) {
+                el.innerHTML = '<span style="color:#64748b;font-size:10px;">Chưa chọn</span>';
+                updateHitConfirmBtn();
+                return;
+              }
+              const isPending = pendingHitCards.length > 0;
+              el.innerHTML = cards.map((card, idx) => `
+                <span class="mp-hand-card" data-idx="${idx}" data-list="hit"
+                  style="display:inline-flex;align-items:center;gap:2px;padding:3px 6px;border-radius:6px;
+                    background:${isPending ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.05)'};
+                    border:1px solid ${isPending ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.08)'};
+                    color:${getSuitColor(card.s)};font-size:13px;font-weight:700;font-family:monospace;
+                    cursor:pointer;transition:all 0.15s;line-height:1;"
+                  title="Xoá ${card.v}${card.s}">${card.v}${card.s} ✕</span>
+              `).join('');
+              updateHitConfirmBtn();
+              // Gán sự kiện xoá
+              el.querySelectorAll('.mp-hand-card').forEach(cardEl => {
+                cardEl.addEventListener('click', async () => {
+                  const idx = parseInt(cardEl.dataset.idx);
+                  if (isNaN(idx)) return;
+                  if (pendingHitCards.length > 0) {
+                    if (idx >= pendingHitCards.length) return;
+                    const rm = pendingHitCards[idx];
+                    pendingHitCards.splice(idx, 1);
+                    usedCards.delete(rm.v + rm.s);
+                    renderHitHand();
+                    renderMpCardGrid();
+                    document.getElementById('mpCardStatus').textContent = '🗑️ Đã xoá ' + rm.v + rm.s;
+                    return;
+                  }
+                  try {
+                    const sn = await _mpFs.getDoc(_mpRoomRef);
+                    if (!sn.exists()) return;
+                    const gs2 = sn.data().gameState || {};
+                    const cur = gs2.preselectedHitCards?.[_mpMyUid] || [];
+                    if (idx >= cur.length) return;
+                    const rm = cur[idx];
+                    const upd = [...cur]; upd.splice(idx, 1);
+                    await _mpFs.updateDoc(_mpRoomRef, { ['gameState.preselectedHitCards.' + _mpMyUid]: upd });
+                    myHitCards = upd;
+                    window.__vt_hitCards = upd;
+                    usedCards.delete(rm.v + rm.s);
+                    renderHitHand();
+                    renderMpCardGrid();
+                    document.getElementById('mpCardStatus').textContent = '🗑️ Đã xoá ' + rm.v + rm.s;
+                  } catch (e) {
+                    document.getElementById('mpCardStatus').textContent = '❌ Lỗi: ' + e.message;
+                  }
+                });
+              });
+            }
+
+            function renderMpCardGrid() {
+              const grid = document.getElementById('mpCardGrid');
+              if (!grid) return;
+              const activeUsedSet = activeTab === 'initial'
+                ? new Set([...pendingInitialCards, ...myInitialCards].map(c => c.v + c.s))
+                : usedCards;
+              let html = `<div style="display:grid;grid-template-columns:repeat(13,1fr);gap:4px;margin-bottom:8px;">
+                ${values.map(v => `<div style="text-align:center;font-size:10px;color:#64748b;font-weight:700;padding:2px;">${v}</div>`).join('')}
+              </div>`;
+              suits.forEach(s => {
+                const suitColor = getSuitColor(s);
+                html += `<div style="display:grid;grid-template-columns:repeat(13,1fr);gap:4px;margin-bottom:6px;">`;
+                values.forEach(v => {
+                  const cardKey = v + s;
+                  const isUsed = activeUsedSet.has(cardKey);
+                  html += `<button class="mp-pick-card" data-v="${v}" data-s="${s}"
+                    style="padding:6px 2px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);
+                      background:${isUsed ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.03)'};
+                      color:${isUsed ? 'rgba(148,163,184,0.2)' : suitColor};
+                      font-size:13px;font-weight:700;font-family:monospace;
+                      cursor:${isUsed ? 'not-allowed' : 'pointer'};transition:all 0.15s;
+                      ${isUsed ? 'opacity:0.25;text-decoration:line-through;' : ''}"
+                    ${isUsed ? 'disabled' : ''}
+                    onmouseover="this.style.borderColor='${isUsed ? 'rgba(255,255,255,0.06)' : 'rgba(167,139,250,0.4)'}';this.style.background='${isUsed ? 'rgba(255,255,255,0.01)' : 'rgba(167,139,250,0.1)'}"
+                    onmouseout="this.style.borderColor='rgba(255,255,255,0.06)';this.style.background='${isUsed ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.03)'}"
+                  >${v}${s}</button>`;
+                });
+                html += `</div>`;
+              });
+              grid.innerHTML = html;
+
+              grid.querySelectorAll('.mp-pick-card:not([disabled])').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                  const v = btn.dataset.v;
+                  const s = btn.dataset.s;
+                  const card = { v, s };
+                  if (activeTab === 'initial') {
+                    if (pendingInitialCards.length >= 2) {
+                      document.getElementById('mpCardStatus').textContent = '⚠️ Đã chọn đủ 2 lá, bấm Xác nhận!';
+                      return;
+                    }
+                    pendingInitialCards.push(card);
+                    usedCards.add(v + s);
+                    renderMpCardGrid();
+                    renderInitialHand();
+                    document.getElementById('mpCardStatus').textContent = '📝 Chọn ' + pendingInitialCards.length + '/2';
+                    return;
+                  }
+                  // Rút bài: thêm vào pending, chờ xác nhận
+                  pendingHitCards.push(card);
+                  usedCards.add(v + s);
+                  renderMpCardGrid();
+                  renderHitHand();
+                  document.getElementById('mpCardStatus').textContent = '📝 ' + pendingHitCards.length + ' lá chờ rút'
+                });
+              });
+            }
+
+            // Confirm buttons
+            document.getElementById('mpInitialConfirm')?.addEventListener('click', async () => {
+              if (pendingInitialCards.length !== 2) return;
+              try {
+                await _mpFs.updateDoc(_mpRoomRef, {
+                  ['gameState.preselectedCards.' + _mpMyUid]: pendingInitialCards
+                });
+                myInitialCards = [...pendingInitialCards];
+                pendingInitialCards = [];
+                renderInitialHand();
+                renderMpCardGrid();
+                document.getElementById('mpCardStatus').textContent = '✅ Đã xác nhận 2 lá cho ván sau!';
+              } catch (e) {
+                document.getElementById('mpCardStatus').textContent = '❌ Lỗi: ' + e.message;
+              }
+            });
+            document.getElementById('mpHitConfirm')?.addEventListener('click', async () => {
+              if (pendingHitCards.length === 0) return;
+              try {
+                const snap = await _mpFs.getDoc(_mpRoomRef);
+                if (!snap.exists()) return;
+                const gs2 = snap.data().gameState || {};
+                const currentList = gs2.preselectedHitCards?.[_mpMyUid] || [];
+                const newList = [...currentList, ...pendingHitCards];
+                await _mpFs.updateDoc(_mpRoomRef, {
+                  ['gameState.preselectedHitCards.' + _mpMyUid]: newList
+                });
+                myHitCards = newList;
+                window.__vt_hitCards = newList;
+                const cardsStr = pendingHitCards.map(c => c.v + c.s).join(' ');
+                pendingHitCards = [];
+                renderHitHand();
+                renderMpCardGrid();
+                document.getElementById('mpCardStatus').textContent = '✅ Đã xác nhận rút bài: ' + cardsStr;
+              } catch (e) {
+                document.getElementById('mpCardStatus').textContent = '❌ Lỗi: ' + e.message;
+              }
+            });
+
+            // Quick-select buttons
+            document.querySelectorAll('.mpQuickBtn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                if (activeTab !== 'initial') return;
+                const combo = btn.dataset.combo;
+                if (combo === 'clear') {
+                  pendingInitialCards.forEach(c => usedCards.delete(c.v + c.s));
+                  pendingInitialCards = [];
+                  renderInitialHand();
+                  renderMpCardGrid();
+                  document.getElementById('mpCardStatus').textContent = '🗑️ Đã xoá chọn';
+                  return;
+                }
+                const allSuits = ['♠', '♣', '♦', '♥'];
+                const initUsedSet = new Set([...pendingInitialCards, ...myInitialCards].map(c => c.v + c.s));
+                function findCard(v) {
+                  for (const s of allSuits) {
+                    if (!initUsedSet.has(v + s)) return { v, s };
+                  }
+                  return null;
+                }
+                let cards = [];
+                if (combo === '19') {
+                  const c1 = findCard('10'), c2 = findCard('9');
+                  if (c1 && c2) cards = [c1, c2];
+                } else if (combo === '20') {
+                  const c1 = findCard('10'), c2 = findCard('10');
+                  if (c1 && c2 && c1.s !== c2.s) cards = [c1, c2];
+                  else {
+                    const f10 = findCard('10');
+                    const fJ = findCard('J');
+                    if (f10 && fJ) cards = [f10, fJ];
+                    else if (f10) { const fK = findCard('K'); if (fK) cards = [f10, fK]; }
+                  }
+                } else if (combo === 'xidach') {
+                  const c1 = findCard('A');
+                  const c2 = findCard('10') || findCard('J') || findCard('Q') || findCard('K');
+                  if (c1 && c2) cards = [c1, c2];
+                } else if (combo === 'xiban') {
+                  const c1 = findCard('A'), c2 = findCard('A');
+                  if (c1 && c2 && c1.s !== c2.s) cards = [c1, c2];
+                }
+                if (cards.length !== 2) {
+                  document.getElementById('mpCardStatus').textContent = '⚠️ Không đủ lá trống cho combo!';
+                  return;
+                }
+                pendingInitialCards.forEach(c => usedCards.delete(c.v + c.s));
+                pendingInitialCards = cards;
+                cards.forEach(c => usedCards.add(c.v + c.s));
+                renderInitialHand();
+                renderMpCardGrid();
+                document.getElementById('mpCardStatus').textContent = '📝 ' + combo.toUpperCase() + ': ' + cards.map(c => c.v + c.s).join(' ');
+              });
+            });
+
+            // Close button
+            document.getElementById('mpHackClose')?.addEventListener('click', closeModal);
+
+            // Load data
+            loadCardData();
+          }
+        });
+      } catch (e) {
+        console.warn('MP hack: cannot check game type', e);
+      }
+    })();
+  }
 
   // ========== Init ==========
   function _boot() {

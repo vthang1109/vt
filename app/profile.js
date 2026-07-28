@@ -7,7 +7,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { renderAvatar } from '../avatar.js';
 import { renderProfilePet, mountPetModal } from '../pet-ui.js';
-import { getOwnedTitles, getDefaultTitle, getTitleById } from '../titles.js';
+import { getOwnedTitles, getDefaultTitle, getTitleById, TITLES } from '../titles.js';
 
 let currentUser = null;
 let currentViewUid = null;
@@ -385,6 +385,231 @@ async function calcRank(uid) {
 
 // ── RANK ────────────────────────────────────────────────
 
+// ── BIO ──────────────────────────────────────────────────
+function setupBio(uid, d, isOwner) {
+  const bioText = document.getElementById('pro-bio-text');
+  const bioTextarea = document.getElementById('pro-bio-textarea');
+  const bioEditBtn = document.getElementById('pro-bio-edit-btn');
+  const bioActions = document.getElementById('pro-bio-actions');
+  const bioCounter = document.getElementById('pro-bio-counter');
+  const bioSave = document.getElementById('pro-bio-save');
+  
+  if (!bioText) return;
+  
+  const currentBio = d.bio || '';
+  
+  // Hiển thị bio
+  if (currentBio) {
+    bioText.textContent = currentBio;
+    bioText.style.display = 'block';
+    bioTextarea.style.display = 'none';
+    bioActions.style.display = 'none';
+  } else {
+    bioText.textContent = 'Chưa có giới thiệu';
+    bioText.style.display = 'block';
+    bioTextarea.style.display = 'none';
+    bioActions.style.display = 'none';
+  }
+  
+  if (!isOwner) {
+    if (bioEditBtn) bioEditBtn.style.display = 'none';
+    return;
+  }
+  
+  // Owner: hiện nút edit
+  if (bioEditBtn) bioEditBtn.style.display = 'flex';
+  
+  // Xoá listener cũ
+  const newEditBtn = bioEditBtn.cloneNode(true);
+  bioEditBtn.parentNode.replaceChild(newEditBtn, bioEditBtn);
+  
+  const editBtn = document.getElementById('pro-bio-edit-btn');
+  const textEl = document.getElementById('pro-bio-text');
+  const textareaEl = document.getElementById('pro-bio-textarea');
+  const actionsEl = document.getElementById('pro-bio-actions');
+  const counterEl = document.getElementById('pro-bio-counter');
+  const saveBtn = document.getElementById('pro-bio-save');
+  
+  if (!editBtn) return;
+  
+  editBtn.addEventListener('click', () => {
+    textEl.style.display = 'none';
+    textareaEl.value = currentBio;
+    textareaEl.style.display = 'block';
+    actionsEl.style.display = 'flex';
+    counterEl.textContent = `${currentBio.length}/200`;
+    textareaEl.focus();
+  });
+  
+  textareaEl.addEventListener('input', () => {
+    const len = textareaEl.value.length;
+    counterEl.textContent = `${len}/200`;
+  });
+  
+  saveBtn.addEventListener('click', async () => {
+    const newBio = textareaEl.value.trim();
+    if (newBio.length > 200) {
+      window.showToast?.('⚠️ Tối đa 200 ký tự!', 'warn');
+      return;
+    }
+    saveBtn.disabled = true;
+    saveBtn.textContent = '...';
+    try {
+      await updateDoc(doc(db, 'users', uid), { bio: newBio });
+      textEl.textContent = newBio || 'Chưa có giới thiệu';
+      textEl.style.display = 'block';
+      textareaEl.style.display = 'none';
+      actionsEl.style.display = 'none';
+      window.showToast?.('✅ Đã lưu giới thiệu!', 'success');
+    } catch (e) {
+      window.showToast?.('❌ Lỗi: ' + e.message, 'error');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Lưu';
+    }
+  });
+}
+
+// ── GAME STATS ──────────────────────────────────────────
+function renderGameStats(stats, us) {
+  const grid = document.getElementById('pro-gamestats-grid');
+  if (!grid) return;
+  
+  const gamesPlayed = stats.gamesPlayed || 0;
+  const totalWins = stats.totalWins || 0;
+  const overallWR = gamesPlayed > 0 ? Math.round((totalWins / gamesPlayed) * 100) : 0;
+  
+  const statDefs = [
+    { icon: '🎮', label: 'Tổng Game', played: gamesPlayed, wins: totalWins, wr: overallWR },
+    { icon: '♟️', label: 'Cờ', played: stats.chessGamesPlayed || 0, wins: 0, noWr: true },
+    { icon: '🃏', label: 'Bài', played: stats.cardGamesPlayed || 0, wins: 0, noWr: true },
+    { icon: '🧠', label: 'Trí Tuệ', played: stats.smartGamesPlayed || 0, wins: 0, noWr: true },
+    { icon: '🎰', label: 'Casino', played: stats.casinoGamesPlayed || 0, wins: stats.casinoWins || 0 },
+  ];
+  
+  // Thêm game cụ thể có thống kê thắng
+  const gameWins = [
+    { id: 'xidach', label: 'Xì Dách', icon: '🃏', played: us.xidachGamesPlayed || 0, wins: stats.xidachWins || 0 },
+    { id: 'slot', label: 'Slot', icon: '🎰', played: us.slotGamesPlayed || 0, wins: stats.slotWins || 0 },
+    { id: 'baucua', label: 'Bầu Cua', icon: '🎲', played: us.baucuaGamesPlayed || 0, wins: stats.baucuaWins || 0 },
+    { id: 'taixiu', label: 'Tài Xỉu', icon: '⚀', played: us.taixiuGamesPlayed || 0, wins: stats.taixiuWins || 0 },
+  ].filter(g => g.played > 0);
+  
+  let html = '';
+  
+  // Overall stats
+  statDefs.forEach(s => {
+    const wrColor = s.wr >= 50 ? 'high' : s.wr >= 30 ? 'mid' : 'low';
+    const wrHtml = s.noWr ? '' : `<span class="pro-gstat-winrate ${wrColor}">${s.wr}%</span>`;
+    html += `
+      <div class="pro-gstat-item">
+        <div class="pro-gstat-label">${s.icon} ${s.label}</div>
+        <div class="pro-gstat-row">
+          <span class="pro-gstat-val">${s.played.toLocaleString('vi-VN')}</span>
+          ${s.noWr ? `<span class="pro-gstat-sub">đã chơi</span>` : wrHtml}
+        </div>
+        ${s.noWr ? '' : `<div style="display:flex;gap:6px;margin-top:2px">
+          <span class="pro-gstat-sub">Thắng: ${s.wins.toLocaleString('vi-VN')}</span>
+        </div>`}
+      </div>`;
+  });
+  
+  // Specific game win stats
+  gameWins.forEach(g => {
+    const wr = g.played > 0 ? Math.round((g.wins / g.played) * 100) : 0;
+    const wrColor = wr >= 50 ? 'high' : wr >= 30 ? 'mid' : 'low';
+    html += `
+      <div class="pro-gstat-item">
+        <div class="pro-gstat-label">${g.icon} ${g.label}</div>
+        <div class="pro-gstat-row">
+          <span class="pro-gstat-val">${g.wins.toLocaleString('vi-VN')}</span>
+          <span class="pro-gstat-winrate ${wrColor}">${wr}%</span>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:2px">
+          <span class="pro-gstat-sub">${g.played.toLocaleString('vi-VN')} ván</span>
+        </div>
+      </div>`;
+  });
+  
+  grid.innerHTML = html || '<div style="grid-column:1/-1;text-align:center;padding:16px;color:#4a7a9b;font-size:12px">Chưa có dữ liệu game</div>';
+}
+
+function escHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ── ACHIEVEMENT PROGRESS ────────────────────────────────
+function renderAchievementProgress(stats) {
+  const list = document.getElementById('pro-achievements-list');
+  if (!list) return;
+
+  // Lọc ra auto titles có thể hiện progress bar
+  const autoTitles = TITLES.filter(t => t.type === 'auto' && t.target && t.statKey && !t.boolean);
+
+  if (autoTitles.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:16px;color:#4a7a9b;font-size:12px">Đang tải dữ liệu thành tựu...</div>';
+    return;
+  }
+
+  // Sắp xếp: gần hoàn thành nhất lên đầu, đã hoàn thành xuống cuối
+  const sorted = [...autoTitles].sort((a, b) => {
+    const pctA = Math.min((stats[a.statKey] || 0) / a.target, 1);
+    const pctB = Math.min((stats[b.statKey] || 0) / b.target, 1);
+    // Ưu tiên chưa hoàn thành, gần xong nhất
+    const doneA = pctA >= 1 ? 1 : 0;
+    const doneB = pctB >= 1 ? 1 : 0;
+    if (doneA !== doneB) return doneA - doneB; // chưa xong lên trước
+    return pctB - pctA; // gần xong nhất lên đầu
+  });
+
+  const showAll = sorted.length <= 10;
+  const displayTitles = showAll ? sorted : sorted.slice(0, 8);
+  let hasMore = !showAll;
+
+  function renderItems(items) {
+    return items.map(t => {
+      const current = Math.min(stats[t.statKey] || 0, t.target);
+      const target = t.target;
+      const pct = Math.round((current / target) * 100);
+      const completed = current >= target;
+      return `
+        <div class="pro-ach-item ${completed ? 'completed' : ''}">
+          <span class="pro-ach-badge ${completed ? 'unlocked' : 'locked'}">
+            ${completed ? '✓' : `${pct}%`}
+          </span>
+          <div class="pro-ach-info">
+            <div class="pro-ach-name">${escHtml(t.label)}</div>
+            <div class="pro-ach-desc">${escHtml(t.desc || '')}</div>
+          </div>
+          <div class="pro-ach-bar-wrap">
+            <div class="pro-ach-bar">
+              <div class="pro-ach-bar-fill ${completed ? 'unlocked' : 'locked'}" style="width:${pct}%"></div>
+            </div>
+            <div class="pro-ach-pct">${current.toLocaleString('vi-VN')}/${target.toLocaleString('vi-VN')}</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  let html = renderItems(displayTitles);
+  if (hasMore) {
+    html += `
+      <button class="pro-ach-showmore" id="pro-ach-showmore">
+        📋 Xem tất cả (${sorted.length} thành tựu)
+      </button>`;
+  }
+  list.innerHTML = html;
+
+  // Nút Xem thêm
+  const showMoreBtn = document.getElementById('pro-ach-showmore');
+  if (showMoreBtn) {
+    showMoreBtn.addEventListener('click', () => {
+      list.innerHTML = renderItems(sorted);
+    });
+  }
+}
+
+
 // ── LISTEN PROFILE ────────────────────────────────────────
 function listenProfile(uid) {
   if (_unsubProfile) { _unsubProfile(); _unsubProfile = null; }
@@ -437,6 +662,10 @@ function listenProfile(uid) {
     if(fr) fr.textContent = friends.length;
     const jo = document.getElementById('pro-stat-joined');
     if(jo) jo.textContent = joined;
+    
+    // Games played stat
+    const ge = document.getElementById('pro-stat-games');
+    if (ge) ge.textContent = (d.stats?.gamesPlayed || 0).toLocaleString('vi-VN');
 
     if (document.getElementById('pro-stat-rank')) {
       calcRank(uid).then(v => {
@@ -447,8 +676,36 @@ function listenProfile(uid) {
     }
 
     // Danh hiệu — chỉ hiện 1 danh hiệu đang được chọn
-    const stats = { points, friends: friends.length };
+    const petCol = d.petCollection || {};
+    const petCount = Object.values(petCol).reduce((sum, q) => sum + (q || 0), 0);
+    const streak = d.streak || {};
     const ownedShopIds = d.ownedTitles || [];
+    const us = d.stats || {};
+    const stats = {
+      points,
+      friends: friends.length,
+      petsOwned: petCount,
+      streakCurrent: streak.current || 0,
+      titlesOwned: ownedShopIds.length,
+      hasNickname: !!(d.nickname),
+      hasAvatar: !!d.avatarUrl,
+      gamesPlayed: us.gamesPlayed || 0,
+      uniqueGamesPlayed: us.uniqueGamesPlayed || 0,
+      chessGamesPlayed: us.chessGamesPlayed || 0,
+      cardGamesPlayed: us.cardGamesPlayed || 0,
+      smartGamesPlayed: us.smartGamesPlayed || 0,
+      xidachWins: us.xidachWins || 0,
+      xidachSpecials: us.xidachSpecials || 0,
+      casinoGamesPlayed: us.casinoGamesPlayed || 0,
+      slotGamesPlayed: us.slotGamesPlayed || 0,
+      slotWins: us.slotWins || 0,
+      baucuaGamesPlayed: us.baucuaGamesPlayed || 0,
+      baucuaWins: us.baucuaWins || 0,
+      taixiuGamesPlayed: us.taixiuGamesPlayed || 0,
+      taixiuWins: us.taixiuWins || 0,
+      casinoWins: us.casinoWins || 0,
+      totalWins: us.totalWins || 0,
+    };
     const ownedTitles = getOwnedTitles(stats, ownedShopIds);
     function parseActiveTitles(val) {
       if (!val) return [null, null];
@@ -482,6 +739,16 @@ function listenProfile(uid) {
     // Ảnh cá nhân — chỉ render khi có data
     if (d.photoUrl) renderPhoto(d.photoUrl);
 
+    // BIO
+    const isOwner = uid === currentUser?.uid;
+    setupBio(uid, d, isOwner);
+
+    // Game Stats
+    renderGameStats(stats, us);
+
+    // Achievement Progress
+    renderAchievementProgress(stats);
+
     try {
       renderProfilePet(uid, d.petCollection || d.pets || {}, d.activePet || null);
     } catch (e) {
@@ -489,3 +756,5 @@ function listenProfile(uid) {
     }
   }, err => console.error('onSnapshot:', err));
 }
+
+

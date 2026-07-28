@@ -6,7 +6,7 @@ import {
   limit
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { initProfileCard } from '../profile-card.js';
+import { getOwnedTitles, getDefaultTitle, getTitleById } from '../titles.js';
 import { initRoomChat, getMyNickname, destroyRoomChat } from '../room-chat.js';
 
 const GAMES = {
@@ -100,7 +100,16 @@ try {
     try {
       if (!user) { window.location.href = '../index.html'; return; }
       _user = user;
-      initProfileCard({ db, getMyUid: () => _user.uid });
+      if (window.initProfileCard) {
+  window.initProfileCard({
+    db,
+    getMyUid: () => _user.uid,
+    firestore: { doc, getDoc, updateDoc, deleteDoc, setDoc, arrayUnion, arrayRemove, serverTimestamp },
+    titles: { getOwnedTitles, getDefaultTitle, getTitleById }
+  });
+} else {
+  console.warn('⚠️ profile-card.js chưa load — check <script> trong HTML');
+}
       const ps = await getDoc(doc(db, 'users', user.uid));
       _myProfile = ps.exists() ? ps.data() : { nickname: user.email.split('@')[0] };
       setText('me-name', _myProfile.nickname || user.email.split('@')[0]);

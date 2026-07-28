@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Cờ Cá Ngựa</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../games.css"/>
+  <link rel="stylesheet" href="../../quests.css"/>
+  <link rel="stylesheet" href="ludo.css"/>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+  <script src="../../fullscreen.js"></script>
+  <script src="../../admin-toggle.js"></script>
+  <script type="module" src="../../quests.js"></script>
+</head>
+<body data-bottom-nav="games">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+
+  <div class="ld-page">
+
+    <!-- ===== START SCREEN ===== -->
+    <div class="ld-start" id="ld-start">
+      <div class="ld-hero">
+        <h1>🐴 <span>Cờ Cá Ngựa</span></h1>
+      </div>
+      <div class="ld-start-logo">🎲</div>
+      <h2>Ludo</h2>
+      <p>Đua 4 ngựa về đích! Tung xúc xắc, di chuyển, ăn quân đối thủ.</p>
+
+      <div class="ld-player-select" id="ld-player-count">
+        <button class="ld-player-btn" data-n="2" onclick="Ludo.setPlayerCount(2)">2 Người</button>
+        <button class="ld-player-btn active" data-n="3" onclick="Ludo.setPlayerCount(3)">3 Người</button>
+        <button class="ld-player-btn" data-n="4" onclick="Ludo.setPlayerCount(4)">4 Người</button>
+      </div>
+
+      <div class="ld-color-select" id="ld-color-select">
+        <button class="ld-color-btn" style="background:#ef4444" data-color="red" onclick="Ludo.setColor('red')"></button>
+        <button class="ld-color-btn active" style="background:#3b82f6" data-color="blue" onclick="Ludo.setColor('blue')"></button>
+        <button class="ld-color-btn" style="background:#22c55e" data-color="green" onclick="Ludo.setColor('green')"></button>
+        <button class="ld-color-btn" style="background:#eab308" data-color="yellow" onclick="Ludo.setColor('yellow')"></button>
+      </div>
+
+      <button class="ld-start-btn" onclick="Ludo.startGame()">🎮 Bắt đầu chơi</button>
+    </div>
+
+    <!-- ===== GAME SCREEN ===== -->
+    <div class="ld-game" id="ld-game">
+      <div class="ld-top">
+        <div class="ld-turn-indicator">
+          <div class="ld-turn-dot" id="ld-turn-dot"></div>
+          <span id="ld-turn-name">—</span>
+        </div>
+        <div class="ld-dice-area">
+          <button class="ld-dice-btn" id="ld-dice-btn" onclick="Ludo.rollDice()">🎲</button>
+        </div>
+      </div>
+
+      <div class="ld-board-wrap">
+        <canvas id="ld-board-canvas" width="480" height="480"></canvas>
+      </div>
+
+      <div class="ld-players" id="ld-players"></div>
+      <div class="ld-info" id="ld-info"><span>🎲</span> Nhấn xúc xắc để bắt đầu</div>
+    </div>
+
+    <!-- ===== RESULT ===== -->
+    <div class="ld-result" id="ld-result">
+      <div class="ld-result-box">
+        <div class="ld-result-emoji" id="ld-res-emoji">🏆</div>
+        <div class="ld-result-title" id="ld-res-title">Thắng!</div>
+        <div class="ld-result-sub" id="ld-res-sub">Chúc mừng!</div>
+        <button class="ld-result-btn" onclick="Ludo.reset()">🔄 Chơi lại</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    // Particles
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(251,191,36,0.35)';ctx.fill()});requestAnimationFrame(loop)})();
+
+    window.showToast=function(msg,type='info'){
+      const c={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};
+      const t=document.createElement('div');
+      t.style.cssText=`pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]};color:#e0f2fe;font-size:13px;font-weight:400;font-family:"Science Gothic",sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;
+      t.innerHTML=msg;
+      document.getElementById('toastContainer').appendChild(t);
+      setTimeout(()=>t.remove(),3500);
+    };
+  </script>
+  <script src="ludo.js"></script>
+</body>
+</html>

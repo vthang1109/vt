@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Random Number</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../games.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="random.css"/>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+  <script src="../../fullscreen.js"></script>
+  <script src="../../admin-toggle.js"></script>
+</head>
+<body data-bottom-nav="apps">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+
+  <div class="rand-page">
+    <div class="rand-hero">
+      <h1>🔢 <span>Random</span> Number</h1>
+      <p>Tạo số ngẫu nhiên · Tung đồng xu · Chọn người</p>
+    </div>
+
+    <!-- STATUS BAR -->
+    <div class="rand-status" id="rand-status">
+      <span class="stat-bet" id="rand-count">0</span>
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="rand-msg">Nhấn để random</span>
+      </div>
+      <span class="stat-profit zero" id="rand-result">—</span>
+    </div>
+
+    <!-- KẾT QUẢ -->
+    <div class="rand-result-area" id="rand-result-area">
+      <div class="rand-big-number" id="rand-big-number">?</div>
+    </div>
+
+    <!-- CHẾ ĐỘ -->
+    <div class="rand-modes">
+      <button class="rand-mode-btn active" data-mode="number" onclick="RandApp.setMode('number')">
+        <span class="rm-icon">🔢</span>
+        <span class="rm-name">Số ngẫu nhiên</span>
+      </button>
+      <button class="rand-mode-btn" data-mode="picker" onclick="RandApp.setMode('picker')">
+        <span class="rm-icon">👥</span>
+        <span class="rm-name">Chọn người</span>
+      </button>
+    </div>
+
+    <!-- SỐ -->
+    <div class="rand-number-section" id="rand-number-section">
+      <div class="rand-input-row">
+        <div class="rand-input-group">
+          <label>Từ</label>
+          <input class="rand-input" id="rand-min" type="number" value="1"/>
+        </div>
+        <div class="rand-input-group">
+          <label>Đến</label>
+          <input class="rand-input" id="rand-max" type="number" value="100"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- PICKER -->
+    <div class="rand-picker-section" id="rand-picker-section" style="display:none">
+      <div class="rand-input-row">
+        <input class="rand-input flex" id="rand-picker-input" placeholder="Tên người..." maxlength="20" onkeydown="if(event.key==='Enter')RandApp.addPickerItem()"/>
+        <button class="rand-add-btn" onclick="RandApp.addPickerItem()">➕</button>
+      </div>
+      <div class="rand-picker-list" id="rand-picker-list"></div>
+    </div>
+
+    <!-- NÚT RANDOM -->
+    <button class="rand-do-btn" id="rand-do-btn" onclick="RandApp.doRandom()">
+      <span>🎲</span> Random!
+    </button>
+
+    <!-- LỊCH SỬ -->
+    <div class="rand-history" id="rand-history">
+      <div class="rand-history-header">
+        <span>📜 Lịch sử</span>
+        <button class="rand-history-clear" onclick="RandApp.clearHistory()">✕ Xóa</button>
+      </div>
+      <div class="rand-history-list" id="rand-history-list">
+        <div class="rand-history-empty">Chưa có lần random nào</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(56,189,248,0.35)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast=function(msg,type='info'){const c={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};const t=document.createElement('div');t.style.cssText=`pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]};color:#e0f2fe;font-size:13px;font-weight:400;font-family:"Science Gothic",sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;t.innerHTML=msg;document.getElementById('toastContainer').appendChild(t);setTimeout(()=>t.remove(),3500)};
+  </script>
+  <script src="random.js"></script>
+</body>
+</html>

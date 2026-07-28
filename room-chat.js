@@ -384,7 +384,7 @@ function renderMsg(m) {
   row.className = 'rc-row ' + (me ? 'me' : 'other');
 
   const initial = esc(String(senderName || '?').trim().charAt(0).toUpperCase() || '?');
-  const avatarHtml = me ? '' : `<div class="rc-avatar" style="background:${avatarColor(senderName)}">${initial}</div>`;
+  const avatarHtml = me ? '' : `<div class="rc-avatar" style="background:${avatarColor(senderName)};cursor:pointer" title="Xem hồ sơ" onclick="event.stopPropagation();window.showProfileCard&&window.showProfileCard('${senderUid}')">${initial}</div>`;
 
   // Seen/delivered check
   let timeHtml = '';
@@ -399,7 +399,7 @@ function renderMsg(m) {
   row.innerHTML = `
     ${avatarHtml}
     <div class="rc-bubble-wrap">
-      <div class="rc-name">${esc(senderName)}</div>
+      <div class="rc-name" style="cursor:pointer" title="Xem hồ sơ" onclick="event.stopPropagation();window.showProfileCard&&window.showProfileCard('${senderUid}')">${esc(senderName)}</div>
       <div class="rc-bubble">${esc(m.text)}</div>
       ${timeHtml}
     </div>`;

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Vòng Quay</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../games.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="spinwheel.css"/>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+  <script src="../../fullscreen.js"></script>
+  <script src="../../admin-toggle.js"></script>
+</head>
+<body data-bottom-nav="apps">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+
+  <div class="sw-page">
+    <div class="sw-hero">
+      <h1>🎯 <span>Vòng Quay</span> May Mắn</h1>
+      <p>Tạo vòng quay · Quay số · Đưa ra quyết định</p>
+    </div>
+
+    <!-- STATUS BAR -->
+    <div class="sw-status" id="sw-status">
+      <span class="stat-bet" id="sw-count">0</span>
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="sw-msg">Quay nào!</span>
+      </div>
+      <span class="stat-profit zero" id="sw-result">—</span>
+    </div>
+
+    <!-- WHEEL -->
+    <div class="sw-area">
+      <div class="sw-wheel-wrap">
+        <canvas id="wheel-canvas" width="400" height="400"></canvas>
+        <div class="sw-pointer"></div>
+      </div>
+      <button class="sw-spin-btn" id="sw-spin-btn" onclick="SpinWheel.spin()">
+        <span>🎯</span> QUAY
+      </button>
+    </div>
+
+    <!-- DANH SÁCH MỤC -->
+    <div class="sw-items-section">
+      <div class="sw-section-label">Danh sách mục</div>
+      <div class="sw-items-row">
+        <input class="sw-input" id="sw-item-input" placeholder="Thêm mục mới..." maxlength="20" onkeydown="if(event.key==='Enter')SpinWheel.addItem()"/>
+        <button class="sw-add-btn" onclick="SpinWheel.addItem()">➕</button>
+      </div>
+      <div class="sw-items-list" id="sw-items-list"></div>
+    </div>
+
+    <!-- LỊCH SỬ -->
+    <div class="sw-history" id="sw-history">
+      <div class="sw-history-header">
+        <span>📜 Lịch sử</span>
+        <button class="sw-history-clear" onclick="SpinWheel.clearHistory()">✕ Xóa</button>
+      </div>
+      <div class="sw-history-list" id="sw-history-list">
+        <div class="sw-history-empty">Chưa có lần quay nào</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(167,139,250,0.35)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast=function(msg,type='info'){const c={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};const t=document.createElement('div');t.style.cssText=`pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]};color:#e0f2fe;font-size:13px;font-weight:400;font-family:"Science Gothic",sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;t.innerHTML=msg;document.getElementById('toastContainer').appendChild(t);setTimeout(()=>t.remove(),3500)};
+  </script>
+  <script src="spinwheel.js"></script>
+</body>
+</html>

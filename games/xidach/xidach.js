@@ -4,6 +4,7 @@ import { auth, db } from '../../points.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { addPoints, subscribeBalance } from '../../points.js';
 import { getActiveBuff } from '../../pet.js';
+import { doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 class XiDach {
     constructor() {
         this.deck = [];
@@ -569,6 +570,7 @@ class XiDach {
         }
 
         await this.settlePoints(delta);
+        this.trackXidachResult(res);
         this.render(true);
         this.updateButtons(false);
         document.getElementById('bc-status')?.classList.remove('rolling');
@@ -651,10 +653,31 @@ class XiDach {
         const subText = buffBonus > 0
             ? `${dealerWins}T-${dealerLosses}B-${draws}H 🐾+${buffBonus.toLocaleString('vi-VN')}`
             : `${dealerWins}T-${dealerLosses}B-${draws}H`;
+        // Track: dealer mode win/loss từ perspective người chơi (cầm cái)
+        const dealerOverall = dealerNet > 0 ? 'THẮNG' : (dealerNet < 0 ? 'THUA' : '');
+        if (dealerOverall) this.trackXidachResult(dealerOverall);
         this.updateStatusBar(this.dealerResult, totalNet, subText);
         this.isBusy = false;
         this.phase = 'betting';
         document.getElementById('xd-bet-row').style.display = 'flex';
+    }
+
+    // ── TRACKING ACHIEVEMENT ─────────────────────────
+    async trackXidachResult(result) {
+        if (!auth.currentUser || !result) return;
+        try {
+            const isWin = ['THẮNG','XÌ BÀN','XÌ DÁCH','NGŨ LINH'].includes(result);
+            const isSpecial = ['XÌ BÀN','XÌ DÁCH','NGŨ LINH'].includes(result);
+            const uRef = doc(db, 'users', auth.currentUser.uid);
+            const updates = { 'stats.xidachGamesPlayed': increment(1) };
+            if (isWin) {
+                updates['stats.xidachWins'] = increment(1);
+                updates['stats.totalWins'] = increment(1); // ← Thêm: cho title Thần Cờ Bạc
+                updates['stats.casinoWins'] = increment(1); // ← Thêm: cho title Thần Bài
+            }
+            if (isSpecial) updates['stats.xidachSpecials'] = increment(1);
+            await updateDoc(uRef, updates);
+        } catch(e) {}
     }
 
     async settlePoints(delta) {
@@ -832,3 +855,149 @@ class XiDach {
 new XiDach();
 window.addEventListener('pagehide', () => { if (!window.__navigated) window.game?.forfeitIfAbandoned(); });
 window.addEventListener('beforeunload', () => { if (!window.__navigated) window.game?.forfeitIfAbandoned(); });
+
+// ── ADMIN HACK: CHỌN BÀI ────────────────────────────────
+if (window.__ADMIN_GAME_HACKS) {
+  const suits = ['♠', '♣', '♦', '♥'];
+  const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+  window.__ADMIN_GAME_HACKS.push({
+    id: 'xidach_pick_cards',
+    label: '🃏 Chọn bài',
+    icon: '🃏',
+    render: (container, closeModal) => {
+      container.innerHTML = `
+        <p style="color:#94a3b8;font-size:12px;margin-bottom:10px;">Click vào lá bài để thêm vào tay — lá đã dùng sẽ bị mờ ⛔</p>
+        <div id="xdHackStatus" style="color:#34d399;font-size:12px;font-weight:700;margin-bottom:8px;min-height:18px;"></div>
+        <div id="xdHackGrid"></div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="xdHackClear">🗑️ Xoá tay</button>
+          <button id="xdHackReset" style="background:rgba(248,113,113,0.1);color:#f87171;border-color:rgba(248,113,113,0.3);">🔄 Reset deck</button>
+          <button id="xdHackClose" style="background:rgba(148,163,184,0.1);color:#94a3b8;border-color:rgba(148,163,184,0.2);">✕ Đóng</button>
+        </div>
+      `;
+
+      const status = document.getElementById('xdHackStatus');
+      const game = window.game;
+
+      function updateStatus(msg) {
+        if (status) { status.textContent = msg; status.style.color = '#34d399'; }
+      }
+
+      // Collect tất cả lá đã dùng (người chơi, máy, nhà cái, bot)
+      function getUsedCards() {
+        const g = window.game;
+        if (!g) return new Set();
+        const used = new Set();
+        // Dealer / nhà cái
+        (g.dealer?.hand || []).forEach(c => used.add(c.v + c.s));
+        // Người chơi
+        if (g.mode === 'dealer') {
+          (g.botPlayers || []).forEach(bot => (bot.hand || []).forEach(c => used.add(c.v + c.s)));
+        } else {
+          (g.players || []).forEach(p => (p.hand || []).forEach(c => used.add(c.v + c.s)));
+        }
+        return used;
+      }
+
+      function renderGrid() {
+        const usedCards = getUsedCards();
+        const grid = document.getElementById('xdHackGrid');
+        if (!grid) return;
+
+        // Header: giá trị
+        let html = `<div style="display:grid;grid-template-columns:repeat(13,1fr);gap:4px;margin-bottom:10px;">
+          ${values.map(v => `<div style="text-align:center;font-size:10px;color:#64748b;font-weight:700;padding:2px;">${v}</div>`).join('')}
+        </div>`;
+
+        // Các hàng: mỗi chất là một hàng
+        suits.forEach(s => {
+          const suitColor = s === '♥' || s === '♦' ? '#f87171' : '#94a3b8';
+          html += `<div style="display:grid;grid-template-columns:repeat(13,1fr);gap:4px;margin-bottom:6px;">`;
+          values.forEach(v => {
+            const cardKey = v + s;
+            const isUsed = usedCards.has(cardKey);
+            html += `<button class="xd-hack-card" data-v="${v}" data-s="${s}"
+              style="
+                padding:6px 2px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);
+                background:${isUsed ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.03)'};
+                color:${isUsed ? 'rgba(148,163,184,0.2)' : suitColor};
+                font-size:13px;font-weight:700;font-family:monospace;
+                cursor:${isUsed ? 'not-allowed' : 'pointer'};
+                transition:all 0.15s;
+                ${isUsed ? 'opacity:0.25;text-decoration:line-through;' : ''}
+              "
+              ${isUsed ? 'disabled' : ''}
+              onmouseover="this.style.borderColor='${isUsed ? 'rgba(255,255,255,0.06)' : 'rgba(167,139,250,0.4)'}';this.style.background='${isUsed ? 'rgba(255,255,255,0.01)' : 'rgba(167,139,250,0.1)'}"
+              onmouseout="this.style.borderColor='rgba(255,255,255,0.06)';this.style.background='${isUsed ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.03)'}"
+            >${v}${s}</button>`;
+          });
+          html += `</div>`;
+        });
+
+        grid.innerHTML = html;
+
+        // Gắn click listener cho các lá chưa dùng
+        grid.querySelectorAll('.xd-hack-card:not([disabled])').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const g = window.game;
+            if (!g) { updateStatus('❌ Game chưa khởi tạo'); return; }
+            const v = btn.dataset.v;
+            const s = btn.dataset.s;
+            const card = { v, s };
+
+            if (g.mode === 'dealer') {
+              g.dealer.hand.push(card);
+              g.render();
+              updateStatus(`✅ Đã thêm ${v}${s} vào tay bạn (Cầm cái)`);
+            } else {
+              g.players[0].hand.push(card);
+              // Force lật bài admin có thể thấy + đồng bộ nút
+              g.isPlayerFlipped = true;
+              g.render();
+              g.updateButtons(true);
+              const finalScore = g.getScore(g.players[0].hand);
+              g.updateStatusBar('Bạn', null, `Điểm: ${finalScore}`);
+              // Tự động stand nếu đủ 21 hoặc đủ 5 lá (giống logic hit())
+              if (finalScore >= 21 || g.players[0].hand.length >= 5) {
+                setTimeout(() => g.stand(), 300);
+                updateStatus(`✅ Đã thêm ${v}${s} — đủ điểm, tự động stand...`);
+              } else {
+                updateStatus(`✅ Đã thêm ${v}${s} vào tay bạn`);
+              }
+            }
+            // Re-render grid để cập nhật các lá đã dùng
+            renderGrid();
+          });
+        });
+      }
+
+      // Render lần đầu
+      renderGrid();
+
+      document.getElementById('xdHackClear')?.addEventListener('click', () => {
+        const g = window.game;
+        if (!g) return;
+        if (g.mode === 'dealer') {
+          g.dealer.hand = [];
+        } else {
+          g.players[0].hand = [];
+        }
+        g.render();
+        renderGrid();
+        updateStatus('🗑️ Đã xoá tay bài');
+      });
+
+      document.getElementById('xdHackReset')?.addEventListener('click', () => {
+        const g = window.game;
+        if (!g) return;
+        g.deck = createDeck();
+        renderGrid();
+        updateStatus('🔄 Đã reset bộ bài (52 lá ngẫu nhiên)');
+      });
+
+      document.getElementById('xdHackClose')?.addEventListener('click', closeModal);
+    }
+  });
+
+}

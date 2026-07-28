@@ -1,195 +1,469 @@
-// titles.js — Danh mục TẤT CẢ danh hiệu trong game
-// Dùng chung cho: profile.js (hiển thị/chọn), shop.js (mua), bag.js (túi đồ)
-//
-// type : 'auto' -> tự động có khi đủ điều kiện
-//        'shop' -> mua bằng điểm
-// tier : 'A' | 'S' | 'S+' | 'SS' | 'SK' | 'SSS'
-// cls  : tên class CSS badge
+// titles.js — Danh hiệu VTWorld
+// type: 'auto' = tự động có khi đủ điều kiện (thành tựu chính)
+//       'shop' = mua bằng điểm
+// tier: 'A' | 'S' | 'SS' | 'SSS'
 
-// ── CẤU HÌNH CẤP ĐỘ ────────────────────────────────────────
+// ── CẤU HÌNH CẤP ĐỘ ────────────────────────────────────
 export const TIER_META = {
-  'A':   { cls: 'tier-a',   name: 'Cấp A · Xanh Lá',    price: 3000,   icon: '🟢', color: '#34d399' },
-  'S':   { cls: 'tier-s',   name: 'Cấp S · Tím',         price: 10000,  icon: '🟣', color: '#a78bfa' },
-  'S+':  { cls: 'tier-sp',  name: 'Cấp S+ · Đỏ',         price: 30000,  icon: '🔴', color: '#f87171' },
-  'SS':  { cls: 'tier-ss',  name: 'Cấp SS · Vàng',       price: 80000,  icon: '🟡', color: '#fbbf24' },
-  'SK':  { cls: 'tier-sk',  name: 'Cấp SK · Sự Kiện',    price: 300000, icon: '🎪', color: '#f472b6' },
-  'SSS': { cls: 'tier-sss', name: 'Cấp SSS · Guardian',  price: 500000, icon: '👑', color: '#f1f5f9' },
+  'A':   { cls: 'tier-a',   name: 'A · Xanh Lá',   price: 5000,   icon: '🟢', color: '#34d399' },
+  'S':   { cls: 'tier-s',   name: 'S · Đỏ',         price: 50000,  icon: '🔴', color: '#f87171' },
+  'SS':  { cls: 'tier-ss',  name: 'SS · Vàng',     price: 200000, icon: '🟡', color: '#fbbf24' },
+  'SSS': { cls: 'tier-sss', name: 'SSS · Guardian',  price: 500000, icon: '👑', color: '#f1f5f9' },
+  'EVENT':  { cls: 'tier-event',   name: 'Event',  price: 0, icon: '🎪', color: '#a78bfa' },
 };
 
-// ── DANH HIỆU TỰ ĐỘNG ───────────────────────────────────────
+// ── GAME CATEGORY MAPPING ───────────────────────────────
+export const GAME_CATEGORIES = {
+  'caro':'chess','chess':'chess','xiangqi':'chess',
+  'tienlen':'card','poker':'card','xidach':'card','baicao':'card','catte':'card',
+  'sudoku':'smart','quiz':'smart','guess':'smart','timso':'smart',
+  'slot':'casino','baucua':'casino','taixiu':'casino',
+};
+
+// ── DANH HIỆU TỰ ĐỘNG (thành tựu chính) ─────────────────
 const AUTO_TITLES = [
+  // ===== ĐIỂM SỐ =====
   {
-    id: 'dai_phu_hao',
-    label: 'Đại Phú Hào',
-    cls: 'tier-ss',
+    id: 'nguoi_choi_moi',
+    label: 'Người Chơi Mới',
+    cls: 'tier-a',
     type: 'auto',
-    condition: (s) => s.points >= 100000,
-    desc: 'Đạt 100.000 điểm trở lên'
+    target: 1000,
+    statKey: 'points',
+    condition: (s) => s.points >= 1000,
+    desc: 'Đạt 1.000 điểm'
   },
   {
     id: 'dai_gia',
     label: 'Đại Gia',
     cls: 'tier-ss',
     type: 'auto',
-    condition: (s) => s.points >= 50000 && s.points < 100000,
-    desc: 'Đạt 50.000 điểm trở lên'
+    target: 50000,
+    statKey: 'points',
+    condition: (s) => s.points >= 50000,
+    desc: 'Đạt 50.000 điểm'
   },
   {
-    id: 'nguoi_choi_moi',
-    label: 'Người Chơi Mới',
+    id: 'dai_phu_hao',
+    label: 'Đại Phú Hào',
+    cls: 'tier-ss',
+    type: 'auto',
+    target: 100000,
+    statKey: 'points',
+    condition: (s) => s.points >= 100000,
+    desc: 'Đạt 100.000 điểm'
+  },
+  {
+    id: 'sieu_dai_gia',
+    label: 'Siêu Đại Gia',
+    cls: 'tier-ss',
+    type: 'auto',
+    target: 500000,
+    statKey: 'points',
+    condition: (s) => s.points >= 500000,
+    desc: 'Đạt 500.000 điểm'
+  },
+  {
+    id: 'trieu_phu',
+    label: 'Triệu Phú',
+    cls: 'tier-ss',
+    type: 'auto',
+    target: 1000000,
+    statKey: 'points',
+    condition: (s) => s.points >= 1000000,
+    desc: 'Đạt 1.000.000 điểm'
+  },
+
+  // ===== BẠN BÈ =====
+  {
+    id: 'than_thien',
+    label: 'Thân Thiện',
     cls: 'tier-a',
     type: 'auto',
-    condition: (s) => s.points >= 1000,
-    desc: 'Đạt 1.000 điểm trở lên'
+    target: 10,
+    statKey: 'friends',
+    condition: (s) => s.friends >= 10,
+    desc: 'Có 10 bạn bè'
   },
   {
     id: 'vua_ngoai_giao',
     label: 'Vua Ngoại Giao',
     cls: 'tier-s',
     type: 'auto',
+    target: 50,
+    statKey: 'friends',
     condition: (s) => s.friends >= 50,
-    desc: 'Có 50 bạn bè trở lên'
+    desc: 'Có 50 bạn bè'
   },
+
+  // ===== THÚ CƯNG =====
   {
-    id: 'than_thien',
-    label: 'Thân Thiện',
+    id: 'first_pet',
+    label: 'Người Bạn Nhỏ',
     cls: 'tier-a',
     type: 'auto',
-    condition: (s) => s.friends >= 10 && s.friends < 50,
-    desc: 'Có 10 bạn bè trở lên'
+    target: 1,
+    statKey: 'petsOwned',
+    condition: (s) => s.petsOwned >= 1,
+    desc: 'Sở hữu thú cưng đầu tiên'
+  },
+  {
+    id: 'pet_10',
+    label: 'Nhà Sưu Tập',
+    cls: 'tier-s',
+    type: 'auto',
+    target: 10,
+    statKey: 'petsOwned',
+    condition: (s) => s.petsOwned >= 10,
+    desc: 'Sở hữu 10 thú cưng'
+  },
+
+  // ===== STREAK =====
+  {
+    id: 'streak_7',
+    label: 'Siêng Năng',
+    cls: 'tier-s',
+    type: 'auto',
+    target: 7,
+    statKey: 'streakCurrent',
+    condition: (s) => s.streakCurrent >= 7,
+    desc: 'Điểm danh 7 ngày liên tiếp'
+  },
+  {
+    id: 'streak_30',
+    label: 'Trung Thành',
+    cls: 'tier-ss',
+    type: 'auto',
+    target: 30,
+    statKey: 'streakCurrent',
+    condition: (s) => s.streakCurrent >= 30,
+    desc: 'Điểm danh 30 ngày liên tiếp'
+  },
+
+  // ===== DANH HIỆU =====
+  {
+    id: 'title_5',
+    label: 'Sưu Tập Danh Hiệu',
+    cls: 'tier-s',
+    type: 'auto',
+    target: 5,
+    statKey: 'titlesOwned',
+    condition: (s) => s.titlesOwned >= 5,
+    desc: 'Sở hữu 5 danh hiệu'
+  },
+
+  // ===== HỒ SƠ =====
+  {
+    id: 'ca_tinh',
+    label: 'Cá Tính',
+    cls: 'tier-a',
+    type: 'auto',
+    condition: (s) => s.hasNickname && s.hasAvatar,
+    desc: 'Đặt tên + tải avatar',
+    boolean: true,
+  },
+
+  // ===== GAME CHUNG =====
+  {
+    id: 'game_thu',
+    label: 'Game Thủ',
+    cls: 'tier-a',
+    type: 'auto',
+    target: 10,
+    statKey: 'gamesPlayed',
+    condition: (s) => s.gamesPlayed >= 10,
+    desc: 'Chơi 10 ván game'
+  },
+  {
+    id: 'nghien_game',
+    label: 'Nghiện Game',
+    cls: 'tier-s',
+    type: 'auto',
+    target: 100,
+    statKey: 'gamesPlayed',
+    condition: (s) => s.gamesPlayed >= 100,
+    desc: 'Chơi 100 ván game'
+  },
+  {
+    id: 'da_dang',
+    label: 'Đa Dạng',
+    cls: 'tier-s',
+    type: 'auto',
+    target: 5,
+    statKey: 'uniqueGamesPlayed',
+    condition: (s) => s.uniqueGamesPlayed >= 5,
+    desc: 'Chơi 5 loại game khác nhau'
+  },
+
+  // ===== CỜ (caro, chess, xiangqi) =====
+  {
+    id: 'ky_thu_co',
+    label: 'Kỳ Thủ',
+    cls: 'tier-s',
+    type: 'auto',
+    target: 5,
+    statKey: 'chessGamesPlayed',
+    condition: (s) => s.chessGamesPlayed >= 5,
+    desc: 'Chơi 5 ván cờ'
+  },
+  {
+    id: 'cao_thu_co',
+    label: 'Cao Thủ Cờ',
+    cls: 'tier-ss',
+    type: 'auto',
+    target: 20,
+    statKey: 'chessGamesPlayed',
+    condition: (s) => s.chessGamesPlayed >= 20,
+    desc: 'Chơi 20 ván cờ'
+  },
+
+  // ===== BÀI (tienlen, poker, xidach, baicao, catte) =====
+  {
+    id: 'tay_choi_bai',
+    label: 'Tay Chơi Bài',
+    cls: 'tier-s',
+    type: 'auto',
+    target: 5,
+    statKey: 'cardGamesPlayed',
+    condition: (s) => s.cardGamesPlayed >= 5,
+    desc: 'Chơi 5 ván bài'
+  },
+  {
+    id: 'vuong_bai',
+    label: 'Vương Bài',
+    cls: 'tier-ss',
+    type: 'auto',
+    target: 20,
+    statKey: 'cardGamesPlayed',
+    condition: (s) => s.cardGamesPlayed >= 20,
+    desc: 'Chơi 20 ván bài'
+  },
+
+  // ===== XÌ DÁCH (thành tích đặc biệt) =====
+  {
+    id: 'vua_xidach',
+    label: 'Vua Xì Dách',
+    cls: 'tier-ss',
+    type: 'auto',
+    target: 100,
+    statKey: 'xidachWins',
+    condition: (s) => s.xidachWins >= 100,
+    desc: 'Thắng 100 ván Xì Dách'
+  },
+  {
+    id: 'huy_diet_xidach',
+    label: 'Hủy Diệt Xì Dách',
+    cls: 'tier-sss',
+    type: 'auto',
+    target: 100,
+    statKey: 'xidachSpecials',
+    condition: (s) => s.xidachSpecials >= 100,
+    desc: 'Đạt 100 ván Xì Dách, Xì Bàn, Ngũ Linh'
+  },
+
+  // ===== TRÍ TUỆ (sudoku, quiz, guess, timso) =====
+  {
+    id: 'hoc_sinh_gioi',
+    label: 'Học Sinh Giỏi',
+    cls: 'tier-a',
+    type: 'auto',
+    target: 3,
+    statKey: 'smartGamesPlayed',
+    condition: (s) => s.smartGamesPlayed >= 3,
+    desc: 'Chơi 3 game trí tuệ'
+  },
+  {
+    id: 'tien_si',
+    label: 'Tiến Sĩ',
+    cls: 'tier-s',
+    type: 'auto',
+    target: 15,
+    statKey: 'smartGamesPlayed',
+    condition: (s) => s.smartGamesPlayed >= 15,
+    desc: 'Chơi 15 game trí tuệ'
+  },
+
+  // ===== CASINO (slot, baucua, taixiu) =====
+  {
+    id: 'casino_tap_su',
+    label: 'Tập Sự Casino',
+    cls: 'tier-a',
+    type: 'auto',
+    target: 3,
+    statKey: 'casinoGamesPlayed',
+    condition: (s) => (s.casinoGamesPlayed || 0) >= 3,
+    desc: 'Chơi 3 ván casino'
+  },
+  {
+    id: 'casino_lao_lang',
+    label: 'Lão Làng Casino',
+    cls: 'tier-s',
+    type: 'auto',
+    target: 20,
+    statKey: 'casinoGamesPlayed',
+    condition: (s) => (s.casinoGamesPlayed || 0) >= 20,
+    desc: 'Chơi 20 ván casino'
+  },
+  {
+    id: 'casino_cao_thu',
+    label: 'Cao Thủ Casino',
+    cls: 'tier-ss',
+    type: 'auto',
+    target: 80,
+    statKey: 'casinoGamesPlayed',
+    condition: (s) => (s.casinoGamesPlayed || 0) >= 80,
+    desc: 'Chơi 80 ván casino'
+  },
+  {
+    id: 'casino_huy_diet',
+    label: 'Hủy Diệt Casino',
+    cls: 'tier-sss',
+    type: 'auto',
+    target: 300,
+    statKey: 'casinoGamesPlayed',
+    condition: (s) => (s.casinoGamesPlayed || 0) >= 300,
+    desc: 'Chơi 300 ván casino'
+  },
+
+  // ===== SLOT (tính theo số ván thắng) =====
+  {
+    id: 'slot_nghiep_du',
+    label: 'Slot Nghiệp Dư',
+    cls: 'tier-a',
+    type: 'auto',
+    target: 3,
+    statKey: 'slotWins',
+    condition: (s) => (s.slotWins || 0) >= 3,
+    desc: 'Thắng 3 ván Slot'
+  },
+  {
+    id: 'slot_cao_thu',
+    label: 'Slot Cao Thủ',
+    cls: 'tier-s',
+    type: 'auto',
+    target: 20,
+    statKey: 'slotWins',
+    condition: (s) => (s.slotWins || 0) >= 20,
+    desc: 'Thắng 20 ván Slot'
+  },
+
+  // ===== BẦU CUA (tính theo số ván thắng) =====
+  {
+    id: 'baucua_nghiep_du',
+    label: 'Bầu Cua Nghiệp Dư',
+    cls: 'tier-a',
+    type: 'auto',
+    target: 3,
+    statKey: 'baucuaWins',
+    condition: (s) => (s.baucuaWins || 0) >= 3,
+    desc: 'Thắng 3 ván Bầu Cua'
+  },
+  {
+    id: 'baucua_cao_thu',
+    label: 'Bầu Cua Cao Thủ',
+    cls: 'tier-s',
+    type: 'auto',
+    target: 20,
+    statKey: 'baucuaWins',
+    condition: (s) => (s.baucuaWins || 0) >= 20,
+    desc: 'Thắng 20 ván Bầu Cua'
+  },
+
+  // ===== TÀI XỈU (tính theo số ván thắng) =====
+  {
+    id: 'taixiu_nghiep_du',
+    label: 'Tài Xỉu Nghiệp Dư',
+    cls: 'tier-a',
+    type: 'auto',
+    target: 3,
+    statKey: 'taixiuWins',
+    condition: (s) => (s.taixiuWins || 0) >= 3,
+    desc: 'Thắng 3 ván Tài Xỉu'
+  },
+  {
+    id: 'taixiu_cao_thu',
+    label: 'Tài Xỉu Cao Thủ',
+    cls: 'tier-s',
+    type: 'auto',
+    target: 20,
+    statKey: 'taixiuWins',
+    condition: (s) => (s.taixiuWins || 0) >= 20,
+    desc: 'Thắng 20 ván Tài Xỉu'
+  },
+
+  // ===== HUYỀN THOẠI CASINO =====
+  {
+    id: 'than_bai',
+    label: 'Thần Bài 🃏',
+    cls: 'tier-event-gold',
+    type: 'auto',
+    target: 1000,
+    statKey: 'casinoWins',
+    condition: (s) => (s.casinoWins || 0) >= 1000,
+    desc: 'Thắng 1.000 ván casino (Slot + Bầu Cua + Tài Xỉu + Xì Dách)'
+  },
+  {
+    id: 'than_co_bac',
+    label: 'Thần Cờ Bạc 🎰',
+    cls: 'tier-event-gold-red',
+    type: 'auto',
+    target: 10000,
+    statKey: 'totalWins',
+    condition: (s) => (s.totalWins || 0) >= 10000,
+    desc: 'Thắng 10.000 ván tổng cộng (mọi game)'
   },
 ];
 
-// ── DANH HIỆU SHOP ───────────────────────────────────────────
-// SK có thêm field: cls riêng theo theme màu, icon theme
-const SHOP_TITLE_DEFS = [
+// ── DANH HIỆU EVENT (màu sắc riêng, admin tặng) ────────
+export const EVENT_TITLES = [
+  // === Visible (hiện trong Shop) ===
+  { id: 'event_cong_chua',  label: '🌸 Công Chúa',       cls: 'tier-event-pink',  type: 'event', desc: 'Sự kiện · Dành cho người đặc biệt' },
+  { id: 'event_hiep_si',    label: '⚔️ Hiệp Sĩ',         cls: 'tier-event-fire',  type: 'event', desc: 'Sự kiện · Dành cho người đặc biệt' },
+  { id: 'event_phu_thuy',   label: '🔮 Phù Thủy',        cls: 'tier-event-dark',  type: 'event', desc: 'Sự kiện · Dành cho người đặc biệt' },
+  { id: 'event_thien_than', label: '👼 Thiên Thần',       cls: 'tier-event-cyan',  type: 'event', desc: 'Sự kiện · Dành cho người đặc biệt' },
+  { id: 'event_ve_si',      label: '🛡️ Vệ Sĩ',           cls: 'tier-event-nature', type: 'event', desc: 'Sự kiện · Dành cho người đặc biệt' },
 
-  // ===== CẤP A — XANH LÁ =====
-  { id: 'tan_binh',          label: 'Tân Binh',           tier: 'A' },
-  { id: 'hoc_viec',          label: 'Học Việc',           tier: 'A' },
-  { id: 'nguoi_moi',         label: 'Người Mới',          tier: 'A' },
-  { id: 'hat_giong',         label: 'Hạt Giống',          tier: 'A' },
-  { id: 'lu_khach',          label: 'Lữ Khách',           tier: 'A' },
-  { id: 'nguoi_mo_mong',     label: 'Người Mơ Mộng',      tier: 'A' },
-  { id: 'nguoi_quan_sat',    label: 'Người Quan Sát',     tier: 'A' },
-  { id: 'ke_dao_choi',       label: 'Kẻ Dạo Chơi',        tier: 'A' },
-  { id: 'mam_non',           label: 'Mầm Non',            tier: 'A' },
-  { id: 'nguoi_tap_su',      label: 'Người Tập Sự',       tier: 'A' },
-
-  // ===== CẤP S — TÍM =====
-  { id: 'cao_thu',           label: 'Cao Thủ',            tier: 'S' },
-  { id: 'bac_thay',          label: 'Bậc Thầy',           tier: 'S' },
-  { id: 'sat_thu_bong_dem',  label: 'Sát Thủ Bóng Đêm',   tier: 'S' },
-  { id: 'phap_su_toi_thuong',label: 'Pháp Sư Tối Thượng', tier: 'S' },
-  { id: 'quan_su',           label: 'Quân Sư',            tier: 'S' },
-  { id: 'dai_hiep',          label: 'Đại Hiệp',           tier: 'S' },
-  { id: 'than_toc',          label: 'Thần Tốc',           tier: 'S' },
-  { id: 'vo_anh',            label: 'Vô Ảnh',             tier: 'S' },
-  { id: 'bi_an',             label: 'Bí Ẩn',              tier: 'S' },
-  { id: 'chien_than_tim',    label: 'Chiến Thần Tím',     tier: 'S' },
-
-  // ===== CẤP S+ — ĐỎ =====
-  { id: 'ba_vuong',          label: 'Bá Vương',           tier: 'S+' },
-  { id: 'chien_than',        label: 'Chiến Thần',         tier: 'S+' },
-  { id: 'hoa_long',          label: 'Hỏa Long',           tier: 'S+' },
-  { id: 'sat_than',          label: 'Sát Thần',           tier: 'S+' },
-  { id: 'vua_chien_truong',  label: 'Vua Chiến Trường',   tier: 'S+' },
-  { id: 'ac_long',           label: 'Ác Long',            tier: 'S+' },
-  { id: 'than_chien_tranh',  label: 'Thần Chiến Tranh',   tier: 'S+' },
-  { id: 'huyet_chien',       label: 'Huyết Chiến',        tier: 'S+' },
-  { id: 'vuong_gia',         label: 'Vương Giả',          tier: 'S+' },
-  { id: 'ke_huy_diet',       label: 'Kẻ Hủy Diệt',        tier: 'S+' },
-
-  // ===== CẤP SS — VÀNG =====
-  { id: 'vua_kim_tien',      label: 'Vua Kim Tiền',       tier: 'SS' },
-  { id: 'hoang_de',          label: 'Hoàng Đế',           tier: 'SS' },
-  { id: 'thien_kim',         label: 'Thiên Kim',          tier: 'SS' },
-  { id: 'de_vuong',          label: 'Đế Vương',           tier: 'SS' },
-  { id: 'bac_ton_quy',       label: 'Bậc Tôn Quý',        tier: 'SS' },
-  { id: 'van_tai',           label: 'Vạn Tài',            tier: 'SS' },
-  { id: 'trum_cuoi',         label: 'Trùm Cuối',          tier: 'SS' },
-  { id: 'than_tai',          label: 'Thần Tài',           tier: 'SS' },
-  { id: 'phu_ho',            label: 'Phú Hộ',             tier: 'SS' },
-  { id: 'doc_co_cau_bai',    label: 'Độc Cô Cầu Bại',     tier: 'SS' },
-
-  // ===== CẤP SK — SỰ KIỆN (mỗi cái có theme màu riêng) =====
-  // 🌸 Hồng — trái tim / lãng mạn
-  { id: 'sk_tinh_yeu',       label: '💕 Tình Yêu',         tier: 'SK', cls: 'tier-sk-pink',   desc: 'Sự kiện Valentine · Tình yêu ngọt ngào' },
-  { id: 'sk_cong_chua',      label: '🌸 Công Chúa',        tier: 'SK', cls: 'tier-sk-pink',   desc: 'Sự kiện mùa xuân · Nhan sắc nghiêng thành' },
-  { id: 'sk_mong_mo',        label: '🫧 Mộng Mơ',          tier: 'SK', cls: 'tier-sk-pink',   desc: 'Sự kiện hoa anh đào · Nhẹ nhàng như gió' },
-
-  // 🔥 Đỏ lửa — mãnh liệt
-  { id: 'sk_lua_than',       label: '🔥 Lửa Thần',         tier: 'SK', cls: 'tier-sk-fire',   desc: 'Sự kiện Hỏa Diệm Sơn · Thiêu đốt tất cả' },
-  { id: 'sk_ac_quy_do',      label: '😈 Ác Quỷ Đỏ',        tier: 'SK', cls: 'tier-sk-fire',   desc: 'Sự kiện Halloween · Đến từ địa ngục' },
-  { id: 'sk_phuong_hoang',   label: '🦅 Phượng Hoàng',     tier: 'SK', cls: 'tier-sk-fire',   desc: 'Sự kiện tái sinh · Bất diệt từ tro tàn' },
-
-  // 🌊 Xanh ngọc — băng / biển
-  { id: 'sk_bang_than',      label: '❄️ Băng Thần',         tier: 'SK', cls: 'tier-sk-cyan',   desc: 'Sự kiện mùa đông · Lạnh như băng giá' },
-  { id: 'sk_hai_vuong',      label: '🌊 Hải Vương',         tier: 'SK', cls: 'tier-sk-cyan',   desc: 'Sự kiện đại dương · Chúa tể biển cả' },
-  { id: 'sk_tuyet_nu',       label: '🌨️ Tuyết Nữ',          tier: 'SK', cls: 'tier-sk-cyan',   desc: 'Sự kiện Noel · Tinh khiết như tuyết trắng' },
-
-  // 🌙 Tím đêm — huyền bí
-  { id: 'sk_ma_vuong',       label: '🌙 Ma Vương',          tier: 'SK', cls: 'tier-sk-dark',   desc: 'Sự kiện bóng tối · Kẻ cai trị đêm đen' },
-  { id: 'sk_phap_su_bong',   label: '🔮 Pháp Sư Bóng Tối', tier: 'SK', cls: 'tier-sk-dark',   desc: 'Sự kiện phù thủy · Bí ẩn khôn lường' },
-  { id: 'sk_nguyet_than',    label: '🌑 Nguyệt Thần',       tier: 'SK', cls: 'tier-sk-dark',   desc: 'Sự kiện trăng máu · Thần của màn đêm' },
-
-  // ⭐ Vàng ánh sao — lễ hội
-  { id: 'sk_sao_bang',       label: '⭐ Sao Băng',          tier: 'SK', cls: 'tier-sk-star',   desc: 'Sự kiện thiên văn · Vụt sáng rực rỡ' },
-  { id: 'sk_hoang_kim',      label: '✨ Hoàng Kim',         tier: 'SK', cls: 'tier-sk-star',   desc: 'Sự kiện năm mới · Ánh vàng rực sáng' },
-  { id: 'sk_than_may_man',   label: '🍀 Thần May Mắn',      tier: 'SK', cls: 'tier-sk-star',   desc: 'Sự kiện St.Patrick · Vận may luôn đến' },
-
-  // 🌿 Xanh lá ngọc — thiên nhiên
-  { id: 'sk_rung_than',      label: '🌿 Rừng Thần',         tier: 'SK', cls: 'tier-sk-nature', desc: 'Sự kiện mùa hè · Linh hồn của đại ngàn' },
-  { id: 'sk_tien_nu_xanh',   label: '🧚 Tiên Nữ Xanh',      tier: 'SK', cls: 'tier-sk-nature', desc: 'Sự kiện mùa xuân · Nàng tiên rừng xanh' },
-
-  // 🎰 Đen-Trắng-Vàng chéo — cờ bạc / casino
-  { id: 'sk_than_bai',        label: '🃏 Thần Bài',          tier: 'SK', cls: 'tier-sk-casino', desc: 'Sự kiện Casino · Bậc thầy thao túng bài' },
-  { id: 'sk_vuong_bai',       label: '🂡 Vương Bài',          tier: 'SK', cls: 'tier-sk-casino', desc: 'Sự kiện Casino · Lá bài định mệnh' },
-  { id: 'sk_ac_quy_bai',      label: '🎴 Ác Quỷ Bài',        tier: 'SK', cls: 'tier-sk-casino', desc: 'Sự kiện Casino · Kẻ không bao giờ thua' },
-  { id: 'sk_joker',           label: '🃏 Joker',              tier: 'SK', cls: 'tier-sk-casino', desc: 'Sự kiện Casino · Lá bài huyền thoại' },
-  { id: 'sk_chieu_bai',       label: '♠️ Chiếu Bài',          tier: 'SK', cls: 'tier-sk-casino', desc: 'Sự kiện Casino · Một chiếu định giang hồ' },
-
-  // ===== CẤP SSS — GUARDIAN (gradient đặc biệt) =====
-  { id: 'sss_guardian',      label: '👑 Guardian',          tier: 'SSS' },
-  { id: 'sss_than_linh',     label: '⚡ Thần Linh',         tier: 'SSS' },
-  { id: 'sss_vo_thuong',     label: '🌌 Vô Thượng',         tier: 'SSS' },
-  { id: 'sss_thien_dia',     label: '🌠 Thiên Địa',         tier: 'SSS' },
-  { id: 'sss_khai_thien',    label: '🔱 Khai Thiên',        tier: 'SSS' },
-  { id: 'sss_diet_the',      label: '💫 Diệt Thế',          tier: 'SSS' },
-  { id: 'sss_nguyen_thu',    label: '🪐 Nguyên Thủy',       tier: 'SSS' },
-  { id: 'sss_bat_diet',      label: '♾️ Bất Diệt',           tier: 'SSS' },
-  { id: 'sss_tuyet_dinh',    label: '🏔️ Tuyệt Đỉnh',        tier: 'SSS' },
-  { id: 'sss_vinh_hang',     label: '🌀 Vĩnh Hằng',         tier: 'SSS' },
+  // === Hidden (chỉ admin thấy trong Chat) ===
+  { id: 'event_hoang_tu',   label: '👑 Hoàng Tử',         cls: 'tier-event-dark',   type: 'event', desc: 'Ẩn · Bí mật', hidden: true },
+  { id: 'event_ma_ca_rong', label: '🐉 Ma Cà Rồng',       cls: 'tier-event-fire',   type: 'event', desc: 'Ẩn · Huyền thoại', hidden: true },
+  { id: 'event_tien_tri',   label: '🔮 Tiên Tri',         cls: 'tier-event-pink',   type: 'event', desc: 'Ẩn · Giác quan thứ 6', hidden: true },
+  { id: 'event_thien_tai',  label: '🌪️ Thiên Tai',        cls: 'tier-event-cyan',   type: 'event', desc: 'Ẩn · Sức mạnh hủy diệt', hidden: true },
+  { id: 'event_phap_su',    label: '🧙 Pháp Sư',          cls: 'tier-event-nature', type: 'event', desc: 'Ẩn · Phép thuật cổ đại', hidden: true },
 ];
 
-const SK_THEME_COLOR = {
-  'tier-sk-pink':   '#f472b6',
-  'tier-sk-fire':   '#fb923c',
-  'tier-sk-cyan':   '#22d3ee',
-  'tier-sk-dark':   '#8b5cf6',
-  'tier-sk-star':   '#facc15',
-  'tier-sk-nature': '#4ade80',
-  'tier-sk-casino': '#f5c518',
-};
+// ── DANH HIỆU SHOP (mua bằng điểm) ──────────────────────
+const SHOP_TITLE_DEFS = [
+  { id: 'tan_binh',       label: 'Tân Binh',       tier: 'A' },
+  { id: 'lu_khach',       label: 'Lữ Khách',       tier: 'A' },
+  { id: 'ke_dao_choi',    label: 'Kẻ Dạo Chơi',    tier: 'A' },
+  { id: 'cao_thu',        label: 'Cao Thủ',        tier: 'S' },
+  { id: 'bac_thay',       label: 'Bậc Thầy',       tier: 'S' },
+  { id: 'dai_hiep',       label: 'Đại Hiệp',       tier: 'S' },
+  { id: 'than_toc',       label: 'Thần Tốc',       tier: 'S' },
+  { id: 'ba_vuong',       label: 'Bá Vương',       tier: 'SS' },
+  { id: 'chien_than',     label: 'Chiến Thần',    tier: 'SS' },
+  { id: 'sat_than',       label: 'Sát Thần',      tier: 'SS' },
+  { id: 'hoang_de',       label: 'Hoàng Đế',      tier: 'SSS' },
+  { id: 'de_vuong',       label: 'Đế Vương',      tier: 'SSS' },
+  { id: 'doc_co_cau_bai', label: 'Độc Cô Cầu Bại', tier: 'SSS' },
+  { id: 'than_tai',       label: 'Thần Tài',      tier: 'SSS' },
+];
 
 export const SHOP_TITLES = SHOP_TITLE_DEFS.map(t => {
   const meta = TIER_META[t.tier];
-  const cls  = t.cls || meta.cls;
-  const color = SK_THEME_COLOR[cls] || meta.color;
   return {
     ...t,
     type: 'shop',
-    cls,
-    color,
+    cls: t.cls || meta.cls,
+    color: meta.color,
     price: meta.price,
-    desc: t.desc || `Danh hiệu ${meta.name}`,
+    desc: `Danh hiệu ${meta.name}`,
   };
 });
 
-export const TITLES = [...AUTO_TITLES, ...SHOP_TITLES];
+export const TITLES = [...AUTO_TITLES, ...SHOP_TITLES, ...EVENT_TITLES];
 
-// ── HÀM HỖ TRỢ ─────────────────────────────────────────────
-
+// ── HÀM HỖ TRỢ ──────────────────────────────────────────
 export function getTitleById(id) {
   return TITLES.find(t => t.id === id) || null;
 }
@@ -198,8 +472,13 @@ export function getShopTitlesByTier(tier) {
   return SHOP_TITLES.filter(t => t.tier === tier);
 }
 
+export function getAutoTitlesByTier(tier) {
+  const prefix = `tier-${tier.toLowerCase()}`;
+  return AUTO_TITLES.filter(t => t.cls === prefix || t.cls.startsWith(prefix + '-'));
+}
+
 export function getAutoOwnedTitles(stats) {
-  return TITLES.filter(t => t.type === 'auto' && t.condition(stats));
+  return AUTO_TITLES.filter(t => t.condition(stats));
 }
 
 export function getOwnedTitles(stats, ownedShopIds = []) {
@@ -213,41 +492,22 @@ export function getDefaultTitle(stats, ownedShopIds = []) {
   return owned[0] || null;
 }
 
-// ── BXH RANK ──────────────────────────────────────────────
-// Thứ tự cấp độ dùng để so sánh trong leaderboard rank
-export const TIER_ORDER = {
-  'A':   1,
-  'S':   2,
-  'S+':  3,
-  'SS':  4,
-  'SK':  5,
-  'SSS': 6,
-};
+// ── BXH RANK ─────────────────────────────────────────────
+export const TIER_ORDER = { 'A': 1, 'S': 2, 'SS': 3, 'SSS': 4 };
 
-/**
- * Lấy cấp (tier) từ một title object.
- * Shop titles có field `tier`; auto titles dùng `cls` để suy ra.
- */
 export function getTierFromTitle(title) {
   if (!title) return null;
-  if (title.tier) return title.tier; // shop titles
-  // Auto titles: cls như 'tier-ss', 'tier-a', 'tier-s'
+  if (title.tier) return title.tier;
   if (title.cls) {
-    const m = title.cls.match(/^tier-(sss|ss|s\+|s|a|sk)$/i);
+    const m = title.cls.match(/^tier-(sss|ss|s|a)$/i);
     if (m) return m[1].toUpperCase();
   }
   return null;
 }
 
-/**
- * Tính highestTierOrder cao nhất từ danh sách title IDs đang sở hữu.
- * @param {string[]} ownedTitleIds - Mảng ID title (shop + auto)
- * @param {{points?:number,friends?:number}} [stats] - Thống kê để tính auto titles (nếu cần)
- * @returns {number} 0 nếu không có title nào
- */
 export function computeHighestTierOrder(ownedTitleIds, stats) {
   let maxOrder = 0;
-  if (ownedTitleIds && ownedTitleIds.length) {
+  if (ownedTitleIds?.length) {
     for (const id of ownedTitleIds) {
       const title = getTitleById(id);
       const tier = getTierFromTitle(title);
@@ -255,10 +515,8 @@ export function computeHighestTierOrder(ownedTitleIds, stats) {
       if (order > maxOrder) maxOrder = order;
     }
   }
-  // Nếu có stats, tính luôn auto titles
   if (stats) {
-    const autoTitles = getAutoOwnedTitles(stats);
-    for (const t of autoTitles) {
+    for (const t of getAutoOwnedTitles(stats)) {
       const tier = getTierFromTitle(t);
       const order = tier ? (TIER_ORDER[tier] || 0) : 0;
       if (order > maxOrder) maxOrder = order;
@@ -267,31 +525,22 @@ export function computeHighestTierOrder(ownedTitleIds, stats) {
   return maxOrder;
 }
 
-/**
- * Lấy thông tin title cao nhất (dùng cho hiển thị BXH Rank).
- * @returns {{label:string, cls:string, tier:string}|null}
- */
-export function getHighestTitleInfo(ownedTitleIds, stats) {
-  let best = null;
-  let bestOrder = 0;
+// ── TIẾN TRÌNH CHO AUTO TITLE ──────────────────────────
+export function getTitleProgress(title, stats) {
+  if (!title || !stats || title.boolean || !title.target || !title.statKey) return null;
+  const current = Math.min(stats[title.statKey] || 0, title.target);
+  return { current, target: title.target };
+}
 
+export function getHighestTitleInfo(ownedTitleIds, stats) {
+  let best = null, bestOrder = 0;
   const check = (title) => {
     if (!title) return;
     const tier = getTierFromTitle(title);
     const order = tier ? (TIER_ORDER[tier] || 0) : 0;
-    if (order > bestOrder) {
-      bestOrder = order;
-      best = { label: title.label, cls: title.cls, tier, order };
-    }
+    if (order > bestOrder) { bestOrder = order; best = { label: title.label, cls: title.cls, tier, order }; }
   };
-
-  if (ownedTitleIds && ownedTitleIds.length) {
-    for (const id of ownedTitleIds) {
-      check(getTitleById(id));
-    }
-  }
-  if (stats) {
-    for (const t of getAutoOwnedTitles(stats)) check(t);
-  }
+  if (ownedTitleIds?.length) { for (const id of ownedTitleIds) check(getTitleById(id)); }
+  if (stats) { for (const t of getAutoOwnedTitles(stats)) check(t); }
   return best;
 }

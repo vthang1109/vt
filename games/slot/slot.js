@@ -257,9 +257,11 @@ class SlotGame {
     this.balance = newUserPoints;
     if (window.TopNav) TopNav.setPoints(this.balance);
 
+    if (window.VTQuests) window.VTQuests.trackPlay('slot');
     if (isJackpot) {
       this.updateResultDisplay('🔥 NỔ HŨ! 🔥', 'jackpot');
       this.updateStatusBar(betAmount, '777', finalWin - betAmount);
+      if (window.VTQuests) window.VTQuests.trackGameWin('slot');
       if (buffPercent > 0) {
         window.showToast(`🐾 Pet buff +${buffPercent}%! Nhận ${finalWin.toLocaleString('vi-VN')} 〄`, 'success');
       }
@@ -267,6 +269,7 @@ class SlotGame {
     } else if (isTriple) {
       this.updateResultDisplay(`🎉 Trúng 3x ${a}!`, 'win');
       this.updateStatusBar(betAmount, 'Triple', finalWin - betAmount);
+      if (window.VTQuests) window.VTQuests.trackGameWin('slot');
       window.showToast(`🎉 Trúng 3x ${a}! +${finalWin.toLocaleString('vi-VN')} 〄`, 'success');
     } else {
       this.updateResultDisplay('❌ Không trúng', 'lose');
@@ -284,3 +287,105 @@ class SlotGame {
 }
 
 new SlotGame();
+
+// ── ADMIN HACK: CHỌN KẾT QUẢ ────────────────────────────
+if (window.__ADMIN_GAME_HACKS) {
+  const HACK_SYMBOLS = ['🍊', '🍇', '🍋', '🔔', '7️⃣', '💎', '⭐', '👑'];
+
+  // Patch spinReels để dùng forced results từ hack
+  const origSpinReels = SlotGame.prototype.spinReels;
+  SlotGame.prototype.spinReels = async function() {
+    if (this.slotResult) {
+      const result = this.slotResult;
+      this.slotResult = null;
+      const reels = [0,1,2].map(i => document.getElementById('reel-' + i));
+      reels.forEach(r => r && r.classList.add('spinning'));
+      await new Promise(r => setTimeout(r, 500));
+      result.forEach((sym, i) => {
+        if (reels[i]) {
+          reels[i].textContent = sym;
+          reels[i].classList.remove('spinning');
+        }
+      });
+      return result;
+    }
+    return origSpinReels.call(this);
+  };
+
+  window.__ADMIN_GAME_HACKS.push({
+    id: 'slot_choose_result',
+    label: 'Chọn kết quả',
+    icon: '🎰',
+    render: (container, closeModal) => {
+      let selected = [null, null, null];
+      let currentReel = 0;
+
+      function renderUI() {
+        container.innerHTML = `
+          <p style="color:#94a3b8;font-size:12px;margin-bottom:10px;">Click để chọn biểu tượng cho từng cột (đang chọn <b id="slotHackCurrentReel">Cột 1</b>)</p>
+          <div id="slotHackStatus" style="color:#34d399;font-size:12px;font-weight:700;margin-bottom:8px;min-height:18px;"></div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;">
+            ${[0,1,2].map(r => `
+              <div style="flex:1;text-align:center;">
+                <div style="font-size:10px;color:#64748b;font-weight:700;margin-bottom:6px;">Cột ${r+1}</div>
+                <div id="slotReel${r}" style="
+                  width:60px;height:60px;margin:0 auto;
+                  background:rgba(255,255,255,0.03);border:2px solid ${selected[r] ? 'rgba(52,211,153,0.4)' : 'rgba(255,255,255,0.1)'};
+                  border-radius:12px;display:flex;align-items:center;justify-content:center;
+                  font-size:28px;transition:border-color 0.2s;
+                ">${selected[r] || '?'}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px;">
+            ${HACK_SYMBOLS.map(sym => `
+              <button class="slot-hack-btn" data-sym="${sym}" style="
+                padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);
+                background:rgba(255,255,255,0.03);color:#e0f2fe;font-size:22px;
+                cursor:pointer;transition:all 0.15s;
+              " onmouseover="this.style.borderColor='rgba(167,139,250,0.4)';this.style.background='rgba(167,139,250,0.1)'"
+                 onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(255,255,255,0.03)'">${sym}</button>
+            `).join('')}
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button id="slotHackApply" style="flex:1" class="green">🎯 Áp dụng</button>
+            <button id="slotHackJackpot" style="flex:1" class="yellow">👑 Jackpot</button>
+            <button id="slotHackClose" style="background:rgba(148,163,184,0.1);color:#94a3b8;border-color:rgba(148,163,184,0.2);">✕</button>
+          </div>
+        `;
+
+        container.querySelectorAll('.slot-hack-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            selected[currentReel] = btn.dataset.sym;
+            const el = document.getElementById('slotReel' + currentReel);
+            if (el) { el.textContent = btn.dataset.sym; el.style.borderColor = 'rgba(52,211,153,0.4)'; }
+            currentReel = (currentReel + 1) % 3;
+            const reelLabel = document.getElementById('slotHackCurrentReel');
+            if (reelLabel) reelLabel.textContent = 'Cột ' + (currentReel + 1);
+          });
+        });
+
+        document.getElementById('slotHackApply')?.addEventListener('click', () => {
+          const g = window.game;
+          if (!g) return;
+          if (selected.includes(null)) { document.getElementById('slotHackStatus').textContent = '⚠️ Chọn đủ 3 cột!'; return; }
+          g.slotResult = [...selected];
+          document.getElementById('slotHackStatus').textContent = '✅ Kết quả set: ' + selected.join(' ');
+        });
+
+        document.getElementById('slotHackJackpot')?.addEventListener('click', () => {
+          const g = window.game;
+          if (!g) return;
+          selected = ['👑', '👑', '👑'];
+          g.slotResult = ['👑', '👑', '👑'];
+          currentReel = 0;
+          renderUI();
+          document.getElementById('slotHackStatus').textContent = '👑 Jackpot set! Quay để nhận.';
+        });
+
+        document.getElementById('slotHackClose')?.addEventListener('click', closeModal);
+      }
+      renderUI();
+    }
+  });
+}

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Tung Đồng Xu</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../games.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="coinflip.css"/>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+  <script src="../../fullscreen.js"></script>
+  <script src="../../admin-toggle.js"></script>
+</head>
+<body data-bottom-nav="apps">
+  <canvas id="bg-canvas"></canvas>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div id="top-nav-root"></div>
+
+  <div class="cf-page">
+    <div class="cf-hero">
+      <h1>🪙 <span>Tung Đồng Xu</span></h1>
+      <p>Ngửa hay sấp? 50/50 — Thử vận may!</p>
+    </div>
+
+    <!-- STATUS BAR -->
+    <div class="cf-status" id="cf-status">
+      <span class="stat-bet" id="cf-count">0</span>
+      <div class="stat-score-wrap">
+        <span class="stat-score" id="cf-msg">Ấn để tung!</span>
+      </div>
+      <span class="stat-profit zero" id="cf-stat">—</span>
+    </div>
+
+    <!-- COIN -->
+    <div class="cf-coin-area">
+      <div class="cf-coin" id="cf-coin" onclick="CoinFlip.flip()">
+        <div class="cf-coin-inner" id="cf-coin-inner">
+          <div class="cf-coin-face cf-coin-heads">
+            <div class="cf-coin-content">
+              <span class="cf-coin-label">NGỬA</span>
+              <span class="cf-coin-emoji">👑</span>
+            </div>
+          </div>
+          <div class="cf-coin-face cf-coin-tails">
+            <div class="cf-coin-content">
+              <span class="cf-coin-label">SẤP</span>
+              <span class="cf-coin-emoji">🪙</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cf-hint">Ấn vào đồng xu để tung!</div>
+    </div>
+
+    <!-- CHỌN MẶT -->
+    <div class="cf-choice" id="cf-choice">
+      <div class="cf-choice-label">Bạn chọn mặt nào?</div>
+      <div class="cf-choice-btns">
+        <button class="cf-choice-btn" data-side="heads" onclick="CoinFlip.setSide('heads')">
+          <span>👑</span> NGỬA
+        </button>
+        <button class="cf-choice-btn" data-side="tails" onclick="CoinFlip.setSide('tails')">
+          <span>🪙</span> SẤP
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="cf-stats" id="cf-stats">
+      <div class="cf-stat">
+        <span class="cf-stat-val" id="cf-heads">0</span>
+        <span class="cf-stat-label">NGỬA</span>
+      </div>
+      <div class="cf-stat">
+        <span class="cf-stat-val" id="cf-tails">0</span>
+        <span class="cf-stat-label">SẤP</span>
+      </div>
+      <div class="cf-stat">
+        <span class="cf-stat-val" id="cf-winrate">0%</span>
+        <span class="cf-stat-label">Tỉ lệ đúng</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="display:none"></div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particles = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+    for(let i=0;i<25;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.5});
+    (function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(251,191,36,0.35)';ctx.fill()});requestAnimationFrame(loop)})();
+    window.showToast=function(msg,type='info'){const c={info:'#38bdf8',success:'#34d399',warn:'#fbbf24',error:'#f87171'};const t=document.createElement('div');t.style.cssText=`pointer-events:all;padding:11px 16px;border-radius:12px;background:rgba(4,20,40,0.97);border:1px solid ${c[type]};color:#e0f2fe;font-size:13px;font-weight:400;font-family:"Science Gothic",sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:280px`;t.innerHTML=msg;document.getElementById('toastContainer').appendChild(t);setTimeout(()=>t.remove(),3500)};
+  </script>
+  <script src="coinflip.js"></script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+/* ===== COIN FLIP APP ===== */
+.cf-page {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px 16px 80px;
+}
+
+.cf-hero {
+  text-align: center;
+  padding: 32px 20px 24px;
+  animation: fadeUp 0.7s both;
+}
+.cf-hero h1 {
+  font-family: 'Science Gothic', sans-serif;
+  font-size: clamp(26px, 7vw, 40px);
+  font-weight: 500;
+  color: #e0f2fe;
+  margin-bottom: 6px;
+}
+.cf-hero h1 span { color: #fbbf24; text-shadow: 0 0 30px rgba(251,191,36,0.5); }
+.cf-hero p { color: #7dd3fc; font-size: 13px; font-weight: 600; }
+
+/* Status bar */
+.cf-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 16px;
+  background: rgba(15,23,42,0.7);
+  border: 1px solid rgba(251,191,36,0.2);
+  margin-bottom: 28px;
+  animation: fadeUp 0.7s 0.1s both;
+}
+
+/* Coin */
+.cf-coin-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  animation: fadeUp 0.7s 0.15s both;
+}
+.cf-coin {
+  width: 140px;
+  height: 140px;
+  perspective: 1000px;
+  cursor: pointer;
+  user-select: none;
+}
+.cf-coin-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+}
+.cf-coin.flipping .cf-coin-inner {
+  animation: coinFlip 0.8s ease;
+}
+@keyframes coinFlip {
+  0% { transform: rotateY(0deg); }
+  25% { transform: rotateY(360deg); }
+  50% { transform: rotateY(720deg); }
+  75% { transform: rotateY(1080deg); }
+  100% { transform: rotateY(1440deg); }
+}
+.cf-coin-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cf-coin-heads {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border: 3px solid #d97706;
+  box-shadow: 0 8px 32px rgba(251,191,36,0.3);
+}
+.cf-coin-tails {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+  border: 3px solid #475569;
+  transform: rotateY(180deg);
+  box-shadow: 0 8px 32px rgba(100,116,139,0.3);
+}
+.cf-coin-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.cf-coin-label {
+  font-size: 18px;
+  font-weight: 900;
+  color: rgba(0,0,0,0.6);
+  letter-spacing: 2px;
+}
+.cf-coin-emoji {
+  font-size: 36px;
+  line-height: 1;
+}
+.cf-hint {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Choice */
+.cf-choice {
+  animation: fadeUp 0.7s 0.2s both;
+  margin-bottom: 28px;
+}
+.cf-choice-label {
+  text-align: center;
+  color: #7dd3fc;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.cf-choice-btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.cf-choice-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(56,189,248,0.15);
+  color: #e0f2fe;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: 'Science Gothic', sans-serif;
+}
+.cf-choice-btn:hover {
+  border-color: rgba(251,191,36,0.4);
+  background: rgba(251,191,36,0.05);
+  transform: translateY(-2px);
+}
+.cf-choice-btn.active {
+  border-color: #fbbf24;
+  background: rgba(251,191,36,0.1);
+  color: #fbbf24;
+  box-shadow: 0 0 16px rgba(251,191,36,0.15);
+}
+
+/* Stats */
+.cf-stats {
+  display: flex;
+  gap: 12px;
+  animation: fadeUp 0.7s 0.25s both;
+}
+.cf-stat {
+  flex: 1;
+  text-align: center;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.cf-stat-val {
+  display: block;
+  font-size: 24px;
+  font-weight: 900;
+  color: #fbbf24;
+  margin-bottom: 4px;
+}
+.cf-stat-label {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 700;
+}

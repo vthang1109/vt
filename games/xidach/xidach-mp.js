@@ -549,9 +549,28 @@ window.hostDeal = async function() {
   if (players.length === 0) { showToast('Chưa ai cược', 'warn'); return; }
 
   const deck = createDeck();
+  const preselectedCards = gs.preselectedCards || {};
+
   const hands = {};
+  // Dealer (host) luôn rút từ deck
   hands[r.hostUid] = [deck.pop(), deck.pop()];
-  players.forEach(uid => { hands[uid] = [deck.pop(), deck.pop()]; });
+
+  players.forEach(uid => {
+    const pre = preselectedCards[uid];
+    if (pre && pre.length >= 2) {
+      // Dùng bài đã chọn sẵn — lấy 2 lá đầu
+      const card1 = pre[0];
+      const card2 = pre[1];
+      hands[uid] = [card1, card2];
+      // Xoá 2 lá này khỏi deck nếu còn
+      const rm1 = deck.findIndex(c => c.v === card1.v && c.s === card1.s);
+      if (rm1 >= 0) deck.splice(rm1, 1);
+      const rm2 = deck.findIndex(c => c.v === card2.v && c.s === card2.s);
+      if (rm2 >= 0) deck.splice(rm2, 1);
+    } else {
+      hands[uid] = [deck.pop(), deck.pop()];
+    }
+  });
 
   const dealerStat = handStatus(hands[r.hostUid]);
   const updates = {
@@ -563,7 +582,8 @@ window.hostDeal = async function() {
     'gameState.turnIdx': 0,
     'gameState.results': {},
     'gameState.revealed': {},
-    'gameState.dealerChecked': {}
+    'gameState.dealerChecked': {},
+    'gameState.preselectedCards': {}
   };
 
   let dealerDelta = 0;
@@ -633,10 +653,32 @@ window.hit = async function() {
     if (handStatus(curHand).tag === 'bust') return; // đã quắc: không được bốc thêm, tự bấm Dằn
     const deck = [...(gs.deck || [])];
     const hand = [...curHand];
-    if (deck.length === 0) { showToast('Hết bài', 'warn'); return; }
-    hand.push(deck.pop());
+      // Ưu tiên dùng window.__vt_hitCards (từ admin toggle, không race condition)
+    let hitCards = window.__vt_hitCards || [];
+    if (hitCards.length === 0) {
+      // Fallback: đọc từ _room (Firestore onSnapshot)
+      hitCards = gs.preselectedHitCards?.[_user.uid] || [];
+    }
+    // Clear để tránh dùng lại cho lần rút sau
+    window.__vt_hitCards = null;
+    let usedHitCard = null;
+    if (hitCards.length > 0) {
+      usedHitCard = hitCards[0];
+      hand.push(usedHitCard);
+      // Xoá lá đã dùng khỏi deck nếu còn
+      const di = deck.findIndex(c => c.v === usedHitCard.v && c.s === usedHitCard.s);
+      if (di >= 0) deck.splice(di, 1);
+    } else {
+      if (deck.length === 0) { showToast('Hết bài', 'warn'); return; }
+      hand.push(deck.pop());
+    }
     const stat = handStatus(hand);
-    const updates = { 'gameState.deck': deck, [`gameState.hands.${_user.uid}`]: hand };
+    const remainingHitCards = hitCards.slice(1); // xoá lá đầu đã dùng
+    const updates = { 
+      'gameState.deck': deck, 
+      [`gameState.hands.${_user.uid}`]: hand,
+      [`gameState.preselectedHitCards.${_user.uid}`]: remainingHitCards
+    };
     if (stat.tag !== 'bust' && (hand.length >= 5 || stat.score >= 21)) {
       updates[`gameState.stands.${_user.uid}`] = true;
       const stands = { ...(gs.stands || {}), [_user.uid]: true };
@@ -839,6 +881,8 @@ window.hostNextRound = async function() {
   const r = _room;
   if (!r) return;
   if (r.hostUid !== _user.uid) return;
+  // Xoá hit cards trong bộ nhớ (từ admin toggle)
+  window.__vt_hitCards = null;
   await updateDoc(doc(db, 'rooms', ROOM_ID), {
     'gameState.phase': 'betting',
     'gameState.hands': {},
@@ -850,6 +894,7 @@ window.hostNextRound = async function() {
     'gameState.deck': [],
     'gameState.revealed': {},
     'gameState.dealerChecked': {},
+    'gameState.preselectedHitCards': {},
     'gameState.round': (r.gameState.round || 1) + 1
   });
 };

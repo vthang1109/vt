@@ -94,9 +94,20 @@
         <div class="pro-card-sub" id="pro-card-pet-sub">Chưa có thú cưng</div>
       </div>
 
-      <div class="pro-card pro-card-vehicle">
-        <div class="pro-card-label">🚗 Xe</div>
-        <div class="pro-card-sub" id="pro-card-vehicle-sub">Chưa có xe</div>
+      <!-- BIO / GIỚI THIỆU (thay ô Xe) -->
+      <div class="pro-card pro-card-bio" id="pro-card-bio">
+        <div class="pro-bio-header">
+          <span class="pro-card-label">📝 Giới thiệu</span>
+          <button class="pro-bio-edit-btn" id="pro-bio-edit-btn" style="display:none" title="Sửa giới thiệu">✏️</button>
+        </div>
+        <div class="pro-bio-content" id="pro-bio-content">
+          <span class="pro-bio-text" id="pro-bio-text">Chưa có giới thiệu</span>
+          <textarea class="pro-bio-textarea" id="pro-bio-textarea" maxlength="200" placeholder="Viết vài dòng giới thiệu về bản thân..." style="display:none"></textarea>
+          <div class="pro-bio-actions" id="pro-bio-actions" style="display:none">
+            <span class="pro-bio-counter" id="pro-bio-counter">0/200</span>
+            <button class="pro-bio-save" id="pro-bio-save">Lưu</button>
+          </div>
+        </div>
       </div>
 
       <div class="pro-card pro-card-title" id="pro-title-card">
@@ -117,6 +128,30 @@
       <div class="pro-stat">
         <span class="pro-stat-val" id="pro-stat-joined">—</span>
         <span class="pro-stat-label">Tham gia</span>
+      </div>
+      <div class="pro-stat">
+        <span class="pro-stat-val" id="pro-stat-games">—</span>
+        <span class="pro-stat-label">Đã chơi</span>
+      </div>
+    </div>
+
+    <!-- ===== GAME STATS SECTION ===== -->
+    <div class="pro-gamestats" id="pro-gamestats">
+      <div class="pro-gamestats-header">
+        <span>🎮 Thống kê Game</span>
+      </div>
+      <div class="pro-gamestats-grid" id="pro-gamestats-grid">
+        <!-- Render by JS -->
+      </div>
+    </div>
+
+    <!-- ===== ACHIEVEMENT PROGRESS SECTION ===== -->
+    <div class="pro-achievements" id="pro-achievements">
+      <div class="pro-achievements-header">
+        <span>🏆 Thành tựu</span>
+      </div>
+      <div class="pro-achievements-list" id="pro-achievements-list">
+        <!-- Render by JS -->
       </div>
     </div>
   </div>

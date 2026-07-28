@@ -253,9 +253,7 @@
     }
     .lb-tier-badge.tier-a   { background:rgba(52,211,153,0.12); border-color:rgba(52,211,153,0.35); color:#34d399; }
     .lb-tier-badge.tier-s   { background:rgba(167,139,250,0.12); border-color:rgba(167,139,250,0.35); color:#a78bfa; }
-    .lb-tier-badge.tier-sp  { background:rgba(248,113,113,0.12); border-color:rgba(248,113,113,0.35); color:#f87171; }
     .lb-tier-badge.tier-ss  { background:rgba(251,191,36,0.12);  border-color:rgba(251,191,36,0.35);  color:#fbbf24; }
-    .lb-tier-badge.tier-sk  { background:rgba(244,114,182,0.12); border-color:rgba(244,114,182,0.35); color:#f472b6; }
     .lb-tier-badge.tier-sss { 
       background:rgba(241,245,249,0.08);
       border-color:rgba(241,245,249,0.3);
@@ -534,7 +532,7 @@
 
     // ── HELPERS ──
     function getTierCls(tier) {
-      const map = { 'A':'tier-a','S':'tier-s','S+':'tier-sp','SS':'tier-ss','SK':'tier-sk','SSS':'tier-sss' };
+      const map = { 'A':'tier-a','S':'tier-s','SS':'tier-ss','SSS':'tier-sss' };
       return map[tier] || 'tier-none';
     }
   </script>

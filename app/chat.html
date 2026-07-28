@@ -104,7 +104,9 @@
           <button class="sd-option" id="sd-theme-btn" onclick="openThemePopup()">🎨 Giao diện</button>
           <div class="sd-divider"></div>
           <button class="sd-option danger" id="sd-clear-msgs" onclick="clearCurrentMessages()">🗑 Xoá tin nhắn</button>
+          <button class="sd-option" id="sd-hide-convo" onclick="hideCurrentConversation()">🙈 Ẩn đoạn chat</button>
           <button class="sd-option gold" id="sd-send-points" onclick="sendPointsToCurrent()">💸 Gửi điểm</button>
+          <button class="sd-option gold" id="sd-gift-tag" onclick="giftTagToCurrent()" style="display:none">🎁 Tặng Tag</button>
         </div>
       </div>
     </div>
@@ -162,7 +164,7 @@
   </div>
 
 </div><!-- end chat-layout -->
-<!-- Scripts -->
+<!-- Scripts -->  <script src="../profile-card.js"></script>
 <script type="module" src="chat.js"></script>
 <script type="module" src="../send-points.js"></script>  <script>
     // ===== SETTINGS DROPDOWN =====
@@ -325,9 +327,13 @@
           // Show/hide options trong settings dropdown
           const sdClear = document.getElementById('sd-clear-msgs');
           const sdPoints = document.getElementById('sd-send-points');
+          const sdHide = document.getElementById('sd-hide-convo');
+          const sdGift = document.getElementById('sd-gift-tag');
           const isDm = !!window.currentConvoUid;
           if (sdClear) sdClear.classList.toggle('hidden', !isDm);
           if (sdPoints) sdPoints.classList.toggle('hidden', !isDm);
+          if (sdHide) sdHide.style.display = isDm ? '' : 'none';
+          if (sdGift) sdGift.style.display = (window._isAdminChat && isDm) ? '' : 'none';
           return r;
         };
         window.openConvo.__patched = true;

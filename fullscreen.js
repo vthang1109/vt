@@ -228,7 +228,35 @@
     }
   });
 
-  // ========== 6. Initialize ==========
+  // ========== 6. Fullscreen State Safety ==========
+  // Đồng bộ class vt-fs-active với trạng thái fullscreen thực tế
+  function syncFullscreenClass() {
+    const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    const hasClass = document.body.classList.contains('vt-fs-active');
+    if (isFS && !hasClass) {
+      document.body.classList.add('vt-fs-active');
+      document.documentElement.classList.add('vt-fs-active');
+    } else if (!isFS && hasClass) {
+      document.body.classList.remove('vt-fs-active');
+      document.documentElement.classList.remove('vt-fs-active');
+    }
+  }
+
+  // Sync on fullscreen change (đã có ở trên, nhưng thêm fallback)
+  document.addEventListener('fullscreenchange', syncFullscreenClass);
+  document.addEventListener('webkitfullscreenchange', syncFullscreenClass);
+
+  // Sync định kỳ mỗi 3 giây — để bắt các trường hợp fullscreenchange không fire
+  setInterval(syncFullscreenClass, 3000);
+
+  // Sync ngay khi page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', syncFullscreenClass);
+  } else {
+    syncFullscreenClass();
+  }
+
+  // ========== 7. Initialize ==========
   // Wait for DOM
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {

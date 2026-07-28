@@ -1,21 +1,45 @@
 /* ═══════════════════════════════════════════════════════════
    titles.css — Badge danh hiệu dùng chung
    Import vào MỌI trang dùng badge: shop.html, profile.html, bag.html
-   Không thêm vào shop.css hay profile.css nữa
 ═══════════════════════════════════════════════════════════ */
 
-/* ── KEYFRAMES ──────────────────────────────────────────── */
-@keyframes titleRainbowRun {
-  0%   { background-position: 0% 0%, 0% 50%; }
-  100% { background-position: 0% 0%, 300% 50%; }
+/* ── BASE — hỗ trợ vệt sáng ──────────────────────────── */
+.title-badge,
+.pro-title-badge {
+  position: relative;
+  overflow: hidden;
 }
-@keyframes skPink   { from { background-position: 0% 0%, 0% 50%; } to { background-position: 0% 0%, 300% 50%; } }
-@keyframes skFire   { from { background-position: 0% 0%, 0% 50%; } to { background-position: 0% 0%, 300% 50%; } }
-@keyframes skCyan   { from { background-position: 0% 0%, 0% 50%; } to { background-position: 0% 0%, 300% 50%; } }
-@keyframes skDark   { from { background-position: 0% 0%, 0% 50%; } to { background-position: 0% 0%, 300% 50%; } }
-@keyframes skStar   { from { background-position: 0% 0%, 0% 50%; } to { background-position: 0% 0%, 300% 50%; } }
-@keyframes skNature { from { background-position: 0% 0%, 0% 50%; } to { background-position: 0% 0%, 300% 50%; } }
-@keyframes skCasino { from { background-position: 0% 0%, 0% 50%; } to { background-position: 0% 0%, 300% 50%; } }
+
+/* ── HIỆU ỨNG VỆT SÁNG — dành cho A, S, SS ──────────── */
+@keyframes titleShimmer {
+  0%   { transform: translateX(-100%) skewX(-20deg); }
+  15%  { transform: translateX(400%) skewX(-20deg); }
+  100% { transform: translateX(400%) skewX(-20deg); }
+}
+
+.title-badge.tier-a::before,
+.pro-title-badge.tier-a::before,
+.title-badge.tier-s::before,
+.pro-title-badge.tier-s::before,
+.title-badge.tier-ss::before,
+.pro-title-badge.tier-ss::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.06) 30%,
+    rgba(255,255,255,0.15) 50%,
+    rgba(255,255,255,0.06) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+  animation: titleShimmer 4s ease-in-out 4s infinite;
+}
 
 /* ── CẤP A — Xanh lá ───────────────────────────────────── */
 .title-badge.tier-a,
@@ -25,17 +49,9 @@
   color: #34d399;
 }
 
-/* ── CẤP S — Tím ────────────────────────────────────────── */
+/* ── CẤP S — Đỏ ──────────────────────────────────────────── */
 .title-badge.tier-s,
 .pro-title-badge.tier-s {
-  background: rgba(167,139,250,0.1);
-  border-color: rgba(167,139,250,0.4);
-  color: #a78bfa;
-}
-
-/* ── CẤP S+ — Đỏ ────────────────────────────────────────── */
-.title-badge.tier-sp,
-.pro-title-badge.tier-sp {
   background: rgba(244,63,94,0.1);
   border-color: rgba(244,63,94,0.4);
   color: #f87171;
@@ -49,7 +65,13 @@
   color: #fbbf24;
 }
 
-/* ── CẤP SSS — Rainbow ──────────────────────────────────── */
+/* ── KEYFRAMES ──────────────────────────────────────────── */
+@keyframes titleRainbowRun {
+  0%   { background-position: 0% 0%, 0% 50%; }
+  100% { background-position: 0% 0%, 300% 50%; }
+}
+
+/* ── CẤP SSS — Cầu Vồng (Guardian) ──────────────────────── */
 .title-badge.tier-sss,
 .pro-title-badge.tier-sss {
   background:
@@ -62,95 +84,123 @@
   animation: titleRainbowRun 3s linear infinite;
 }
 
-/* ── SK · PINK — Hồng ──────────────────────────────────── */
-.title-badge.tier-sk-pink,
-.pro-title-badge.tier-sk-pink {
+/* ── CẤP EVENT (gộp Casino) — Vàng + Tím ────────────── */
+.title-badge.tier-event,
+.pro-title-badge.tier-event {
   background:
-    linear-gradient(rgba(15,23,42,0.4), rgba(15,23,42,0.4)) padding-box,
+    linear-gradient(rgba(10,10,10,0.35), rgba(10,10,10,0.35)) padding-box,
+    linear-gradient(135deg,#a78bfa,#f5c518,#c084fc,#fbbf24,#a78bfa) border-box;
+  background-size: 100% 100%, 300% 100%;
+  border: 2px solid transparent;
+  color: #fbbf24;
+  font-weight: 900;
+  text-shadow: 0 0 8px rgba(167,139,250,0.5), 0 1px 3px rgba(0,0,0,0.5);
+  animation: eventBorderRun 3s linear infinite;
+}
+
+/* Event Gold — màu casino cũ cho Thần Bài */
+@keyframes eventGoldRun {
+  0%   { background-position: 0% 0%, 0% 50%; }
+  100% { background-position: 0% 0%, 300% 50%; }
+}
+.title-badge.tier-event-gold,
+.pro-title-badge.tier-event-gold {
+  background:
+    linear-gradient(rgba(10,10,10,0.45), rgba(10,10,10,0.45)) padding-box,
+    linear-gradient(90deg,#f5c518,#1a1a2e,#f1f5f9,#1a1a2e,#f5c518) border-box;
+  background-size: 100% 100%, 300% 100%;
+  border: 2px solid transparent;
+  color: #f5c518;
+  font-weight: 900;
+  text-shadow: 0 0 8px rgba(245,197,24,0.6), 0 1px 3px rgba(0,0,0,0.5);
+  animation: eventGoldRun 3s linear infinite;
+}
+
+/* Event Gold-Red — vàng-đỏ-đen-trắng cho Thần Cờ Bạc */
+@keyframes eventGoldRedRun {
+  0%   { background-position: 0% 0%, 0% 50%; }
+  100% { background-position: 0% 0%, 300% 50%; }
+}
+.title-badge.tier-event-gold-red,
+.pro-title-badge.tier-event-gold-red {
+  background:
+    linear-gradient(rgba(10,10,10,0.4), rgba(10,10,10,0.4)) padding-box,
+    linear-gradient(90deg,#f5c518,#ef4444,#1a1a2e,#f1f5f9,#1a1a2e,#ef4444,#f5c518) border-box;
+  background-size: 100% 100%, 300% 100%;
+  border: 2px solid transparent;
+  color: #fbbf24;
+  font-weight: 900;
+  text-shadow: 0 0 8px rgba(239,68,68,0.6), 0 0 12px rgba(245,197,24,0.4), 0 0 6px rgba(241,245,249,0.3), 0 1px 3px rgba(0,0,0,0.5);
+  animation: eventGoldRedRun 3s linear infinite;
+}
+
+/* ── EVENT COLORS ─────────────────────────────────────── */
+@keyframes eventBorderRun {
+  0%   { background-position: 0% 0%, 0% 50%; }
+  100% { background-position: 0% 0%, 300% 50%; }
+}
+
+/* Pink — Công Chúa */
+.title-badge.tier-event-pink,
+.pro-title-badge.tier-event-pink {
+  background:
+    linear-gradient(rgba(15,23,42,0.35), rgba(15,23,42,0.35)) padding-box,
     linear-gradient(90deg,#f472b6,#fda4c8,#fb7bb8,#e879a0,#f472b6) border-box;
   background-size: 100% 100%, 300% 100%;
   border: 2px solid transparent;
   color: #fda4c8;
   font-weight: 900;
-  animation: skPink 2.5s linear infinite;
+  animation: eventBorderRun 2.5s linear infinite;
 }
 
-/* ── SK · FIRE — Đỏ lửa ────────────────────────────────── */
-.title-badge.tier-sk-fire,
-.pro-title-badge.tier-sk-fire {
+/* Fire — Hiệp Sĩ */
+.title-badge.tier-event-fire,
+.pro-title-badge.tier-event-fire {
   background:
-    linear-gradient(rgba(15,23,42,0.4), rgba(15,23,42,0.4)) padding-box,
+    linear-gradient(rgba(15,23,42,0.35), rgba(15,23,42,0.35)) padding-box,
     linear-gradient(90deg,#f97316,#ef4444,#fb923c,#fbbf24,#f97316) border-box;
   background-size: 100% 100%, 300% 100%;
   border: 2px solid transparent;
   color: #fb923c;
   font-weight: 900;
-  animation: skFire 2.5s linear infinite;
+  animation: eventBorderRun 2.5s linear infinite;
 }
 
-/* ── SK · CYAN — Băng/Biển ──────────────────────────────── */
-.title-badge.tier-sk-cyan,
-.pro-title-badge.tier-sk-cyan {
+/* Dark — Phù Thủy */
+.title-badge.tier-event-dark,
+.pro-title-badge.tier-event-dark {
   background:
-    linear-gradient(rgba(15,23,42,0.4), rgba(15,23,42,0.4)) padding-box,
-    linear-gradient(90deg,#22d3ee,#67e8f9,#38bdf8,#0ea5e9,#22d3ee) border-box;
-  background-size: 100% 100%, 300% 100%;
-  border: 2px solid transparent;
-  color: #67e8f9;
-  font-weight: 900;
-  animation: skCyan 2.5s linear infinite;
-}
-
-/* ── SK · DARK — Tím đêm ────────────────────────────────── */
-.title-badge.tier-sk-dark,
-.pro-title-badge.tier-sk-dark {
-  background:
-    linear-gradient(rgba(15,23,42,0.4), rgba(15,23,42,0.4)) padding-box,
+    linear-gradient(rgba(15,23,42,0.35), rgba(15,23,42,0.35)) padding-box,
     linear-gradient(90deg,#7c3aed,#a78bfa,#8b5cf6,#6d28d9,#7c3aed) border-box;
   background-size: 100% 100%, 300% 100%;
   border: 2px solid transparent;
   color: #c4b5fd;
   font-weight: 900;
-  animation: skDark 2.5s linear infinite;
+  animation: eventBorderRun 2.5s linear infinite;
 }
 
-/* ── SK · STAR — Vàng sao ───────────────────────────────── */
-.title-badge.tier-sk-star,
-.pro-title-badge.tier-sk-star {
+/* Cyan — Thiên Thần */
+.title-badge.tier-event-cyan,
+.pro-title-badge.tier-event-cyan {
   background:
-    linear-gradient(rgba(15,23,42,0.4), rgba(15,23,42,0.4)) padding-box,
-    linear-gradient(90deg,#facc15,#fde68a,#fbbf24,#f59e0b,#facc15) border-box;
+    linear-gradient(rgba(15,23,42,0.35), rgba(15,23,42,0.35)) padding-box,
+    linear-gradient(90deg,#22d3ee,#67e8f9,#38bdf8,#0ea5e9,#22d3ee) border-box;
   background-size: 100% 100%, 300% 100%;
   border: 2px solid transparent;
-  color: #fde68a;
+  color: #67e8f9;
   font-weight: 900;
-  animation: skStar 2.5s linear infinite;
+  animation: eventBorderRun 2.5s linear infinite;
 }
 
-/* ── SK · NATURE — Xanh lá ngọc ────────────────────────── */
-.title-badge.tier-sk-nature,
-.pro-title-badge.tier-sk-nature {
+/* Nature — Vệ Sĩ */
+.title-badge.tier-event-nature,
+.pro-title-badge.tier-event-nature {
   background:
-    linear-gradient(rgba(15,23,42,0.4), rgba(15,23,42,0.4)) padding-box,
+    linear-gradient(rgba(15,23,42,0.35), rgba(15,23,42,0.35)) padding-box,
     linear-gradient(90deg,#4ade80,#86efac,#22c55e,#16a34a,#4ade80) border-box;
   background-size: 100% 100%, 300% 100%;
   border: 2px solid transparent;
   color: #86efac;
   font-weight: 900;
-  animation: skNature 2.5s linear infinite;
-}
-
-/* ── SK · CASINO — Đen/Trắng/Vàng ──────────────────────── */
-@keyframes skCasinoV2 { from { background-position: 0% 50%; } to { background-position: 300% 50%; } }
-
-.title-badge.tier-sk-casino,
-.pro-title-badge.tier-sk-casino {
-  background: linear-gradient(90deg,rgba(17,17,17,0.8),rgba(245,197,24,0.3),rgba(240,240,240,0.2),rgba(245,197,24,0.3),rgba(17,17,17,0.8));
-  background-size: 300% 100%;
-  border: 2px solid #f5c518;
-  color: #f5c518;
-  font-weight: 900;
-  box-shadow: 0 0 10px rgba(245,197,24,0.4), inset 0 0 12px rgba(245,197,24,0.1);
-  text-shadow: 0 0 8px rgba(245,197,24,0.8), 1px 1px 0 #000;
-  animation: skCasinoV2 1.8s linear infinite;
+  animation: eventBorderRun 2.5s linear infinite;
 }

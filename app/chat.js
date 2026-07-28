@@ -7,10 +7,10 @@ import {
   getFirestore, doc, getDoc, getDocs, updateDoc,
   collection, query, orderBy, limit, onSnapshot,
   addDoc, serverTimestamp, deleteDoc, arrayUnion, arrayRemove, setDoc,
-  writeBatch
+  writeBatch, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { subscribeUserData } from '../points.js';
-import { initProfileCard } from '../profile-card.js';
+import { EVENT_TITLES, getTitleById, computeHighestTierOrder, getOwnedTitles, getDefaultTitle } from '../titles.js';
 
 // ===== FIREBASE CONFIG =====
 const firebaseConfig = {
@@ -26,7 +26,16 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-initProfileCard({ db, getMyUid: () => _currentUser?.uid });
+if (window.initProfileCard) {
+  window.initProfileCard({
+    db,
+    getMyUid: () => _currentUser?.uid,
+    firestore: { doc, getDoc, updateDoc, deleteDoc, setDoc, arrayUnion, arrayRemove, serverTimestamp },
+    titles: { getOwnedTitles, getDefaultTitle, getTitleById }
+  });
+} else {
+  console.warn('⚠️ profile-card.js chưa load — check <script> trong HTML');
+}
 
 // ===== PARTICLE CANVAS =====
 const canvas = document.getElementById('bg-canvas');
@@ -127,6 +136,57 @@ let _otherReadTime   = null;
 let _readUnsubscribe = null;
 let _lastMessages    = [];
 let _currentRoomId   = null;
+
+// ===== HIDDEN CONVERSATIONS (localStorage) =====
+function _getHiddenConvos() {
+  try { return JSON.parse(localStorage.getItem('vt_hidden_convos') || '[]'); } catch { return []; }
+}
+function _saveHiddenConvos(arr) {
+  localStorage.setItem('vt_hidden_convos', JSON.stringify(arr));
+}
+function _toggleHiddenConvo(uid) {
+  const arr = _getHiddenConvos();
+  const idx = arr.indexOf(uid);
+  if (idx >= 0) arr.splice(idx, 1);
+  else arr.push(uid);
+  _saveHiddenConvos(arr);
+  return idx < 0; // true = đã ẩn, false = đã hiện
+}
+function _isConvoHidden(uid) {
+  return _getHiddenConvos().includes(uid);
+}
+
+// ===== RECENT CONVERSATIONS (localStorage) — lưu chat với người lạ =====
+function _getRecentConvos() {
+  try { return JSON.parse(localStorage.getItem('vt_recent_convos') || '[]'); } catch { return []; }
+}
+function _saveRecentConvos(arr) {
+  // Chỉ giữ tối đa 10 recent
+  const trimmed = arr.slice(0, 10);
+  localStorage.setItem('vt_recent_convos', JSON.stringify(trimmed));
+}
+function _addRecentConvo(uid, name, avatarUrl) {
+  if (!uid || uid === 'server') return;
+  const arr = _getRecentConvos();
+  // Xoá entry cũ nếu đã tồn tại
+  const idx = arr.findIndex(c => c.uid === uid);
+  if (idx >= 0) arr.splice(idx, 1);
+  // Thêm lên đầu, giữ lại avatarUrl nếu có
+  arr.unshift({ uid, name: name || '?', avatarUrl: avatarUrl || '' });
+  _saveRecentConvos(arr);
+}
+
+window.hideCurrentConversation = function() {
+  const uid = window.currentConvoUid;
+  if (!uid) { window.showToast('⚠️ Chỉ ẩn đoạn chat riêng!', 'warn'); return; }
+  if (!confirm(`🙈 Ẩn đoạn chat với "${escHtml(currentConvoName || '...')}"?`)) return;
+  _toggleHiddenConvo(uid);
+  // Re-render friends list bằng renderFriendsInChat (dùng lại logic có sẵn, không tạo listener mới)
+  renderFriendsInChat();
+  // Switch to server chat
+  window.openConvo('server', 'Chat toàn server', null, 'server');
+  window.showToast('🙈 Đã ẩn đoạn chat. Vào Khám phá để tìm lại.', 'success');
+};
 
 // ===== SENDER THEME CACHE (per-user theme cho từng tin nhắn) =====
 let _senderThemeCache = {};
@@ -285,9 +345,12 @@ async function getAllUsers(callback) {
   try {
     const snap = await getDocs(collection(db, 'users'));
     const users = [];
-    snap.forEach(d => users.push(d.data()));
+    snap.forEach(d => users.push({ ...d.data(), uid: d.id }));
     callback(users);
-  } catch(e) { callback([]); }
+  } catch(e) {
+    console.error('📛 getAllUsers error:', e);
+    callback([]);
+  }
 }
 
 // Lắng nghe tin nhắn – lọc tin nhắn bị ẩn với người dùng hiện tại
@@ -390,6 +453,34 @@ onAuthStateChanged(auth, async (user) => {
   _currentUser = user;
   _checkAdminForAnnounce();
   await _initChat();
+
+  // ===== XỬ LÝ URL PARAM: ?uid=xxx&name=yyy (từ profile-card.js) =====
+  const params = new URLSearchParams(window.location.search);
+  const targetUid = params.get('uid');
+  const targetName = params.get('name');
+  if (targetUid && targetUid !== _currentUser.uid) {
+    // Defer nhẹ để tránh flicker với openConvo('server') ở desktop
+    setTimeout(async () => {
+      let displayName = targetName || '';
+      if (!displayName) {
+        try {
+          const snap = await getDoc(doc(db, 'users', targetUid));
+          if (snap.exists()) {
+            displayName = snap.data().nickname || snap.data().email?.split('@')[0] || 'Người lạ';
+          }
+        } catch(e) {}
+      }
+      if (!displayName) displayName = 'Người lạ';
+      // Nếu bị ẩn trước đó thì hiện lại
+      if (_isConvoHidden(targetUid)) {
+        _toggleHiddenConvo(targetUid);
+        renderFriendsInChat();
+      }
+      window.openConvo(targetUid, displayName, displayName[0].toUpperCase(), 'dm');
+      // Xoá params khỏi URL để không bị mở lại khi refresh
+      window.history.replaceState({}, '', window.location.pathname);
+    }, 0);
+  }
 });
 
 // ===== INIT =====
@@ -481,10 +572,37 @@ async function _initChat() {
   };
 
 
+  // ===== PRE-FETCH AVATAR CHO TẤT CẢ RECENT CONVOS (khi load trang) =====
+  _prefetchRecentAvatars();
+
   const isMobile = window.innerWidth <= 640;
   if (!isMobile) {
     openConvo('server', 'Chat toàn server', null, 'server');
   }
+}
+
+// ===== Pre-fetch missing avatars for cached recent conversations =====
+function _prefetchRecentAvatars() {
+  const convos = _getRecentConvos();
+  if (!convos.length) return;
+  convos.forEach(c => {
+    if (c.avatarUrl) return; // đã có avatar cache, bỏ qua
+    setTimeout(() => {
+      getDoc(doc(db, 'users', c.uid)).then(s => {
+        if (!s.exists()) return;
+        const url = s.data().avatarUrl;
+        if (!url) return;
+        const list = _getRecentConvos();
+        const entry = list.find(e => e.uid === c.uid);
+        if (entry && !entry.avatarUrl) {
+          entry.avatarUrl = url;
+          _saveRecentConvos(list);
+          console.log('📸 Pre-fetch avatar:', c.uid, url.substring(0, 40) + '...');
+          renderFriendsInChat();
+        }
+      }).catch(e => console.warn('📸 Pre-fetch avatar error:', c.uid, e));
+    }, 100); // delay nhẹ để tránh flood
+  });
 }
 
 // ===== SỬA: RENDER MESSAGES (có seen + xoá mềm + hỗ trợ HTML) =====
@@ -658,6 +776,34 @@ window.openConvo = function(uid, name, avatarChar, type) {
     updateReadReceipt(roomId);
   }
 
+  // Lưu vào recent conversations (nếu không phải server và không phải bạn)
+  if (type !== 'server') {
+    // Giải nén avatarUrl từ avatarChar nếu nó là URL
+    const avatarUrlFromChar = (typeof avatarChar === 'string' && (avatarChar.startsWith('http') || avatarChar.startsWith('data:')))
+      ? avatarChar : '';
+    _addRecentConvo(uid, name, avatarUrlFromChar);
+    // Re-render sidebar để hiện mục "Gần đây"
+    renderFriendsInChat();
+
+    // Fetch user data từ Firestore để lấy avatarUrl (background)
+    getDoc(doc(db, 'users', uid)).then(s => {
+      if (!s.exists()) return;
+      const fbAvatarUrl = s.data().avatarUrl || '';
+      if (!fbAvatarUrl) {
+        console.log('📸 Không tìm thấy avatarUrl cho', uid);
+        return;
+      }
+      const convos = _getRecentConvos();
+      const entry = convos.find(c => c.uid === uid);
+      if (entry && entry.avatarUrl !== fbAvatarUrl) {
+        entry.avatarUrl = fbAvatarUrl;
+        _saveRecentConvos(convos);
+        console.log('📸 Avatar cached cho', uid, ':', fbAvatarUrl.substring(0, 40) + '...');
+        renderFriendsInChat();
+      }
+    }).catch(e => console.warn('📸 Lỗi fetch avatar:', uid, e));
+  }
+
   _chatUnsubscribe = listenMessages(uid, (msgs) => {
     _lastMessages = msgs;
     renderMessages(msgs);
@@ -726,26 +872,132 @@ function _renderFriendsInChatFromList(friends) {
   const el = document.getElementById('friendsInChat');
   if (!el) return;
   el.innerHTML = '';
-  if (!friends.length) return;
-  const label = document.createElement('div');
-  label.className = 'contact-section-label';
-  label.textContent = '👥 Bạn bè';
-  el.appendChild(label);
-  friends.forEach(f => {
-    const name = f.nickname || '?';
-    const div  = document.createElement('div');
-    div.className = 'chat-contact';
-    div.id        = 'contact-' + f.uid;
-    div.onclick   = () => window.openConvo(f.uid, name, f.avatarUrl || name[0].toUpperCase(), 'dm');
-    div.innerHTML = `
-      <div class="contact-av">${name[0].toUpperCase()}</div>
-      <div class="contact-info">
-        <span class="contact-name">${escHtml(name)} <span class="chat-online-dot"></span></span>
-        <span class="contact-preview">Nhấn để nhắn tin</span>
-      </div>`;
-    el.appendChild(div);
-    renderContactAvatar(div.querySelector('.contact-av'), f);
-  });
+  
+  const friendUids = new Set((friends || []).map(f => f.uid));
+  
+  // Filter ra friends chưa bị ẩn
+  const visibleFriends = (friends || []).filter(f => !_isConvoHidden(f.uid));
+  const hiddenFriends  = (friends || []).filter(f => _isConvoHidden(f.uid));
+  
+  // Hiển thị bạn bè visible
+  if (visibleFriends.length) {
+    const label = document.createElement('div');
+    label.className = 'contact-section-label';
+    label.textContent = '👥 Bạn bè';
+    el.appendChild(label);
+    visibleFriends.forEach(f => {
+      const name = f.nickname || '?';
+      const div  = document.createElement('div');
+      div.className = 'chat-contact';
+      div.id        = 'contact-' + f.uid;
+      div.onclick   = () => window.openConvo(f.uid, name, f.avatarUrl || name[0].toUpperCase(), 'dm');
+      div.innerHTML = `
+        <div class="contact-av">${name[0].toUpperCase()}</div>
+        <div class="contact-info">
+          <span class="contact-name">${escHtml(name)} <span class="chat-online-dot"></span></span>
+          <span class="contact-preview">Nhấn để nhắn tin</span>
+        </div>`;
+      el.appendChild(div);
+      renderContactAvatar(div.querySelector('.contact-av'), f);
+    });
+  }
+  
+  // ===== MỤC "TRÒ CHUYỆN GẦN ĐÂY" (người lạ đã chat) =====
+  const recentConvos = _getRecentConvos().filter(c => !friendUids.has(c.uid) && !_isConvoHidden(c.uid));
+  if (recentConvos.length) {
+    const label = document.createElement('div');
+    label.className = 'contact-section-label';
+    label.textContent = '🕐 Gần đây';
+    el.appendChild(label);
+    recentConvos.forEach(c => {
+      const name = c.name || '?';
+      const div  = document.createElement('div');
+      div.className = 'chat-contact';
+      div.id        = 'contact-' + c.uid;
+      div.onclick   = () => window.openConvo(c.uid, name, c.avatarUrl || name[0].toUpperCase(), 'dm');
+      div.innerHTML = `
+        <div class="contact-av">${c.avatarUrl ? '' : name[0].toUpperCase()}</div>
+        <div class="contact-info">
+          <span class="contact-name">${escHtml(name)}</span>
+          <span class="contact-preview" style="color:#a78bfa">Nhấn để nhắn tin</span>
+        </div>`;
+      el.appendChild(div);
+      // Hiển thị avatar từ cache (nếu có)
+      const avEl = div.querySelector('.contact-av');
+      if (c.avatarUrl) {
+        avEl.style.background = `url(${c.avatarUrl}) center/cover`;
+        avEl.textContent = '';
+      }
+    });
+  }
+  
+  // Mục "Đoạn chat ẩn" — expanded mặc định + nút hiện tất cả
+  if (hiddenFriends.length) {
+    const hr = document.createElement('div');
+    hr.className = 'hidden-convos-divider';
+    hr.style.cssText = 'display:flex;align-items:center;gap:6px;padding:12px 6px 4px;font-size:11px;font-weight:700;color:#f59e0b;cursor:pointer;border-top:1px solid rgba(245,158,11,0.2);margin-top:8px;';
+    const arrow = document.createElement('span');
+    arrow.className = 'arrow';
+    arrow.textContent = '▼';
+    arrow.style.cssText = 'font-size:8px;transition:transform 0.2s;';
+    hr.insertBefore(arrow, hr.firstChild);
+    hr.appendChild(document.createTextNode('🙈 Đoạn chat ẩn (' + hiddenFriends.length + ')'));
+    
+    // Nút "Hiện tất cả"
+    const showAllBtn = document.createElement('button');
+    showAllBtn.textContent = '✨ Hiện tất cả';
+    showAllBtn.style.cssText = `margin-left:auto;font-size:10px;padding:2px 8px;border-radius:6px;border:1px solid rgba(52,211,153,0.25);background:rgba(52,211,153,0.08);color:#34d399;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;`;
+    showAllBtn.onclick = function(e) {
+      e.stopPropagation();
+      if (!confirm('✨ Hiện lại TẤT CẢ đoạn chat ẩn?')) return;
+      _saveHiddenConvos([]);
+      renderFriendsInChat();
+      window.showToast('✨ Đã hiện lại tất cả đoạn chat!', 'success');
+    };
+    hr.appendChild(showAllBtn);
+    
+    hr.onclick = function(e) {
+      if (e.target === showAllBtn) return;
+      const hiddenList = document.getElementById('hiddenConvoList');
+      if (hiddenList) {
+        const isCollapsed = hiddenList.dataset.collapsed === 'true';
+        hiddenList.dataset.collapsed = isCollapsed ? 'false' : 'true';
+        hiddenList.style.display = isCollapsed ? '' : 'none';
+        arrow.textContent = isCollapsed ? '▼' : '▶';
+      }
+    };
+    el.appendChild(hr);
+    
+    const hiddenList = document.createElement('div');
+    hiddenList.id = 'hiddenConvoList';
+    hiddenList.dataset.collapsed = 'false'; // expanded mặc định
+    hiddenList.style.display = '';
+    hiddenFriends.forEach(f => {
+      const name = f.nickname || '?';
+      const div  = document.createElement('div');
+      div.className = 'chat-contact';
+      div.id        = 'contact-hidden-' + f.uid;
+      div.style.opacity = '0.65';
+      div.innerHTML = `
+        <div class="contact-av">${name[0].toUpperCase()}</div>
+        <div class="contact-info">
+          <span class="contact-name">${escHtml(name)}</span>
+          <span class="contact-preview" style="color:#fbbf24">🙈 Click để hiện lại</span>
+        </div>`;
+      // Click vào hidden contact → hiện lại
+      div.onclick = function(e) {
+        e.stopPropagation();
+        if (confirm("🙈 Hiện lại đoạn chat với \"" + escHtml(name) + "\"?")) {
+          _toggleHiddenConvo(f.uid); // unhide
+          window.openConvo(f.uid, name, f.avatarUrl || name[0].toUpperCase(), 'dm');
+          setTimeout(renderFriendsInChat, 100);
+        }
+      };
+      el.appendChild(div);
+      renderContactAvatar(div.querySelector('.contact-av'), f);
+    });
+    el.appendChild(hiddenList);
+  }
 }
 
 function renderFriendsInChat() {
@@ -757,18 +1009,27 @@ function renderAllUsersInChat() {
   if (!_currentUser) return;
   getAllUsers((users) => {
     const el = document.getElementById('allUsersInChat');
+    if (!el) {
+      console.warn('⚠️ Không tìm thấy #allUsersInChat element');
+      return;
+    }
     el.innerHTML = '';
     const others = users.filter(u => u.uid !== _currentUser.uid);
-    if (!others.length) return;
+    if (!others.length) {
+      console.warn('⚠️ Không tìm thấy user nào (others.length=0), tổng users:', users.length);
+      el.innerHTML = '<div style="padding:16px 8px;text-align:center;color:#4a7a9b;font-size:13px">🔍 Chưa có người dùng nào.</div>';
+      return;
+    }
     const label = document.createElement('div');
     label.className = 'contact-section-label';
-    label.textContent = 'Tất cả người dùng';
+    label.textContent = '👤 Tất cả người dùng (' + others.length + ')';
     el.appendChild(label);
     others.forEach(u => {
+      const uid  = u.uid;
       const name = u.nickname || u.email?.split('@')[0] || '?';
       const div  = document.createElement('div');
       div.className = 'chat-contact';
-      div.onclick   = () => window.showProfileCard(u.uid);
+      div.onclick   = () => uid && window.showProfileCard(uid);
       div.innerHTML = `
         <div class="contact-av">${name[0].toUpperCase()}</div>
         <div class="contact-info">
@@ -833,6 +1094,82 @@ window._renderMyFriendsList = function renderMyFriendsList() {
     });
   });
 }
+// ── ADMIN: GIFT EVENT TAG ────────────────────────────
+let _isAdminChat = false;
+
+async function chatGiftTitle(targetUid, titleId) {
+  if (!_isAdminChat) throw new Error('Chỉ admin mới có quyền tặng');
+  const userRef = doc(db, 'users', targetUid);
+  await runTransaction(db, async tx => {
+    const snap = await tx.get(userRef);
+    if (!snap.exists()) throw new Error('Không tìm thấy người dùng');
+    const owned = snap.data().ownedTitles || [];
+    if (owned.includes(titleId)) throw new Error('Người này đã có tag này rồi');
+    const titleObj = getTitleById(titleId);
+    const newOwned = [...owned, titleId];
+    const highestOrder = titleObj ? computeHighestTierOrder(newOwned) : 0;
+    tx.update(userRef, { ownedTitles: arrayUnion(titleId), highestTierOrder: highestOrder });
+  });
+}
+
+window.giftTagToCurrent = function() {
+  const uid  = window.currentConvoUid;
+  const name = window.currentConvoName || 'Người nhận';
+  if (!uid) { window.showToast && window.showToast('⚠️ Chỉ tặng tag khi chat riêng!', 'warn'); return; }
+  
+  // Tạo modal
+  const existing = document.getElementById('giftTagModal');
+  if (existing) existing.remove();
+  
+  const overlay = document.createElement('div');
+  overlay.id = 'giftTagModal';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  
+  const tagCards = EVENT_TITLES.map(function(t) {
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(167,139,250,0.15);margin-bottom:6px;">' +
+      '<span class="title-badge ' + t.cls + '" style="font-size:11px">' + t.label + '</span>' +
+      '<span style="flex:1;font-size:11px;color:#94a3b8;">' + t.desc + '</span>' +
+      '<button class="chat-gift-tag-btn" data-id="' + t.id + '"' +
+        ' style="padding:6px 12px;border-radius:8px;border:none;background:#a78bfa;color:#fff;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">🎁 Tặng</button>' +
+    '</div>';
+  }).join('');
+  
+  overlay.innerHTML = '<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:20px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.5);">' +
+    '<div style="font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:8px;text-align:center;">🎪 Tặng Event Tag</div>' +
+    '<div style="font-size:12px;color:#94a3b8;margin-bottom:14px;text-align:center;">cho <b style="color:#e0f2fe">' + escHtml(name) + '</b></div>' +
+    '<div style="max-height:300px;overflow-y:auto;margin-bottom:10px;">' + tagCards + '</div>' +
+    '<div id="chatGiftStatus" style="font-size:12px;color:#94a3b8;margin-bottom:8px;min-height:18px;text-align:center;"></div>' +
+    '<button id="chatGiftCloseBtn" style="width:100%;padding:10px;border-radius:10px;border:1px solid #475569;background:transparent;color:#94a3b8;font-size:13px;cursor:pointer;font-family:\'Nunito\',sans-serif;font-weight:700;">Đóng</button>' +
+  '</div>';
+  document.body.appendChild(overlay);
+  
+  // Gift buttons
+  overlay.querySelectorAll('.chat-gift-tag-btn').forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      const statusEl = document.getElementById('chatGiftStatus');
+      const titleId = btn.dataset.id;
+      btn.disabled = true; btn.textContent = '...';
+      try {
+        await chatGiftTitle(uid, titleId);
+        statusEl.style.color = '#34d399';
+        const tObj = getTitleById(titleId);
+        statusEl.textContent = '✅ Đã tặng ' + (tObj?.label || titleId) + ' thành công!';
+        btn.textContent = '✓ Đã tặng';
+        btn.style.background = 'rgba(52,211,153,0.15)';
+        btn.style.color = '#34d399';
+        btn.style.cursor = 'default';
+      } catch (err) {
+        statusEl.style.color = '#f87171';
+        statusEl.textContent = '❌ ' + err.message;
+        btn.disabled = false; btn.textContent = '🎁 Tặng';
+      }
+    });
+  });
+  
+  document.getElementById('chatGiftCloseBtn').addEventListener('click', function() { overlay.remove(); });
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+};
+
 // ===== ADMIN SEND ANNOUNCEMENT =====
 window._sendAdminAnnouncement = async function() {
   const text = document.getElementById('announceAdminText')?.value.trim();
@@ -891,14 +1228,22 @@ let _announceBtnBound = false;
 function _checkAdminForAnnounce() {
   if (!_currentUser) return;
   const email = (_currentUser.email || '').trim().toLowerCase();
+  _isAdminChat = (email === 'thang@game.com');
+  window._isAdminChat = _isAdminChat;
   const form = document.getElementById('announceAdminForm');
   if (form) {
-    form.style.display = (email === 'thang@game.com') ? 'block' : 'none';
+    form.style.display = _isAdminChat ? 'block' : 'none';
   }
   // Bind button only once
   if (!_announceBtnBound) {
     document.getElementById('announceAdminBtn')?.addEventListener('click', window._sendAdminAnnouncement);
     _announceBtnBound = true;
+  }
+  // Cập nhật gift tag button visibility
+  const giftBtn = document.getElementById('sd-gift-tag');
+  if (giftBtn) {
+    const uid = window.currentConvoUid;
+    giftBtn.style.display = (_isAdminChat && uid) ? '' : 'none';
   }
 }
 

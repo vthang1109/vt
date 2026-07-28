@@ -5,6 +5,7 @@ import {
   serverTimestamp, onSnapshot, increment
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { GAME_CATEGORIES } from './titles.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBupVBUTEJnBSBTShXKm8qnIJ8dGl4hQoY",
@@ -89,7 +90,29 @@ async function track(eventType, value = 1) {
   } catch(e) { console.warn('quest track err', e); }
 }
 
-async function trackPlay(gameId) { await track('play_game'); await track('play_unique', gameId); }
+async function trackPlay(gameId) {
+  await track('play_game');
+  await track('play_unique', gameId);
+  // Cập nhật stats vĩnh viễn cho game titles
+  if (gameId && auth.currentUser) {
+    try {
+      const updates = { 'stats.gamesPlayed': increment(1) };
+      const cat = GAME_CATEGORIES[gameId];
+      if (cat) updates[`stats.${cat}GamesPlayed`] = increment(1);
+      // Per-game tracking (cho casino v.v.)
+      if (gameId) updates[`stats.${gameId}GamesPlayed`] = increment(1);
+      // Unique games
+      const snap = await getDoc(userRef(auth.currentUser.uid));
+      const unique = snap.data()?.stats?.uniqueGameIds || [];
+      if (!unique.includes(gameId)) {
+        unique.push(gameId);
+        updates['stats.uniqueGameIds'] = unique;
+        updates['stats.uniqueGamesPlayed'] = unique.length;
+      }
+      await updateDoc(userRef(auth.currentUser.uid), updates);
+    } catch(e) { console.warn('game title track err', e); }
+  }
+}
 async function trackWinSmart() { return track('win_smart'); }
 async function trackEarn(amount) { return track('earn', amount); }
 async function trackChat() { return track('chat_message'); }
@@ -297,10 +320,25 @@ window.VTPanelQuests = {
 };
 
 // ====== LEGACY: openQuests vẫn hoạt động (dùng panel thay modal) ======
+async function trackGameWin(gameId) {
+  const user = auth.currentUser;
+  if (!user || !gameId) return;
+  try {
+    const updates = {
+      [`stats.${gameId}Wins`]: increment(1),
+      'stats.totalWins': increment(1),
+    };
+    const cat = GAME_CATEGORIES[gameId];
+    if (cat === 'casino' || gameId === 'xidach') updates['stats.casinoWins'] = increment(1);
+    await updateDoc(userRef(user.uid), updates);
+  } catch(e) { console.warn('trackGameWin err', e); }
+}
+
 window.VTQuests = {
   open: () => window.BottomNav?.openPanel(),
   track,
   trackPlay,
+  trackGameWin,
   trackWinSmart,
   trackEarn,
   trackChat,
