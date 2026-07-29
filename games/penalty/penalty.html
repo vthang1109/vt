@@ -178,8 +178,9 @@
 
           <!-- Khán đài (crowd) -->
           <div class="pt-stands" id="pt-stands">
-            <div class="pt-stands-crowd"></div>
-            <div class="pt-stands-shade"></div>
+            <div class="pt-stands-crowd" id="pt-stands-crowd"></div>
+            <div class="pt-stands-shade" id="pt-stands-shade"></div>
+            <div class="pt-stand-flags" id="pt-stand-flags"></div>
           </div>
           <!-- Biển quảng cáo -->
           <div class="pt-billboard-strip" id="pt-billboard-strip">
@@ -193,7 +194,19 @@
 
           <div class="pt-goal-area">
             <div class="pt-goal-frame" id="pt-goal-frame">
-              <div class="pt-goal-net" id="pt-goal-net"></div>
+              <div class="pt-goal-net" id="pt-goal-net">
+                <!-- 5 mặt lưới khớp đúng hình khối phối cảnh (trùng tọa độ với
+                     SVG khung sau bên dưới) — mỗi mặt tô sáng/tối khác nhau
+                     để tạo cảm giác lưới có chiều sâu 3D thật, thay vì phủ
+                     phẳng cả hình chữ nhật như trước -->
+                <div class="pt-goal-net-panel pt-net-top"></div>
+                <div class="pt-goal-net-panel pt-net-left"></div>
+                <div class="pt-goal-net-panel pt-net-right"></div>
+                <div class="pt-goal-net-panel pt-net-bottom"></div>
+                <div class="pt-goal-net-panel pt-net-back"></div>
+              </div>
+              <!-- Cờ đội thắng phủ đầy khung thành -->
+              <div class="pt-goal-flag" id="pt-goal-flag" style="display:none"></div>
               <div class="pt-goal-grid" id="pt-goal-grid">
                 <div class="pt-zone" data-zone="top-left"></div>
                 <div class="pt-zone" data-zone="top-center"></div>
@@ -206,6 +219,23 @@
                 <div class="pt-zone" data-zone="bot-right"></div>
               </div>
               <div class="pt-goal-posts" id="pt-goal-posts">
+                <!-- Khung sau (phối cảnh 3D) — vẽ bằng SVG theo tọa độ % nên luôn
+                     khớp đúng 4 góc khung trước dù màn hình/tỉ lệ khác nhau -->
+                <svg class="pt-goal-back-frame" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <!-- 4 thanh chéo nối khung trước → khung sau -->
+                  <line x1="0" y1="0" x2="8" y2="5"></line>
+                  <line x1="100" y1="0" x2="92" y2="5"></line>
+                  <line x1="0" y1="100" x2="12" y2="80"></line>
+                  <line x1="100" y1="100" x2="88" y2="80"></line>
+                  <!-- Cột sau trái/phải -->
+                  <line x1="8" y1="5" x2="12" y2="80"></line>
+                  <line x1="92" y1="5" x2="88" y2="80"></line>
+                  <!-- Xà ngang sau -->
+                  <line x1="8" y1="5" x2="92" y2="5"></line>
+                  <!-- Đáy khung sau -->
+                  <line x1="12" y1="80" x2="88" y2="80"></line>
+                </svg>
+                <!-- Cột trước -->
                 <div class="pt-post-left"></div>
                 <div class="pt-post-right"></div>
                 <div class="pt-crossbar"></div>
@@ -247,6 +277,32 @@
           <!-- Lá cờ quốc gia trên ngực áo — chỉ hiện ở dáng ăn mừng/thất vọng (nhìn thẳng mặt),
                ẩn ở dáng đứng/sút vì đó là nhìn từ lưng. -->
           <div class="pt-shooter-flag" id="pt-shooter-flag"></div>
+        </div>
+
+        <!-- Result scene: player (left) + AI (right) -->
+        <div class="pt-shooter pt-shooter-player" id="pt-shooter-player" style="display:none">
+          <img class="pt-shooter-body" id="pt-shooter-player-body" src="img/player/shooter-mid-stand.png" alt="">
+          <img class="pt-shooter-hair" id="pt-shooter-player-hair" alt="">
+          <img class="pt-shooter-shirt" id="pt-shooter-player-shirt" alt="">
+          <img class="pt-shooter-shorts" id="pt-shooter-player-shorts" alt="">
+          <img class="pt-shooter-socks" id="pt-shooter-player-socks" alt="">
+          <div class="pt-shooter-jersey">
+            <span class="pt-jersey-name" id="pt-shooter-player-name"></span>
+            <span class="pt-jersey-number" id="pt-shooter-player-number"></span>
+          </div>
+          <div class="pt-shooter-flag" id="pt-shooter-player-flag"></div>
+        </div>
+        <div class="pt-shooter pt-shooter-ai" id="pt-shooter-ai" style="display:none">
+          <img class="pt-shooter-body" id="pt-shooter-ai-body" src="img/player/shooter-mid-stand.png" alt="">
+          <img class="pt-shooter-hair" id="pt-shooter-ai-hair" alt="">
+          <img class="pt-shooter-shirt" id="pt-shooter-ai-shirt" alt="">
+          <img class="pt-shooter-shorts" id="pt-shooter-ai-shorts" alt="">
+          <img class="pt-shooter-socks" id="pt-shooter-ai-socks" alt="">
+          <div class="pt-shooter-jersey">
+            <span class="pt-jersey-name" id="pt-shooter-ai-name"></span>
+            <span class="pt-jersey-number" id="pt-shooter-ai-number"></span>
+          </div>
+          <div class="pt-shooter-flag" id="pt-shooter-ai-flag"></div>
         </div>
 
       </div>
