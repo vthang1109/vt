@@ -225,7 +225,397 @@ const MODES = [
   { id:'cup',    name:'Cúp',    icon:'🏆', desc:'Đấu loại trực tiếp', label:'Bắt đầu Cúp!' },
 ];
 
+// Trích màu chủ đạo từ lá cờ quốc gia (dùng cho màu áo/quần cầu thủ)
+// Bảng màu áo SÂN NHÀ thực tế của các đội tuyển phổ biến (ưu tiên dùng thay vì suy ra từ cờ).
+// primary = màu áo, secondary = màu quần. Đội không có trong bảng sẽ fallback sang trích màu cờ.
+const KIT_COLORS = {
+  // Châu Á
+  jp:{primary:'#001c58',secondary:'#001c58'}, kr:{primary:'#c8102e',secondary:'#c8102e'},
+  ir:{primary:'#ffffff',secondary:'#ffffff'}, au:{primary:'#ffd400',secondary:'#00843d'},
+  sa:{primary:'#2f7d32',secondary:'#ffffff'}, qa:{primary:'#8a1538',secondary:'#ffffff'},
+  iq:{primary:'#ffffff',secondary:'#ffffff'}, ae:{primary:'#ffffff',secondary:'#ffffff'},
+  uz:{primary:'#ffffff',secondary:'#1e3a8a'}, jo:{primary:'#ffffff',secondary:'#ffffff'},
+  cn:{primary:'#dd2727',secondary:'#dd2727'}, vn:{primary:'#dc2626',secondary:'#dc2626'},
+  th:{primary:'#1e3a8a',secondary:'#ffffff'}, in:{primary:'#1e40af',secondary:'#1e40af'},
+  id:{primary:'#dc2626',secondary:'#dc2626'}, my:{primary:'#ffd400',secondary:'#000000'},
+  ph:{primary:'#0038a8',secondary:'#0038a8'}, sg:{primary:'#dc2626',secondary:'#dc2626'},
+  kp:{primary:'#dc2626',secondary:'#dc2626'},
+  // Châu Âu
+  fr:{primary:'#002654',secondary:'#ffffff'}, be:{primary:'#dc143c',secondary:'#000000'},
+  gb:{primary:'#ffffff',secondary:'#1e3a8a'}, pt:{primary:'#a4123f',secondary:'#046a38'},
+  nl:{primary:'#ff6a13',secondary:'#ffffff'}, es:{primary:'#c60b1e',secondary:'#1e3a8a'},
+  it:{primary:'#004c9a',secondary:'#ffffff'}, hr:{primary:'#dc2626',secondary:'#ffffff'},
+  de:{primary:'#ffffff',secondary:'#000000',socks:'#ffffff'}, ua:{primary:'#ffd400',secondary:'#1e3a8a'},
+  ch:{primary:'#dc2626',secondary:'#ffffff'}, dk:{primary:'#dc2626',secondary:'#ffffff'},
+  at:{primary:'#dc2626',secondary:'#ffffff'}, se:{primary:'#ffd400',secondary:'#1e3a8a'},
+  'gb-wls':{primary:'#dc2626',secondary:'#dc2626'}, pl:{primary:'#ffffff',secondary:'#dc2626'},
+  tr:{primary:'#dc2626',secondary:'#ffffff'}, no:{primary:'#dc2626',secondary:'#ffffff'},
+  rs:{primary:'#dc2626',secondary:'#1e3a8a'}, 'gb-sct':{primary:'#00205b',secondary:'#00205b'},
+  hu:{primary:'#dc2626',secondary:'#ffffff'}, cz:{primary:'#dc2626',secondary:'#1e3a8a'},
+  fi:{primary:'#ffffff',secondary:'#1e3a8a'}, gr:{primary:'#0d5eaf',secondary:'#ffffff'},
+  ro:{primary:'#ffd400',secondary:'#1e3a8a'}, sk:{primary:'#1e3a8a',secondary:'#1e3a8a'},
+  si:{primary:'#ffffff',secondary:'#ffffff'}, ie:{primary:'#0d7a3f',secondary:'#ffffff'},
+  is:{primary:'#1e3a8a',secondary:'#ffffff'}, ba:{primary:'#1e3a8a',secondary:'#ffd400'},
+  al:{primary:'#dc2626',secondary:'#dc2626'}, bg:{primary:'#ffffff',secondary:'#046a38'},
+  il:{primary:'#ffffff',secondary:'#1e3a8a'},
+  // Châu Phi
+  ma:{primary:'#dc2626',secondary:'#046a38'}, sn:{primary:'#ffffff',secondary:'#046a38'},
+  eg:{primary:'#dc2626',secondary:'#000000'}, dz:{primary:'#ffffff',secondary:'#ffffff'},
+  tn:{primary:'#dc2626',secondary:'#ffffff'}, ng:{primary:'#046a38',secondary:'#ffffff'},
+  ci:{primary:'#ff8200',secondary:'#ffffff'}, cm:{primary:'#046a38',secondary:'#dc2626'},
+  gh:{primary:'#ffffff',secondary:'#000000'}, za:{primary:'#ffd400',secondary:'#046a38'},
+  // Châu Mỹ
+  ar:{primary:'#75aadb',secondary:'#000000'}, br:{primary:'#ffd400',secondary:'#1e3a8a'},
+  co:{primary:'#ffd400',secondary:'#1e3a8a'}, uy:{primary:'#7ec4e8',secondary:'#000000'},
+  us:{primary:'#ffffff',secondary:'#1e3a8a'}, mx:{primary:'#046a38',secondary:'#ffffff'},
+  ec:{primary:'#ffd400',secondary:'#1e3a8a'}, pe:{primary:'#ffffff',secondary:'#ffffff'},
+  pa:{primary:'#dc2626',secondary:'#1e3a8a'}, cl:{primary:'#dc2626',secondary:'#1e3a8a'},
+  ca:{primary:'#dc2626',secondary:'#dc2626'}, py:{primary:'#dc2626',secondary:'#1e3a8a'},
+  ve:{primary:'#7b1c3d',secondary:'#ffffff'}, cr:{primary:'#dc2626',secondary:'#1e3a8a'},
+  jm:{primary:'#000000',secondary:'#000000'},
+};
+const flagColorCache = {};
+function getFlagColors(code){
+  if(flagColorCache[code]) return Promise.resolve(flagColorCache[code]);
+  if(KIT_COLORS[code]){
+    const k=KIT_COLORS[code];
+    const result={primary:k.primary,secondary:k.secondary,socks:k.socks||k.secondary,tertiary:k.secondary,hasWhite:k.secondary==='#ffffff'};
+    flagColorCache[code]=result;
+    return Promise.resolve(result);
+  }
+  return new Promise((resolve)=>{
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      canvas.width=img.width;canvas.height=img.height;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0);
+      let data;
+      try{ data=ctx.getImageData(0,0,canvas.width,canvas.height).data; }
+      catch(e){ const fb={primary:'#dc2626',secondary:'#1e3a8a',socks:'#1e3a8a',tertiary:'#ffffff'}; flagColorCache[code]=fb; resolve(fb); return; }
+      const buckets={};
+      let totalPx=0, whitePx=0;
+      for(let i=0;i<data.length;i+=4){
+        const r=data[i],g=data[i+1],b=data[i+2],a=data[i+3];
+        if(a<200) continue;
+        totalPx++;
+        const brightness=(r+g+b)/3;
+        if(brightness>232){ whitePx++; continue; } // đếm riêng để biết cờ có mảng trắng hay không
+        if(brightness<40) continue; // bỏ gần đen — tránh áo/quần bị nhuộm đen kịt do dải đen trên cờ (VD: Đức, Bỉ)
+        const key=`${Math.round(r/32)*32},${Math.round(g/32)*32},${Math.round(b/32)*32}`;
+        buckets[key]=(buckets[key]||0)+1;
+      }
+      // Cờ có mảng trắng đáng kể (>=6% diện tích) → quần lấy màu trắng
+      const hasWhite = totalPx>0 && (whitePx/totalPx)>=0.06;
+      const sorted=Object.entries(buckets).sort((a,b)=>b[1]-a[1]);
+      const toHex=(str)=>{const [r,g,b]=str.split(',').map(Number);return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');};
+      // Đảm bảo màu không quá tối khi lên áo (nếu không sẽ ăn màu đen kịt dù đã lọc bucket đen ở trên,
+      // vì bucket làm tròn /32 vẫn có thể ra màu rất tối, VD (32,32,0)).
+      const ensureNotTooDark=(hex)=>{
+        const {r,g,b}=_hexToRgb(hex);
+        const [h,s,l]=_rgbToHsl(r,g,b);
+        if(l>=0.28) return hex;
+        const [nr,ng,nb]=_hslToRgb(h, Math.max(s,0.55), 0.4);
+        return '#'+[nr,ng,nb].map(v=>v.toString(16).padStart(2,'0')).join('');
+      };
+      // Áo: luôn là màu chủ đạo (đậm nhất, không trắng/đen) của lá cờ
+      const primary=ensureNotTooDark(sorted[0]?toHex(sorted[0][0]):'#dc2626');
+      // Quần: trắng nếu cờ có trắng, không thì dùng lại chính màu chủ đạo (đồng bộ cả bộ, không tự bịa màu phụ)
+      const secondary = hasWhite ? '#ffffff' : primary;
+      const tertiary=sorted[1]?toHex(sorted[1][0]):secondary;
+      const result={primary,secondary,socks:secondary,tertiary,hasWhite};
+      flagColorCache[code]=result;
+      resolve(result);
+    };
+    img.onerror=()=>{
+      const fb={primary:'#dc2626',secondary:'#ffffff',socks:'#ffffff',tertiary:'#1e3a8a'};
+      flagColorCache[code]=fb; resolve(fb);
+    };
+    img.src=`https://flagcdn.com/w40/${code}.png`;
+  });
+}
+async function applyTeamKit(el, countryCode){
+  const {primary, secondary} = await getFlagColors(countryCode);
+  el.style.setProperty('--team-color', primary);
+  el.style.setProperty('--team-shorts-color', secondary);
+}
+
 const ZONES = ['top-left','top-center','top-right','mid-left','mid-center','mid-right','bot-left','bot-center','bot-right'];
+
+// Ảnh gốc cầu thủ + mask áo/quần tương ứng (dùng để nhuộm màu theo cờ đội).
+// Nhuộm màu được thực hiện bằng canvas (đổi pixel thật sự rồi gán vào src ảnh),
+// KHÔNG dùng CSS mask-image/mix-blend-mode vì 2 thuộc tính này không được hỗ trợ
+// ổn định trên các WebView nhúng (Zalo, Facebook in-app browser, WebView Android cũ...).
+// mask   = vùng ÁO (nhuộm bằng màu primary của cờ)
+// mask2  = vùng QUẦN (nhuộm bằng màu secondary của cờ) → 2 tông rõ rệt như áo thật
+// mask3 = vùng TÓC (nhuộm màu random hài hòa) · mask4 = vùng TẤT (nhuộm cùng màu secondary với quần)
+const SHOOTER_POSES = {
+  'mid-stand': { img:'img/player/shooter-mid-stand.png', mask:'img/player/shooter-mid-stand-kit-shirt.png',  mask2:'img/player/shooter-mid-stand-kit-shorts.png',  mask3:'img/player/shooter-mid-stand-kit-hair.png',  mask4:'img/player/shooter-mid-stand-kit-socks.png' },
+  'kick':      { img:'img/player/shooter-kick.png',       mask:'img/player/shooter-kick-kit-shirt.png',       mask2:'img/player/shooter-kick-kit-shorts.png',       mask3:'img/player/shooter-kick-kit-hair.png',       mask4:'img/player/shooter-kick-kit-socks.png' },
+  'celebrate': { img:'img/player/shooter-celebrate.png',  mask:'img/player/shooter-celebrate-kit-shirt.png',  mask2:'img/player/shooter-celebrate-kit-shorts.png',  mask3:'img/player/shooter-celebrate-kit-hair.png',  mask4:'img/player/shooter-celebrate-kit-socks.png' },
+  'disappoint':{ img:'img/player/shooter-disappoint.png', mask:'img/player/shooter-disappoint-kit-shirt.png', mask2:'img/player/shooter-disappoint-kit-shorts.png', mask3:'img/player/shooter-disappoint-kit-hair.png', mask4:'img/player/shooter-disappoint-kit-socks.png' },
+};
+
+// Bảng màu tóc cố định — chỉ chọn ngẫu nhiên TRONG 10 màu này (không suy ra từ hue áo nữa).
+const HAIR_COLOR_PALETTE = [
+  '#1b1b1b', // đen
+  '#4a2f1c', // nâu
+  '#5d5049', // nâu lạnh (nâu tro, tông lạnh)
+  '#7a4423', // nâu tây (nâu hạt dẻ ấm)
+  '#12171f', // xanh dương đen
+  '#d8d3c4', // bạch kim
+  '#93662f', // vàng nâu
+  '#3a1416', // đỏ đen
+  '#341920', // hồng đen
+  '#15221a', // xanh lá đen
+];
+// Mỗi cầu thủ (mỗi lượt sút) random 1 màu tóc riêng — KHÔNG cache theo đội nữa,
+// để các cầu thủ cùng đội không bị trùng y hệt màu tóc nhau.
+function pickRandomHairColor(){
+  return HAIR_COLOR_PALETTE[Math.floor(Math.random()*HAIR_COLOR_PALETTE.length)];
+}
+
+// Số áo cầu thủ: chủ yếu 1-25 (đúng dải số phổ biến của đội tuyển), thỉnh
+// thoảng (~12%) rơi vào vài số đặc biệt hay gặp ở đời thực (VD: 30, 80).
+const JERSEY_SPECIAL_NUMBERS = [30, 80];
+function randomJerseyNumber(){
+  if(Math.random() < 0.12){
+    return JERSEY_SPECIAL_NUMBERS[Math.floor(Math.random()*JERSEY_SPECIAL_NUMBERS.length)];
+  }
+  return 1 + Math.floor(Math.random()*25);
+}
+
+const _shooterImgCache = {};
+function _loadImg(src){
+  if(_shooterImgCache[src]) return _shooterImgCache[src];
+  const p = new Promise((resolve)=>{
+    const im = new Image();
+    im.onload = ()=>resolve(im);
+    im.onerror = ()=>{
+      // Nếu 1 file mask (VD: -kit-shorts.png) load lỗi, vùng đó sẽ KHÔNG bị
+      // cắt trong suốt khỏi lớp thân → màu gốc có sẵn trong ảnh nền (thường
+      // là màu placeholder mặc định) sẽ lộ ra thay vì màu đội thật. Log lại
+      // để dễ soi trong DevTools > Console/Network khi màu bị sai bất thường.
+      console.error('[penalty] Không tải được ảnh sprite:', src);
+      resolve(null);
+    };
+    im.src = src;
+  });
+  _shooterImgCache[src] = p;
+  return p;
+}
+function _hexToRgb(hex){
+  hex = (hex||'#dc2626').replace('#','');
+  if(hex.length===3) hex = hex.split('').map(c=>c+c).join('');
+  // LƯU Ý: không được dùng `parseInt(hex,16)||0xdc2626` — parseInt('000000',16)
+  // trả về 0, mà 0 là falsy trong JS nên `0 || 0xdc2626` sẽ SAI LẦM rơi vào màu
+  // fallback đỏ, khiến MỌI màu đen tuyền (#000000, VD quần Đức/Argentina) bị
+  // lặng lẽ đổi thành đỏ. Phải kiểm tra NaN riêng, không dùng toán tử `||`.
+  const parsed = parseInt(hex,16);
+  const n = Number.isNaN(parsed) ? 0xdc2626 : parsed;
+  return {r:(n>>16)&255, g:(n>>8)&255, b:n&255};
+}
+function _rgbToHsl(r,g,b){
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h=0,s=0; const l=(max+min)/2;
+  if(max!==min){
+    const d=max-min;
+    s = l>0.5 ? d/(2-max-min) : d/(max+min);
+    if(max===r) h=(g-b)/d+(g<b?6:0);
+    else if(max===g) h=(b-r)/d+2;
+    else h=(r-g)/d+4;
+    h/=6;
+  }
+  return [h,s,l];
+}
+function _hslToRgb(h,s,l){
+  if(s===0){ const v=Math.round(l*255); return [v,v,v]; }
+  const hue2rgb=(p,q,t)=>{
+    if(t<0)t+=1; if(t>1)t-=1;
+    if(t<1/6) return p+(q-p)*6*t;
+    if(t<1/2) return q;
+    if(t<2/3) return p+(q-p)*(2/3-t)*6;
+    return p;
+  };
+  const q = l<0.5 ? l*(1+s) : l+s-l*s;
+  const p = 2*l-q;
+  return [Math.round(hue2rgb(p,q,h+1/3)*255), Math.round(hue2rgb(p,q,h)*255), Math.round(hue2rgb(p,q,h-1/3)*255)];
+}
+
+// Cache dữ liệu pixel gốc (ảnh + tất cả mask) theo TỪNG POSE — chỉ load/decode
+// 1 lần cho mỗi pose, dùng lại cho mọi tổ hợp màu áo/tóc sau đó.
+const _poseDataCache = {};
+async function _getPoseData(pose){
+  if(_poseDataCache[pose]) return _poseDataCache[pose];
+  const p = SHOOTER_POSES[pose] || SHOOTER_POSES['mid-stand'];
+  const promise = (async()=>{
+    const [baseImg, maskImg, mask2Img, mask3Img, mask4Img] = await Promise.all([_loadImg(p.img), _loadImg(p.mask), _loadImg(p.mask2), _loadImg(p.mask3), _loadImg(p.mask4)]);
+    if(!baseImg) return null;
+    const w=baseImg.naturalWidth||500, h=baseImg.naturalHeight||700;
+    const baseCanvas=document.createElement('canvas'); baseCanvas.width=w; baseCanvas.height=h;
+    const bctx=baseCanvas.getContext('2d');
+    bctx.drawImage(baseImg,0,0,w,h);
+    let baseData;
+    try{ baseData=bctx.getImageData(0,0,w,h); }
+    catch(e){ return null; } // canvas bị taint (CORS)
+    const readMaskAlpha=(im)=>{
+      if(!im) return null;
+      const mc=document.createElement('canvas'); mc.width=w; mc.height=h;
+      const mctx=mc.getContext('2d'); mctx.drawImage(im,0,0,w,h);
+      return mctx.getImageData(0,0,w,h).data;
+    };
+    return {
+      w, h, bd: baseData.data,
+      shirtAlpha: readMaskAlpha(maskImg),
+      shortsAlpha: readMaskAlpha(mask2Img),
+      hairAlpha: readMaskAlpha(mask3Img),
+      socksAlpha: readMaskAlpha(mask4Img),
+    };
+  })();
+  _poseDataCache[pose] = promise;
+  return promise;
+}
+
+// Nhuộm 1 vùng mask theo 1 màu hex → trả về data URL. Tách riêng để có thể
+// cache độc lập theo từng loại lớp (áo/quần/tất theo màu đội, tóc theo màu tóc)
+// thay vì phải tính lại TOÀN BỘ sprite chỉ vì 1 lớp đổi màu.
+function _dyeMaskLayer(poseData, maskAlphaArr, hex){
+  const {w,h,bd} = poseData;
+  const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+  const ctx=canvas.getContext('2d');
+  if(!maskAlphaArr) return canvas.toDataURL('image/png');
+  const {r,g,b}=_hexToRgb(hex);
+  const [th,ts,tl]=_rgbToHsl(r,g,b);
+  const tsBoost=Math.min(1, ts*1.15);
+  let sumL=0, sumW=0;
+  for(let i=0;i<bd.length;i+=4){
+    const ma=maskAlphaArr[i+3]/255;
+    if(ma<=0.02) continue;
+    const [,,bl]=_rgbToHsl(bd[i],bd[i+1],bd[i+2]);
+    sumL+=bl*ma; sumW+=ma;
+  }
+  const avgL = sumW>0 ? sumL/sumW : 0.80;
+  const layerData=ctx.createImageData(w,h);
+  const d=layerData.data;
+  for(let i=0;i<bd.length;i+=4){
+    const ma=maskAlphaArr[i+3]/255;
+    if(ma<=0.02) continue;
+    const [,,bl]=_rgbToHsl(bd[i],bd[i+1],bd[i+2]);
+    let newL = tl + (bl-avgL)*0.62;
+    newL = Math.max(0.22, Math.min(0.94, newL));
+    const [nr,ng,nb]=_hslToRgb(th,tsBoost,newL);
+    d[i]=nr; d[i+1]=ng; d[i+2]=nb; d[i+3]=Math.round(255*ma);
+  }
+  ctx.putImageData(layerData,0,0);
+  return canvas.toDataURL('image/png');
+}
+
+const _bodyLayerCache = {};   // pose -> dataURL (không phụ thuộc màu, chỉ phụ thuộc pose)
+const _teamLayerCache = {};   // pose|primary|secondary -> {shirt,shorts,socks}
+const _hairLayerCache = {};   // pose|hairHex -> dataURL
+// Tách sprite cầu thủ thành các lớp ảnh riêng biệt (thân, áo, quần, tất, tóc).
+// Mỗi lớp cache RIÊNG theo đúng thứ nó phụ thuộc: thân chỉ phụ thuộc pose, áo/quần/tất
+// phụ thuộc màu đội, tóc phụ thuộc màu tóc — nhờ vậy đổi màu tóc mỗi lượt sút KHÔNG
+// còn buộc tính lại toàn bộ sprite (nguyên nhân gây giật hình lúc sút/thủ môn bay).
+async function _getSplitShooterLayers(pose, primaryHex, secondaryHex, hairHex, socksHex){
+  secondaryHex = secondaryHex || primaryHex;
+  socksHex = socksHex || secondaryHex;
+  hairHex = hairHex || pickRandomHairColor();
+  const poseData = await _getPoseData(pose);
+  const p = SHOOTER_POSES[pose] || SHOOTER_POSES['mid-stand'];
+  const fallback = {body:p.img, hair:'', shirt:'', shorts:'', socks:''};
+  if(!poseData) return fallback;
+
+  let body;
+  try{
+    body = _bodyLayerCache[pose];
+    if(!body){
+      const {w,h,bd,shirtAlpha,shortsAlpha,hairAlpha,socksAlpha} = poseData;
+      const bodyCanvas=document.createElement('canvas'); bodyCanvas.width=w; bodyCanvas.height=h;
+      const bodyCtx=bodyCanvas.getContext('2d');
+      const bodyData=bodyCtx.createImageData(w,h);
+      const bod=bodyData.data;
+      for(let i=0;i<bd.length;i+=4){
+        const ma = shirtAlpha ? shirtAlpha[i+3]/255 : 0;
+        const ma2 = shortsAlpha ? shortsAlpha[i+3]/255 : 0;
+        const ma3 = hairAlpha ? hairAlpha[i+3]/255 : 0;
+        const ma4 = socksAlpha ? socksAlpha[i+3]/255 : 0;
+        const cut = Math.max(ma,ma2,ma3,ma4);
+        bod[i]=bd[i]; bod[i+1]=bd[i+1]; bod[i+2]=bd[i+2];
+        bod[i+3]=Math.round(bd[i+3]*(1-cut));
+      }
+      bodyCtx.putImageData(bodyData,0,0);
+      body = bodyCanvas.toDataURL('image/png');
+      _bodyLayerCache[pose] = body;
+    }
+
+    const teamKey = pose+'|'+primaryHex+'|'+secondaryHex+'|'+socksHex;
+    let team = _teamLayerCache[teamKey];
+    if(!team){
+      team = {
+        shirt: _dyeMaskLayer(poseData, poseData.shirtAlpha, primaryHex),
+        shorts: _dyeMaskLayer(poseData, poseData.shortsAlpha, secondaryHex),
+        socks: _dyeMaskLayer(poseData, poseData.socksAlpha, socksHex),
+      };
+      _teamLayerCache[teamKey] = team;
+    }
+
+    const hairKey = pose+'|'+hairHex;
+    let hair = _hairLayerCache[hairKey];
+    if(!hair){
+      hair = _dyeMaskLayer(poseData, poseData.hairAlpha, hairHex);
+      _hairLayerCache[hairKey] = hair;
+    }
+
+    return { body, hair, shirt:team.shirt, shorts:team.shorts, socks:team.socks };
+  }catch(e){ return fallback; }
+}
+// Vẽ sprite cầu thủ ở đúng dáng (pose), nhuộm áo/quần theo màu cờ (primary/secondary)
+// nếu đã biết, nếu chưa (đang chờ tải màu cờ) thì hiện ảnh gốc trước để không bị đứng hình.
+async function renderShooterSprite(pose, kit){
+  const bodyEl=document.getElementById('pt-shooter-body');
+  const hairEl=document.getElementById('pt-shooter-hair');
+  const shirtEl=document.getElementById('pt-shooter-shirt');
+  const shortsEl=document.getElementById('pt-shooter-shorts');
+  const socksEl=document.getElementById('pt-shooter-socks');
+  if(!bodyEl) return;
+  const p = SHOOTER_POSES[pose] || SHOOTER_POSES['mid-stand'];
+  if(!kit || !kit.primary){
+    bodyEl.src=p.img;
+    if(hairEl) hairEl.src='';
+    if(shirtEl) shirtEl.src='';
+    if(shortsEl) shortsEl.src='';
+    if(socksEl) socksEl.src='';
+    return;
+  }
+  const layers = await _getSplitShooterLayers(pose, kit.primary, kit.secondary, kit.hair, kit.socks);
+  bodyEl.src=layers.body;
+  if(hairEl) hairEl.src=layers.hair;
+  if(shirtEl) shirtEl.src=layers.shirt;
+  if(shortsEl) shortsEl.src=layers.shorts;
+  if(socksEl) socksEl.src=layers.socks;
+}
+
+// Ảnh thủ môn: chỉ cần 5 file gốc, trái/phải dùng chung ảnh lật gương (flip)
+const GK_POSITIONS = {
+  'mid-stand':  { img: 'img/gk/gk-mid-stand.png', flip: false, scale: 1 },
+  'top-center': { img: 'img/gk/gk-mid-high.png',  flip: false, scale: 1.15, offsetY: 14 },
+  'bot-center': { img: 'img/gk/gk-mid-low.png',   flip: false, scale: 1 },
+  'mid-left':   { img: 'img/gk/gk-left-mid.png',  flip: false, scale: 1 },
+  'top-left':   { img: 'img/gk/gk-left-high.png', flip: false, scale: 1 },
+  'bot-left':   { img: 'img/gk/gk-left-mid.png',  flip: false, scale: 1 },
+  'mid-right':  { img: 'img/gk/gk-left-mid.png',  flip: true,  scale: 1 },
+  'top-right':  { img: 'img/gk/gk-left-high.png', flip: true,  scale: 1 },
+  'bot-right':  { img: 'img/gk/gk-left-mid.png',  flip: true,  scale: 1 },
+};
+function applyKeeperSprite(keeper, zone){
+  const pos = GK_POSITIONS[zone] || GK_POSITIONS['mid-stand'];
+  keeper.src = pos.img;
+  keeper.dataset.flip = pos.flip ? '1' : '0';
+  keeper.style.setProperty('--gk-scale', pos.scale ?? 1);
+}
 const AI_ACCURACY = 0.35;
 // Mỗi giải (League hoặc Cup) có tiến trình lưu riêng biệt theo configId
 // → 5 League + 5 Cup = 10 tiến trình độc lập, không đè lên nhau.
@@ -275,6 +665,7 @@ function orientMatchScore(fixture, playerGoals, oppGoals){
 // ============================
 class PenaltyGame {
   constructor() {
+    this._shooterReq = 0; // token chống race giữa 2 promise màu cờ đội nhà/đội khách
     this.state = {
       modeId: 'nhanh',
       playerCountry: getAllCountries().find(c=>c.code==='vn') || getAllCountries()[0],
@@ -540,6 +931,20 @@ class PenaltyGame {
     this.state.maxRounds=5;
     this.state._matchContext = context || null;
     this.state._matchLabel = label||'';
+    getFlagColors(pc.code); getFlagColors(ac.code); // prefetch màu áo cho cả 2 đội, tránh chớp trắng ở lượt sút đầu
+    // Làm nóng trước cache sprite cho các pose sẽ dùng lúc sút (kick/celebrate/
+    // disappoint) ngay khi vào trận, thay vì để việc tính pixel (nặng) rơi đúng
+    // vào lúc bắt đầu animation sút + thủ môn bay → đây là nguyên nhân chính
+    // gây giật hình ở 2 thời điểm đó.
+    [pc,ac].forEach(team=>{
+      if(!team) return;
+      getFlagColors(team.code).then(kit=>{
+        if(!kit) return;
+        ['kick','celebrate','disappoint'].forEach(pose=>{
+          _getSplitShooterLayers(pose, kit.primary, kit.secondary, pickRandomHairColor(), kit.socks).catch(()=>{});
+        });
+      });
+    });
     document.getElementById('pt-actions').style.display='none';
     document.getElementById('pt-match-done-btn').style.display='none';
     this.renderStatusBar();
@@ -1299,6 +1704,7 @@ class PenaltyGame {
     this.state.shotLocked=false;
     this.state._pendingAiZone=null;
     this.resetKeeperPos();
+    this.resetShooterPos();
     this._resetBall();
     document.getElementById('pt-actions').style.display='none';
     document.getElementById('pt-match-done-btn').style.display='none';
@@ -1324,10 +1730,13 @@ class PenaltyGame {
         this.state.phase='defending';
         this.state.shotLocked=false;
         this.resetKeeperPos();
+        this.resetShooterPos('right');
+        this._resetBall();
         this.renderStatusBar();
         // Zone click will call playerDefend()
       }else{
         this.resetKeeperPos();
+        this.resetShooterPos();
         this.afterShotDone();
       }
     },1700);
@@ -1393,6 +1802,8 @@ class PenaltyGame {
     this.state.phase='shooting';
     this.renderStatusBar();
     this.resetKeeperPos();
+    this.resetShooterPos();
+    this._resetBall();
     document.getElementById('pt-actions').style.display='none';
     document.getElementById('pt-match-done-btn').style.display='none';
   }
@@ -1438,6 +1849,38 @@ class PenaltyGame {
     document.getElementById('pt-result-overlay').style.display='';
     document.getElementById('pt-actions').style.display='none';
     document.getElementById('pt-match-done-btn').style.display='none';
+    // Hiệu ứng chiến thắng: lá cờ của đội THẮNG bay khắp sân (hòa thì bỏ qua vì không có đội thắng).
+    const result=this.state._lastMatchResult;
+    if(result==='win'||result==='lose'){
+      const winner = result==='win' ? this.state.playerCountry : this.state.aiCountry;
+      if(winner) this._spawnVictoryFlags(winner.code, winner.name);
+    }
+  }
+
+  // Rắc nhiều lá cờ của đội thắng bay từ dưới lên trên, trôi ngang + xoay ngẫu
+  // nhiên, khắp mặt sân (.pt-pitch có overflow:hidden nên tự động bị "khung"
+  // gọn trong sân, không tràn ra ngoài giao diện).
+  _spawnVictoryFlags(code, name){
+    const pitch=document.getElementById('pt-pitch');
+    if(!pitch || !code || code.startsWith('gen_')) return;
+    const COUNT=16;
+    for(let i=0;i<COUNT;i++){
+      const el=document.createElement('div');
+      el.className='pt-victory-flag';
+      const size=26+Math.floor(Math.random()*22); // 26-48px, cỡ khác nhau cho tự nhiên
+      el.innerHTML=flagImg(code,name,size);
+      el.style.left=(Math.random()*90+2)+'%';
+      const duration=(3.2+Math.random()*2.4);
+      const delay=(Math.random()*1.6);
+      const drift=Math.round(Math.random()*220-110);   // trôi ngang -110..110px
+      const rot=Math.round(Math.random()*540-270);      // xoay -270..270deg
+      el.style.animationDuration=duration.toFixed(2)+'s';
+      el.style.animationDelay=delay.toFixed(2)+'s';
+      el.style.setProperty('--vf-drift',drift+'px');
+      el.style.setProperty('--vf-rot',rot+'deg');
+      pitch.appendChild(el);
+      setTimeout(()=>el.remove(),(duration+delay+0.4)*1000);
+    }
   }
 
   onMatchDone(){
@@ -1538,6 +1981,7 @@ class PenaltyGame {
     const keeper=document.getElementById('pt-keeper');
     if(keeper){keeper.classList.remove('mine');keeper.classList.add('theirs');}
     this._keeperDive(aiZone,isGoal&&zoneId!==aiZone?'diving':'save');
+    this._shooterKick();
     this._animateBallToZone(zoneId,()=>{
       const el=document.querySelector(`[data-zone="${zoneId}"]`);
       if(el){el.classList.add(isGoal?'zone-goal':'zone-shot');if(!isGoal)setTimeout(()=>el.classList.add('zone-save'),300)}
@@ -1547,6 +1991,7 @@ class PenaltyGame {
         if(saveEl)setTimeout(()=>{saveEl.classList.remove('zone-shot','zone-save','zone-goal');saveEl.classList.add('zone-keeper-save')},400);
       }
       this.showShotResultBanner(isGoal,'mine');
+      this._shooterResult(isGoal);
     },'mine');
   }
 
@@ -1557,6 +2002,7 @@ class PenaltyGame {
     const keeper=document.getElementById('pt-keeper');
     if(keeper){keeper.classList.remove('theirs');keeper.classList.add('mine');}
     this._keeperDive(saveZone,isGoal?'diving':'save');
+    this._shooterKick();
     this._animateBallToZone(zoneId,()=>{
       const el=document.querySelector(`[data-zone="${zoneId}"]`);
       if(el){el.classList.add(isGoal?'zone-goal':'zone-shot');if(!isGoal)setTimeout(()=>el.classList.add('zone-save'),300)}
@@ -1566,7 +2012,29 @@ class PenaltyGame {
         if(saveEl)setTimeout(()=>{saveEl.classList.remove('zone-shot','zone-save','zone-goal');saveEl.classList.add('zone-keeper-save')},400);
       }
       this.showShotResultBanner(isGoal,'theirs');
+      this._shooterResult(isGoal);
     },'theirs');
+  }
+
+  // Vị trí Y của bóng — bám đúng vào chấm phạt đền (.pt-penalty-spot) trên sân,
+  // không tính gián tiếp qua vị trí cầu thủ nữa (2 hệ tọa độ trước đây lệch nhau).
+  _ballStartY(pitch,pRect){
+    const spot=document.getElementById('pt-penalty-spot');
+    if(spot){
+      const spRect=spot.getBoundingClientRect();
+      if(spRect.height>0) return (spRect.top-pRect.top)+spRect.height/2;
+    }
+    return pRect.height*0.78;
+  }
+
+  // Vị trí X của bóng — cũng bám theo chấm phạt đền (luôn ở giữa sân theo chiều ngang).
+  _ballStartX(pitch,pRect){
+    const spot=document.getElementById('pt-penalty-spot');
+    if(spot){
+      const spRect=spot.getBoundingClientRect();
+      if(spRect.width>0) return (spRect.left-pRect.left)+spRect.width/2;
+    }
+    return pRect.width/2;
   }
 
   // Reset ball to penalty spot position
@@ -1577,10 +2045,15 @@ class PenaltyGame {
     if(!pitch)return;
     const pRect=pitch.getBoundingClientRect();
     if(pRect.width===0)return;
+    const x=this._ballStartX(pitch,pRect);
+    const y=this._ballStartY(pitch,pRect);
     ball.style.transition='none';
-    ball.style.left=(pRect.width/2)+'px';
-    ball.style.top=(pRect.height*0.9-6)+'px';
-    ball.style.transform='scale(1) rotate(0deg)';
+    // Dùng transform (translate) thay vì left/top để trình duyệt chỉ cần
+    // composite lại layer này (GPU), không phải tính lại layout mỗi frame
+    // → hết giật/lag khi bóng di chuyển.
+    ball.style.left='0';
+    ball.style.top='0';
+    ball.style.transform=`translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(1) rotate(0deg)`;
     ball.style.opacity='1';
     ball.style.display='';
   }
@@ -1620,46 +2093,68 @@ class PenaltyGame {
 
     const pRect=pitch.getBoundingClientRect();
     const zRect=zone.getBoundingClientRect();
-    // Ball starts at bottom-center of pitch (penalty spot)
-    const startX=pRect.width/2;
-    const startY=pRect.height*0.9-6;
+    // Ball starts right in front of the shooter (penalty spot)
+    const startX=this._ballStartX(pitch,pRect);
+    const startY=this._ballStartY(pitch,pRect);
     // Target: center of the zone
     const endX=zRect.left-pRect.left+zRect.width/2;
     const endY=zRect.top-pRect.top+zRect.height/2;
     const angleDeg=Math.atan2(endY-startY,endX-startX)*180/Math.PI;
 
-    // Reset position
-    ball.style.left=startX+'px';
-    ball.style.top=startY+'px';
+    // Reset position — luôn dùng transform (translate/scale/rotate), KHÔNG
+    // dùng left/top để animate: left/top buộc trình duyệt reflow+repaint mỗi
+    // frame (rất dễ giật trên máy yếu/mobile), còn transform chỉ cần composite
+    // trên GPU nên mượt hơn hẳn.
+    ball.style.left='0';
+    ball.style.top='0';
     ball.style.opacity='1';
-    ball.style.transform='scale(1) rotate(0deg)';
     ball.style.transition='none';
     ball.style.display='';
+    const setBallTransform=(x,y,scale,rotDeg)=>{
+      ball.style.transform=`translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${scale}) rotate(${rotDeg}deg)`;
+    };
+    setBallTransform(startX,startY,1,0);
     void ball.offsetWidth;
 
-    // Fly to target with cubic-bezier for realistic arc
+    // Tự điều khiển animation bằng requestAnimationFrame thay vì CSS transition
+    // + setInterval riêng lẻ (2 timeline khác nhau chạy độc lập là nguyên nhân
+    // chính gây giật hình/giật đường bay) — giờ tất cả đồng bộ theo đúng 1 vòng
+    // rAF, luôn khớp với frame vẽ thực tế của trình duyệt.
     const flightMs=500;
-    ball.style.transition=`left ${flightMs}ms cubic-bezier(0.25,0.46,0.45,0.94), top ${flightMs}ms cubic-bezier(0.25,0.1,0.25,1), transform 0.4s ease-out, opacity 0.5s`;
-    ball.style.left=endX+'px';
-    ball.style.top=endY+'px';
-    ball.style.transform='scale(1.3) rotate(720deg)';
-
-    // Rắc vệt gió dọc đường bay trong lúc bóng di chuyển
     const t0=performance.now();
-    const windTimer=setInterval(()=>{
-      const t=Math.min(1,(performance.now()-t0)/flightMs);
-      this._spawnWindStreak(pitch,startX+(endX-startX)*t,startY+(endY-startY)*t,angleDeg,team);
-      if(t>=1)clearInterval(windTimer);
-    },32);
-
-    setTimeout(()=>{
-      ball.style.opacity='0';
-      callback();
-    },520);
+    let lastStreakT=-1;
+    const step=(now)=>{
+      const raw=Math.min(1,(now-t0)/flightMs);
+      // 2 easing khác nhau cho X/Y để giữ hiệu ứng vòng cung như bản cũ
+      // (left dùng cubic ease-out, top dùng ease-in-out) thay vì bay theo
+      // đường thẳng cứng nhắc.
+      const ex=1-Math.pow(1-raw,3);
+      const ey=raw<0.5 ? 2*raw*raw : 1-Math.pow(-2*raw+2,2)/2;
+      const x=startX+(endX-startX)*ex;
+      const y=startY+(endY-startY)*ey;
+      const scale=1+0.3*raw;
+      const rot=720*raw;
+      setBallTransform(x,y,scale,rot);
+      // Rắc vệt gió theo cùng nhịp rAF (giới hạn ~32ms/lần như bản cũ) thay vì
+      // 1 setInterval tách rời — tránh 2 timeline lệch pha gây giật hình.
+      if(raw-lastStreakT>=0.06 || raw>=1){
+        lastStreakT=raw;
+        this._spawnWindStreak(pitch,x,y,angleDeg,team);
+      }
+      if(raw<1){
+        requestAnimationFrame(step);
+      }else{
+        ball.style.opacity='0';
+        setTimeout(callback,20);
+      }
+    };
+    requestAnimationFrame(step);
   }
 
   _keeperDive(zone,cls){
     const keeper=document.getElementById('pt-keeper');
+    applyKeeperSprite(keeper,zone);
+    keeper.style.setProperty('--flip',keeper.dataset.flip==='1'?-1:1);
     const targetZone=document.querySelector(`.pt-zone[data-zone="${zone}"]`);
     let kx=0,ky=0;
     if(targetZone){
@@ -1672,6 +2167,12 @@ class PenaltyGame {
       const col=zi%3,row=Math.floor(zi/3);
       kx=(col-1)*40;ky=(row-1)*30;
     }
+    // Chỉnh tay thêm cho từng pose nếu ảnh gốc không canh giữa đẹp (VD: top-center bay hơi cao/nhỏ)
+    const posCfg=GK_POSITIONS[zone];
+    if(posCfg){
+      kx+=posCfg.offsetX||0;
+      ky+=posCfg.offsetY||0;
+    }
     // Bỏ transition "all" của trạng thái nghỉ để animation keyframe dưới đây
     // toàn quyền điều khiển transform — tránh 2 nguồn cùng ghi đè gây giật.
     keeper.style.transition='none';
@@ -1682,9 +2183,74 @@ class PenaltyGame {
 
   resetKeeperPos(){
     const k=document.getElementById('pt-keeper');
+    applyKeeperSprite(k,'mid-stand');
+    k.style.setProperty('--flip',1);
     k.classList.remove('diving','save');
     k.style.transition='transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
     k.style.transform='translate(0,0)';k.style.setProperty('--dx','0px');k.style.setProperty('--dy','0px');
+  }
+
+  // ===== Shooter sprite (foreground, whichever team is currently shooting) =====
+  _shooterKick(){
+    const s=document.getElementById('pt-shooter');
+    if(!s)return;
+    this.state._shooterPose='kick';
+    renderShooterSprite('kick', this.state._shooterKit);
+    s.classList.remove('kick','celebrate','disappoint');
+    void s.offsetWidth;
+    s.classList.add('kick');
+  }
+
+  _shooterResult(isGoal){
+    const s=document.getElementById('pt-shooter');
+    if(!s)return;
+    const pose = isGoal?'celebrate':'disappoint';
+    this.state._shooterPose=pose;
+    renderShooterSprite(pose, this.state._shooterKit);
+    s.classList.remove('kick','celebrate','disappoint');
+    void s.offsetWidth;
+    s.classList.add(pose);
+  }
+
+  resetShooterPos(side='left'){
+    const s=document.getElementById('pt-shooter');
+    if(!s)return;
+    s.classList.remove('kick','celebrate','disappoint','pos-left','pos-right');
+    s.classList.add(side==='right'?'pos-right':'pos-left');
+    // Áo/quần + số áo + tên đội đổi theo đội đang sút (trái = đội mình, phải = đối thủ)
+    const team = side==='right' ? this.state.aiCountry : this.state.playerCountry;
+    const nameEl=document.getElementById('pt-jersey-name');
+    const numEl=document.getElementById('pt-jersey-number');
+    const flagEl=document.getElementById('pt-shooter-flag');
+    if(nameEl) nameEl.textContent = team ? abbr3(team) : '';
+    if(numEl) numEl.textContent = String(randomJerseyNumber());
+    if(flagEl) flagEl.innerHTML = team ? flagImg(team.code, team.name, 13) : '';
+    this.state._shooterPose='mid-stand';
+    if(!team){ renderShooterSprite('mid-stand', null); return; }
+    // Token chống trường hợp promise của lượt trước (đội kia) resolve trễ rồi
+    // ghi đè nhầm màu áo lên sprite của đội đang hiện tại.
+    const reqId = ++this._shooterReq;
+    // Màu tóc random riêng cho MỖI cầu thủ/lượt sút (không dùng chung với cache màu cờ của đội,
+    // để tránh 2 cầu thủ cùng đội bị lấy đúng 1 object cache và dính chung màu tóc).
+    const hairHex = pickRandomHairColor();
+    const cached = flagColorCache[team.code];
+    if(cached){
+      // Đã có sẵn màu cờ (nhờ prefetch ở showMatch) → nhuộm màu ngay, không
+      // hiện ảnh trắng gốc rồi mới đổi màu sau (tránh chớp trắng).
+      const kit = {...cached, hair:hairHex};
+      this.state._shooterKit = kit;
+      renderShooterSprite('mid-stand', kit);
+      return;
+    }
+    // Chưa có cache: hiện ảnh gốc tạm trong lúc chờ tải màu cờ, TUYỆT ĐỐI
+    // không dùng lại _shooterKit cũ (của đội trước đó) kẻo tô nhầm màu đội kia.
+    renderShooterSprite('mid-stand', null);
+    getFlagColors(team.code).then((kitRaw)=>{
+      if(reqId!==this._shooterReq) return; // đội đang hiện đã đổi trong lúc chờ → bỏ kết quả cũ
+      const kit = {...kitRaw, hair:hairHex};
+      this.state._shooterKit = kit;
+      if(this.state._shooterPose==='mid-stand') renderShooterSprite('mid-stand', kit);
+    });
   }
 
   // ===== RENDER — Status Bar with 5-shot circles =====
@@ -1853,6 +2419,7 @@ class PenaltyGame {
     document.getElementById('pt-match-label').innerHTML=this.state._matchLabel||'';
     this.renderStatusBar();
     this.resetKeeperPos();
+    this.resetShooterPos();
     this._resetBall();
     if(this.state.phase==='finished'){
       this._displayResultOverlay();

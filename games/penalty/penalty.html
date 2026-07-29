@@ -173,22 +173,52 @@
       <!-- Pitch / Goal with football scene -->
       <div class="pt-pitch" id="pt-pitch">
 
-        <!-- Khán đài (crowd) -->
-        <div class="pt-stands" id="pt-stands">
-          <div class="pt-stands-crowd"></div>
-          <div class="pt-stands-shade"></div>
-        </div>
-        <!-- Biển quảng cáo -->
-        <div class="pt-billboard-strip" id="pt-billboard-strip">
-          <div class="pt-billboard pt-bb-1">VTWORLD</div>
-          <div class="pt-billboard pt-bb-2">PENALTY CUP</div>
-          <div class="pt-billboard pt-bb-3">⚽ LEAGUE 〄</div>
-        </div>
+        <!-- Khu khung thành — giữ nguyên tỉ lệ gốc, KHÔNG bị kéo giãn -->
+        <div class="pt-goal-zone">
 
-        <!-- Turn tag / Kết quả — chữ to giữa sân -->
-        <div class="pt-turn-box shoot-turn" id="pt-turn-box">SÚT!!!</div>
+          <!-- Khán đài (crowd) -->
+          <div class="pt-stands" id="pt-stands">
+            <div class="pt-stands-crowd"></div>
+            <div class="pt-stands-shade"></div>
+          </div>
+          <!-- Biển quảng cáo -->
+          <div class="pt-billboard-strip" id="pt-billboard-strip">
+            <div class="pt-billboard pt-bb-1">VTWORLD</div>
+            <div class="pt-billboard pt-bb-2">PENALTY CUP</div>
+            <div class="pt-billboard pt-bb-3">⚽ LEAGUE 〄</div>
+          </div>
 
-        <!-- Grass markings -->
+          <!-- Turn tag / Kết quả — chữ to giữa sân -->
+          <div class="pt-turn-box shoot-turn" id="pt-turn-box">SÚT!!!</div>
+
+          <div class="pt-goal-area">
+            <div class="pt-goal-frame" id="pt-goal-frame">
+              <div class="pt-goal-net" id="pt-goal-net"></div>
+              <div class="pt-goal-grid" id="pt-goal-grid">
+                <div class="pt-zone" data-zone="top-left"></div>
+                <div class="pt-zone" data-zone="top-center"></div>
+                <div class="pt-zone" data-zone="top-right"></div>
+                <div class="pt-zone" data-zone="mid-left"></div>
+                <div class="pt-zone" data-zone="mid-center"></div>
+                <div class="pt-zone" data-zone="mid-right"></div>
+                <div class="pt-zone" data-zone="bot-left"></div>
+                <div class="pt-zone" data-zone="bot-center"></div>
+                <div class="pt-zone" data-zone="bot-right"></div>
+              </div>
+              <div class="pt-goal-posts" id="pt-goal-posts">
+                <div class="pt-post-left"></div>
+                <div class="pt-post-right"></div>
+                <div class="pt-crossbar"></div>
+              </div>
+            </div>
+            <img class="pt-keeper" id="pt-keeper" src="img/gk/gk-mid-stand.png" alt="">
+          </div>
+
+        </div>
+        <!-- END pt-goal-zone -->
+
+        <!-- Grass markings — nằm ngoài goal-zone để vòng cấm/chấm pen kéo dài
+             ra hết phần sân mở rộng phía cầu thủ đứng sút -->
         <div class="pt-pitch-markings">
           <div class="pt-touchline-top"></div>
           <div class="pt-box-lines"></div>
@@ -196,37 +226,28 @@
           <div class="pt-arc-left"></div>
           <div class="pt-arc-right"></div>
           <div class="pt-center-circle"></div>
-          <div class="pt-penalty-spot"></div>
-        </div>
-
-        <div class="pt-goal-area">
-          <div class="pt-goal-frame" id="pt-goal-frame">
-            <div class="pt-goal-net" id="pt-goal-net"></div>
-            <div class="pt-goal-grid" id="pt-goal-grid">
-              <div class="pt-zone" data-zone="top-left"></div>
-              <div class="pt-zone" data-zone="top-center"></div>
-              <div class="pt-zone" data-zone="top-right"></div>
-              <div class="pt-zone" data-zone="mid-left"></div>
-              <div class="pt-zone" data-zone="mid-center"></div>
-              <div class="pt-zone" data-zone="mid-right"></div>
-              <div class="pt-zone" data-zone="bot-left"></div>
-              <div class="pt-zone" data-zone="bot-center"></div>
-              <div class="pt-zone" data-zone="bot-right"></div>
-            </div>
-            <div class="pt-keeper" id="pt-keeper">
-              <div class="pt-keeper-hand pt-keeper-hand-left">🧤</div>
-              <div class="pt-keeper-hand pt-keeper-hand-right">🧤</div>
-            </div>
-            <div class="pt-goal-posts" id="pt-goal-posts">
-              <div class="pt-post-left"></div>
-              <div class="pt-post-right"></div>
-              <div class="pt-crossbar"></div>
-            </div>
-          </div>
+          <div class="pt-penalty-spot" id="pt-penalty-spot"></div>
         </div>
 
         <!-- Football on the penalty spot -->
         <div class="pt-ball" id="pt-ball">⚽</div>
+
+        <!-- Shooter — đứng ngay sau chấm 11m, ở phần chân sân được kéo dài thêm.
+             Wrapper chứa: ảnh cầu thủ (đã nhuộm màu áo theo cờ đội bằng canvas) + số áo/tên đội. -->
+        <div class="pt-shooter" id="pt-shooter">
+          <img class="pt-shooter-body" id="pt-shooter-body" src="img/player/shooter-mid-stand.png" alt="">
+          <img class="pt-shooter-hair" id="pt-shooter-hair" alt="">
+          <img class="pt-shooter-shirt" id="pt-shooter-shirt" alt="">
+          <img class="pt-shooter-shorts" id="pt-shooter-shorts" alt="">
+          <img class="pt-shooter-socks" id="pt-shooter-socks" alt="">
+          <div class="pt-shooter-jersey">
+            <span class="pt-jersey-name" id="pt-jersey-name"></span>
+            <span class="pt-jersey-number" id="pt-jersey-number"></span>
+          </div>
+          <!-- Lá cờ quốc gia trên ngực áo — chỉ hiện ở dáng ăn mừng/thất vọng (nhìn thẳng mặt),
+               ẩn ở dáng đứng/sút vì đó là nhìn từ lưng. -->
+          <div class="pt-shooter-flag" id="pt-shooter-flag"></div>
+        </div>
 
       </div>
       <!-- END pt-pitch -->

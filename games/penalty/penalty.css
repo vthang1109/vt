@@ -402,23 +402,197 @@
 
 /* ===================== GAME SCREEN ===================== */
 
-/* Pitch background with markings */
+/* Pitch background with markings — 1 khối sân duy nhất, cao hơn bản gốc một chút
+   để chừa chỗ đứng cho người sút ngay sau chấm 11m, không tách khối riêng. */
 .pt-pitch {
   width: 100%;
   max-width: 480px;
   position: relative;
-  background: radial-gradient(ellipse at 50% 60%, #1a6b48 0%, #0d3f2a 55%, #041b12 100%) padding-box,
+  background:
+    repeating-linear-gradient(180deg, rgba(255,255,255,0.07) 0, rgba(255,255,255,0.07) 34px, rgba(0,0,0,0.05) 34px, rgba(0,0,0,0.05) 68px) padding-box,
+    radial-gradient(ellipse at 50% 55%, #3fae63 0%, #1f8a48 45%, #106634 78%, #052c18 100%) padding-box,
     linear-gradient(135deg, #0a0a0a, #d4af37 50%, #0a0a0a) border-box;
   border: 3px solid transparent;
   border-radius: 20px;
   padding: 0;
   margin-bottom: 12px;
-  aspect-ratio: 1/0.92;
+  aspect-ratio: 1/1.34;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: inset 0 0 0 3px rgba(0,0,0,0.4), inset 0 0 50px rgba(0,0,0,0.5), 0 0 20px rgba(74,222,128,0.2), 0 12px 28px rgba(0,0,0,0.5);
   overflow: hidden;
+}
+
+/* Hiệu ứng chiến thắng: lá cờ đội thắng bay khắp sân khi kết thúc trận —
+   nhiều lá cờ trôi từ dưới lên trên, lệch ngang + xoay ngẫu nhiên (mỗi lá
+   cờ tự set --vf-drift/--vf-rot bằng JS). .pt-pitch có overflow:hidden nên
+   cờ tự động bị giới hạn gọn trong khung sân, không tràn ra ngoài UI khác. */
+.pt-victory-flag {
+  position: absolute;
+  bottom: -12%;
+  z-index: 40;
+  pointer-events: none;
+  animation-name: ptVictoryFly;
+  animation-timing-function: cubic-bezier(0.33,0,0.2,1);
+  animation-fill-mode: forwards;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
+}
+.pt-victory-flag img { display: block; }
+@keyframes ptVictoryFly {
+  0%   { transform: translate(0,0) rotate(0deg) scale(0.5); opacity: 0; }
+  12%  { opacity: 1; }
+  100% { transform: translate(var(--vf-drift), -145%) rotate(var(--vf-rot)) scale(1.15); opacity: 0; }
+}
+
+/* Khối khung thành + khán đài + biển quảng cáo — chốt cứng ở đầu trên của sân
+   với chiều cao cố định (%) để mọi phần tử con (%) bên trong định vị đúng,
+   không còn bị co lại/chồng lên biển quảng cáo như trước. */
+.pt-goal-zone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 58%;
+  z-index: 1;
+}
+
+/* Shooter — full-body sprite, back view, đứng ngay sau chấm 11m ở tiền cảnh sân.
+   Định vị bằng px cố định (không theo %) nên không phụ thuộc chiều cao sân. */
+.pt-shooter {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  width: 100px;
+  height: auto;
+  margin-left: -50px;
+  z-index: 5;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+  transform-origin: 50% 100%;
+  transition: left 0.3s ease;
+}
+/* Đội nhà sút — đứng lệch trái */
+.pt-shooter.pos-left { left: 30%; }
+/* Đội bot sút — đứng lệch phải */
+.pt-shooter.pos-right { left: 70%; }
+.pt-shooter.kick {
+  animation: ptShooterKick 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.pt-shooter.celebrate {
+  animation: ptShooterCelebrate 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+.pt-shooter.disappoint {
+  animation: ptShooterDisappoint 0.5s ease-out;
+}
+
+/* Cầu thủ tách 5 lớp ảnh riêng — nhuộm màu tóc/áo/quần/tất độc lập bằng canvas (JS):
+   - pt-shooter-body  : chỉ còn da/giày (vùng tóc+áo+quần+tất đã bị xoá trong suốt), quyết định kích thước khối
+   - pt-shooter-hair  : chỉ vùng tóc, nhuộm màu ngẫu nhiên (hài hòa với màu áo)
+   - pt-shooter-shirt : chỉ vùng áo, nhuộm theo màu primary
+   - pt-shooter-shorts: chỉ vùng quần, nhuộm theo màu secondary
+   - pt-shooter-socks : chỉ vùng tất, nhuộm theo màu tất riêng (kit.socks, mặc định = secondary nếu đội không khai báo riêng)
+   4 lớp tóc/áo/quần/tất chồng đúng khớp lên lớp thân bằng position absolute inset 0. */
+.pt-shooter-body {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+.pt-shooter-hair,
+.pt-shooter-shirt,
+.pt-shooter-shorts,
+.pt-shooter-socks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Số áo + tên đội in trên áo — vị trí canh theo giữa thân áo (không phải cổ áo) */
+.pt-shooter-jersey {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.pt-jersey-name,
+.pt-jersey-number {
+  position: absolute;
+  left: 50%;
+  font-family: 'Science Gothic', sans-serif;
+  color: #fff;
+  -webkit-text-stroke: 0.5px rgba(0,0,0,0.6);
+  text-shadow: 0 1px 1.5px rgba(0,0,0,0.4);
+  white-space: nowrap;
+  line-height: 1;
+}
+.pt-jersey-name {
+  top: 44%;
+  transform: translate(-50%, -50%);
+  font-weight: 800;
+  font-size: 4.5px;
+  letter-spacing: 0.3px;
+  -webkit-text-stroke: 0.4px rgba(0,0,0,0.55);
+}
+.pt-jersey-number {
+  top: 52%;
+  transform: translate(-50%, -50%);
+  font-weight: 900;
+  font-size: 10px;
+  -webkit-text-stroke: 0.4px rgba(0,0,0,0.55);
+}
+/* Mỗi dáng (pose) có tỉ lệ thân người hơi khác nên chỉnh lại vị trí số áo/tên đội cho khớp,
+   giữ số/tên nằm gọn trong thân áo (không lấn ra cổ áo hay lưng quần). */
+.pt-shooter.kick .pt-jersey-name       { top: 42%; }
+.pt-shooter.kick .pt-jersey-number     { top: 49%; }
+/* Ăn mừng / thất vọng: dáng người co giãn khác nhiều (tay giơ lên, cúi người che mặt)
+   nên số áo/tên đội không còn khớp vị trí thân áo → ẩn hẳn để tránh đè lệch ra ngoài áo. */
+.pt-shooter.celebrate .pt-shooter-jersey,
+.pt-shooter.disappoint .pt-shooter-jersey {
+  display: none;
+}
+
+/* Lá cờ quốc gia trên ngực áo — chỉ hiện ở 2 dáng nhìn thẳng mặt (ăn mừng/thất vọng),
+   ẩn mặc định vì dáng đứng/sút là nhìn từ lưng nên không thấy ngực áo. */
+.pt-shooter-flag {
+  display: none;
+  position: absolute;
+  left: 50%;
+  width: 13px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.35);
+  overflow: hidden;
+  pointer-events: none;
+}
+.pt-shooter-flag img { display: block; width: 100%; height: auto; }
+.pt-shooter.celebrate .pt-shooter-flag {
+  display: block;
+  top: 47%;
+  transform: translate(-50%, -50%);
+}
+.pt-shooter.disappoint .pt-shooter-flag {
+  display: block;
+  top: 51%;
+  transform: translate(-50%, -50%);
+}
+@keyframes ptShooterKick {
+  0%   { transform: scale(1) translateY(0); }
+  35%  { transform: scale(1.06) translateY(-6px); }
+  100% { transform: scale(1) translateY(0); }
+}
+@keyframes ptShooterCelebrate {
+  0%   { transform: scale(1) translateY(0); }
+  45%  { transform: scale(1.12) translateY(-10px); }
+  100% { transform: scale(1) translateY(0); }
+}
+@keyframes ptShooterDisappoint {
+  0%   { transform: scale(1) translateY(0); }
+  40%  { transform: scale(0.95) translateY(4px); }
+  100% { transform: scale(1) translateY(0); }
 }
 
 /* Pitch markings */
@@ -430,7 +604,7 @@
 }
 .pt-penalty-spot {
   position: absolute;
-  bottom: 10%;
+  bottom: 26%;
   left: 50%;
   transform: translateX(-50%);
   width: 9px;
@@ -485,8 +659,8 @@
   position: absolute;
   left: 9%;
   right: 9%;
-  top: 17%;
-  bottom: 15%;
+  top: 10%;
+  bottom: 22%;
   border: 2px solid rgba(255,255,255,0.22);
   border-top: none;
 }
@@ -494,7 +668,7 @@
 .pt-box-arc {
   position: absolute;
   left: 50%;
-  bottom: 13%;
+  bottom: 19%;
   width: 66px;
   height: 28px;
   transform: translateX(-50%);
@@ -566,27 +740,46 @@
 .pt-bb-2 { background: linear-gradient(135deg,#ef4444,#991b1b); }
 .pt-bb-3 { background: linear-gradient(135deg,#facc15,#ca8a04); color:#1a1a1a; text-shadow:none; }
 
-/* Goal area wrapper */
+/* Goal area wrapper — kéo lên gần biển quảng cáo, để phần trên khung thành
+   (xà ngang) đè lên mép dưới biển quảng cáo cho có chiều sâu phối cảnh */
 .pt-goal-area {
-  position: relative;
+  position: absolute;
   z-index: 1;
-  width: 88%;
-  height: 54%;
+  left: 6%;
+  right: 6%;
+  top: 18%;
+  bottom: 2%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  margin-top: -14%;
+}
+/* Vạch vôi ngang chân khung thành (goal line) — nằm ngay đáy khung thành,
+   đặt trên .pt-goal-area (không bị .pt-goal-frame overflow:hidden cắt mất) */
+.pt-goal-area::after {
+  content: '';
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  top: 62%;
+  height: 3px;
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 0 6px rgba(255,255,255,0.4);
+  z-index: 5;
+  pointer-events: none;
 }
 
 /* The football */
 .pt-ball {
   position: absolute;
+  left: 0;
+  top: 0;
   z-index: 10;
   font-size: 22px;
   pointer-events: none;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-  will-change: transform, left, top, opacity;
+  will-change: transform, opacity;
   transition: none;
+  transform: translate(-50%, -50%);
 }
 .pt-wind-streak {
   position: absolute;
@@ -616,7 +809,7 @@
 .pt-goal-frame {
   position: relative;
   width: 88%;
-  height: 78%;
+  height: 62%;
   background: rgba(0,0,0,0.25);
   border-radius: 4px;
   overflow: hidden;
@@ -740,45 +933,21 @@
   100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-/* Goalkeeper — represented as just two gloved hands */
+/* Goalkeeper — full-body sprite image, swapped per zone in JS */
 .pt-keeper {
   position: absolute;
   left: 50%;
-  top: 50%;
-  margin-left: -20px;
-  margin-top: -10px;
-  width: 40px;
-  height: 20px;
-  z-index: 5;
+  top: 62%;
+  width: 90px;
+  height: 90px;
+  margin-left: -45px;
+  margin-top: -76px; /* chân đứng sát vạch vôi/đáy khung thành, không lơ lửng xa gôn */
+  z-index: 7; /* cao hơn .pt-goal-posts (6) để thủ môn đè lên khung thành */
+  object-fit: contain;
   transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1);
   pointer-events: none;
-}
-.pt-keeper-hand {
-  position: absolute;
-  top: 2px;
-  width: 20px;
-  height: 20px;
-  font-size: 20px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   filter: drop-shadow(0 2px 3px rgba(0,0,0,0.45));
-  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), top 0.35s ease;
-}
-.pt-keeper-hand-left { left: 0; }
-.pt-keeper-hand-right { right: 0; }
-
-/* Hands raise up when diving / saving */
-.pt-keeper.diving .pt-keeper-hand-left,
-.pt-keeper.save .pt-keeper-hand-left {
-  top: -12px;
-  transform: translateX(-6px);
-}
-.pt-keeper.diving .pt-keeper-hand-right,
-.pt-keeper.save .pt-keeper-hand-right {
-  top: -12px;
-  transform: translateX(6px);
+  transform: scale(var(--gk-scale, 1));
 }
 
 .pt-keeper.diving {
@@ -788,25 +957,23 @@
   animation: ptSaveJump 1.3s cubic-bezier(0.34,1.56,0.64,1) forwards;
 }
 
-/* Găng thủ môn theo màu đội — đội nhà xanh dương+trắng, đội bạn đỏ+trắng */
-.pt-keeper.mine .pt-keeper-hand {
-  background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(56,189,248,0.5) 55%, transparent 78%);
+/* Viền glow theo màu đội — đội nhà xanh dương, đội bạn đỏ */
+.pt-keeper.mine {
   filter: drop-shadow(0 0 6px rgba(255,255,255,0.6)) drop-shadow(0 0 7px rgba(56,189,248,0.85)) drop-shadow(0 2px 3px rgba(0,0,0,0.45));
 }
-.pt-keeper.theirs .pt-keeper-hand {
-  background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(239,68,68,0.5) 55%, transparent 78%);
+.pt-keeper.theirs {
   filter: drop-shadow(0 0 6px rgba(255,255,255,0.6)) drop-shadow(0 0 7px rgba(239,68,68,0.85)) drop-shadow(0 2px 3px rgba(0,0,0,0.45));
 }
 @keyframes ptDive {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(var(--dx), var(--dy)) scale(1.3); }
-  100% { transform: translate(var(--dx), var(--dy)) scale(1); }
+  0% { transform: translate(0, 0) scale(var(--gk-scale, 1)) scaleX(var(--flip, 1)); }
+  50% { transform: translate(var(--dx), var(--dy)) scale(calc(var(--gk-scale, 1) * 1.3)) scaleX(var(--flip, 1)); }
+  100% { transform: translate(var(--dx), var(--dy)) scale(var(--gk-scale, 1)) scaleX(var(--flip, 1)); }
 }
 @keyframes ptSaveJump {
-  0% { transform: translate(0, 0) scale(1); }
-  30% { transform: translate(var(--dx), var(--dy)) scale(1.5); }
-  70% { transform: translate(var(--dx), var(--dy)) scale(1.2); }
-  100% { transform: translate(0, 0) scale(1); }
+  0% { transform: translate(0, 0) scale(var(--gk-scale, 1)) scaleX(var(--flip, 1)); }
+  30% { transform: translate(var(--dx), var(--dy)) scale(calc(var(--gk-scale, 1) * 1.5)) scaleX(var(--flip, 1)); }
+  70% { transform: translate(var(--dx), var(--dy)) scale(calc(var(--gk-scale, 1) * 1.2)) scaleX(var(--flip, 1)); }
+  100% { transform: translate(0, 0) scale(var(--gk-scale, 1)) scaleX(var(--flip, 1)); }
 }
 
 /* Ball flight line */
@@ -1435,7 +1602,7 @@
   .pt-title { font-size: 28px; }
   .pt-logo { font-size: 56px; }
   .pt-zone { font-size: 18px; }
-  .pt-goal-frame { width: 92%; height: 72%; }
+  .pt-goal-frame { width: 92%; height: 62%; }
   .pt-goal-grid { gap: 0; }
   .pt-lt { font-size: 10px; }
   .pt-cup-match { padding: 8px 10px; }
