@@ -2379,40 +2379,52 @@ class PenaltyGame {
       stroke=team==='theirs'?'#ef4444':'#38bdf8';
     }
 
-    // Lớp glow ngoài — to, mờ, tạo hào quang
-    const glow=document.createElementNS(svgNS,'path');
-    glow.setAttribute('fill','none');
-    glow.setAttribute('stroke',stroke);
-    glow.setAttribute('stroke-width','26');
-    glow.setAttribute('stroke-linecap','round');
-    glow.setAttribute('stroke-linejoin','round');
-    glow.setAttribute('opacity','0.4');
-    glow.style.filter='blur(5px)';
+    // Nhóm glow ngoài — to, mờ, tạo hào quang (vẽ theo từng đoạn để vuốt nhỏ dần)
+    const glowGroup=document.createElementNS(svgNS,'g');
+    glowGroup.setAttribute('opacity','0.4');
+    glowGroup.style.filter='blur(5px)';
 
-    // Lớp lõi — sáng rõ, nét đậm ở giữa
-    const core=document.createElementNS(svgNS,'path');
-    core.setAttribute('fill','none');
-    core.setAttribute('stroke',stroke);
-    core.setAttribute('stroke-width','10');
-    core.setAttribute('stroke-linecap','round');
-    core.setAttribute('stroke-linejoin','round');
-    core.setAttribute('opacity','0.95');
+    // Nhóm lõi — sáng rõ, vuốt nhỏ dần về phía đuôi như hình chóp dài
+    const coreGroup=document.createElementNS(svgNS,'g');
+    coreGroup.setAttribute('opacity','0.95');
 
-    svg.appendChild(glow);
-    svg.appendChild(core);
+    svg.appendChild(glowGroup);
+    svg.appendChild(coreGroup);
     pitch.appendChild(svg);
 
-    this._trailLine={svg,glow,core,d:`M ${startX} ${startY}`};
-    glow.setAttribute('d',this._trailLine.d);
-    core.setAttribute('d',this._trailLine.d);
+    this._trailLine={svg,glowGroup,coreGroup,stroke,points:[{x:startX,y:startY}]};
   }
 
   _updateTrailLine(x,y){
     const tl=this._trailLine;
     if(!tl) return;
-    tl.d+=` L ${x} ${y}`;
-    tl.glow.setAttribute('d',tl.d);
-    tl.core.setAttribute('d',tl.d);
+    tl.points.push({x,y});
+    const svgNS='http://www.w3.org/2000/svg';
+    // To bằng quả bóng ngay sát bóng, nhỏ dần về phía đuôi — hình chóp dài
+    const CORE_MAX=22, CORE_MIN=2, GLOW_MAX=34, GLOW_MIN=6;
+    tl.glowGroup.innerHTML='';
+    tl.coreGroup.innerHTML='';
+    const n=tl.points.length-1;
+    for(let i=0;i<n;i++){
+      const p1=tl.points[i], p2=tl.points[i+1];
+      const t=(i+1)/n; // 0 = đuôi, 1 = ngay sát bóng
+      const coreW=CORE_MIN+(CORE_MAX-CORE_MIN)*t;
+      const glowW=GLOW_MIN+(GLOW_MAX-GLOW_MIN)*t;
+      const glowSeg=document.createElementNS(svgNS,'path');
+      glowSeg.setAttribute('d',`M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`);
+      glowSeg.setAttribute('fill','none');
+      glowSeg.setAttribute('stroke',tl.stroke);
+      glowSeg.setAttribute('stroke-width',glowW.toFixed(1));
+      glowSeg.setAttribute('stroke-linecap','round');
+      tl.glowGroup.appendChild(glowSeg);
+      const coreSeg=document.createElementNS(svgNS,'path');
+      coreSeg.setAttribute('d',`M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`);
+      coreSeg.setAttribute('fill','none');
+      coreSeg.setAttribute('stroke',tl.stroke);
+      coreSeg.setAttribute('stroke-width',coreW.toFixed(1));
+      coreSeg.setAttribute('stroke-linecap','round');
+      tl.coreGroup.appendChild(coreSeg);
+    }
   }
 
   _finishTrailLine(){
@@ -2433,7 +2445,7 @@ class PenaltyGame {
       case 'dark':    return 36*(1-raw)*Math.sin(raw*3*2*Math.PI);         // hắc ám: xoáy rộng hơn — dùng chung công thức, bóng phân thân lấy dấu ngược lại
       case 'rainbow': return 70*Math.sin(Math.PI*raw);                     // cầu vồng: 1 vòng cung duy nhất, đúng hình dải cầu vồng
       case 'leaf':    return 18*(1-raw)*Math.abs(Math.sin(raw*4*Math.PI)); // lá cây: nảy nảy nảy, biên độ giảm dần
-      case 'fire':    return 26*Math.sin(raw*2*Math.PI);                  // lửa: đúng 1 chu kỳ sin = hình chữ S
+      case 'fire':    return 42*Math.sin(raw*2*Math.PI);                  // lửa: 1 chu kỳ sin biên độ lớn = rõ hình chữ S
       case 'thunder':{
         const tw=raw*4;
         return 22*(2*Math.abs(2*(tw-Math.floor(tw+0.5)))-1);              // sấm sét: sóng tam giác = zíc-zắc góc nhọn
@@ -2446,7 +2458,7 @@ class PenaltyGame {
   // Tốc độ tiến theo phương chính: băng giá & sấm sét bay đều tốc độ không
   // đổi (đúng chất "thẳng"/"tia chớp"), các kiểu còn lại ease-out cho mượt.
   _trailForward(style,raw){
-    if(style==='ice'||style==='thunder') return raw;
+    if(style==='ice'||style==='thunder'||style==='fire') return raw;
     return 1-Math.pow(1-raw,3);
   }
 
