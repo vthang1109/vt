@@ -2557,6 +2557,9 @@ class PenaltyGame {
 
   _keeperDive(zone,cls){
     const keeper=document.getElementById('pt-keeper');
+    // Hủy lịch tự về vị trí cũ (nếu đang chờ sau pha bắt dính trước đó) —
+    // thủ môn sắp đổ người cho pha bóng mới nên không cần giữ tư thế cũ nữa.
+    if(this._keeperResetTimer){clearTimeout(this._keeperResetTimer);this._keeperResetTimer=null;}
     applyKeeperSprite(keeper,zone);
     keeper.style.setProperty('--flip',keeper.dataset.flip==='1'?-1:1);
     const targetZone=document.querySelector(`.pt-zone[data-zone="${zone}"]`);
@@ -2587,6 +2590,23 @@ class PenaltyGame {
 
   resetKeeperPos(){
     const k=document.getElementById('pt-keeper');
+    if(!k)return;
+    // Nếu thủ môn vừa bắt dính bóng (đang ở pose "save"), giữ nguyên tư thế
+    // thêm 1 nhịp trước khi về vị trí đứng — tránh giật ngay lập tức khiến
+    // người chơi không kịp nhận ra pha cản phá vừa xảy ra.
+    if(k.classList.contains('save') && !this._keeperResetTimer){
+      this._keeperResetTimer=setTimeout(()=>{
+        this._keeperResetTimer=null;
+        this._doResetKeeperPos();
+      },900);
+      return;
+    }
+    this._doResetKeeperPos();
+  }
+
+  _doResetKeeperPos(){
+    const k=document.getElementById('pt-keeper');
+    if(!k)return;
     applyKeeperSprite(k,'mid-stand');
     k.style.setProperty('--flip',1);
     k.classList.remove('diving','save');
