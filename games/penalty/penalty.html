@@ -54,17 +54,24 @@
         <div class="pt-tournament-row" id="pt-league-row"></div>
       </div>
 
-      <!-- Tùy chỉnh: đội tuyển + 2 người chơi -->
+      <!-- Tùy chỉnh: đội tuyển + hiệu ứng -->
       <div class="pt-panel">
         <div class="pt-panel-label">⚙️ Tùy chỉnh</div>
 
-        <!-- Country selection (chỉ hiển thị quốc gia hiện tại, bấm vào mở popup) -->
-        <div class="pt-country-picker" id="pt-country-picker" onclick="penaltyGame.openCountryPopup()">
-          <span class="pt-country-flag" id="pt-country-flag">
-            <img src="https://flagcdn.com/vn.svg" class="pt-flag-svg" style="width:32px;height:auto;vertical-align:middle"/>
-          </span>
-          <span class="pt-country-name" id="pt-country-name">Việt Nam</span>
-          <svg class="pt-country-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <!-- Country + Effects cùng 1 hàng -->
+        <div class="pt-custom-row">
+          <div class="pt-country-picker" id="pt-country-picker" onclick="penaltyGame.openCountryPopup()">
+            <span class="pt-country-flag" id="pt-country-flag">
+              <img src="https://flagcdn.com/vn.svg" class="pt-flag-svg" style="width:18px;height:auto;vertical-align:middle"/>
+            </span>
+            <span class="pt-country-name" id="pt-country-name">Việt Nam</span>
+            <svg class="pt-country-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="pt-effect-bar" id="pt-effect-panel">
+            <span class="pt-effect-bar-icon" id="pt-effect-bar-icon">⚽</span>
+            <span class="pt-effect-bar-name" id="pt-effect-bar-name">Chưa chọn</span>
+            <svg class="pt-effect-bar-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
         </div>
       </div>
 
@@ -325,6 +332,42 @@
 
     </div>
 
+  </div>
+
+  <!-- Effect popup modal -->
+  <div class="pt-modal-overlay" id="pt-effect-modal">
+    <div class="pt-modal-box">
+      <div class="pt-modal-header">
+        <h3>🎯 Hiệu ứng cú sút</h3>
+        <button class="pt-modal-close" id="pt-effect-modal-close">✕</button>
+      </div>
+      <p class="pt-effect-modal-desc">Chọn một hoặc nhiều hiệu ứng — mỗi cú sút sẽ chọn ngẫu nhiên từ danh sách đã chọn.</p>
+      <div class="pt-effect-modal-grid" id="pt-effect-modal-grid"></div>
+      <div class="pt-modal-actions">
+        <button class="btn-primary" id="pt-effect-apply-btn">✓ Áp dụng</button>
+        <button class="btn-secondary" id="pt-effect-modal-cancel">Hủy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm mua hiệu ứng trả phí -->
+  <div class="pt-modal-overlay" id="pt-buy-confirm-modal">
+    <div class="pt-modal-box pt-buy-box">
+      <div class="pt-modal-header">
+        <h3>🛒 Xác nhận mua</h3>
+        <button class="pt-modal-close" id="pt-buy-confirm-close">✕</button>
+      </div>
+      <div class="pt-buy-confirm-content" id="pt-buy-confirm-content">
+        <div class="pt-buy-icon" id="pt-buy-icon">🌈</div>
+        <div class="pt-buy-name" id="pt-buy-name">Cầu vồng</div>
+        <div class="pt-buy-desc" id="pt-buy-desc">Sắc màu rực rỡ</div>
+        <div class="pt-buy-price" id="pt-buy-price">💰 5.000</div>
+      </div>
+      <div class="pt-modal-actions">
+        <button class="btn-primary" id="pt-buy-confirm-btn">💸 Mua ngay</button>
+        <button class="btn-secondary" id="pt-buy-confirm-cancel">Hủy</button>
+      </div>
+    </div>
   </div>
 
   <!-- Country popup modal -->

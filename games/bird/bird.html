@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Flappy Bird 🐦</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="bird.css"/>
+  <link rel="stylesheet" href="../../quests.css"/>
+  <script type="module" src="../../quests.js"></script>
+  <script src="../../fullscreen.js"></script>
+  <script src="../../admin-toggle.js"></script>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+</head>
+<body data-bottom-nav="games">
+  <div id="top-nav-root"></div>
+
+  <div class="bird-container">
+    <!-- MENU SCREEN -->
+    <div id="screen-menu" class="bird-screen active">
+      <div class="bird-logo">🐦</div>
+      <h1 class="bird-title main-title">Flappy Bird</h1>
+      <p class="bird-subtitle">Vượt qua mọi chướng ngại vật</p>
+      <div class="score-tag-info">🏆 Vượt ống = +1 điểm · Mỗi 10 điểm = +100⭐</div>
+      <button class="start-btn" id="btn-start">BẮT ĐẦU</button>
+      <div class="bird-highscore" id="menu-highscore">🏆 Kỷ lục: <span id="highscore-display">0</span></div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="screen-game" class="bird-screen">
+      <div class="bc-status" id="bc-status" style="display:none">
+        <span class="stat-bet" id="b-left">🐦</span>
+        <div class="stat-score-wrap">
+          <span class="stat-score" id="b-center">0</span>
+          <span class="stat-score-sub">Điểm</span>
+        </div>
+        <span class="stat-profit zero" id="b-right">0</span>
+      </div>
+      <div class="canvas-wrapper" id="canvas-wrapper">
+        <canvas id="bird-canvas"></canvas>
+        <div class="tap-hint" id="game-hint">Chạm hoặc nhấn Space để bay</div>
+      </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="screen-result" class="bird-screen">
+      <div class="res-emoji">💀</div>
+      <h2 class="bird-title game-over-title">GAME OVER</h2>
+      <div class="res-stats">
+        <div class="res-stat">
+          <span class="res-val" id="final-score">0</span>
+          <span class="res-label">Điểm</span>
+        </div>
+        <div class="res-stat">
+          <span class="res-val" id="best-score">0</span>
+          <span class="res-label">Kỷ lục</span>
+        </div>
+        <div class="res-stat">
+          <span class="res-val" id="earned-pts">+0</span>
+          <span class="res-label">Thưởng</span>
+        </div>
+        <div class="res-stat">
+          <span class="res-val" id="pipes-passed">0</span>
+          <span class="res-label">Ống qua</span>
+        </div>
+      </div>
+      <button class="start-btn" id="btn-restart" style="margin-bottom:12px">CHƠI LẠI</button>
+      <button class="speed-btn" id="btn-home" style="width:100%">VỀ MENU</button>
+    </div>
+
+    <!-- PAUSE BUTTON (floating) -->
+    <button class="b-pause-btn" id="btn-pause" style="display:none" title="Tạm dừng">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+        <rect x="6" y="5" width="4" height="14" rx="1"></rect>
+        <rect x="14" y="5" width="4" height="14" rx="1"></rect>
+      </svg>
+    </button>
+
+    <!-- PAUSE OVERLAY -->
+    <div id="pause-overlay" class="overlay">
+      <h2 class="bird-title pause-title">TẠM DỪNG</h2>
+      <p class="pause-sub">Nhấn tiếp tục để bay tiếp</p>
+      <button class="start-btn" id="btn-resume">TIẾP TỤC</button>
+    </div>
+  </div>
+
+  <script type="module" src="bird.js"></script>
+</body>
+</html>

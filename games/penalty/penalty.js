@@ -1,622 +1,15 @@
 // ===================== PENALTY SHOOTOUT - CUP EDITION =====================
 import { auth, addPoints } from '../../points.js';
+import { COUNTRIES, FIFA_CODE3, abbr3, TOURNAMENT_CONFIGS, CUP_TOURNAMENTS, LEAGUE_CONFIGS, LEAGUE_LIST, buildRoundRobin, MODES, KIT_COLORS, flagColorCache, getFlagColors, applyTeamKit, SHOOTER_POSES, HAIR_COLOR_PALETTE, pickRandomHairColor, JERSEY_SPECIAL_NUMBERS, randomJerseyNumber, _shooterImgCache, _loadImg, _hexToRgb, _rgbToHsl, _hslToRgb, _poseDataCache, _getPoseData, _dyeMaskLayer, _bodyLayerCache, _teamLayerCache, _hairLayerCache, _getSplitShooterLayers, renderShooterSprite, GK_POSITIONS, applyKeeperSprite, shuffle, getAllCountries, getRegionCountries, countryByCode, getTopCountries, flagImg } from './penalty-countries.js';
+import { PT_EFFECTS, PT_EFFECTS_STORAGE_KEY, loadPenaltyEffects, savePenaltyEffects, simAIPenalty, orientMatchScore } from './penalty-effects.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// ============================
-// DỮ LIỆU QUỐC GIA
-// ============================
-const COUNTRIES = {
-  chau_a: { name:'🌏 Châu Á', list: [
-    {code:'jp',name:'Nhật Bản',flag:'🇯🇵',rank:17},{code:'ir',name:'Iran',flag:'🇮🇷',rank:20},
-    {code:'kr',name:'Hàn Quốc',flag:'🇰🇷',rank:23},{code:'au',name:'Úc',flag:'🇦🇺',rank:24},
-    {code:'sa',name:'Ả Rập Saudi',flag:'🇸🇦',rank:56},{code:'qa',name:'Qatar',flag:'🇶🇦',rank:58},
-    {code:'iq',name:'Iraq',flag:'🇮🇶',rank:63},{code:'ae',name:'UAE',flag:'🇦🇪',rank:67},
-    {code:'uz',name:'Uzbekistan',flag:'🇺🇿',rank:68},{code:'jo',name:'Jordan',flag:'🇯🇴',rank:73},
-    {code:'om',name:'Oman',flag:'🇴🇲',rank:76},{code:'bh',name:'Bahrain',flag:'🇧🇭',rank:86},
-    {code:'cn',name:'Trung Quốc',flag:'🇨🇳',rank:88},{code:'sy',name:'Syria',flag:'🇸🇾',rank:90},
-    {code:'vn',name:'Việt Nam',flag:'🇻🇳',rank:94},{code:'ps',name:'Palestine',flag:'🇵🇸',rank:96},
-    {code:'kg',name:'Kyrgyzstan',flag:'🇰🇬',rank:98},{code:'tj',name:'Tajikistan',flag:'🇹🇯',rank:104},
-    {code:'lb',name:'Lebanon',flag:'🇱🇧',rank:106},{code:'kp',name:'Triều Tiên',flag:'🇰🇵',rank:110},
-    {code:'th',name:'Thái Lan',flag:'🇹🇭',rank:113},{code:'in',name:'Ấn Độ',flag:'🇮🇳',rank:117},
-    {code:'my',name:'Malaysia',flag:'🇲🇾',rank:130},{code:'tm',name:'Turkmenistan',flag:'🇹🇲',rank:131},
-    {code:'id',name:'Indonesia',flag:'🇮🇩',rank:127},{code:'ph',name:'Philippines',flag:'🇵🇭',rank:135},
-    {code:'hk',name:'Hồng Kông',flag:'🇭🇰',rank:150},{code:'tw',name:'Đài Bắc Trung Hoa',flag:'🇹🇼',rank:150},
-    {code:'ye',name:'Yemen',flag:'🇾🇪',rank:156},{code:'mm',name:'Myanmar',flag:'🇲🇲',rank:159},
-    {code:'sg',name:'Singapore',flag:'🇸🇬',rank:161},{code:'mv',name:'Maldives',flag:'🇲🇻',rank:163},
-    {code:'kh',name:'Campuchia',flag:'🇰🇭',rank:176},{code:'np',name:'Nepal',flag:'🇳🇵',rank:176},
-    {code:'bd',name:'Bangladesh',flag:'🇧🇩',rank:183},{code:'mn',name:'Mông Cổ',flag:'🇲🇳',rank:183},
-    {code:'bn',name:'Brunei',flag:'🇧🇳',rank:190},{code:'pk',name:'Pakistan',flag:'🇵🇰',rank:195},
-    {code:'lk',name:'Sri Lanka',flag:'🇱🇰',rank:200},{code:'la',name:'Lào',flag:'🇱🇦',rank:188},
-    {code:'tl',name:'Timor Leste',flag:'🇹🇱',rank:196},{code:'bt',name:'Bhutan',flag:'🇧🇹',rank:185},
-    {code:'af',name:'Afghanistan',flag:'🇦🇫',rank:150},
-  ]},
-  chau_eu: { name:'🌍 Châu Âu', list: [
-    {code:'fr',name:'Pháp',flag:'🇫🇷',rank:2},{code:'be',name:'Bỉ',flag:'🇧🇪',rank:5},
-    {code:'gb',name:'Anh',flag:'🇬🇧',rank:4},{code:'pt',name:'Bồ Đào Nha',flag:'🇵🇹',rank:6},
-    {code:'nl',name:'Hà Lan',flag:'🇳🇱',rank:7},{code:'es',name:'Tây Ban Nha',flag:'🇪🇸',rank:8},
-    {code:'it',name:'Ý',flag:'🇮🇹',rank:9},{code:'hr',name:'Croatia',flag:'🇭🇷',rank:10},
-    {code:'de',name:'Đức',flag:'🇩🇪',rank:11},{code:'ua',name:'Ukraine',flag:'🇺🇦',rank:22},
-    {code:'ch',name:'Thụy Sĩ',flag:'🇨🇭',rank:19},{code:'dk',name:'Đan Mạch',flag:'🇩🇰',rank:21},
-    {code:'at',name:'Áo',flag:'🇦🇹',rank:25},{code:'se',name:'Thụy Điển',flag:'🇸🇪',rank:26},
-    {code:'gb-wls',name:'Wales',flag:'🏴',rank:27},{code:'pl',name:'Ba Lan',flag:'🇵🇱',rank:28},
-    {code:'tr',name:'Thổ Nhĩ Kỳ',flag:'🇹🇷',rank:29},{code:'no',name:'Na Uy',flag:'🇳🇴',rank:30},
-    {code:'rs',name:'Serbia',flag:'🇷🇸',rank:33},{code:'gb-sct',name:'Scotland',flag:'🏴',rank:39},
-    {code:'hu',name:'Hungary',flag:'🇭🇺',rank:35},{code:'cz',name:'CH Séc',flag:'🇨🇿',rank:36},
-    {code:'fi',name:'Phần Lan',flag:'🇫🇮',rank:55},{code:'gr',name:'Hy Lạp',flag:'🇬🇷',rank:44},
-    {code:'ro',name:'Romania',flag:'🇷🇴',rank:46},{code:'sk',name:'Slovakia',flag:'🇸🇰',rank:48},
-    {code:'si',name:'Slovenia',flag:'🇸🇮',rank:53},{code:'mk',name:'Bắc Macedonia',flag:'🇲🇰',rank:65},
-    {code:'ie',name:'Ireland',flag:'🇮🇪',rank:60},{code:'is',name:'Iceland',flag:'🇮🇸',rank:62},
-    {code:'ba',name:'Bosnia',flag:'🇧🇦',rank:70},{code:'al',name:'Albania',flag:'🇦🇱',rank:66},
-    {code:'bg',name:'Bulgaria',flag:'🇧🇬',rank:72},{code:'il',name:'Israel',flag:'🇮🇱',rank:80},
-    {code:'ge',name:'Georgia',flag:'🇬🇪',rank:75},{code:'me',name:'Montenegro',flag:'🇲🇪',rank:82},
-    {code:'xk',name:'Kosovo',flag:'🇽🇰',rank:78},{code:'am',name:'Armenia',flag:'🇦🇲',rank:89},
-    {code:'lu',name:'Luxembourg',flag:'🇱🇺',rank:83},{code:'az',name:'Azerbaijan',flag:'🇦🇿',rank:103},
-    {code:'cy',name:'Cyprus',flag:'🇨🇾',rank:120},{code:'ee',name:'Estonia',flag:'🇪🇪',rank:121},
-    {code:'lt',name:'Lithuania',flag:'🇱🇹',rank:131},{code:'lv',name:'Latvia',flag:'🇱🇻',rank:136},
-    {code:'md',name:'Moldova',flag:'🇲🇩',rank:153},{code:'mt',name:'Malta',flag:'🇲🇹',rank:170},
-    {code:'ad',name:'Andorra',flag:'🇦🇩',rank:150},{code:'sm',name:'San Marino',flag:'🇸🇲',rank:210},
-    {code:'fo',name:'Quần đảo Faroe',flag:'🇫🇴',rank:150},{code:'gi',name:'Gibraltar',flag:'🇬🇮',rank:200},
-  ]},
-  chau_phi: { name:'🌍 Châu Phi', list: [
-    {code:'ma',name:'Maroc',flag:'🇲🇦',rank:13},{code:'sn',name:'Senegal',flag:'🇸🇳',rank:18},
-    {code:'eg',name:'Ai Cập',flag:'🇪🇬',rank:34},{code:'dz',name:'Algeria',flag:'🇩🇿',rank:37},
-    {code:'tn',name:'Tunisia',flag:'🇹🇳',rank:38},{code:'ng',name:'Nigeria',flag:'🇳🇬',rank:40},
-    {code:'ci',name:'Bờ Biển Ngà',flag:'🇨🇮',rank:41},{code:'cm',name:'Cameroon',flag:'🇨🇲',rank:43},
-    {code:'ml',name:'Mali',flag:'🇲🇱',rank:47},{code:'bf',name:'Burkina Faso',flag:'🇧🇫',rank:54},
-    {code:'cd',name:'CH Dân chủ Congo',flag:'🇨🇩',rank:57},{code:'gh',name:'Ghana',flag:'🇬🇭',rank:60},
-    {code:'za',name:'Nam Phi',flag:'🇿🇦',rank:61},{code:'cv',name:'Cape Verde',flag:'🇨🇻',rank:63},
-    {code:'gn',name:'Guinea',flag:'🇬🇳',rank:72},{code:'bj',name:'Benin',flag:'🇧🇯',rank:78},
-    {code:'ga',name:'Gabon',flag:'🇬🇦',rank:82},{code:'zm',name:'Zambia',flag:'🇿🇲',rank:85},
-    {code:'ug',name:'Uganda',flag:'🇺🇬',rank:87},{code:'ao',name:'Angola',flag:'🇦🇴',rank:92},
-    {code:'mr',name:'Mauritania',flag:'🇲🇷',rank:104},{code:'ke',name:'Kenya',flag:'🇰🇪',rank:103},
-    {code:'mg',name:'Madagascar',flag:'🇲🇬',rank:106},{code:'gq',name:'Guinea Xích Đạo',flag:'🇬🇶',rank:108},
-    {code:'mz',name:'Mozambique',flag:'🇲🇿',rank:110},{code:'ne',name:'Niger',flag:'🇳🇪',rank:123},
-    {code:'sl',name:'Sierra Leone',flag:'🇸🇱',rank:119},{code:'zw',name:'Zimbabwe',flag:'🇿🇼',rank:118},
-    {code:'tg',name:'Togo',flag:'🇹🇬',rank:127},{code:'sd',name:'Sudan',flag:'🇸🇩',rank:124},
-    {code:'ly',name:'Libya',flag:'🇱🇾',rank:130},{code:'cg',name:'Congo',flag:'🇨🇬',rank:135},
-    {code:'bw',name:'Botswana',flag:'🇧🇼',rank:140},{code:'km',name:'Comoros',flag:'🇰🇲',rank:132},
-    {code:'gm',name:'Gambia',flag:'🇬🇲',rank:145},{code:'rw',name:'Rwanda',flag:'🇷🇼',rank:148},
-    {code:'et',name:'Ethiopia',flag:'🇪🇹',rank:150},{code:'mw',name:'Malawi',flag:'🇲🇼',rank:152},
-    {code:'cf',name:'CH Trung Phi',flag:'🇨🇫',rank:158},{code:'lr',name:'Liberia',flag:'🇱🇷',rank:160},
-    {code:'sz',name:'Eswatini',flag:'🇸🇿',rank:163},{code:'ls',name:'Lesotho',flag:'🇱🇸',rank:166},
-    {code:'bi',name:'Burundi',flag:'🇧🇮',rank:161},{code:'ss',name:'Nam Sudan',flag:'🇸🇸',rank:167},
-    {code:'dj',name:'Djibouti',flag:'🇩🇯',rank:200},{code:'so',name:'Somalia',flag:'🇸🇴',rank:190},
-    {code:'er',name:'Eritrea',flag:'🇪🇷',rank:206},{code:'sc',name:'Seychelles',flag:'🇸🇨',rank:200},
-    {code:'mu',name:'Mauritius',flag:'🇲🇺',rank:190},{code:'td',name:'Chad',flag:'🇹🇩',rank:183},
-  ]},
-  chau_my: { name:'🌎 Châu Mỹ', list: [
-    {code:'ar',name:'Argentina',flag:'🇦🇷',rank:1},{code:'br',name:'Brazil',flag:'🇧🇷',rank:3},
-    {code:'co',name:'Colombia',flag:'🇨🇴',rank:12},{code:'uy',name:'Uruguay',flag:'🇺🇾',rank:14},
-    {code:'us',name:'Mỹ',flag:'🇺🇸',rank:15},{code:'mx',name:'Mexico',flag:'🇲🇽',rank:16},
-    {code:'ec',name:'Ecuador',flag:'🇪🇨',rank:31},{code:'pe',name:'Peru',flag:'🇵🇪',rank:32},
-    {code:'pa',name:'Panama',flag:'🇵🇦',rank:33},{code:'cl',name:'Chile',flag:'🇨🇱',rank:42},
-    {code:'ca',name:'Canada',flag:'🇨🇦',rank:45},{code:'py',name:'Paraguay',flag:'🇵🇾',rank:49},
-    {code:'ve',name:'Venezuela',flag:'🇻🇪',rank:50},{code:'cr',name:'Costa Rica',flag:'🇨🇷',rank:52},
-    {code:'jm',name:'Jamaica',flag:'🇯🇲',rank:59},{code:'cw',name:'Curaçao',flag:'🇨🇼',rank:80},
-    {code:'bo',name:'Bolivia',flag:'🇧🇴',rank:78},{code:'hn',name:'Honduras',flag:'🇭🇳',rank:85},
-    {code:'ht',name:'Haiti',flag:'🇭🇹',rank:87},{code:'sv',name:'El Salvador',flag:'🇸🇻',rank:90},
-    {code:'gt',name:'Guatemala',flag:'🇬🇹',rank:100},{code:'tt',name:'Trinidad & Tobago',flag:'🇹🇹',rank:95},
-    {code:'sr',name:'Suriname',flag:'🇸🇷',rank:110},{code:'cu',name:'Cuba',flag:'🇨🇺',rank:120},
-    {code:'ni',name:'Nicaragua',flag:'🇳🇮',rank:130},{code:'do',name:'Cộng hòa Dominica',flag:'🇩🇴',rank:140},
-    {code:'gy',name:'Guyana',flag:'🇬🇾',rank:150},{code:'bz',name:'Belize',flag:'🇧🇿',rank:165},
-    {code:'bs',name:'Bahamas',flag:'🇧🇸',rank:180},{code:'bm',name:'Bermuda',flag:'🇧🇲',rank:170},
-  ]},
-};
 
-// ============================
-// TOURNAMENT CONFIGURATIONS
-// ============================
-const FIFA_CODE3 = {
-  ad:'AND',ae:'UAE',af:'AFG',al:'ALB',am:'ARM',ao:'ANG',ar:'ARG',at:'AUT',au:'AUS',az:'AZE',
-  ba:'BIH',bd:'BAN',be:'BEL',bf:'BFA',bg:'BUL',bh:'BHR',bi:'BDI',bj:'BEN',bm:'BER',bn:'BRU',
-  bo:'BOL',br:'BRA',bs:'BAH',bt:'BHU',bw:'BOT',bz:'BLZ',ca:'CAN',cd:'COD',cf:'CTA',cg:'CGO',
-  ch:'SUI',ci:'CIV',cl:'CHI',cm:'CMR',cn:'CHN',co:'COL',cr:'CRC',cu:'CUB',cv:'CPV',cw:'CUW',
-  cy:'CYP',cz:'CZE',de:'GER',dj:'DJI',dk:'DEN',do:'DOM',dz:'ALG',ec:'ECU',ee:'EST',eg:'EGY',
-  er:'ERI',es:'ESP',et:'ETH',fi:'FIN',fo:'FRO',fr:'FRA',ga:'GAB',gb:'ENG',ge:'GEO',gh:'GHA',
-  gi:'GIB',gm:'GAM',gn:'GUI',gq:'EQG',gr:'GRE',gt:'GUA',gy:'GUY',hk:'HKG',hn:'HON',hr:'CRO',
-  ht:'HAI',hu:'HUN',id:'IDN',ie:'IRL',il:'ISR',in:'IND',iq:'IRQ',ir:'IRN',is:'ISL',it:'ITA',
-  jm:'JAM',jo:'JOR',jp:'JPN',ke:'KEN',kg:'KGZ',kh:'CAM',km:'COM',kp:'PRK',kr:'KOR',la:'LAO',
-  lb:'LIB',lk:'SRI',lr:'LBR',ls:'LES',lt:'LTU',lu:'LUX',lv:'LVA',ly:'LBY',ma:'MAR',md:'MDA',
-  me:'MNE',mg:'MAD',mk:'MKD',ml:'MLI',mm:'MYA',mn:'MGL',mr:'MTN',mt:'MLT',mu:'MRI',mv:'MDV',
-  mw:'MWI',mx:'MEX',my:'MAS',mz:'MOZ',ne:'NIG',ng:'NGA',ni:'NCA',nl:'NED',no:'NOR',np:'NEP',
-  om:'OMA',pa:'PAN',pe:'PER',ph:'PHI',pk:'PAK',pl:'POL',ps:'PLE',pt:'POR',py:'PAR',qa:'QAT',
-  ro:'ROU',rs:'SRB',rw:'RWA',sa:'KSA',sc:'SEY',sd:'SDN',se:'SWE',sg:'SGP',si:'SVN',sk:'SVK',
-  sl:'SLE',sm:'SMR',sn:'SEN',so:'SOM',sr:'SUR',ss:'SSD',sv:'ESA',sy:'SYR',sz:'SWZ',td:'CHA',
-  tg:'TOG',th:'THA',tj:'TJK',tl:'TLS',tm:'TKM',tn:'TUN',tr:'TUR',tt:'TRI',tw:'TPE',ua:'UKR',
-  ug:'UGA',us:'USA',uy:'URU',uz:'UZB',ve:'VEN',vn:'VIE',xk:'KVX',ye:'YEM',za:'RSA',zm:'ZAM',
-  zw:'ZIM',
-};
-function abbr3(team){
-  return (team && FIFA_CODE3[team.code]) || (team ? team.name.slice(0,3).toUpperCase() : '');
-}
-
-const TOURNAMENT_CONFIGS = {
-  worldcup: {
-    id:'worldcup', name:'FIFA WC', icon:'🏆', region:null,
-    teamCount:32, groups:8, advancePerGroup:2,
-    knockoutRoundNames:['Vòng 16 đội','Tứ kết','Bán kết','Chung kết'],
-    pointsWin:500, pointsLose:100,
-  },
-  euro: {
-    id:'euro', name:'Euro', icon:'🇪🇺', region:'chau_eu',
-    teamCount:16, groups:4, advancePerGroup:2,
-    knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
-    pointsWin:400, pointsLose:80,
-  },
-  copa: {
-    id:'copa', name:'Copa A', icon:'🌎', region:'chau_my',
-    teamCount:16, groups:4, advancePerGroup:2,
-    knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
-    pointsWin:400, pointsLose:80,
-  },
-  afcon: {
-    id:'afcon', name:'CAN', icon:'🌍', region:'chau_phi',
-    teamCount:16, groups:4, advancePerGroup:2,
-    knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
-    pointsWin:400, pointsLose:80,
-  },
-  asiancup: {
-    id:'asiancup', name:'AFC', icon:'🌏', region:'chau_a',
-    teamCount:16, groups:4, advancePerGroup:2,
-    knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
-    pointsWin:400, pointsLose:80,
-  },
-};
-
-const CUP_TOURNAMENTS = Object.values(TOURNAMENT_CONFIGS);
-
-// ============================
-// LEAGUE CONFIGURATIONS (5 giải)
-// ============================
-const LEAGUE_CONFIGS = {
-  world: {
-    id:'world', name:'World', icon:'🌐', region:null,
-    teamCount:8, pointsWin:200, pointsDraw:80, pointsLose:50,
-  },
-  eu: {
-    id:'eu', name:'EU', icon:'🇪🇺', region:'chau_eu',
-    teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40,
-  },
-  copa: {
-    id:'copa', name:'America', icon:'🌎', region:'chau_my',
-    teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40,
-  },
-  africa: {
-    id:'africa', name:'African', icon:'🌍', region:'chau_phi',
-    teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40,
-  },
-  asia: {
-    id:'asia', name:'Asian', icon:'🌏', region:'chau_a',
-    teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40,
-  },
-};
-const LEAGUE_LIST = Object.values(LEAGUE_CONFIGS);
-
-// Circle-method round-robin: trả về mảng các vòng, mỗi vòng là mảng cặp đấu {home,away,result}
-// Đảm bảo mỗi đội đá đúng 1 trận/vòng, và mọi cặp gặp nhau đúng 1 lần.
-function buildRoundRobin(n){
-  let arr=[...Array(n).keys()];
-  const hasBye = n%2!==0;
-  if(hasBye) arr.push(-1);
-  const total=arr.length;
-  const numRounds=total-1;
-  const half=total/2;
-  const rounds=[];
-  for(let r=0;r<numRounds;r++){
-    const round=[];
-    for(let i=0;i<half;i++){
-      const a=arr[i],b=arr[total-1-i];
-      if(a!==-1&&b!==-1){
-        round.push(r%2===0?{home:a,away:b,result:null}:{home:b,away:a,result:null});
-      }
-    }
-    rounds.push(round);
-    const fixed=arr[0];
-    const rest=arr.slice(1);
-    rest.unshift(rest.pop());
-    arr=[fixed,...rest];
-  }
-  return rounds;
-}
-
-const MODES = [
-  { id:'nhanh',  name:'Giao hữu', icon:'⚡', desc:'Đá 1 trận',        label:'Đá Penalty!' },
-  { id:'league', name:'League', icon:'📊', desc:'Đấu bảng xếp hạng', label:'Bắt đầu League!' },
-  { id:'cup',    name:'Cúp',    icon:'🏆', desc:'Đấu loại trực tiếp', label:'Bắt đầu Cúp!' },
-];
-
-// Trích màu chủ đạo từ lá cờ quốc gia (dùng cho màu áo/quần cầu thủ)
-// Bảng màu áo SÂN NHÀ thực tế của các đội tuyển phổ biến (ưu tiên dùng thay vì suy ra từ cờ).
-// primary = màu áo, secondary = màu quần. Đội không có trong bảng sẽ fallback sang trích màu cờ.
-const KIT_COLORS = {
-  // Châu Á
-  jp:{primary:'#001c58',secondary:'#001c58'}, kr:{primary:'#c8102e',secondary:'#c8102e'},
-  ir:{primary:'#ffffff',secondary:'#ffffff'}, au:{primary:'#ffd400',secondary:'#00843d'},
-  sa:{primary:'#2f7d32',secondary:'#ffffff'}, qa:{primary:'#8a1538',secondary:'#ffffff'},
-  iq:{primary:'#ffffff',secondary:'#ffffff'}, ae:{primary:'#ffffff',secondary:'#ffffff'},
-  uz:{primary:'#ffffff',secondary:'#1e3a8a'}, jo:{primary:'#ffffff',secondary:'#ffffff'},
-  cn:{primary:'#dd2727',secondary:'#dd2727'}, vn:{primary:'#dc2626',secondary:'#dc2626'},
-  th:{primary:'#1e3a8a',secondary:'#ffffff'}, in:{primary:'#1e40af',secondary:'#1e40af'},
-  id:{primary:'#dc2626',secondary:'#dc2626'}, my:{primary:'#ffd400',secondary:'#000000'},
-  ph:{primary:'#0038a8',secondary:'#0038a8'}, sg:{primary:'#dc2626',secondary:'#dc2626'},
-  kp:{primary:'#dc2626',secondary:'#dc2626'},
-  // Châu Âu
-  fr:{primary:'#002654',secondary:'#ffffff'}, be:{primary:'#dc143c',secondary:'#000000'},
-  gb:{primary:'#ffffff',secondary:'#1e3a8a'}, pt:{primary:'#a4123f',secondary:'#046a38'},
-  nl:{primary:'#ff6a13',secondary:'#ffffff'}, es:{primary:'#c60b1e',secondary:'#1e3a8a'},
-  it:{primary:'#004c9a',secondary:'#ffffff'}, hr:{primary:'#dc2626',secondary:'#ffffff'},
-  de:{primary:'#ffffff',secondary:'#000000',socks:'#ffffff'}, ua:{primary:'#ffd400',secondary:'#1e3a8a'},
-  ch:{primary:'#dc2626',secondary:'#ffffff'}, dk:{primary:'#dc2626',secondary:'#ffffff'},
-  at:{primary:'#dc2626',secondary:'#ffffff'}, se:{primary:'#ffd400',secondary:'#1e3a8a'},
-  'gb-wls':{primary:'#dc2626',secondary:'#dc2626'}, pl:{primary:'#ffffff',secondary:'#dc2626'},
-  tr:{primary:'#dc2626',secondary:'#ffffff'}, no:{primary:'#dc2626',secondary:'#ffffff'},
-  rs:{primary:'#dc2626',secondary:'#1e3a8a'}, 'gb-sct':{primary:'#00205b',secondary:'#00205b'},
-  hu:{primary:'#dc2626',secondary:'#ffffff'}, cz:{primary:'#dc2626',secondary:'#1e3a8a'},
-  fi:{primary:'#ffffff',secondary:'#1e3a8a'}, gr:{primary:'#0d5eaf',secondary:'#ffffff'},
-  ro:{primary:'#ffd400',secondary:'#1e3a8a'}, sk:{primary:'#1e3a8a',secondary:'#1e3a8a'},
-  si:{primary:'#ffffff',secondary:'#ffffff'}, ie:{primary:'#0d7a3f',secondary:'#ffffff'},
-  is:{primary:'#1e3a8a',secondary:'#ffffff'}, ba:{primary:'#1e3a8a',secondary:'#ffd400'},
-  al:{primary:'#dc2626',secondary:'#dc2626'}, bg:{primary:'#ffffff',secondary:'#046a38'},
-  il:{primary:'#ffffff',secondary:'#1e3a8a'},
-  // Châu Phi
-  ma:{primary:'#dc2626',secondary:'#046a38'}, sn:{primary:'#ffffff',secondary:'#046a38'},
-  eg:{primary:'#dc2626',secondary:'#000000'}, dz:{primary:'#ffffff',secondary:'#ffffff'},
-  tn:{primary:'#dc2626',secondary:'#ffffff'}, ng:{primary:'#046a38',secondary:'#ffffff'},
-  ci:{primary:'#ff8200',secondary:'#ffffff'}, cm:{primary:'#046a38',secondary:'#dc2626'},
-  gh:{primary:'#ffffff',secondary:'#000000'}, za:{primary:'#ffd400',secondary:'#046a38'},
-  // Châu Mỹ
-  ar:{primary:'#75aadb',secondary:'#000000'}, br:{primary:'#ffd400',secondary:'#1e3a8a'},
-  co:{primary:'#ffd400',secondary:'#1e3a8a'}, uy:{primary:'#7ec4e8',secondary:'#000000'},
-  us:{primary:'#ffffff',secondary:'#1e3a8a'}, mx:{primary:'#046a38',secondary:'#ffffff'},
-  ec:{primary:'#ffd400',secondary:'#1e3a8a'}, pe:{primary:'#ffffff',secondary:'#ffffff'},
-  pa:{primary:'#dc2626',secondary:'#1e3a8a'}, cl:{primary:'#dc2626',secondary:'#1e3a8a'},
-  ca:{primary:'#dc2626',secondary:'#dc2626'}, py:{primary:'#dc2626',secondary:'#1e3a8a'},
-  ve:{primary:'#7b1c3d',secondary:'#ffffff'}, cr:{primary:'#dc2626',secondary:'#1e3a8a'},
-  jm:{primary:'#000000',secondary:'#000000'},
-};
-const flagColorCache = {};
-function getFlagColors(code){
-  if(flagColorCache[code]) return Promise.resolve(flagColorCache[code]);
-  if(KIT_COLORS[code]){
-    const k=KIT_COLORS[code];
-    const result={primary:k.primary,secondary:k.secondary,socks:k.socks||k.secondary,tertiary:k.secondary,hasWhite:k.secondary==='#ffffff'};
-    flagColorCache[code]=result;
-    return Promise.resolve(result);
-  }
-  return new Promise((resolve)=>{
-    const img=new Image();
-    img.crossOrigin='anonymous';
-    img.onload=()=>{
-      const canvas=document.createElement('canvas');
-      canvas.width=img.width;canvas.height=img.height;
-      const ctx=canvas.getContext('2d');
-      ctx.drawImage(img,0,0);
-      let data;
-      try{ data=ctx.getImageData(0,0,canvas.width,canvas.height).data; }
-      catch(e){ const fb={primary:'#dc2626',secondary:'#1e3a8a',socks:'#1e3a8a',tertiary:'#ffffff'}; flagColorCache[code]=fb; resolve(fb); return; }
-      const buckets={};
-      let totalPx=0, whitePx=0;
-      for(let i=0;i<data.length;i+=4){
-        const r=data[i],g=data[i+1],b=data[i+2],a=data[i+3];
-        if(a<200) continue;
-        totalPx++;
-        const brightness=(r+g+b)/3;
-        if(brightness>232){ whitePx++; continue; } // đếm riêng để biết cờ có mảng trắng hay không
-        if(brightness<40) continue; // bỏ gần đen — tránh áo/quần bị nhuộm đen kịt do dải đen trên cờ (VD: Đức, Bỉ)
-        const key=`${Math.round(r/32)*32},${Math.round(g/32)*32},${Math.round(b/32)*32}`;
-        buckets[key]=(buckets[key]||0)+1;
-      }
-      // Cờ có mảng trắng đáng kể (>=6% diện tích) → quần lấy màu trắng
-      const hasWhite = totalPx>0 && (whitePx/totalPx)>=0.06;
-      const sorted=Object.entries(buckets).sort((a,b)=>b[1]-a[1]);
-      const toHex=(str)=>{const [r,g,b]=str.split(',').map(Number);return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');};
-      // Đảm bảo màu không quá tối khi lên áo (nếu không sẽ ăn màu đen kịt dù đã lọc bucket đen ở trên,
-      // vì bucket làm tròn /32 vẫn có thể ra màu rất tối, VD (32,32,0)).
-      const ensureNotTooDark=(hex)=>{
-        const {r,g,b}=_hexToRgb(hex);
-        const [h,s,l]=_rgbToHsl(r,g,b);
-        if(l>=0.28) return hex;
-        const [nr,ng,nb]=_hslToRgb(h, Math.max(s,0.55), 0.4);
-        return '#'+[nr,ng,nb].map(v=>v.toString(16).padStart(2,'0')).join('');
-      };
-      // Áo: luôn là màu chủ đạo (đậm nhất, không trắng/đen) của lá cờ
-      const primary=ensureNotTooDark(sorted[0]?toHex(sorted[0][0]):'#dc2626');
-      // Quần: trắng nếu cờ có trắng, không thì dùng lại chính màu chủ đạo (đồng bộ cả bộ, không tự bịa màu phụ)
-      const secondary = hasWhite ? '#ffffff' : primary;
-      const tertiary=sorted[1]?toHex(sorted[1][0]):secondary;
-      const result={primary,secondary,socks:secondary,tertiary,hasWhite};
-      flagColorCache[code]=result;
-      resolve(result);
-    };
-    img.onerror=()=>{
-      const fb={primary:'#dc2626',secondary:'#ffffff',socks:'#ffffff',tertiary:'#1e3a8a'};
-      flagColorCache[code]=fb; resolve(fb);
-    };
-    img.src=`https://flagcdn.com/w40/${code}.png`;
-  });
-}
-async function applyTeamKit(el, countryCode){
-  const {primary, secondary} = await getFlagColors(countryCode);
-  el.style.setProperty('--team-color', primary);
-  el.style.setProperty('--team-shorts-color', secondary);
-}
 
 const ZONES = ['top-left','top-center','top-right','mid-left','mid-center','mid-right','bot-left','bot-center','bot-right'];
+const FLIGHT_MS_BY_STYLE={wind:650,fire:650,ice:650,leaf:650,rainbow:650,dark:650,thunder:650,light:650,clone:650,butterfly:650,blackhole:650};
+const KEEPER_REACT_DELAY_MS = 130;
 
-// Ảnh gốc cầu thủ + mask áo/quần tương ứng (dùng để nhuộm màu theo cờ đội).
-// Nhuộm màu được thực hiện bằng canvas (đổi pixel thật sự rồi gán vào src ảnh),
-// KHÔNG dùng CSS mask-image/mix-blend-mode vì 2 thuộc tính này không được hỗ trợ
-// ổn định trên các WebView nhúng (Zalo, Facebook in-app browser, WebView Android cũ...).
-// mask   = vùng ÁO (nhuộm bằng màu primary của cờ)
-// mask2  = vùng QUẦN (nhuộm bằng màu secondary của cờ) → 2 tông rõ rệt như áo thật
-// mask3 = vùng TÓC (nhuộm màu random hài hòa) · mask4 = vùng TẤT (nhuộm cùng màu secondary với quần)
-const SHOOTER_POSES = {
-  'mid-stand': { img:'img/player/shooter-mid-stand.png', mask:'img/player/shooter-mid-stand-kit-shirt.png',  mask2:'img/player/shooter-mid-stand-kit-shorts.png',  mask3:'img/player/shooter-mid-stand-kit-hair.png',  mask4:'img/player/shooter-mid-stand-kit-socks.png' },
-  'kick':      { img:'img/player/shooter-kick.png',       mask:'img/player/shooter-kick-kit-shirt.png',       mask2:'img/player/shooter-kick-kit-shorts.png',       mask3:'img/player/shooter-kick-kit-hair.png',       mask4:'img/player/shooter-kick-kit-socks.png' },
-  'celebrate': { img:'img/player/shooter-celebrate.png',  mask:'img/player/shooter-celebrate-kit-shirt.png',  mask2:'img/player/shooter-celebrate-kit-shorts.png',  mask3:'img/player/shooter-celebrate-kit-hair.png',  mask4:'img/player/shooter-celebrate-kit-socks.png' },
-  'disappoint':{ img:'img/player/shooter-disappoint.png', mask:'img/player/shooter-disappoint-kit-shirt.png', mask2:'img/player/shooter-disappoint-kit-shorts.png', mask3:'img/player/shooter-disappoint-kit-hair.png', mask4:'img/player/shooter-disappoint-kit-socks.png' },
-};
-
-// Bảng màu tóc cố định — chỉ chọn ngẫu nhiên TRONG 10 màu này (không suy ra từ hue áo nữa).
-const HAIR_COLOR_PALETTE = [
-  '#1b1b1b', // đen
-  '#4a2f1c', // nâu
-  '#5d5049', // nâu lạnh (nâu tro, tông lạnh)
-  '#7a4423', // nâu tây (nâu hạt dẻ ấm)
-  '#12171f', // xanh dương đen
-  '#d8d3c4', // bạch kim
-  '#93662f', // vàng nâu
-  '#3a1416', // đỏ đen
-  '#341920', // hồng đen
-  '#15221a', // xanh lá đen
-];
-// Mỗi cầu thủ (mỗi lượt sút) random 1 màu tóc riêng — KHÔNG cache theo đội nữa,
-// để các cầu thủ cùng đội không bị trùng y hệt màu tóc nhau.
-function pickRandomHairColor(){
-  return HAIR_COLOR_PALETTE[Math.floor(Math.random()*HAIR_COLOR_PALETTE.length)];
-}
-
-// Số áo cầu thủ: chủ yếu 1-25 (đúng dải số phổ biến của đội tuyển), thỉnh
-// thoảng (~12%) rơi vào vài số đặc biệt hay gặp ở đời thực (VD: 30, 80).
-const JERSEY_SPECIAL_NUMBERS = [30, 80];
-function randomJerseyNumber(){
-  if(Math.random() < 0.12){
-    return JERSEY_SPECIAL_NUMBERS[Math.floor(Math.random()*JERSEY_SPECIAL_NUMBERS.length)];
-  }
-  return 1 + Math.floor(Math.random()*25);
-}
-
-const _shooterImgCache = {};
-function _loadImg(src){
-  if(_shooterImgCache[src]) return _shooterImgCache[src];
-  const p = new Promise((resolve)=>{
-    const im = new Image();
-    im.onload = ()=>resolve(im);
-    im.onerror = ()=>{
-      // Nếu 1 file mask (VD: -kit-shorts.png) load lỗi, vùng đó sẽ KHÔNG bị
-      // cắt trong suốt khỏi lớp thân → màu gốc có sẵn trong ảnh nền (thường
-      // là màu placeholder mặc định) sẽ lộ ra thay vì màu đội thật. Log lại
-      // để dễ soi trong DevTools > Console/Network khi màu bị sai bất thường.
-      console.error('[penalty] Không tải được ảnh sprite:', src);
-      resolve(null);
-    };
-    im.src = src;
-  });
-  _shooterImgCache[src] = p;
-  return p;
-}
-function _hexToRgb(hex){
-  hex = (hex||'#dc2626').replace('#','');
-  if(hex.length===3) hex = hex.split('').map(c=>c+c).join('');
-  // LƯU Ý: không được dùng `parseInt(hex,16)||0xdc2626` — parseInt('000000',16)
-  // trả về 0, mà 0 là falsy trong JS nên `0 || 0xdc2626` sẽ SAI LẦM rơi vào màu
-  // fallback đỏ, khiến MỌI màu đen tuyền (#000000, VD quần Đức/Argentina) bị
-  // lặng lẽ đổi thành đỏ. Phải kiểm tra NaN riêng, không dùng toán tử `||`.
-  const parsed = parseInt(hex,16);
-  const n = Number.isNaN(parsed) ? 0xdc2626 : parsed;
-  return {r:(n>>16)&255, g:(n>>8)&255, b:n&255};
-}
-function _rgbToHsl(r,g,b){
-  r/=255; g/=255; b/=255;
-  const max=Math.max(r,g,b), min=Math.min(r,g,b);
-  let h=0,s=0; const l=(max+min)/2;
-  if(max!==min){
-    const d=max-min;
-    s = l>0.5 ? d/(2-max-min) : d/(max+min);
-    if(max===r) h=(g-b)/d+(g<b?6:0);
-    else if(max===g) h=(b-r)/d+2;
-    else h=(r-g)/d+4;
-    h/=6;
-  }
-  return [h,s,l];
-}
-function _hslToRgb(h,s,l){
-  if(s===0){ const v=Math.round(l*255); return [v,v,v]; }
-  const hue2rgb=(p,q,t)=>{
-    if(t<0)t+=1; if(t>1)t-=1;
-    if(t<1/6) return p+(q-p)*6*t;
-    if(t<1/2) return q;
-    if(t<2/3) return p+(q-p)*(2/3-t)*6;
-    return p;
-  };
-  const q = l<0.5 ? l*(1+s) : l+s-l*s;
-  const p = 2*l-q;
-  return [Math.round(hue2rgb(p,q,h+1/3)*255), Math.round(hue2rgb(p,q,h)*255), Math.round(hue2rgb(p,q,h-1/3)*255)];
-}
-
-// Cache dữ liệu pixel gốc (ảnh + tất cả mask) theo TỪNG POSE — chỉ load/decode
-// 1 lần cho mỗi pose, dùng lại cho mọi tổ hợp màu áo/tóc sau đó.
-const _poseDataCache = {};
-async function _getPoseData(pose){
-  if(_poseDataCache[pose]) return _poseDataCache[pose];
-  const p = SHOOTER_POSES[pose] || SHOOTER_POSES['mid-stand'];
-  const promise = (async()=>{
-    const [baseImg, maskImg, mask2Img, mask3Img, mask4Img] = await Promise.all([_loadImg(p.img), _loadImg(p.mask), _loadImg(p.mask2), _loadImg(p.mask3), _loadImg(p.mask4)]);
-    if(!baseImg) return null;
-    const w=baseImg.naturalWidth||500, h=baseImg.naturalHeight||700;
-    const baseCanvas=document.createElement('canvas'); baseCanvas.width=w; baseCanvas.height=h;
-    const bctx=baseCanvas.getContext('2d');
-    bctx.drawImage(baseImg,0,0,w,h);
-    let baseData;
-    try{ baseData=bctx.getImageData(0,0,w,h); }
-    catch(e){ return null; } // canvas bị taint (CORS)
-    const readMaskAlpha=(im)=>{
-      if(!im) return null;
-      const mc=document.createElement('canvas'); mc.width=w; mc.height=h;
-      const mctx=mc.getContext('2d'); mctx.drawImage(im,0,0,w,h);
-      return mctx.getImageData(0,0,w,h).data;
-    };
-    return {
-      w, h, bd: baseData.data,
-      shirtAlpha: readMaskAlpha(maskImg),
-      shortsAlpha: readMaskAlpha(mask2Img),
-      hairAlpha: readMaskAlpha(mask3Img),
-      socksAlpha: readMaskAlpha(mask4Img),
-    };
-  })();
-  _poseDataCache[pose] = promise;
-  return promise;
-}
-
-// Nhuộm 1 vùng mask theo 1 màu hex → trả về data URL. Tách riêng để có thể
-// cache độc lập theo từng loại lớp (áo/quần/tất theo màu đội, tóc theo màu tóc)
-// thay vì phải tính lại TOÀN BỘ sprite chỉ vì 1 lớp đổi màu.
-function _dyeMaskLayer(poseData, maskAlphaArr, hex){
-  const {w,h,bd} = poseData;
-  const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
-  const ctx=canvas.getContext('2d');
-  if(!maskAlphaArr) return canvas.toDataURL('image/png');
-  const {r,g,b}=_hexToRgb(hex);
-  const [th,ts,tl]=_rgbToHsl(r,g,b);
-  const tsBoost=Math.min(1, ts*1.15);
-  let sumL=0, sumW=0;
-  for(let i=0;i<bd.length;i+=4){
-    const ma=maskAlphaArr[i+3]/255;
-    if(ma<=0.02) continue;
-    const [,,bl]=_rgbToHsl(bd[i],bd[i+1],bd[i+2]);
-    sumL+=bl*ma; sumW+=ma;
-  }
-  const avgL = sumW>0 ? sumL/sumW : 0.80;
-  const layerData=ctx.createImageData(w,h);
-  const d=layerData.data;
-  for(let i=0;i<bd.length;i+=4){
-    const ma=maskAlphaArr[i+3]/255;
-    if(ma<=0.02) continue;
-    const [,,bl]=_rgbToHsl(bd[i],bd[i+1],bd[i+2]);
-    let newL = tl + (bl-avgL)*0.62;
-    newL = Math.max(0.22, Math.min(0.94, newL));
-    const [nr,ng,nb]=_hslToRgb(th,tsBoost,newL);
-    d[i]=nr; d[i+1]=ng; d[i+2]=nb; d[i+3]=Math.round(255*ma);
-  }
-  ctx.putImageData(layerData,0,0);
-  return canvas.toDataURL('image/png');
-}
-
-const _bodyLayerCache = {};   // pose -> dataURL (không phụ thuộc màu, chỉ phụ thuộc pose)
-const _teamLayerCache = {};   // pose|primary|secondary -> {shirt,shorts,socks}
-const _hairLayerCache = {};   // pose|hairHex -> dataURL
-// Tách sprite cầu thủ thành các lớp ảnh riêng biệt (thân, áo, quần, tất, tóc).
-// Mỗi lớp cache RIÊNG theo đúng thứ nó phụ thuộc: thân chỉ phụ thuộc pose, áo/quần/tất
-// phụ thuộc màu đội, tóc phụ thuộc màu tóc — nhờ vậy đổi màu tóc mỗi lượt sút KHÔNG
-// còn buộc tính lại toàn bộ sprite (nguyên nhân gây giật hình lúc sút/thủ môn bay).
-async function _getSplitShooterLayers(pose, primaryHex, secondaryHex, hairHex, socksHex){
-  secondaryHex = secondaryHex || primaryHex;
-  socksHex = socksHex || secondaryHex;
-  hairHex = hairHex || pickRandomHairColor();
-  const poseData = await _getPoseData(pose);
-  const p = SHOOTER_POSES[pose] || SHOOTER_POSES['mid-stand'];
-  const fallback = {body:p.img, hair:'', shirt:'', shorts:'', socks:''};
-  if(!poseData) return fallback;
-
-  let body;
-  try{
-    body = _bodyLayerCache[pose];
-    if(!body){
-      const {w,h,bd,shirtAlpha,shortsAlpha,hairAlpha,socksAlpha} = poseData;
-      const bodyCanvas=document.createElement('canvas'); bodyCanvas.width=w; bodyCanvas.height=h;
-      const bodyCtx=bodyCanvas.getContext('2d');
-      const bodyData=bodyCtx.createImageData(w,h);
-      const bod=bodyData.data;
-      for(let i=0;i<bd.length;i+=4){
-        const ma = shirtAlpha ? shirtAlpha[i+3]/255 : 0;
-        const ma2 = shortsAlpha ? shortsAlpha[i+3]/255 : 0;
-        const ma3 = hairAlpha ? hairAlpha[i+3]/255 : 0;
-        const ma4 = socksAlpha ? socksAlpha[i+3]/255 : 0;
-        const cut = Math.max(ma,ma2,ma3,ma4);
-        bod[i]=bd[i]; bod[i+1]=bd[i+1]; bod[i+2]=bd[i+2];
-        bod[i+3]=Math.round(bd[i+3]*(1-cut));
-      }
-      bodyCtx.putImageData(bodyData,0,0);
-      body = bodyCanvas.toDataURL('image/png');
-      _bodyLayerCache[pose] = body;
-    }
-
-    const teamKey = pose+'|'+primaryHex+'|'+secondaryHex+'|'+socksHex;
-    let team = _teamLayerCache[teamKey];
-    if(!team){
-      team = {
-        shirt: _dyeMaskLayer(poseData, poseData.shirtAlpha, primaryHex),
-        shorts: _dyeMaskLayer(poseData, poseData.shortsAlpha, secondaryHex),
-        socks: _dyeMaskLayer(poseData, poseData.socksAlpha, socksHex),
-      };
-      _teamLayerCache[teamKey] = team;
-    }
-
-    const hairKey = pose+'|'+hairHex;
-    let hair = _hairLayerCache[hairKey];
-    if(!hair){
-      hair = _dyeMaskLayer(poseData, poseData.hairAlpha, hairHex);
-      _hairLayerCache[hairKey] = hair;
-    }
-
-    return { body, hair, shirt:team.shirt, shorts:team.shorts, socks:team.socks };
-  }catch(e){ return fallback; }
-}
-// Vẽ sprite cầu thủ ở đúng dáng (pose), nhuộm áo/quần theo màu cờ (primary/secondary)
-// nếu đã biết, nếu chưa (đang chờ tải màu cờ) thì hiện ảnh gốc trước để không bị đứng hình.
-async function renderShooterSprite(pose, kit, prefix){
-  prefix = prefix || 'pt-shooter';
-  const bodyEl=document.getElementById(prefix+'-body');
-  const hairEl=document.getElementById(prefix+'-hair');
-  const shirtEl=document.getElementById(prefix+'-shirt');
-  const shortsEl=document.getElementById(prefix+'-shorts');
-  const socksEl=document.getElementById(prefix+'-socks');
-  if(!bodyEl) return;
-  const p = SHOOTER_POSES[pose] || SHOOTER_POSES['mid-stand'];
-  if(!kit || !kit.primary){
-    bodyEl.src=p.img;
-    if(hairEl) hairEl.src='';
-    if(shirtEl) shirtEl.src='';
-    if(shortsEl) shortsEl.src='';
-    if(socksEl) socksEl.src='';
-    return;
-  }
-  const layers = await _getSplitShooterLayers(pose, kit.primary, kit.secondary, kit.hair, kit.socks);
-  bodyEl.src=layers.body;
-  if(hairEl) hairEl.src=layers.hair;
-  if(shirtEl) shirtEl.src=layers.shirt;
-  if(shortsEl) shortsEl.src=layers.shorts;
-  if(socksEl) socksEl.src=layers.socks;
-}
-
-// Ảnh thủ môn: chỉ cần 5 file gốc, trái/phải dùng chung ảnh lật gương (flip)
-const GK_POSITIONS = {
-  'mid-stand':  { img: 'img/gk/gk-mid-stand.png', flip: false, scale: 1 },
-  'top-center': { img: 'img/gk/gk-mid-high.png',  flip: false, scale: 1.15, offsetY: 14 },
-  'bot-center': { img: 'img/gk/gk-mid-low.png',   flip: false, scale: 1 },
-  'mid-left':   { img: 'img/gk/gk-left-mid.png',  flip: false, scale: 1 },
-  'top-left':   { img: 'img/gk/gk-left-high.png', flip: false, scale: 1 },
-  'bot-left':   { img: 'img/gk/gk-left-mid.png',  flip: false, scale: 1 },
-  'mid-right':  { img: 'img/gk/gk-left-mid.png',  flip: true,  scale: 1 },
-  'top-right':  { img: 'img/gk/gk-left-high.png', flip: true,  scale: 1 },
-  'bot-right':  { img: 'img/gk/gk-left-mid.png',  flip: true,  scale: 1 },
-};
-function applyKeeperSprite(keeper, zone){
-  const pos = GK_POSITIONS[zone] || GK_POSITIONS['mid-stand'];
-  keeper.src = pos.img;
-  keeper.dataset.flip = pos.flip ? '1' : '0';
-  keeper.style.setProperty('--gk-scale', pos.scale ?? 1);
-}
 const AI_ACCURACY = 0.35;
 // Mỗi giải (League hoặc Cup) có tiến trình lưu riêng biệt theo configId
 // → 5 League + 5 Cup = 10 tiến trình độc lập, không đè lên nhau.
@@ -626,44 +19,6 @@ function saveKeyFor(mode, configId){
   return null;
 }
 
-// ============================
-// HELPERS
-// ============================
-function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function getAllCountries(){const a=[];for(const r of Object.values(COUNTRIES))a.push(...r.list);return a}
-function getRegionCountries(region){return region?COUNTRIES[region]?.list||[]:getAllCountries()}
-function countryByCode(code){for(const r of Object.values(COUNTRIES)){const f=r.list.find(c=>c.code===code);if(f)return f}return null}
-// Lấy N đội mạnh nhất (rank FIFA thấp = mạnh hơn) từ 1 pool, loại trừ 1 mã quốc gia
-function getTopCountries(pool, n, excludeCode){
-  return pool.filter(c=>c.code!==excludeCode).slice().sort((a,b)=>(a.rank||999)-(b.rank||999)).slice(0,n);
-}
-
-// Flag SVG helper — uses flagcdn.com free CDN
-function flagImg(code, name, size) {
-  if (!code || code.startsWith('gen_')) return '🏳️';
-  const s = size || 20;
-  return `<img src="https://flagcdn.com/${code}.svg" alt="${name||code}" class="pt-flag-svg" style="width:${s}px;height:auto;vertical-align:middle;" loading="lazy"/>`;
-}
-
-// Simulate an AI-vs-AI penalty match → returns [goals_home, goals_away]
-// Realistic: 3-5 penalties each, scores range 2-5
-function simAIPenalty() {
-  const base = 2;
-  const h = base + Math.floor(Math.random() * 4); // 2-5
-  const a = base + Math.floor(Math.random() * 4); // 2-5
-  return [h, a];
-}
-
-// Khi người chơi vừa đá xong 1 trận, scoreboard trong game luôn là [điểm mình, điểm đối thủ]
-// — nhưng lịch đấu có thể xếp mình là "away". Hàm này quy đổi về đúng [homeGoals, awayGoals]
-// để mọi logic thắng/thua/BXH phía sau (vốn đọc result[0]=home, result[1]=away) luôn chính xác.
-function orientMatchScore(fixture, playerGoals, oppGoals){
-  return fixture.home===0 ? [playerGoals, oppGoals] : [oppGoals, playerGoals];
-}
-
-// ============================
-// GAME CLASS
-// ============================
 class PenaltyGame {
   constructor() {
     this._shooterReq = 0; // token chống race giữa 2 promise màu cờ đội nhà/đội khách
@@ -690,7 +45,17 @@ class PenaltyGame {
       cupKnockoutRounds: [],// [{name, matches:[{home,away,result}]}]
       cupKnockoutMatchPtr: 0,
       _matchContext: null,   // {type:'cup-group'|'cup-knockout', groupIdx, matchIdx, roundIdx}
+      // effect
+      _effectOwned: [],
+      _effectSelected: [],
     };
+    // Load effects from localStorage — normalize dữ liệu cũ (string → array)
+    const saved = loadPenaltyEffects();
+    const rawOwned = saved.owned;
+    const rawSelected = saved.selected;
+    this.state._effectOwned = Array.isArray(rawOwned) ? rawOwned : [];
+    this.state._effectSelected = Array.isArray(rawSelected) ? rawSelected : [];
+    this._pendingBuyEffectId = null;
     this._init();
   }
 
@@ -892,6 +257,36 @@ class PenaltyGame {
     const kn=document.getElementById('pt-knockout-next');
     if(kn)kn.addEventListener('click',()=>this.playKnockoutMatch());
 
+    // Hiệu ứng cú sút — click bar mở modal chứa tất cả hiệu ứng
+    document.getElementById('pt-effect-panel').addEventListener('click',()=>{
+      this.openEffectModal();
+    });
+    // Modal effect grid — chọn/bỏ chọn / mua + gợi ý
+    document.getElementById('pt-effect-modal-grid').addEventListener('click',e=>{
+      const btn = e.target.closest('.pt-effect-modal-btn');
+      if(btn) return this._handleEffectModalClick(btn.dataset.effectId);
+      const sug = e.target.closest('.pt-effect-suggestion span');
+      if(sug && sug.dataset.effectId) return this._handleEffectModalClick(sug.dataset.effectId);
+      // Select-all checkbox
+      const cb = e.target.closest('.pt-select-all-cb');
+      if(cb) return this._handleSelectAll(cb.checked);
+    });
+    // Modal apply
+    document.getElementById('pt-effect-apply-btn').addEventListener('click',()=>this._applyEffectSelection());
+    // Modal close / cancel
+    document.getElementById('pt-effect-modal-close').addEventListener('click',()=>this.closeEffectModal());
+    document.getElementById('pt-effect-modal-cancel').addEventListener('click',()=>this.closeEffectModal());
+    document.getElementById('pt-effect-modal').addEventListener('click',e=>{
+      if(e.target===e.currentTarget) this.closeEffectModal();
+    });
+
+    // Confirm mua hiệu ứng
+    document.getElementById('pt-buy-confirm-btn').addEventListener('click',()=>this._confirmBuy());
+    document.getElementById('pt-buy-confirm-cancel').addEventListener('click',()=>this._cancelBuy());
+    document.getElementById('pt-buy-confirm-close').addEventListener('click',()=>this._cancelBuy());
+    document.getElementById('pt-buy-confirm-modal').addEventListener('click',e=>{
+      if(e.target===e.currentTarget) this._cancelBuy();
+    });
     setTimeout(()=>{
       if(window.TopNav?.setLeaveAction)window.TopNav.setLeaveAction(()=>this.showScreen('pt-menu'));
     },100);
@@ -920,6 +315,206 @@ class PenaltyGame {
     document.getElementById('pt-match-info').style.display='none';
     this._updateContinueCard();
     this._updatePlayButton();
+    this.renderEffectsPanel();
+  }
+
+  // ===== HIỆU ỨNG CÚ SÚT =====
+  renderEffectsPanel(){
+    const iconEl = document.getElementById('pt-effect-bar-icon');
+    const nameEl = document.getElementById('pt-effect-bar-name');
+    if(!iconEl || !nameEl) return;
+    const selected = this.state._effectSelected || [];
+    const owned = this.state._effectOwned || [];
+    // Filter to valid selected effects
+    const valid = selected.filter(id => PT_EFFECTS.find(e=>e.id===id));
+    if(valid.length === 0){
+      iconEl.textContent = '⚽';
+      nameEl.textContent = 'Chưa chọn';
+      nameEl.style.color = '#94a3b8';
+      iconEl.style.filter = 'none';
+    } else if(valid.length === 1){
+      const eff = PT_EFFECTS.find(e=>e.id===valid[0]);
+      iconEl.textContent = eff.icon;
+      nameEl.textContent = eff.name;
+      nameEl.style.color = '#e0f2fe';
+      iconEl.style.filter = `drop-shadow(0 0 6px ${eff.color}80)`;
+    } else {
+      const first = PT_EFFECTS.find(e=>e.id===valid[0]);
+      iconEl.textContent = '✨';
+      nameEl.textContent = `${valid.length} hiệu ứng`;
+      nameEl.style.color = '#c4b5fd';
+      iconEl.style.filter = first ? `drop-shadow(0 0 6px ${first.color}80)` : 'none';
+    }
+  }
+
+  // === Modal hiệu ứng ===
+  openEffectModal(){
+    const modal = document.getElementById('pt-effect-modal');
+    if(!modal) return;
+    // Lưu tạm selected vào dataset để có thể hủy
+    this._tempSelected = [...(this.state._effectSelected || [])];
+    this.renderEffectModalGrid();
+    modal.classList.add('active');
+  }
+
+  closeEffectModal(){
+    const modal = document.getElementById('pt-effect-modal');
+    if(modal) modal.classList.remove('active');
+    this._tempSelected = null;
+  }
+
+  renderEffectModalGrid(){
+    const grid = document.getElementById('pt-effect-modal-grid');
+    if(!grid) return;
+    const owned = this.state._effectOwned || [];
+    const tempSel = this._tempSelected || [];
+    const allOwned = PT_EFFECTS.every(e => owned.includes(e.id));
+    // Tính xem có bao nhiêu hiệu ứng có thể chọn (đã sở hữu hoặc miễn phí)
+    const selectable = PT_EFFECTS.filter(e => owned.includes(e.id) || e.price === 0);
+    const allSelected = selectable.length > 0 && selectable.every(e => tempSel.includes(e.id));
+    let html = `<div class="pt-select-all-row">
+      <label class="pt-select-all-label">
+        <input type="checkbox" class="pt-select-all-cb" ${allSelected?'checked':''} />
+        <span>Chọn tất cả (${selectable.length} hiệu ứng)</span>
+      </label>
+      <span class="pt-select-all-count">${tempSel.length} đã chọn</span>
+    </div>`;
+    html += PT_EFFECTS.map(e => {
+      const isOwned = owned.includes(e.id);
+      const isSelected = tempSel.includes(e.id);
+      const locked = !isOwned;
+      const isFree = e.price === 0;
+      let statusHtml = '';
+      if(locked){
+        if(isFree){
+          statusHtml = `<span class="pt-effect-modal-status">🎁 Miễn phí</span>`;
+        } else {
+          statusHtml = `<span class="pt-effect-modal-price"><span class="pt-price-icon">💰</span> ${e.price.toLocaleString('vi-VN')}</span>`;
+        }
+      } else {
+        statusHtml = `<span class="pt-effect-modal-status">${isSelected ? '✓ Đã chọn' : 'Đã sở hữu'}</span>`;
+      }
+      return `<button class="pt-effect-modal-btn ${isSelected?'selected':''} ${isOwned?'owned':''} ${locked?'locked':''}" data-effect-id="${e.id}">
+        <div class="pt-effect-modal-bg" style="background:radial-gradient(circle,${e.color}20,transparent 70%)"></div>
+        <div class="pt-effect-modal-check">${isSelected ? '✓' : ''}</div>
+        <span class="pt-effect-modal-icon">${e.icon}</span>
+        <span class="pt-effect-modal-name">${e.name}</span>
+        <span class="pt-effect-modal-desc-text">${e.desc}</span>
+        ${statusHtml}
+      </button>`;
+    }).join('');
+    // Gợi ý hiệu ứng chưa mua (paid) — chỉ hiện nếu còn
+    const lockedPaid = PT_EFFECTS.filter(e => e.price > 0 && !owned.includes(e.id));
+    if(lockedPaid.length > 0){
+      html += `<div class="pt-effect-suggestion">💡 Mới: ${lockedPaid.map(e =>
+        `<span data-effect-id="${e.id}">${e.icon} ${e.name} (💰${e.price.toLocaleString('vi-VN')})</span>`
+      ).join(' ')}</div>`;
+    }
+    grid.innerHTML = html;
+  }
+
+  _handleSelectAll(checked){
+    if(!this._tempSelected) this._tempSelected = [];
+    const owned = this.state._effectOwned || [];
+    // Các hiệu ứng có thể chọn: đã sở hữu hoặc miễn phí
+    const selectable = PT_EFFECTS.filter(e => owned.includes(e.id) || e.price === 0).map(e=>e.id);
+    if(checked){
+      // Thêm tất cả vào _tempSelected (tránh trùng)
+      selectable.forEach(id => {
+        if(!this._tempSelected.includes(id)) this._tempSelected.push(id);
+      });
+    } else {
+      // Bỏ tất cả
+      this._tempSelected = this._tempSelected.filter(id => !selectable.includes(id));
+    }
+    this.renderEffectModalGrid();
+  }
+
+  _handleEffectModalClick(effectId){
+    const effect = PT_EFFECTS.find(e=>e.id===effectId);
+    if(!effect) return;
+    const owned = this.state._effectOwned || [];
+    if(!owned.includes(effectId)){
+      // Chưa sở hữu → free thì mua luôn, paid thì confirm
+      if(effect.price > 0){
+        this._showBuyConfirm(effectId);
+        return;
+      }
+      // Free — mua ngay
+      owned.push(effectId);
+      this.state._effectOwned = owned;
+      const data = loadPenaltyEffects();
+      data.owned = [...owned];
+      if(!this._tempSelected) this._tempSelected = [];
+      if(!this._tempSelected.includes(effectId)) this._tempSelected.push(effectId);
+      savePenaltyEffects(data);
+      this.renderEffectModalGrid();
+      this.renderEffectsPanel();
+    } else {
+      // Đã sở hữu → toggle chọn/bỏ chọn
+      if(!this._tempSelected) this._tempSelected = [];
+      const idx = this._tempSelected.indexOf(effectId);
+      if(idx >= 0){
+        this._tempSelected.splice(idx, 1);
+      } else {
+        this._tempSelected.push(effectId);
+      }
+      this.renderEffectModalGrid();
+    }
+  }
+
+  _showBuyConfirm(effectId){
+    const effect = PT_EFFECTS.find(e=>e.id===effectId);
+    if(!effect) return;
+    this._pendingBuyEffectId = effectId;
+    document.getElementById('pt-buy-icon').textContent = effect.icon;
+    document.getElementById('pt-buy-name').textContent = effect.name;
+    document.getElementById('pt-buy-desc').textContent = effect.desc;
+    document.getElementById('pt-buy-price').textContent = `💰 ${effect.price.toLocaleString('vi-VN')} điểm`;
+    const modal = document.getElementById('pt-buy-confirm-modal');
+    if(modal) modal.classList.add('active');
+  }
+
+  _confirmBuy(){
+    const effectId = this._pendingBuyEffectId;
+    this._pendingBuyEffectId = null;
+    if(!effectId) return;
+    const effect = PT_EFFECTS.find(e=>e.id===effectId);
+    if(!effect) return;
+    const modal = document.getElementById('pt-buy-confirm-modal');
+    if(modal) modal.classList.remove('active');
+    const owned = this.state._effectOwned || [];
+    if(owned.includes(effectId)) return; // đã mua rồi
+    // Trừ points
+    import('../../points.js').then(mod => {
+      mod.addPoints('Penalty', `Mua hiệu ứng ${effect.name}`, -effect.price).catch(()=>{});
+    });
+    owned.push(effectId);
+    this.state._effectOwned = owned;
+    const data = loadPenaltyEffects();
+    data.owned = [...owned];
+    if(!this._tempSelected) this._tempSelected = [];
+    if(!this._tempSelected.includes(effectId)) this._tempSelected.push(effectId);
+    savePenaltyEffects(data);
+    this.renderEffectModalGrid();
+    this.renderEffectsPanel();
+  }
+
+  _cancelBuy(){
+    this._pendingBuyEffectId = null;
+    const modal = document.getElementById('pt-buy-confirm-modal');
+    if(modal) modal.classList.remove('active');
+  }
+
+  _applyEffectSelection(){
+    const selected = this._tempSelected || [];
+    this.state._effectSelected = [...selected];
+    const data = loadPenaltyEffects();
+    data.selected = [...selected];
+    data.owned = [...(this.state._effectOwned || [])];
+    savePenaltyEffects(data);
+    this.renderEffectsPanel();
+    this.closeEffectModal();
   }
 
   showScreen(id){
@@ -1094,7 +689,7 @@ class PenaltyGame {
       this.updateLeagueTable(f.home,h,a);
       this.updateLeagueTable(f.away,a,h);
       const home=this.state.leagueTeams[f.home],away=this.state.leagueTeams[f.away];
-      window.showToast(`⚡ ${flagImg(home.code, home.name)} ${home.name} ${h}-${a} ${flagImg(away.code, away.name)} ${away.name}`,'info');
+      //window.showToast(`⚡ ${flagImg(home.code, home.name)} ${home.name} ${h}-${a} ${flagImg(away.code, away.name)} ${away.name}`,'info');
     });
   }
 
@@ -1375,7 +970,7 @@ class PenaltyGame {
       this._updateCupGroupTable(item.groupIdx, match.home, hGoal, aGoal);
       this._updateCupGroupTable(item.groupIdx, match.away, aGoal, hGoal);
       this.state.cupGroupMatchPtr = ptr + 1;
-      window.showToast(`⚽ Bảng ${group.name}: ${flagImg(teams[match.home].code, teams[match.home].name)} ${teams[match.home].name} ${hGoal}-${aGoal} ${flagImg(teams[match.away].code, teams[match.away].name)} ${teams[match.away].name}`, 'info');
+      //window.showToast(`⚽ Bảng ${group.name}: ${flagImg(teams[match.home].code, teams[match.home].name)} ${teams[match.home].name} ${hGoal}-${aGoal} ${flagImg(teams[match.away].code, teams[match.away].name)} ${teams[match.away].name}`, 'info');
       this.renderGroupStage();
     }
   }
@@ -1688,7 +1283,7 @@ class PenaltyGame {
           // AI auto-simulate
           const [hGoal, aGoal] = simAIPenalty();
           match.result = [hGoal, aGoal];
-          window.showToast(`🏟️ ${rounds[r].name}: ${flagImg(home.code, home.name)} ${home.name} ${hGoal}-${aGoal} ${flagImg(away.code, away.name)} ${away.name}`, 'info');
+          //window.showToast(`🏟️ ${rounds[r].name}: ${flagImg(home.code, home.name)} ${home.name} ${hGoal}-${aGoal} ${flagImg(away.code, away.name)} ${away.name}`, 'info');
           this.renderKnockoutStage();
           return;
         }
@@ -1726,7 +1321,7 @@ class PenaltyGame {
 
     // Show final result as overlay
     if (isWin) {
-      window.showToast(`🏆 Chức vô địch ${config.name} thuộc về ${flagImg(teams[0].code, teams[0].name)} ${teams[0].name}!`, 'success');
+      //window.showToast(`🏆 Chức vô địch ${config.name} thuộc về ${flagImg(teams[0].code, teams[0].name)} ${teams[0].name}!`, 'success');
     }
     this.clearProgress('cup', config.id);
   }
@@ -1757,8 +1352,6 @@ class PenaltyGame {
     this.animateShot(zoneId,aiZone,isGoal);
     const result=isGoal?'goal':'saved';
     this.state.history.push({shooter:this.state.currentShooter,zone:zoneId,target:aiZone,result});
-    if(isGoal)this.state.scores[0]++;
-    this.renderStatusBar();
 
     // Bắt dính bóng (không vào) thì giữ nguyên hiện trường thêm 1.5s trước
     // khi reset lượt — để người chơi kịp nhận ra pha cản phá vừa xảy ra,
@@ -1796,8 +1389,6 @@ class PenaltyGame {
     this.animateAIShot(aiZone,playerDive,isGoal);
     const result=isGoal?'goal':'saved';
     this.state.history.push({shooter:'ai',zone:aiZone,target:playerDive,result});
-    if(isGoal)this.state.scores[1]++;
-    this.renderStatusBar();
     setTimeout(()=>{
       if(!isGoal){ setTimeout(()=>this.afterShotDone(),1500); } else { this.afterShotDone(); }
     },1700);
@@ -1823,7 +1414,7 @@ class PenaltyGame {
         return;
       }
       // Knockout, tied after 5 → sudden death — reset 5 nốt để hiển thị lượt luân lưu mới
-      window.showToast('⚽ Bước vào loạt luân lưu tử thần!','info');
+      //window.showToast('⚽ Bước vào loạt luân lưu tử thần!','info');
       this.state._dotsBaseP = ps;
       this.state._dotsBaseA = as;
       this.state.round = Math.max(this.state.round, 1);
@@ -2098,10 +1689,11 @@ class PenaltyGame {
   animateShot(zoneId,aiZone,isGoal){
     const zones=document.querySelectorAll('.pt-zone');
     zones.forEach(z=>z.classList.remove('zone-shot','zone-save','zone-goal','zone-keeper-save'));
-    // Thủ môn (đội bạn) bay ngay khi bóng được sút, không đợi bóng bay xong
+    // Thủ môn (đội bạn) phản ứng trễ 1 nhịp sau khi bóng được sút
     const keeper=document.getElementById('pt-keeper');
     if(keeper){keeper.classList.remove('mine');keeper.classList.add('theirs');}
-    this._keeperDive(aiZone,isGoal&&zoneId!==aiZone?'diving':'save');
+    const _trailStyle=this._pickTrailStyle();
+    setTimeout(()=>this._keeperDive(aiZone,isGoal&&zoneId!==aiZone?'diving':'save',FLIGHT_MS_BY_STYLE[_trailStyle]||900), KEEPER_REACT_DELAY_MS);
     this._shooterKick();
     this._animateBallToZone(zoneId,()=>{
       const el=document.querySelector(`[data-zone="${zoneId}"]`);
@@ -2111,20 +1703,25 @@ class PenaltyGame {
         const saveEl=document.querySelector(`[data-zone="${aiZone}"]`);
         if(saveEl)setTimeout(()=>{saveEl.classList.remove('zone-shot','zone-save','zone-goal');saveEl.classList.add('zone-keeper-save')},400);
       }
+      // Cập nhật tỉ số TRƯỚC — tránh renderStatusBar ghi đè banner
+      if(isGoal){this.state.scores[0]++;this.renderStatusBar();this._bumpScoreEl('pt-sb-you');}
+      else{this.renderStatusBar();}
+      // Banner kết quả HIỆN SAU, không bị renderStatusBar xoá mất
       this.showShotResultBanner(isGoal,'mine');
       this._shooterResult(isGoal);
       // Lưới rung khi bóng vào lưới
       if(isGoal) this._rippleNet();
-    },'mine');
+    },'mine',_trailStyle);
   }
 
   animateAIShot(zoneId,saveZone,isGoal){
     const zones=document.querySelectorAll('.pt-zone');
     zones.forEach(z=>z.classList.remove('zone-shot','zone-save','zone-goal','zone-keeper-save'));
-    // Thủ môn (đội mình) bay ngay khi bóng được sút, không đợi bóng bay xong
+    // Thủ môn (đội mình) phản ứng trễ 1 nhịp sau khi bóng được sút
     const keeper=document.getElementById('pt-keeper');
     if(keeper){keeper.classList.remove('theirs');keeper.classList.add('mine');}
-    this._keeperDive(saveZone,isGoal?'diving':'save');
+    const _trailStyle=this._pickTrailStyle();
+    setTimeout(()=>this._keeperDive(saveZone,isGoal?'diving':'save',FLIGHT_MS_BY_STYLE[_trailStyle]||900), KEEPER_REACT_DELAY_MS);
     this._shooterKick();
     this._animateBallToZone(zoneId,()=>{
       const el=document.querySelector(`[data-zone="${zoneId}"]`);
@@ -2134,11 +1731,15 @@ class PenaltyGame {
         const saveEl=document.querySelector(`[data-zone="${saveZone}"]`);
         if(saveEl)setTimeout(()=>{saveEl.classList.remove('zone-shot','zone-save','zone-goal');saveEl.classList.add('zone-keeper-save')},400);
       }
+      // Cập nhật tỉ số TRƯỚC — tránh renderStatusBar ghi đè banner
+      if(isGoal){this.state.scores[1]++;this.renderStatusBar();this._bumpScoreEl('pt-sb-ai');}
+      else{this.renderStatusBar();}
+      // Banner kết quả HIỆN SAU, không bị renderStatusBar xoá mất
       this.showShotResultBanner(isGoal,'theirs');
       this._shooterResult(isGoal);
       // Lưới rung khi bóng vào lưới
       if(isGoal) this._rippleNet();
-    },'theirs');
+    },'theirs',_trailStyle);
   }
 
   // Lưới rung khi bóng vào lưới
@@ -2190,7 +1791,7 @@ class PenaltyGame {
     ball.style.transform=`translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(1) rotate(0deg)`;
     ball.style.opacity='1';
     ball.style.display='';
-    ball.classList.remove('ball-fx-wind-mine','ball-fx-wind-theirs','ball-fx-fire','ball-fx-ice','ball-fx-leaf','ball-fx-rainbow','ball-fx-dark','ball-fx-thunder');
+    ball.classList.remove('ball-fx-wind-mine','ball-fx-wind-theirs','ball-fx-fire','ball-fx-ice','ball-fx-leaf','ball-fx-rainbow','ball-fx-dark','ball-fx-thunder','ball-fx-light','ball-fx-clone','ball-fx-butterfly','ball-fx-blackhole');
   }
 
   // Tạo vệt gió theo đường bay của bóng — 3 đường lệch tâm banh, 2 đường ngoài ngắn hơn
@@ -2214,8 +1815,28 @@ class PenaltyGame {
       s.style.setProperty('--wr',angleDeg+'deg');
       s.style.setProperty('--len',ln.len);
       pitch.appendChild(s);
-      setTimeout(()=>s.remove(),420);
+      setTimeout(()=>s.remove(),450);
     });
+    // ===== Hạt neon gió xoáy — xanh-trắng bay cuốn theo chiều gió (mới) =====
+    const neonCount=6+Math.floor(Math.random()*5);
+    for(let i=0;i<neonCount;i++){
+      const n=document.createElement('div');
+      n.className='pt-wind-neon';
+      const spread=20+Math.random()*30;
+      const aOff=(Math.random()-0.5)*60;
+      const aDeg=angleDeg+aOff;
+      const aRad=aDeg*Math.PI/180;
+      n.style.left=(x+Math.cos(aRad)*spread)+'px';
+      n.style.top=(y+Math.sin(aRad)*spread)+'px';
+      n.style.setProperty('--wn-delay',String(Math.random()*0.15));
+      n.style.setProperty('--wn-scale',String(0.4+Math.random()*1.2));
+      // Drift theo hướng gió + xoáy nhẹ
+      const drift=10+Math.random()*20;
+      n.style.setProperty('--wn-dx',String(Math.cos(aRad+0.5)*drift));
+      n.style.setProperty('--wn-dy',String(Math.sin(aRad+0.5)*drift));
+      pitch.appendChild(n);
+      setTimeout(()=>n.remove(),700);
+    }
   }
 
   // Hạt lửa — cháy đỏ/cam/vàng, bay lên rồi tắt dần
@@ -2228,28 +1849,134 @@ class PenaltyGame {
       pitch.appendChild(p);
       setTimeout(()=>p.remove(),520);
     }
+    // Tàn lửa neon đỏ-vàng-đen bay xung quanh (6-10 hạt)
+    const emberCount=6+Math.floor(Math.random()*5);
+    const emberColors=['#ef4444','#fb923c','#fde68a','#dc2626','#000000'];
+    for(let i=0;i<emberCount;i++){
+      const n=document.createElement('div');
+      n.className='pt-fire-ember';
+      const angle=Math.random()*360;
+      const dist=6+Math.random()*24;
+      n.style.left=(x+Math.cos(angle*Math.PI/180)*dist)+'px';
+      n.style.top=(y+Math.sin(angle*Math.PI/180)*dist)+'px';
+      n.style.setProperty('--ember-delay',String(Math.random()*0.15));
+      n.style.setProperty('--ember-scale',String(0.4+Math.random()*1.2));
+      n.style.setProperty('--ember-color',emberColors[Math.floor(Math.random()*emberColors.length)]);
+      const driftX=(Math.random()-0.5)*40, driftY=-(Math.random()*30+10);
+      n.style.setProperty('--ember-dx',driftX+'px');
+      n.style.setProperty('--ember-dy',driftY+'px');
+      pitch.appendChild(n);
+      setTimeout(()=>n.remove(),700);
+    }
   }
 
-  // Mảnh băng — trắng/xanh cyan lấp lánh, xoay khi tan
+  // Mảnh băng — trắng/xanh cyan lấp lánh, xoay khi tan + hạt lấp lánh đi kèm
   _spawnIceTrail(pitch,x,y){
+    // Mảnh băng chính — hình thoi (giữ nguyên)
     const p=document.createElement('div');
     p.className='pt-trail-ice';
     p.style.left=(x+(Math.random()-0.5)*10)+'px';
     p.style.top=(y+(Math.random()-0.5)*10)+'px';
     pitch.appendChild(p);
     setTimeout(()=>p.remove(),570);
+    // Hạt lấp lánh (giữ nguyên)
+    const sp=document.createElement('div');
+    sp.className='pt-trail-ice-sparkle';
+    sp.style.left=(x+(Math.random()-0.5)*16)+'px';
+    sp.style.top=(y+(Math.random()-0.5)*16)+'px';
+    pitch.appendChild(sp);
+    setTimeout(()=>sp.remove(),500);
+    // ===== Tinh thể băng neon — 8-12 hạt toả xung quanh (mới) =====
+    const crystalCount=8+Math.floor(Math.random()*5);
+    const crystalSizes=[4,5,7];
+    for(let i=0;i<crystalCount;i++){
+      const n=document.createElement('div');
+      n.className='pt-ice-crystal';
+      const angle=Math.random()*360;
+      const dist=5+Math.random()*28;
+      n.style.left=(x+Math.cos(angle*Math.PI/180)*dist)+'px';
+      n.style.top=(y+Math.sin(angle*Math.PI/180)*dist)+'px';
+      const size=crystalSizes[Math.floor(Math.random()*crystalSizes.length)];
+      n.style.width=size+'px'; n.style.height=size+'px';
+      n.style.setProperty('--cr-delay',String(Math.random()*0.2));
+      n.style.setProperty('--cr-scale',String(0.4+Math.random()*1.2));
+      n.style.setProperty('--cr-rot',String(Math.floor(Math.random()*360)));
+      pitch.appendChild(n);
+      setTimeout(()=>n.remove(),800);
+    }
+    // ===== Icon băng ❄️ bay xung quanh (giống lá 🍃) =====
+    const iconCount=2+Math.floor(Math.random()*3);
+    for(let i=0;i<iconCount;i++){
+      const ic=document.createElement('div');
+      ic.className='pt-ice-icon';
+      ic.textContent='❄️';
+      ic.style.left=(x+(Math.random()-0.5)*40)+'px';
+      ic.style.top=(y+(Math.random()-0.5)*40)+'px';
+      ic.style.setProperty('--ii-delay',String(Math.random()*0.15));
+      ic.style.setProperty('--ii-x',String((Math.random()-0.5)*35));
+      ic.style.setProperty('--ii-y',String((-12-Math.random()*24)));
+      pitch.appendChild(ic);
+      setTimeout(()=>ic.remove(),800);
+    }
+    // ===== Vệt đóng băng — mảnh băng loang (mới) =====
+    for(let i=0;i<3;i++){
+      const f=document.createElement('div');
+      f.className='pt-ice-frost';
+      const fa=Math.random()*360;
+      const fd=4+Math.random()*20;
+      f.style.left=(x+Math.cos(fa*Math.PI/180)*fd)+'px';
+      f.style.top=(y+Math.sin(fa*Math.PI/180)*fd)+'px';
+      const fs=6+Math.floor(Math.random()*15);
+      f.style.width=fs+'px'; f.style.height=fs+'px';
+      f.style.setProperty('--fr-rot',String(Math.floor(Math.random()*120)-60));
+      f.style.setProperty('--fr-delay',String(Math.random()*0.15));
+      pitch.appendChild(f);
+      setTimeout(()=>f.remove(),650);
+    }
   }
 
-  // Lá cây bay theo sau bóng, xoay lật như bị gió cuốn
+  // Lá cây bay theo sau bóng, xoay lật như bị gió cuốn — rắc 2 lá + quầng
+  // gió xanh mờ mỗi lượt để trông như cả chùm lá bị cuốn theo bóng
   _spawnLeafTrail(pitch,x,y){
     const leaves=['🍃','🍂'];
-    const p=document.createElement('span');
-    p.className='pt-trail-leaf';
-    p.textContent=leaves[Math.floor(Math.random()*leaves.length)];
-    p.style.left=(x+(Math.random()-0.5)*10)+'px';
-    p.style.top=(y+(Math.random()-0.5)*10)+'px';
-    pitch.appendChild(p);
-    setTimeout(()=>p.remove(),620);
+    // Quầng lá xanh (giữ nguyên)
+    const glow=document.createElement('div');
+    glow.className='pt-trail-leaf-glow';
+    glow.style.left=x+'px';
+    glow.style.top=y+'px';
+    pitch.appendChild(glow);
+    setTimeout(()=>glow.remove(),550);
+    // Lá cây — tăng từ 2 lên 3-5
+    const leafCount=3+Math.floor(Math.random()*3);
+    for(let i=0;i<leafCount;i++){
+      const p=document.createElement('span');
+      p.className='pt-trail-leaf';
+      p.textContent=leaves[Math.floor(Math.random()*leaves.length)];
+      p.style.left=(x+(Math.random()-0.5)*20)+'px';
+      p.style.top=(y+(Math.random()-0.5)*20)+'px';
+      p.style.fontSize=(16+Math.random()*12)+'px';
+      const delay=Math.random()*0.15;
+      p.style.animationDelay=delay+'s';
+      pitch.appendChild(p);
+      setTimeout(()=>p.remove(),800);
+    }
+    // ===== Hạt neon xanh-vàng — linh hồn lá bay xung quanh (mới) =====
+    const spiritCount=6+Math.floor(Math.random()*5);
+    for(let i=0;i<spiritCount;i++){
+      const n=document.createElement('div');
+      n.className='pt-leaf-spirit';
+      const angle=Math.random()*360;
+      const dist=4+Math.random()*26;
+      n.style.left=(x+Math.cos(angle*Math.PI/180)*dist)+'px';
+      n.style.top=(y+Math.sin(angle*Math.PI/180)*dist)+'px';
+      n.style.setProperty('--sp-delay',String(Math.random()*0.18));
+      n.style.setProperty('--sp-scale',String(0.4+Math.random()*1.3));
+      const driftX=(Math.random()-0.5)*30, driftY=-(Math.random()*25+8);
+      n.style.setProperty('--sp-dx',driftX+'px');
+      n.style.setProperty('--sp-dy',driftY+'px');
+      pitch.appendChild(n);
+      setTimeout(()=>n.remove(),700);
+    }
   }
 
   // Vệt cầu vồng — cùng hình dạng vệt gió nhưng màu tăng dần theo --hue mỗi
@@ -2261,9 +1988,9 @@ class PenaltyGame {
     const rad=angleDeg*Math.PI/180;
     const nx=-Math.sin(rad), ny=Math.cos(rad);
     const lines=[
-      {off:0,  len:1,   side:false},
-      {off:-6, len:0.6, side:true},
-      {off:6,  len:0.6, side:true}
+      {off:0,   len:1,    side:false, rotOff:0},
+      {off:-12, len:0.65, side:true,  rotOff:-6},
+      {off:12,  len:0.65, side:true,  rotOff:6}
     ];
     lines.forEach(ln=>{
       const s=document.createElement('div');
@@ -2272,23 +1999,64 @@ class PenaltyGame {
       const oy=y+ny*ln.off-2;
       s.style.left=ox+'px';
       s.style.top=oy+'px';
-      s.style.setProperty('--wr',angleDeg+'deg');
+      s.style.setProperty('--wr',(angleDeg+(ln.rotOff||0))+'deg');
       s.style.setProperty('--len',ln.len);
       s.style.setProperty('--hue',hue);
       pitch.appendChild(s);
       setTimeout(()=>s.remove(),480);
     });
+    // ===== Hạt neon cầu vồng đa sắc — bay xung quanh (mới) =====
+    const neonCount=6+Math.floor(Math.random()*5);
+    const rbHues=[0,30,55,130,210,280];
+    for(let i=0;i<neonCount;i++){
+      const n=document.createElement('div');
+      n.className='pt-rainbow-neon';
+      const spread=10+Math.random()*28;
+      const aOff=(Math.random()-0.5)*50;
+      const aDeg=angleDeg+aOff;
+      const aRad=aDeg*Math.PI/180;
+      n.style.left=(x+Math.cos(aRad)*spread)+'px';
+      n.style.top=(y+Math.sin(aRad)*spread)+'px';
+      n.style.setProperty('--rb-hue',String(rbHues[Math.floor(Math.random()*rbHues.length)]));
+      n.style.setProperty('--rn-delay',String(Math.random()*0.15));
+      n.style.setProperty('--rn-scale',String(0.4+Math.random()*1.2));
+      const drift=8+Math.random()*18;
+      n.style.setProperty('--rn-dx',String(Math.cos(aRad+0.8)*drift));
+      n.style.setProperty('--rn-dy',String(Math.sin(aRad+0.8)*drift-6));
+      pitch.appendChild(n);
+      setTimeout(()=>n.remove(),700);
+    }
   }
 
   // Khói bạc-đen cuộn theo sau bóng — dùng cho cú sút hắc ám
   _spawnSmokeTrail(pitch,x,y){
+    // Bụi đen — 2 cụm lửa tối bùng lên (giống .pt-trail-fire)
     for(let i=0;i<2;i++){
       const p=document.createElement('div');
-      p.className='pt-trail-smoke';
-      p.style.left=(x+(Math.random()-0.5)*10)+'px';
-      p.style.top=(y+(Math.random()-0.5)*10)+'px';
+      p.className='pt-dark-flame';
+      p.style.left=(x+(Math.random()-0.5)*12)+'px';
+      p.style.top=(y+(Math.random()-0.5)*12)+'px';
       pitch.appendChild(p);
-      setTimeout(()=>p.remove(),780);
+      setTimeout(()=>p.remove(),550);
+    }
+    // ===== Tàn hắc ám — đen-đỏ, lõi đen, giống .pt-fire-ember =====
+    const emberColors=['#000000','#dc2626','#6b21a8','#000000'];
+    const emberCount=6+Math.floor(Math.random()*5);
+    for(let i=0;i<emberCount;i++){
+      const n=document.createElement('div');
+      n.className='pt-dark-ember';
+      const angle=Math.random()*360;
+      const dist=5+Math.random()*22;
+      n.style.left=(x+Math.cos(angle*Math.PI/180)*dist)+'px';
+      n.style.top=(y+Math.sin(angle*Math.PI/180)*dist)+'px';
+      n.style.setProperty('--ember-color',emberColors[i%emberColors.length]);
+      n.style.setProperty('--ember-delay',String(Math.random()*0.15));
+      n.style.setProperty('--ember-scale',String(0.4+Math.random()*1.3));
+      const driftX=(Math.random()-0.5)*40, driftY=-(Math.random()*28+10);
+      n.style.setProperty('--ember-dx',driftX+'px');
+      n.style.setProperty('--ember-dy',driftY+'px');
+      pitch.appendChild(n);
+      setTimeout(()=>n.remove(),700);
     }
   }
 
@@ -2301,12 +2069,209 @@ class PenaltyGame {
     p.style.top=(y+(Math.random()-0.5)*8)+'px';
     pitch.appendChild(p);
     setTimeout(()=>p.remove(),380);
+    // Neon đen-vàng — 5-7 hạt glow toả xung quanh tia sét
+    const neonCount=5+Math.floor(Math.random()*3);
+    for(let i=0;i<neonCount;i++){
+      const n=document.createElement('div');
+      n.className='pt-thunder-neon';
+      const angle=Math.random()*360;
+      const dist=10+Math.random()*22;
+      n.style.left=(x+Math.cos(angle*Math.PI/180)*dist)+'px';
+      n.style.top=(y+Math.sin(angle*Math.PI/180)*dist)+'px';
+      n.style.setProperty('--neon-delay',String(Math.random()*0.2));
+      n.style.setProperty('--neon-scale',String(0.5+Math.random()*1));
+      pitch.appendChild(n);
+      setTimeout(()=>n.remove(),600);
+    }
   }
 
-  // Chọn ngẫu nhiên 1 kiểu hiệu ứng cho mỗi cú sút — chia đều tỉ lệ cho cả
-  // 7 kiểu: gió, lửa cháy, băng giá, lá cây bay, cầu vồng, hắc ám, sấm sét
+  // Tia sáng — 3 tia trắng-vàng neon toả từ bóng như bánh xe chia đều 3
+  // phần: tia giữa theo đúng hướng bay mặc định (bay thẳng), 2 tia còn lại
+  // hợp với tia giữa 1 góc 120° và -120°
+  _spawnLightBurst(pitch,x,y,angleDeg){
+    // 5 tia sáng — trung tâm + 4 tia phụ toả đều xung quanh
+    const rays=[
+      {rot:0,   side:false},
+      {rot:80,  side:true},
+      {rot:-80, side:true},
+      {rot:150, side:true},
+      {rot:-150,side:true}
+    ];
+    rays.forEach(r=>{
+      const s=document.createElement('div');
+      s.className='pt-light-ray'+(r.side?' side':'');
+      s.style.left=x+'px';
+      s.style.top=y+'px';
+      s.style.setProperty('--wr',(angleDeg+r.rot)+'deg');
+      pitch.appendChild(s);
+      setTimeout(()=>s.remove(),430);
+    });
+    // ===== Lens flare — vòng hào quang đồng tâm xoay tròn (mới) =====
+    const flare=document.createElement('div');
+    flare.className='pt-light-lensflare';
+    flare.style.left=x+'px';
+    flare.style.top=y+'px';
+    // 3 vòng tròn đồng tâm với kích thước khác nhau
+    const ringSizes=[28,44,62];
+    ringSizes.forEach(size=>{
+      const ring=document.createElement('div');
+      ring.className='pt-light-lensflare-ring';
+      ring.style.width=size+'px';
+      ring.style.height=size+'px';
+      flare.appendChild(ring);
+    });
+    pitch.appendChild(flare);
+    setTimeout(()=>flare.remove(),530);
+    // ===== Hạt neon lấp lánh — trắng-vàng toả ra mọi hướng =====
+    const sparkleCount=8+Math.floor(Math.random()*7);
+    for(let i=0;i<sparkleCount;i++){
+      const n=document.createElement('div');
+      n.className='pt-light-neon';
+      const angle=Math.random()*360;
+      const dist=8+Math.random()*30;
+      const aRad=angle*Math.PI/180;
+      n.style.left=(x+Math.cos(aRad)*dist)+'px';
+      n.style.top=(y+Math.sin(aRad)*dist)+'px';
+      const delay=Math.random()*0.12;
+      n.style.setProperty('--ln-delay',String(delay));
+      n.style.setProperty('--ln-scale',String(0.5+Math.random()*1.5));
+      // Drift nhẹ ra xa dần
+      const drift=6+Math.random()*14;
+      n.style.setProperty('--ln-dx',String(Math.cos(aRad+0.2)*drift));
+      n.style.setProperty('--ln-dy',String(Math.sin(aRad+0.2)*drift));
+      pitch.appendChild(n);
+      setTimeout(()=>n.remove(),700);
+    }
+    // ===== Tàn dư va chạm — đỏ/cam/vàng/trắng bắn ra từ điểm giao tia =====
+    const emberColors=['#ef4444','#fb923c','#facc15','#ffffff'];
+    const emberCount=6+Math.floor(Math.random()*5);
+    for(let i=0;i<emberCount;i++){
+      const e=document.createElement('div');
+      e.className='pt-light-ember';
+      const angle=Math.random()*360;
+      const aRad=angle*Math.PI/180;
+      const dist=4+Math.random()*10;
+      e.style.left=(x+Math.cos(aRad)*dist)+'px';
+      e.style.top=(y+Math.sin(aRad)*dist)+'px';
+      e.style.setProperty('--em-color',emberColors[i%emberColors.length]);
+      e.style.setProperty('--em-delay',String(Math.random()*0.1));
+      e.style.setProperty('--em-scale',String(0.6+Math.random()*1.2));
+      const drift=10+Math.random()*20;
+      e.style.setProperty('--em-dx',String(Math.cos(aRad+0.3)*drift));
+      e.style.setProperty('--em-dy',String(Math.sin(aRad+0.3)*drift));
+      pitch.appendChild(e);
+      setTimeout(()=>e.remove(),700);
+    }
+    // ===== Icon sao ⭐ bay xung quanh =====
+    const starCount=2+Math.floor(Math.random()*3);
+    for(let i=0;i<starCount;i++){
+      const ic=document.createElement('div');
+      ic.className='pt-light-icon';
+      ic.textContent='⭐';
+      ic.style.left=(x+(Math.random()-0.5)*55)+'px';
+      ic.style.top=(y+(Math.random()-0.5)*55)+'px';
+      ic.style.setProperty('--li-delay',String(Math.random()*0.15));
+      ic.style.setProperty('--li-x',String((Math.random()-0.5)*45));
+      ic.style.setProperty('--li-y',String((-12-Math.random()*28)));
+      pitch.appendChild(ic);
+      setTimeout(()=>ic.remove(),800);
+    }
+  }
+
+  // Bươm bướm — nhiều hạt màu hồng/tím/cam bay rập rờn
+  _spawnButterflyTrail(pitch,x,y){
+    const colors=['#ffffff','#fce7f3','#fbcfe8','#f9a8d4','#ec4899'];
+    for(let i=0;i<6;i++){
+      const p=document.createElement('div');
+      p.className='pt-trail-butterfly';
+      p.style.left=(x+(Math.random()-0.5)*18)+'px';
+      p.style.top=(y+(Math.random()-0.5)*18)+'px';
+      p.style.background=`radial-gradient(circle, ${colors[i%colors.length]} 30%, transparent 70%)`;
+      p.style.setProperty('--bf-sx',((Math.random()-0.5)*30).toFixed(1));
+      p.style.setProperty('--bf-sy',((-10-Math.random()*20)).toFixed(1));
+      pitch.appendChild(p);
+      setTimeout(()=>p.remove(),600);
+    }
+    // ===== Neon hồng-trắng — cánh sen lấp lánh (mới) =====
+    const neonCount=6+Math.floor(Math.random()*5);
+    for(let i=0;i<neonCount;i++){
+      const n=document.createElement('div');
+      n.className='pt-butterfly-neon';
+      const angle=Math.random()*360;
+      const dist=5+Math.random()*28;
+      const aRad=angle*Math.PI/180;
+      n.style.left=(x+Math.cos(aRad)*dist)+'px';
+      n.style.top=(y+Math.sin(aRad)*dist)+'px';
+      const isPink=Math.random()>0.5;
+      n.style.setProperty('--bn-color',isPink?'#ec4899':'#ffffff');
+      n.style.setProperty('--bn-delay',String(Math.random()*0.18));
+      n.style.setProperty('--bn-scale',String(0.4+Math.random()*1.4));
+      const drift=6+Math.random()*20;
+      n.style.setProperty('--bn-dx',String(Math.cos(aRad+0.3)*drift));
+      n.style.setProperty('--bn-dy',String(Math.sin(aRad+0.3)*drift));
+      pitch.appendChild(n);
+      setTimeout(()=>n.remove(),800);
+    }
+    // Thả thêm icon hoa sen bay xung quanh
+    const iconCount=2+Math.floor(Math.random()*2);
+    for(let j=0;j<iconCount;j++){
+      const b=document.createElement('span');
+      b.className='pt-trail-butterfly-icon';
+      b.textContent=Math.random()>0.5?'🦋':'🪷';
+      b.style.left=(x+(Math.random()-0.5)*40)+'px';
+      b.style.top=(y+(Math.random()-0.5)*40)+'px';
+      pitch.appendChild(b);
+      setTimeout(()=>b.remove(),700);
+    }
+  }
+  _spawnButterflyAntennae(pitch,x,y,angleDeg){
+    [-18,18].forEach(offsetDeg=>{
+      const s=document.createElement('div');
+      s.className='pt-butterfly-antenna';
+      s.style.left=x+'px';
+      s.style.top=y+'px';
+      s.style.setProperty('--ar',(angleDeg+offsetDeg)+'deg');
+      pitch.appendChild(s);
+      setTimeout(()=>s.remove(),420);
+    });
+  }
+
+  // Hố đen — xoáy hạt tím/đen cuốn vào lỗ sâu
+  _spawnBlackholeTrail(pitch,x,y){
+    const colors=['#000000','#0c4a6e','#06b6d4','#a855f7','#d8b4fe','#ffffff'];
+    for(let i=0;i<4;i++){
+      const p=document.createElement('div');
+      p.className='pt-trail-blackhole';
+      p.style.left=(x+(Math.random()-0.5)*20)+'px';
+      p.style.top=(y+(Math.random()-0.5)*20)+'px';
+      p.style.background=`radial-gradient(circle, ${colors[i%colors.length]} 40%, transparent 80%)`;
+      p.style.setProperty('--bh-sx',((Math.random()-0.5)*24).toFixed(1));
+      p.style.setProperty('--bh-sy',((-6-Math.random()*12)).toFixed(1));
+      pitch.appendChild(p);
+      setTimeout(()=>p.remove(),500);
+    }
+  }
+
+  // Hạt ma trơi tím — cho cú sút phân thân, bay lập loè rồi tắt
+  _spawnCloneTrail(pitch,x,y){
+    const p=document.createElement('div');
+    p.className='pt-trail-clone';
+    p.style.left=(x+(Math.random()-0.5)*12)+'px';
+    p.style.top=(y+(Math.random()-0.5)*12)+'px';
+    pitch.appendChild(p);
+    setTimeout(()=>p.remove(),600);
+  }
+
+  // Chọn hiệu ứng cú sút — random từ danh sách đã chọn, fallback random toàn bộ
   _pickTrailStyle(){
-    const styles=['wind','fire','ice','leaf','rainbow','dark','thunder'];
+    const selected = this.state._effectSelected || [];
+    const owned = this.state._effectOwned || [];
+    // Lọc chỉ lấy hiệu ứng hợp lệ
+    const valid = selected.filter(id => PT_EFFECTS.find(e=>e.id===id));
+    if(valid.length > 0){
+      return valid[Math.floor(Math.random()*valid.length)];
+    }
+    const styles=['wind','fire','ice','leaf','rainbow','dark','thunder','light','clone','butterfly','blackhole'];
     return styles[Math.floor(Math.random()*styles.length)];
   }
 
@@ -2318,13 +2283,17 @@ class PenaltyGame {
     if(style==='rainbow') return this._spawnRainbowTrail(pitch,x,y,angleDeg);
     if(style==='dark')    return this._spawnSmokeTrail(pitch,x,y);
     if(style==='thunder') return this._spawnThunderTrail(pitch,x,y);
+    if(style==='light')   return this._spawnLightBurst(pitch,x,y,angleDeg);
+    if(style==='clone')     return this._spawnCloneTrail(pitch,x,y);
+    if(style==='butterfly') return this._spawnButterflyTrail(pitch,x,y);
+    if(style==='blackhole') return this._spawnBlackholeTrail(pitch,x,y);
     return this._spawnWindStreak(pitch,x,y,angleDeg,team);
   }
 
   // Gán ánh sáng bao quanh bóng khớp với kiểu hiệu ứng đang bay; luôn gỡ các
   // class cũ trước để không bị chồng hiệu ứng của lần sút trước
   _setBallFx(ball,style,team){
-    ball.classList.remove('ball-fx-wind-mine','ball-fx-wind-theirs','ball-fx-fire','ball-fx-ice','ball-fx-leaf','ball-fx-rainbow','ball-fx-dark','ball-fx-thunder');
+    ball.classList.remove('ball-fx-wind-mine','ball-fx-wind-theirs','ball-fx-fire','ball-fx-ice','ball-fx-leaf','ball-fx-rainbow','ball-fx-dark','ball-fx-thunder','ball-fx-light','ball-fx-clone','ball-fx-butterfly','ball-fx-blackhole');
     if(style==='wind'){
       ball.classList.add(team==='theirs'?'ball-fx-wind-theirs':'ball-fx-wind-mine');
     }else{
@@ -2340,19 +2309,24 @@ class PenaltyGame {
   // rõ ràng hơn hẳn so với các đoạn ngắn mờ dần trước đây.
   _trailGradientStops(style){
     switch(style){
-      case 'fire':    return [['0%','#7f1d1d'],['45%','#ef4444'],['75%','#fb923c'],['100%','#fde68a']];
-      case 'ice':     return [['0%','#0e7490'],['50%','#67e8f9'],['100%','#f0fdff']];
-      case 'leaf':    return [['0%','#365314'],['50%','#84cc16'],['100%','#d9f99d']];
-      case 'rainbow': return [['0%','#f43f5e'],['20%','#fb923c'],['40%','#facc15'],['60%','#4ade80'],['80%','#38bdf8'],['100%','#a78bfa']];
-      case 'dark':    return [['0%','#000000'],['40%','#1e1b4b'],['70%','#6b21a8'],['100%','#4c1d95']];
-      case 'thunder': return [['0%','#78350f'],['40%','#facc15'],['75%','#fef9c3'],['100%','#ffffff']];
+      case 'fire':    return [['0%','#000000'],['20%','#7f1d1d'],['45%','#ef4444'],['70%','#fb923c'],['100%','#fde68a']];
+      case 'ice':     return [['0%','#000000'],['20%','#0e7490'],['50%','#67e8f9'],['80%','#a5f3fc'],['100%','#ffffff']];
+      case 'leaf':    return [['0%','#000000'],['20%','#365314'],['50%','#84cc16'],['75%','#bef264'],['100%','#f0fdf4']];
+      case 'rainbow': return [['0%','#000000'],['15%','#f43f5e'],['30%','#fb923c'],['45%','#facc15'],['60%','#4ade80'],['78%','#38bdf8'],['100%','#a78bfa']];
+      case 'dark':    return [['0%','#000000'],['40%','#dc2626'],['70%','#6b21a8'],['100%','#000000']];
+      case 'thunder': return [['0%','#000000'],['25%','#78350f'],['50%','#facc15'],['75%','#fef9c3'],['100%','#ffffff']];
+      case 'light':   return [['0%','#b45309'],['35%','#fbbf24'],['70%','#fef08a'],['100%','#ffffff']];
+      case 'clone':     return [['0%','#4c1d95'],['40%','#7b2ff7'],['75%','#b48cfa'],['100%','#ffffff']];
+      case 'butterfly': return [['0%','#ffffff'],['30%','#fbcfe8'],['60%','#f9a8d4'],['100%','#ec4899']];
+      case 'blackhole': return [['0%','#000000'],['25%','#0c4a6e'],['50%','#06b6d4'],['75%','#a855f7'],['100%','#ffffff']];
       default:        return null; // wind dùng màu đặc theo team, không cần gradient
     }
   }
 
-  _startTrailLine(pitch,style,team,startX,startY,endX,endY){
-    // Dọn đường path của lượt trước nếu vì lý do gì đó chưa kịp remove
-    if(this._trailLine){ this._trailLine.svg.remove(); this._trailLine=null; }
+  // Tạo 1 đường path SVG (glow + lõi) độc lập — dùng chung cho cả đường bay
+  // chính lẫn đường bay của "bóng phân thân" (kiểu hắc ám), để có thể vẽ 2
+  // đường tách biệt xoáy vào nhau thay vì chỉ 1 đường duy nhất.
+  _createTrailLineObj(pitch,style,team,startX,startY,endX,endY){
     const svgNS='http://www.w3.org/2000/svg';
     const svg=document.createElementNS(svgNS,'svg');
     svg.setAttribute('class','pt-trail-line-svg');
@@ -2384,7 +2358,7 @@ class PenaltyGame {
       svg.appendChild(defs);
       stroke=`url(#${gradId})`;
     }else{
-      stroke=team==='theirs'?'#ef4444':'#38bdf8';
+      stroke='#38bdf8';
     }
 
     // Nhóm glow ngoài — to, mờ, tạo hào quang (vẽ theo từng đoạn để vuốt nhỏ dần)
@@ -2400,11 +2374,10 @@ class PenaltyGame {
     svg.appendChild(coreGroup);
     pitch.appendChild(svg);
 
-    this._trailLine={svg,glowGroup,coreGroup,stroke,points:[{x:startX,y:startY}]};
+    return {svg,glowGroup,coreGroup,stroke,points:[{x:startX,y:startY}]};
   }
 
-  _updateTrailLine(x,y){
-    const tl=this._trailLine;
+  _updateTrailLineObj(tl,x,y){
     if(!tl) return;
     tl.points.push({x,y});
     const svgNS='http://www.w3.org/2000/svg';
@@ -2435,13 +2408,37 @@ class PenaltyGame {
     }
   }
 
-  _finishTrailLine(){
-    const tl=this._trailLine;
+  _finishTrailLineObj(tl){
     if(!tl) return;
-    this._trailLine=null;
     tl.svg.style.transition='opacity 0.35s ease-out';
     tl.svg.style.opacity='0';
     setTimeout(()=>tl.svg.remove(),380);
+  }
+
+  // Đường bay chính (theo bóng thật)
+  _startTrailLine(pitch,style,team,startX,startY,endX,endY){
+    // Dọn đường path của lượt trước nếu vì lý do gì đó chưa kịp remove
+    if(this._trailLine){ this._trailLine.svg.remove(); this._trailLine=null; }
+    this._trailLine=this._createTrailLineObj(pitch,style,team,startX,startY,endX,endY);
+  }
+  _updateTrailLine(x,y){ this._updateTrailLineObj(this._trailLine,x,y); }
+  _finishTrailLine(){
+    const tl=this._trailLine;
+    this._trailLine=null;
+    this._finishTrailLineObj(tl);
+  }
+
+  // Đường bay của "bóng phân thân" — chỉ dùng cho kiểu hắc ám, để 2 đường
+  // luôn nhìn rõ tách biệt trong lúc xoáy vào nhau, rồi hợp nhất tại điểm rơi
+  _startShadowTrailLine(pitch,style,team,startX,startY,endX,endY){
+    if(this._trailLineShadow){ this._trailLineShadow.svg.remove(); this._trailLineShadow=null; }
+    this._trailLineShadow=this._createTrailLineObj(pitch,style,team,startX,startY,endX,endY);
+  }
+  _updateShadowTrailLine(x,y){ this._updateTrailLineObj(this._trailLineShadow,x,y); }
+  _finishShadowTrailLine(){
+    const tl=this._trailLineShadow;
+    this._trailLineShadow=null;
+    this._finishTrailLineObj(tl);
   }
 
   // Độ lệch vuông góc so với đường thẳng chấm 11m → điểm rơi, theo từng kiểu
@@ -2449,29 +2446,34 @@ class PenaltyGame {
   // chữ S, vòng cung, nảy...), khác với _trailGradientStops chỉ lo màu sắc.
   _trailOffset(style,raw){
     switch(style){
-      case 'wind':    return 30*(1-raw)*Math.sin(raw*2.5*2*Math.PI);       // lốc xoáy: xoáy quanh trục bay, thu nhỏ dần như phễu
-      case 'dark':    return 36*(1-raw)*Math.sin(raw*3*2*Math.PI);         // hắc ám: xoáy rộng hơn — dùng chung công thức, bóng phân thân lấy dấu ngược lại
-      case 'rainbow': return 70*Math.sin(Math.PI*raw);                     // cầu vồng: 1 vòng cung duy nhất, đúng hình dải cầu vồng
+      case 'wind':    return 28*Math.sin(raw*3*2*Math.PI);                 // gió: xoáy tròn đều như lò xo, biên độ không đổi suốt đường bay
+      case 'dark':    return 34*(1-raw)*Math.sin(raw*3*2*Math.PI);         // hắc ám: 2 đường xoáy đối pha, thu hẹp dần rồi hợp nhất tại điểm rơi
+      case 'rainbow': return 100*Math.sin(Math.PI*raw); // cầu vồng: vòng cung cao, rõ nét
       case 'leaf':    return 18*(1-raw)*Math.abs(Math.sin(raw*4*Math.PI)); // lá cây: nảy nảy nảy, biên độ giảm dần
       case 'fire':    return 42*Math.sin(raw*2*Math.PI);                  // lửa: 1 chu kỳ sin biên độ lớn = rõ hình chữ S
       case 'thunder':{
         const tw=raw*4;
         return 22*(2*Math.abs(2*(tw-Math.floor(tw+0.5)))-1);              // sấm sét: sóng tam giác = zíc-zắc góc nhọn
       }
+      case 'butterfly': return 0; // bươm bướm: bóng chính bay thẳng = thân, 2 cánh tách ra từ giữa
+      case 'blackhole': return 0; // hố đen: bóng đi thẳng, teleport ở giữa
       case 'ice':
-      default: return 0;                                                   // băng giá: bay thẳng tuyệt đối, không lệch
+      case 'light':
+      case 'clone':
+      default: return 0;                                                   // băng giá & ánh sáng: bay thẳng tuyệt đối, không lệch
     }
   }
 
   // Tốc độ tiến theo phương chính: băng giá & sấm sét bay đều tốc độ không
   // đổi (đúng chất "thẳng"/"tia chớp"), các kiểu còn lại ease-out cho mượt.
   _trailForward(style,raw){
-    if(style==='ice'||style==='thunder'||style==='fire') return raw;
+    if(style==='ice'||style==='thunder'||style==='fire'||style==='light'||style==='clone'||style==='blackhole') return raw;
+    if(style==='butterfly') return raw; // bướm bay đều tốc độ
     return 1-Math.pow(1-raw,3);
   }
 
   // Animate ball from penalty spot to target zone
-  _animateBallToZone(zoneId, callback, team){
+  _animateBallToZone(zoneId, callback, team, preTrailStyle){
     const ball=document.getElementById('pt-ball');
     if(!ball)return callback();
     const pitch=document.getElementById('pt-pitch');
@@ -2511,16 +2513,15 @@ class PenaltyGame {
     // Dọn bóng phân thân còn sót lại từ cú sút "hắc ám" trước (nếu vì lý do
     // gì đó chưa kịp remove) trước khi tạo cú sút mới.
     if(this._shadowBall){ this._shadowBall.remove(); this._shadowBall=null; }
+    if(this._trailLineShadow){ this._trailLineShadow.svg.remove(); this._trailLineShadow=null; }
+    if(this._bhExitTrail){ this._finishTrailLineObj(this._bhExitTrail); this._bhExitTrail=null; }
 
     // Tự điều khiển animation bằng requestAnimationFrame thay vì CSS transition
     // + setInterval riêng lẻ (2 timeline khác nhau chạy độc lập là nguyên nhân
     // chính gây giật hình/giật đường bay) — giờ tất cả đồng bộ theo đúng 1 vòng
     // rAF, luôn khớp với frame vẽ thực tế của trình duyệt.
-    const trailStyle=this._pickTrailStyle();
-    // Thời gian bay riêng cho từng kiểu — kéo dài hơn bản cũ (500ms) để hình
-    // dạng đường bay (xoáy/chữ S/vòng cung/nảy/zíc-zắc) kịp thể hiện rõ.
-    const FLIGHT_MS_BY_STYLE={wind:950,fire:850,ice:750,leaf:1000,rainbow:900,dark:950,thunder:650};
-    const flightMs=FLIGHT_MS_BY_STYLE[trailStyle]||800;
+    const trailStyle=preTrailStyle||this._pickTrailStyle();
+    const flightMs=FLIGHT_MS_BY_STYLE[trailStyle]||900;
     const t0=performance.now();
     let lastAccentT=-1;
     this._setBallFx(ball,trailStyle,team);
@@ -2539,14 +2540,130 @@ class PenaltyGame {
       shadowBall.style.transform=`translate(calc(-50% + ${startX}px), calc(-50% + ${startY}px)) scale(1) rotate(0deg)`;
       pitch.appendChild(shadowBall);
       this._shadowBall=shadowBall;
+      // Vẽ riêng 1 đường path thứ 2 cho bóng phân thân — để nhìn rõ 2 đường
+      // bay tách biệt luôn xoáy vào nhau, thay vì chỉ 1 đường duy nhất
+      this._startShadowTrailLine(pitch,trailStyle,team,startX,startY,endX,endY);
+    }
+
+    // "Ánh sáng" — 3 quả bóng từ 3 hướng cách đều 120°, hợp nhất tại khung thành
+    let lightBalls=null; // [{el,trail,sx,sy}]
+    if(trailStyle==='light'){
+      const angleToGoal=Math.atan2(endY-startY, endX-startX);
+      const a60=60*Math.PI/180;
+      const dirs=[
+        {rot: a60},
+        {rot:-a60},
+      ];
+      lightBalls=dirs.map(d=>{
+        const sx=endX+dist*Math.cos(angleToGoal+d.rot);
+        const sy=endY+dist*Math.sin(angleToGoal+d.rot);
+        const eb=document.createElement('div');
+        eb.className='pt-ball pt-ball-light-shadow';
+        eb.textContent=ball.textContent;
+        eb.style.left='0';
+        eb.style.top='0';
+        eb.style.transition='none';
+        eb.style.transform=`translate(calc(-50% + ${sx}px), calc(-50% + ${sy}px)) scale(1) rotate(0deg)`;
+        pitch.appendChild(eb);
+        const trail=this._createTrailLineObj(pitch,trailStyle,team,sx,sy,endX,endY);
+        return {el:eb, trail, sx, sy};
+      });
+    }
+
+    // "Phân thân" — 3 bóng bay 3 hướng, 2 clone mờ dần biến mất
+    let cloneBalls=null; // [{el,trail,endX,endY}]
+    if(trailStyle==='clone'){
+      const allZones=[...document.querySelectorAll('.pt-zone')];
+      const mainZoneEl=document.querySelector(`[data-zone="${zoneId}"]`);
+      const others=allZones.filter(z=>z!==mainZoneEl);
+      // Tính tâm từng zone rồi ưu tiên chọn cặp CÁCH XA NHAU (vẫn có yếu tố
+      // ngẫu nhiên) — tránh trường hợp 2 clone rơi vào 2 ô sát nhau khiến
+      // đường bay chồng/dính vào nhau.
+      const pts=others.map(z=>{
+        const r=z.getBoundingClientRect();
+        return {zone:z, x:r.left-pRect.left+r.width/2, y:r.top-pRect.top+r.height/2};
+      });
+      let bestPair=null,bestScore=-1;
+      for(let i=0;i<pts.length;i++){
+        for(let j=i+1;j<pts.length;j++){
+          const dist=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);
+          const score=dist+Math.random()*40; // nhiễu ngẫu nhiên để không luôn ra 1 cặp cố định
+          if(score>bestScore){bestScore=score;bestPair=[pts[i],pts[j]];}
+        }
+      }
+      const shuffled=bestPair.map(p=>p.zone);
+      cloneBalls=shuffled.map(targetZone=>{
+        const tRect=targetZone.getBoundingClientRect();
+        const tzEndX=tRect.left-pRect.left+tRect.width/2;
+        const tzEndY=tRect.top-pRect.top+tRect.height/2;
+        const eb=document.createElement('div');
+        eb.className='pt-ball pt-ball-clone-shadow';
+        eb.textContent=ball.textContent;
+        eb.style.left='0';
+        eb.style.top='0';
+        eb.style.transition='none';
+        eb.style.transform=`translate(calc(-50% + ${startX}px), calc(-50% + ${startY}px)) scale(1) rotate(0deg)`;
+        pitch.appendChild(eb);
+        const trail=this._createTrailLineObj(pitch,trailStyle,team,startX,startY,tzEndX,tzEndY);
+        return {el:eb, trail, endX: tzEndX, endY: tzEndY};
+      });
+    }
+
+    // "Bươm bướm" — bóng chính bay thẳng làm thân, tại ~35% tách ra 2 cánh
+    // vẽ hình cánh bướm rồi hợp lại tại khung thành thành râu.
+    let wingBalls=null; // [{el,trail,side,startX,startY}]
+    let wingSpawned=false;
+
+    // "Hố đen" — 2 cổng xuyên không: bóng bay vào cổng 1, biến mất, xuất hiện từ cổng 2
+    let portalEntered=false, portalExited=false;
+    let portal1El=null, portal2El=null;
+    let portal1X, portal1Y, portal2X, portal2Y;
+    const portal1Raw=0.2, portal2Raw=0.65; // teleport timing
+    if(trailStyle==='blackhole'){
+      portal1X=startX+dx*0.15; portal1Y=startY+dy*0.15;
+      portal2X=startX+dx*0.65; portal2Y=startY+dy*0.65;
+      const createPortal=(x,y,cls)=>{
+        const e=document.createElement('div'); e.className=cls;
+        e.style.left=x+'px'; e.style.top=y+'px';
+        e.style.transform='translate(-50%,-50%)';
+        // Lớp xoáy conic-gradient — tạo cảm giác xoắn ốc hút vào
+        const vortex=document.createElement('div');
+        vortex.className='pt-blackhole-vortex';
+        e.appendChild(vortex);
+        // Lớp xoáy trong — quay ngược chiều tạo chiều sâu
+        const inner=document.createElement('div');
+        inner.className='pt-blackhole-vortex-inner';
+        e.appendChild(inner);
+        // Vòng quỹ đạo — dashed ring
+        const orbit=document.createElement('div');
+        orbit.className='pt-blackhole-orbit';
+        e.appendChild(orbit);
+        // Hạt mảnh vụn quay quanh hố đen (8 hạt)
+        const debrisColors=['#06b6d4','#a855f7','#ffffff','#0ea5e9','#c084fc','#38bdf8','#d8b4fe','#6ee7b7'];
+        for(let i=0;i<8;i++){
+          const d=document.createElement('div');
+          d.className='pt-blackhole-debris';
+          const a=(i/8)*360;
+          d.style.setProperty('--start-angle',a+'deg');
+          d.style.setProperty('--orbit-speed',String(1.2+Math.random()*2));
+          d.style.setProperty('--orbit-radius',String(28+Math.random()*10));
+          d.style.animationDelay=(Math.random()*2)+'s';
+          d.style.color=debrisColors[i%debrisColors.length];
+          e.appendChild(d);
+        }
+        pitch.appendChild(e);
+        return e;
+      };
+      portal1El=createPortal(portal1X,portal1Y,'pt-blackhole-portal entry');
+      portal2El=createPortal(portal2X,portal2Y,'pt-blackhole-portal exit');
     }
 
     const step=(now)=>{
       const raw=Math.min(1,(now-t0)/flightMs);
       const fwd=this._trailForward(trailStyle,raw);
       const off=this._trailOffset(trailStyle,raw);
-      const x=startX+dx*fwd+nx*off;
-      const y=startY+dy*fwd+ny*off;
+      let x=startX+dx*fwd+nx*off;
+      let y=startY+dy*fwd+ny*off;
       const scale=1+0.3*raw;
       const rot=(trailStyle==='thunder'?360:720)*raw;
       setBallTransform(x,y,scale,rot);
@@ -2554,20 +2671,170 @@ class PenaltyGame {
         const sx=startX+dx*fwd-nx*off;
         const sy=startY+dy*fwd-ny*off;
         shadowBall.style.transform=`translate(calc(-50% + ${sx}px), calc(-50% + ${sy}px)) scale(${scale}) rotate(${-rot}deg)`;
+        this._updateShadowTrailLine(sx,sy);
       }
+      // 2 bóng phụ ánh sáng — bay thẳng về khung thành
+      if(lightBalls){
+        lightBalls.forEach(b=>{
+          const f=raw; // linear
+          const bx=b.sx+(endX-b.sx)*f;
+          const by=b.sy+(endY-b.sy)*f;
+          b.el.style.transform=`translate(calc(-50% + ${bx}px), calc(-50% + ${by}px)) scale(${scale}) rotate(${-rot}deg)`;
+          this._updateTrailLineObj(b.trail,bx,by);
+        });
+      }
+      // Bươm bướm — vẽ cánh: bóng chính = thân, tại ~35% tách 2 cánh bay vòng
+      // ra ngoài rồi khép lại ở khung thành tạo thành râu bướm.
+      if(trailStyle==='butterfly'){
+        if(raw>=0.35 && !wingSpawned){
+          wingSpawned=true;
+          const LOBES=[
+            {id:'fore',path:'M0,0 C14,-6 20,-20 4,-24 C-6,-20 -6,-6 0,0 Z',w:24,h:26,amp:1,phase:0},
+            {id:'hind',path:'M0,0 C12,4 16,16 4,20 C-4,16 -4,4 0,0 Z',w:20,h:22,amp:0.6,phase:0.9},
+          ];
+          wingBalls=[1,-1].flatMap(side=>LOBES.map(lobe=>{
+            const eb=document.createElement('div');
+            eb.className='pt-ball-butterfly-wing';
+            eb.innerHTML=`<svg viewBox="-8 -26 28 52" width="${lobe.w}" height="${lobe.h}">
+              <path d="${lobe.path}" fill="url(#pt-wing-grad-${side>0?'r':'l'}-${lobe.id})" stroke="rgba(255,255,255,0.55)" stroke-width="1.1"/>
+              <defs><linearGradient id="pt-wing-grad-${side>0?'r':'l'}-${lobe.id}" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#ec4899"/>
+              </linearGradient></defs>
+            </svg>`;
+            eb.style.left='0';
+            eb.style.top='0';
+            eb.style.transition='none';
+            eb.style.transform=`translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${scale}) scaleX(${side})`;
+            pitch.appendChild(eb);
+            const trail=this._createTrailLineObj(pitch,trailStyle,team,x,y,endX,endY);
+            return {el:eb,trail,side,startX:x,startY:y,amp:lobe.amp,phase:lobe.phase};
+          }));
+        }
+        if(wingBalls){
+          const wingRaw=Math.min(1,(raw-0.35)/0.65);
+          const envelope=Math.sin(wingRaw*Math.PI);
+          const flapFreq=6;
+          wingBalls.forEach(w=>{
+            const ws=envelope*w.amp*60*Math.sin(wingRaw*Math.PI);
+            const wingFlap=0.55+0.45*Math.abs(Math.sin((wingRaw*flapFreq+w.phase)*Math.PI));
+            const wx=w.startX+(endX-w.startX)*wingRaw+ws*w.side;
+            const wy=w.startY+(endY-w.startY)*wingRaw-6*envelope*w.amp;
+            w.el.style.transform=`translate(calc(-50% + ${wx}px), calc(-50% + ${wy}px)) scale(${scale}) scaleX(${w.side*wingFlap})`;
+            this._updateTrailLineObj(w.trail,wx,wy);
+          });
+          // 2 râu bướm — tỉa ra khi bóng sắp chạm đích
+          if(raw>=0.9 && !this._antennaeSpawned){
+            this._antennaeSpawned=true;
+            this._spawnButterflyAntennae(pitch,endX,endY,angleDeg);
+          }
+        } else {
+          this._antennaeSpawned=false;
+        }
+      }
+
+      // 2 clone — bay về zone riêng, mờ dần từ 40%→70% rồi biến mất
+      if(cloneBalls){
+        const cloneOpacity=raw<0.4?1:raw<0.7?1-(raw-0.4)/0.3:0;
+        cloneBalls.forEach(b=>{
+          const f=raw;
+          const cx=startX+(b.endX-startX)*f;
+          const cy=startY+(b.endY-startY)*f;
+          b.el.style.opacity=String(cloneOpacity);
+          b.el.style.transform=`translate(calc(-50% + ${cx}px), calc(-50% + ${cy}px)) scale(${scale}) rotate(${-rot}deg)`;
+          this._updateTrailLineObj(b.trail,cx,cy);
+          if(cloneOpacity<=0&&b.trail.svg.style.opacity!=='0'){
+            b.trail.svg.style.transition='opacity 0.2s ease-out';
+            b.trail.svg.style.opacity='0';
+          }
+        });
+      }
+      // "Hố đen" — teleport: bay vào cổng 1, biến mất, xuất hiện từ cổng 2
+      // Vệt cũ (start→portal1) giữ nguyên, tạo vệt RIÊNG cho đoạn sau cổng 2
+      if(trailStyle==='blackhole' && portal1El && portal2El){
+        if(raw < portal1Raw){
+          // Phase 1: bay từ start đến portal1 (vệt vẽ đến portal1)
+          const t=raw/portal1Raw;
+          x=startX+(portal1X-startX)*t;
+          y=startY+(portal1Y-startY)*t;
+          const sc=1-0.6*t;
+          setBallTransform(x,y,sc,rot);
+          ball.style.opacity=String(1-0.3*t);
+          portal1El.style.setProperty('--portal-scale',String(0.5+0.5*raw));
+          portal1El.style.opacity=String(Math.min(1,raw*3));
+        }else if(raw < portal2Raw){
+          // Phase 2: trong cổng — ẩn bóng, giữ x,y không đổi (trail đứng yên)
+          x=portal1X; y=portal1Y;
+          ball.style.opacity='0';
+          ball.style.transform='translate(-50%,-50%) scale(0)';
+          portal1El.style.setProperty('--portal-scale','1.3');
+          portal2El.style.setProperty('--portal-scale',String(0.5+1.5*(raw-portal1Raw)/(portal2Raw-portal1Raw)));
+          portal2El.style.opacity=String(Math.min(1,3*(raw-portal1Raw)/(portal2Raw-portal1Raw)));
+        }else{
+          // Phase 3: xuất hiện từ cổng 2
+          if(!portalExited){
+            portalExited=true;
+            // Tạo vệt RIÊNG từ portal2 — giữ nguyên vệt cũ (start→portal1)
+            this._bhExitTrail = this._createTrailLineObj(pitch,trailStyle,team,portal2X,portal2Y,endX,endY);
+            // Thêm điểm giả tại portal2 để vệt đầu ra dày (k bị nhọn)
+            if(this._bhExitTrail){
+              for(let d=0;d<20;d++) this._bhExitTrail.points.push({x:portal2X,y:portal2Y});
+            }
+          }
+          const t=(raw-portal2Raw)/(1-portal2Raw);
+          x=portal2X+(endX-portal2X)*t;
+          y=portal2Y+(endY-portal2Y)*t;
+          const sc=0.4+0.6*(1+0.3*t);
+          setBallTransform(x,y,sc,rot);
+          ball.style.opacity=String(0.6+0.4*t);
+          portal2El.style.setProperty('--portal-scale',String(1.3-0.3*t));
+          // Cập nhật vệt exit
+          if(this._bhExitTrail) this._updateTrailLineObj(this._bhExitTrail,x,y);
+        }
+      }
+
       // Vẽ nối thêm điểm vào đường path — luôn liền mạch theo đúng khung hình
       // thực tế, không còn đứt quãng như cách rắc từng đoạn rời trước đây.
-      this._updateTrailLine(x,y);
+      // Hố đen: Phase 2 thì trail đã giậm chân ở portal1, Phase 3 dùng vệt riêng
+      if(trailStyle!=='blackhole' || raw<portal1Raw) this._updateTrailLine(x,y);
       // Hạt điểm nhấn (lửa/băng/lá/hắc ám/sấm sét) rắc thưa hơn để tô thêm
       // chi tiết trên nền đường path liên tục, không đóng vai trò chính nữa.
-      if((trailStyle==='fire'||trailStyle==='ice'||trailStyle==='leaf'||trailStyle==='dark'||trailStyle==='thunder') && (raw-lastAccentT>=0.14 || raw>=1)){
+      const bhGap = trailStyle==='blackhole' && raw>=portal1Raw && raw<portal2Raw;
+      if((trailStyle==='wind'||trailStyle==='rainbow'||trailStyle==='fire'||trailStyle==='ice'||trailStyle==='leaf'||trailStyle==='dark'||trailStyle==='thunder'||trailStyle==='light'||trailStyle==='clone'||trailStyle==='butterfly'||trailStyle==='blackhole') && !bhGap && (raw-lastAccentT>=0.14 || raw>=1)){
         lastAccentT=raw;
         this._spawnBallTrail(pitch,x,y,angleDeg,team,trailStyle);
       }
       if(raw<1){
         requestAnimationFrame(step);
       }else{
-        if(shadowBall){ shadowBall.remove(); this._shadowBall=null; }
+        if(shadowBall){ shadowBall.remove(); this._shadowBall=null; this._finishShadowTrailLine(); }
+        if(lightBalls){
+          lightBalls.forEach(b=>{
+            b.el.remove();
+            b.trail.svg.style.transition='opacity 0.35s ease-out';
+            b.trail.svg.style.opacity='0';
+            setTimeout(()=>{if(b.trail.svg.parentNode)b.trail.svg.remove();},380);
+          });
+          lightBalls=null;
+        }
+        if(cloneBalls){
+          cloneBalls.forEach(b=>{
+            b.el.remove();
+            if(b.trail.svg.parentNode) b.trail.svg.remove();
+          });
+          cloneBalls=null;
+        }
+        if(wingBalls){
+          wingBalls.forEach(w=>{
+            w.el.remove();
+            w.trail.svg.style.transition='opacity 0.35s ease-out';
+            w.trail.svg.style.opacity='0';
+            setTimeout(()=>{if(w.trail.svg.parentNode)w.trail.svg.remove();},380);
+          });
+          wingBalls=null;
+        }
+        if(portal1El){ portal1El.remove(); portal1El=null; }
+        if(portal2El){ portal2El.remove(); portal2El=null; }
+        if(this._bhExitTrail){ this._finishTrailLineObj(this._bhExitTrail); this._bhExitTrail=null; }
         this._finishTrailLine();
         setTimeout(callback,20);
       }
@@ -2575,10 +2842,12 @@ class PenaltyGame {
     requestAnimationFrame(step);
   }
 
-  _keeperDive(zone,cls){
+  _keeperDive(zone,cls,flightMs){
     const keeper=document.getElementById('pt-keeper');
     applyKeeperSprite(keeper,zone);
     keeper.style.setProperty('--flip',keeper.dataset.flip==='1'?-1:1);
+    const keeperMs=(flightMs||900)*1.5;
+    keeper.style.setProperty('--dive-ms',keeperMs+'ms');
     const targetZone=document.querySelector(`.pt-zone[data-zone="${zone}"]`);
     let kx=0,ky=0;
     if(targetZone){
@@ -2601,6 +2870,7 @@ class PenaltyGame {
     // toàn quyền điều khiển transform — tránh 2 nguồn cùng ghi đè gây giật.
     keeper.style.transition='none';
     keeper.style.setProperty('--dx',kx+'px');keeper.style.setProperty('--dy',ky+'px');
+    keeper.style.animationDuration=keeperMs+'ms';
     keeper.classList.remove('diving','save');void keeper.offsetWidth;
     keeper.classList.add(cls);
   }
@@ -2608,11 +2878,17 @@ class PenaltyGame {
   resetKeeperPos(){
     const k=document.getElementById('pt-keeper');
     if(!k)return;
+    // Freeze vị trí hiện tại + set transition TRƯỚC KHI xoá animation class
+    const curTransform=getComputedStyle(k).transform;
+    k.style.transition='transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+    k.style.transform=curTransform;
+    void k.offsetWidth; // force reflow để browser ghi nhận transition
+    // Giờ mới xoá class — transition sẽ animate từ vị trí đang bay về giữa
+    k.classList.remove('diving','save');
     applyKeeperSprite(k,'mid-stand');
     k.style.setProperty('--flip',1);
-    k.classList.remove('diving','save');
-    k.style.transition='transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
-    k.style.transform='translate(0,0)';k.style.setProperty('--dx','0px');k.style.setProperty('--dy','0px');
+    k.style.transform='translate(0,0) scale(var(--gk-scale,1))';
+    k.style.setProperty('--dx','0px');k.style.setProperty('--dy','0px');
   }
 
   // ===== Shooter sprite (foreground, whichever team is currently shooting) =====
@@ -2680,6 +2956,15 @@ class PenaltyGame {
   }
 
   // ===== RENDER — Status Bar with 5-shot circles =====
+  // Hiệu ứng "nhảy" số tỉ số — chỉ gọi đúng lúc điểm vừa tăng
+  _bumpScoreEl(id){
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.classList.remove('pt-score-bump');
+    void el.offsetWidth;
+    el.classList.add('pt-score-bump');
+  }
+
   renderStatusBar(){
     const pc=this.state.playerCountry,ac=this.state.aiCountry;
     // Flags + names
@@ -2904,6 +3189,7 @@ class PenaltyGame {
 
   // ===== NEW MATCH (Đá lại) =====
   newMatch(){
+    this._hideResultShooters();
     document.getElementById('pt-result-overlay').style.display='none';
     // Clear any residual zone effects from previous match
     document.querySelectorAll('.pt-zone').forEach(z=>z.classList.remove('zone-shot','zone-save','zone-goal','zone-keeper-save'));

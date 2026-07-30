@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>VTWorld — Đua Xe 🏎️</title>
+  <link rel="stylesheet" href="../../style.css"/>
+  <link rel="stylesheet" href="../../status-bar.css"/>
+  <link rel="stylesheet" href="race.css"/>
+  <link rel="stylesheet" href="../../quests.css"/>
+  <script type="module" src="../../quests.js"></script>
+  <script src="../../fullscreen.js"></script>
+  <script src="../../admin-toggle.js"></script>
+  <script src="../../top-nav.js"></script>
+  <script src="../../bottom-nav.js"></script>
+</head>
+<body data-bottom-nav="games">
+  <div id="top-nav-root"></div>
+
+  <div class="race-container">
+    <!-- MENU -->
+    <div id="screen-menu" class="race-screen active">
+      <div class="race-logo">🏎️</div>
+      <h1 class="race-title main-title">Đua Xe</h1>
+      <p class="race-subtitle">Lạng lách · Né chướng ngại vật · Sống càng lâu càng tốt</p>
+      <div class="score-tag-info">🏆 100 điểm = 1 ⭐ · Tốc độ tăng dần</div>
+      <button class="start-btn" id="btn-start">XUẤT PHÁT</button>
+      <div class="race-highscore">🏆 Kỷ lục: <span id="highscore-display">0</span></div>
+    </div>
+
+    <!-- GAME -->
+    <div id="screen-game" class="race-screen">
+      <div class="bc-status" id="bc-status" style="display:none">
+        <span class="stat-bet" id="r-left">🏎️</span>
+        <div class="stat-score-wrap">
+          <span class="stat-score" id="r-center">0</span>
+          <span class="stat-score-sub">Điểm</span>
+        </div>
+        <span class="stat-profit zero" id="r-right">0</span>
+      </div>
+      <div class="canvas-wrapper" id="canvas-wrapper">
+        <canvas id="race-canvas"></canvas>
+        <div class="tap-hint" id="game-hint">Chạm trái/phải để lạng</div>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div id="screen-result" class="race-screen">
+      <div class="res-emoji">💥</div>
+      <h2 class="race-title game-over-title">Tông Xe!</h2>
+      <div class="res-stats">
+        <div class="res-stat"><span class="res-val" id="final-score">0</span><span class="res-label">Điểm</span></div>
+        <div class="res-stat"><span class="res-val" id="best-score">0</span><span class="res-label">Kỷ lục</span></div>
+        <div class="res-stat"><span class="res-val" id="earned-pts">+0</span><span class="res-label">Thưởng</span></div>
+        <div class="res-stat"><span class="res-val" id="distance">0m</span><span class="res-label">Khoảng cách</span></div>
+      </div>
+      <button class="start-btn" id="btn-restart" style="margin-bottom:12px">ĐUA LẠI</button>
+      <button class="speed-btn" id="btn-home" style="width:100%">VỀ MENU</button>
+    </div>
+  </div>
+
+  <script type="module" src="race.js"></script>
+</body>
+</html>
