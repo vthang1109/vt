@@ -17,6 +17,7 @@ const GAMES = {
   catte:     { id: 'catte',     name: 'Cát Tê',      icon: '♣️', max: 4, min: 2, page: '../games/catte/catte-mp.html',          ready: true, category: 'casino' },
   tienlen:   { id: 'tienlen',   name: 'Tiến Lên',    icon: '♥️', max: 4, min: 2, page: '../games/tienlen/tienlen-mp.html',       ready: true, category: 'casino' },
   // === TRÍ TUỆ ===
+  penalty:   { id: 'penalty',   name: 'Đá Penalty',  icon: '⚽', max: 2, min: 2, page: '../games/penalty/penalty-mp.html',      ready: true, category: 'tritue' },
   caro:      { id: 'caro',      name: 'Caro',        icon: '⭕', max: 2, min: 2, page: '../games/caro/caro-mp.html',            ready: true, category: 'tritue' },
   tictactoe: { id: 'tictactoe', name: 'Tic-Tac-Toe', icon: '⭕', max: 2, min: 2, page: '../games/tictactoe/tictactoe-mp.html',    ready: true, category: 'tritue' },
   chess:     { id: 'chess',     name: 'Cờ Vua',      icon: '♟️', max: 2, min: 2, page: '../games/chess/chess-mp.html',            ready: true, category: 'tritue' },
@@ -564,6 +565,15 @@ window.startGame = async function(){
   } else if (data.gameType === 'timso'){
     const players = data.members.slice(0, 2);
     gameState = { phase: 'betting', betConfirmed: {}, betAmount: null, bet: null, players };
+    } else if (data.gameType === 'penalty'){
+   gameState = {
+     phase: 'setup', seq: 0, players: data.members.slice(0, 2),
+     shooterUid: null, keeperUid: null, round: 0, maxRounds: 5,
+     scores: [0, 0], history: [],
+     playerCountry: null, aiCountry: null,
+     playerZone: null, keeperAiZone: null, pendingAiZone: null, keeperZone: null,
+     matchLabel: '🏟️ Giao hữu (2 người)'
+   };
   }
   await updateDoc(doc(db,'rooms',_currentRoomId), {
     status: 'playing',

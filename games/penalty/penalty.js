@@ -19,7 +19,7 @@ function saveKeyFor(mode, configId){
   return null;
 }
 
-class PenaltyGame {
+export class PenaltyGame {
   constructor() {
     this._shooterReq = 0; // token chống race giữa 2 promise màu cờ đội nhà/đội khách
     this.state = {
@@ -3210,5 +3210,7 @@ class PenaltyGame {
   }
 }
 
-const penaltyGame=new PenaltyGame();
-window.penaltyGame=penaltyGame;
+if(!new URLSearchParams(location.search).get('room')){
+   const penaltyGame=new PenaltyGame();
+   window.penaltyGame=penaltyGame;
+ }
