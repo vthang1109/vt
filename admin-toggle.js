@@ -484,6 +484,35 @@ window.__ADMIN_GAME_HACKS = [];
   async function instantEndRound(forcedResult) {
     window.__ADMIN_FORCED_RESULT = forcedResult;
 
+    // === PENALTY (đơn + MP) — penalty chỉ set window.penaltyGame, KHÔNG set
+    // window.game nên phải xử lý TRƯỚC khi lookup game generic bên dưới. ===
+    if (window.penaltyGame) {
+      const pg = window.penaltyGame;
+      const isMp = pg.constructor?.name === 'PenaltyMP';
+      // MP: phase đọc từ Firestore snapshot (_gs); đơn: đọc từ state.phase
+      const phase = isMp ? (pg._gs && pg._gs.phase) : pg.state.phase;
+      const inMatch = phase && phase !== 'finished' && phase !== 'idle' && phase !== 'setup' && phase !== 'tournament';
+      if (inMatch) {
+        if (isMp && typeof pg.adminForceEnd === 'function') {
+          // Ghi kết quả ép lên Firestore để CẢ 2 client cùng thấy màn kết thúc,
+          // rồi host bấm "Hoàn thành" để giải đấu tiếp tục.
+          try {
+            const ok = await pg.adminForceEnd(forcedResult);
+            showDebugToast(ok ? '✅ Penalty MP: ' + (forcedResult === 'win' ? 'THẮNG' : 'THUA') : '❌ Penalty MP: không ép được kết quả', 1500);
+          } catch (e) {
+            showDebugToast('❌ Penalty MP: lỗi ép kết quả — ' + e.message, 2500);
+          }
+          return;
+        }
+        // Đơn: endMatch() của PenaltyGame tự đọc __ADMIN_FORCED_RESULT (5-0 / 0-5)
+        pg.endMatch();
+        showDebugToast('✅ Penalty: ' + (forcedResult === 'win' ? 'THẮNG' : 'THUA'), 1500);
+        return;
+      }
+      showDebugToast('⚠️ Penalty chưa có trận đang đá', 2000);
+      return;
+    }
+
     const game = window.game || window.txGame || window.bcGame;
     if (!game) { showDebugToast('❌ Không tìm thấy game instance', 2000); return; }
 
@@ -583,18 +612,6 @@ window.__ADMIN_GAME_HACKS = [];
         }
       }
       showDebugToast('⚠️ Xì Dách chưa có ván đang chơi', 2000);
-      return;
-    }
-
-    // === PENALTY ===
-    if (name === 'PenaltyGame' && window.penaltyGame) {
-      const pg = window.penaltyGame;
-      if (pg.state.phase !== 'finished' && pg.state.phase !== 'idle') {
-        pg.endMatch();
-        showDebugToast('✅ Penalty: ' + (forcedResult === 'win' ? 'THẮNG' : 'THUA'), 1500);
-        return;
-      }
-      showDebugToast('⚠️ Penalty chưa có trận đang đá', 2000);
       return;
     }
 

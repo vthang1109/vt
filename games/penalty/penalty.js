@@ -1347,6 +1347,7 @@ export class PenaltyGame {
   playerShoot(zoneId){
     if(this.state.shotLocked)return;
     this.state.shotLocked=true;
+    this._setRoleBlink(false); // tắt nhấp nháy khi bóng bay
     const aiZone=this.aiPickZone();
     const isGoal=zoneId!==aiZone;
     this.animateShot(zoneId,aiZone,isGoal);
@@ -1383,6 +1384,7 @@ export class PenaltyGame {
   playerDefend(zoneId){
     if(this.state.shotLocked)return;
     this.state.shotLocked=true;
+    this._setRoleBlink(false); // tắt nhấp nháy khi thủ môn bay cản phá
     const aiZone=this.state._pendingAiZone||this.aiPickZone();
     const playerDive=zoneId;
     const isGoal=playerDive!==aiZone;  // Player chose wrong zone → goal
@@ -1530,12 +1532,13 @@ export class PenaltyGame {
     if(numEl) numEl.textContent = String(randomJerseyNumber());
     if(flagEl) flagEl.innerHTML = team ? flagImg(team.code, team.name, 13) : '';
     const kit = flagColorCache[team.code];
+    const hairSeed = prefix==='pt-shooter-ai' ? 1 : 0;
     if(kit){
-      renderShooterSprite(pose, {...kit, hair:pickRandomHairColor()}, prefix);
+      renderShooterSprite(pose, {...kit, hair:this._pickShooterHair(hairSeed)}, prefix);
     }else{
       renderShooterSprite(pose, null, prefix);
       getFlagColors(team.code).then(kitRaw=>{
-        renderShooterSprite(pose, {...kitRaw, hair:pickRandomHairColor()}, prefix);
+        renderShooterSprite(pose, {...kitRaw, hair:this._pickShooterHair(hairSeed)}, prefix);
       });
     }
   }
@@ -1686,13 +1689,13 @@ export class PenaltyGame {
     box.style.display='';
   }
 
-  animateShot(zoneId,aiZone,isGoal){
+  animateShot(zoneId,aiZone,isGoal,styleOverride){
     const zones=document.querySelectorAll('.pt-zone');
     zones.forEach(z=>z.classList.remove('zone-shot','zone-save','zone-goal','zone-keeper-save'));
     // Thủ môn (đội bạn) phản ứng trễ 1 nhịp sau khi bóng được sút
     const keeper=document.getElementById('pt-keeper');
     if(keeper){keeper.classList.remove('mine');keeper.classList.add('theirs');}
-    const _trailStyle=this._pickTrailStyle();
+    const _trailStyle=styleOverride||this._pickTrailStyle();
     setTimeout(()=>this._keeperDive(aiZone,isGoal&&zoneId!==aiZone?'diving':'save',FLIGHT_MS_BY_STYLE[_trailStyle]||900), KEEPER_REACT_DELAY_MS);
     this._shooterKick();
     this._animateBallToZone(zoneId,()=>{
@@ -1714,13 +1717,13 @@ export class PenaltyGame {
     },'mine',_trailStyle);
   }
 
-  animateAIShot(zoneId,saveZone,isGoal){
+  animateAIShot(zoneId,saveZone,isGoal,styleOverride){
     const zones=document.querySelectorAll('.pt-zone');
     zones.forEach(z=>z.classList.remove('zone-shot','zone-save','zone-goal','zone-keeper-save'));
     // Thủ môn (đội mình) phản ứng trễ 1 nhịp sau khi bóng được sút
     const keeper=document.getElementById('pt-keeper');
     if(keeper){keeper.classList.remove('theirs');keeper.classList.add('mine');}
-    const _trailStyle=this._pickTrailStyle();
+    const _trailStyle=styleOverride||this._pickTrailStyle();
     setTimeout(()=>this._keeperDive(saveZone,isGoal?'diving':'save',FLIGHT_MS_BY_STYLE[_trailStyle]||900), KEEPER_REACT_DELAY_MS);
     this._shooterKick();
     this._animateBallToZone(zoneId,()=>{
@@ -2273,6 +2276,14 @@ export class PenaltyGame {
     }
     const styles=['wind','fire','ice','leaf','rainbow','dark','thunder','light','clone','butterfly','blackhole'];
     return styles[Math.floor(Math.random()*styles.length)];
+  }
+
+  // Màu tóc cho cầu thủ đang sút — mặc định random. Lớp MP override để 2 client
+  // cùng suy ra 1 màu tóc (đồng bộ giữa 2 bên) dựa trên gameState đã sync.
+  // `seed` giúp các vị trí/cầu thủ khác nhau (vd: 2 nhân vật màn kết quả) có màu
+  // khác nhau dù cùng chung một lượt — lớp MP dùng seed trong phép băm.
+  _pickShooterHair(seed){
+    return pickRandomHairColor();
   }
 
   // Điều phối hiệu ứng bay theo đúng kiểu đã chọn cho cú sút hiện tại
@@ -2934,7 +2945,7 @@ export class PenaltyGame {
     const reqId = ++this._shooterReq;
     // Màu tóc random riêng cho MỖI cầu thủ/lượt sút (không dùng chung với cache màu cờ của đội,
     // để tránh 2 cầu thủ cùng đội bị lấy đúng 1 object cache và dính chung màu tóc).
-    const hairHex = pickRandomHairColor();
+    const hairHex = this._pickShooterHair(side==='right' ? 1 : 0);
     const cached = flagColorCache[team.code];
     if(cached){
       // Đã có sẵn màu cờ (nhờ prefetch ở showMatch) → nhuộm màu ngay, không
@@ -2965,7 +2976,18 @@ export class PenaltyGame {
     el.classList.add('pt-score-bump');
   }
 
+  // Nhấp nháy bóng đổ đen theo viền — bóng khi SÚT, thủ môn khi BẮT
+  _setRoleBlink(on, which){
+    const ball=document.getElementById('pt-ball');
+    const keeper=document.getElementById('pt-keeper');
+    if(ball) ball.classList.toggle('role-blink', !!(on && which==='ball'));
+    if(keeper) keeper.classList.toggle('role-blink', !!(on && which==='keeper'));
+  }
+
   renderStatusBar(){
+    // Blink theo lượt: đang SÚT thì nhấp nháy bóng, đang BẮT thì nhấp nháy thủ môn
+    const _p=this.state.phase;
+    this._setRoleBlink((_p==='shooting'||_p==='defending') && !this.state.shotLocked, _p==='defending' ? 'keeper' : 'ball');
     const pc=this.state.playerCountry,ac=this.state.aiCountry;
     // Flags + names
     document.getElementById('pt-sb-pflag').innerHTML=flagImg(pc.code, pc.name, 24);

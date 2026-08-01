@@ -18,9 +18,65 @@
     }
     #bg-canvas, .orb { position: fixed; pointer-events: none; }
     .pt-wrap { overflow: visible; touch-action: pan-y; }
-    .pt-mp-setup-box { max-width: 420px; margin: 24px auto; text-align: center; }
+    .pt-mp-setup-box { max-width: 480px; margin: 24px auto; text-align: center; }
     .pt-mp-hint { color: #94a3b8; font-size: 14px; margin: 14px 0; line-height: 1.5; }
     .pt-mp-role-note { color: #38bdf8; font-size: 13px; margin-top: 6px; }
+    /* Mode buttons for MP */
+    .pt-mp-mode-row { display: flex; gap: 8px; justify-content: center; margin: 12px 0; }
+    .pt-mp-mode-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all .2s; }
+    .pt-mp-mode-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); color: #e0f2fe; }
+    .pt-mp-mode-btn.selected { background: rgba(56,189,248,0.15); border-color: #38bdf8; color: #38bdf8; box-shadow: 0 0 20px rgba(56,189,248,0.1); }
+    .pt-mp-pick-row { display: flex; gap: 8px; justify-content: center; margin: 10px 0; flex-wrap: wrap; }
+    .pt-mp-pick-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: all .2s; }
+    .pt-mp-pick-btn:hover { background: rgba(255,255,255,0.08); color: #e0f2fe; }
+    .pt-mp-pick-btn.selected { background: rgba(74,222,128,0.12); border-color: #4ade80; color: #4ade80; }
+    .pt-mp-actions { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    /* Nút quay về chọn chế độ (hiện khi bị loại / giải đã kết thúc) */
+    .pt-btn-back { background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.32); color: #38bdf8; padding: 10px 18px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all .2s; }
+    .pt-btn-back:hover { background: rgba(56,189,248,0.22); border-color: #38bdf8; box-shadow: 0 0 18px rgba(56,189,248,0.12); }
+
+    /* ===== TURN TAG — phong cách bài cào / xì dách ===== */
+    /* SÚT — Tiên (xanh dương, phong cách Bài Cào) */
+    .pt-turn-box.tag-shoot {
+      background: #3b82f6;
+      color: #fff;
+      border-color: #3b82f6;
+      box-shadow: 0 0 40px #3b82f6, 0 0 80px rgba(59,130,246,0.7);
+      text-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    /* THỦ MÔN — Xì Dách (vàng gradient) */
+    .pt-turn-box.tag-keeper {
+      background: linear-gradient(45deg, #facc15, #fb923c);
+      color: #000;
+      border-color: #facc15;
+      box-shadow: 0 0 40px #facc15, 0 0 80px rgba(250,204,21,0.6);
+      text-shadow: 0 0 10px #000, 0 0 20px #fbbf24;
+    }
+    /* VÀO!!! — Thắng (xanh) */
+    .pt-turn-box.tag-goal {
+      background: rgba(34,197,94,0.9);
+      color: #fff;
+      border-color: #22c55e;
+      box-shadow: 0 0 30px #22c55e, 0 0 60px rgba(34,197,94,0.5);
+      text-shadow: 0 0 10px #fff, 0 0 20px #22c55e;
+      animation: ptResultPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+    /* KHÔNG VÀO!!! — Thua (đỏ) */
+    .pt-turn-box.tag-miss {
+      background: rgba(239,68,68,0.9);
+      color: #fff;
+      border-color: #ef4444;
+      box-shadow: 0 0 30px #ef4444, 0 0 60px rgba(239,68,68,0.5);
+      text-shadow: 0 0 10px #fff, 0 0 20px #ef4444;
+      animation: ptResultPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+    /* Tên người thực hiện chữ thường, không khung — chỉ chặn tràn màn hình khi tên dài */
+    .pt-turn-box.tag-shoot, .pt-turn-box.tag-keeper {
+      max-width: min(80vw, 280px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    /* Blink bóng đổ đen (ptRoleShadowBlink) dùng chung từ penalty.css */
   </style>
   <script src="../../top-nav.js"></script>
   <script src="../../fullscreen.js"></script>
@@ -41,11 +97,27 @@
       <h1 class="pt-title">⚽ Đá Penalty — Đồng đội</h1>
 
       <div class="pt-mp-setup-box" id="pt-mp-setup-host" style="display:none">
-        <div class="pt-mp-hint">Bạn là chủ phòng. Chọn đội tuyển rồi bắt đầu trận — 2 người trong phòng sẽ luân phiên SÚT và BẮT GÔN qua mỗi lượt.</div>
-        <div class="pt-country-picker" id="pt-country-picker" onclick="penaltyGame.openCountryPopup()">
+        <div class="pt-mp-hint">Bạn là chủ phòng. Chọn chế độ, đội tuyển rồi bắt đầu!</div>
+
+        <!-- Mode selection -->
+        <div class="pt-mp-mode-row" id="pt-mp-mode-row">
+          <button class="pt-mp-mode-btn selected" data-mode="quick">⚡ Giao hữu</button>
+          <button class="pt-mp-mode-btn" data-mode="cup">🏆 Cúp</button>
+          <button class="pt-mp-mode-btn" data-mode="league">📊 League</button>
+        </div>
+
+        <!-- Cup picker -->
+        <div class="pt-mp-pick-row" id="pt-mp-cup-pick" style="display:none"></div>
+
+        <!-- League picker -->
+        <div class="pt-mp-pick-row" id="pt-mp-league-pick" style="display:none"></div>
+
+        <!-- Country picker -->
+        <div class="pt-country-picker" id="pt-country-picker" onclick="penaltyGame.openCountryPopup()" style="margin-top:8px">
           <span class="pt-country-flag" id="pt-country-flag"></span>
           <span class="pt-country-name" id="pt-country-name">Việt Nam</span>
         </div>
+
         <button class="pt-play-btn" id="pt-mp-start-btn" style="margin-top:16px">
           <svg class="pt-play-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
           <span>Bắt đầu trận</span>
@@ -53,11 +125,52 @@
       </div>
 
       <div class="pt-mp-setup-box" id="pt-mp-setup-guest" style="display:none">
-        <div class="pt-mp-hint">⏳ Đang chờ chủ phòng chọn đội tuyển và bắt đầu trận...</div>
+        <div class="pt-mp-hint">⏳ Đang chờ chủ phòng chọn chế độ và bắt đầu trận...</div>
       </div>
     </div>
 
-    <!-- ===== MATCH SCREEN (dùng chung với single-player) ===== -->
+    <!-- ===== LEAGUE VIEW (MP) ===== -->
+    <div id="pt-league-view" class="pt-screen" style="display:none">
+      <div class="pt-overview-header" id="pt-overview-header"></div>
+      <div id="pt-league-table"></div>
+      <div class="pt-actions">
+        <button class="pt-btn-start" id="pt-league-next">⚽ Đá trận tiếp</button>
+        <button class="pt-btn-back" id="pt-league-back" style="display:none" onclick="penaltyGame._mpBackToModeSelect()">🔄 Chọn chế độ khác</button>
+        <button class="pt-btn-quit" onclick="penaltyGame.quitToMenu()">🚪 Rời</button>
+      </div>
+    </div>
+
+    <!-- ===== CUP GROUP VIEW (MP) ===== -->
+    <div id="pt-cup-group-view" class="pt-screen" style="display:none">
+      <div id="pt-group-view-content"></div>
+      <div class="pt-actions">
+        <button class="pt-btn-start" id="pt-group-next">⚽ Đá trận tiếp</button>
+        <button class="pt-btn-quit" onclick="penaltyGame.quitToMenu()">🚪 Rời</button>
+      </div>
+    </div>
+
+    <!-- ===== CUP TRANSITION (MP) ===== -->
+    <div id="pt-cup-transition" class="pt-screen" style="display:none">
+      <div id="pt-transition-content"></div>
+      <div class="pt-actions">
+        <button class="pt-btn-start" id="pt-transition-next">⚡ Vào vòng knock-out</button>
+        <button class="pt-btn-back" id="pt-transition-back" style="display:none" onclick="penaltyGame._mpBackToModeSelect()">🔄 Chọn chế độ khác</button>
+        <button class="pt-btn-quit" onclick="penaltyGame.quitToMenu()">🚪 Rời</button>
+      </div>
+    </div>
+
+    <!-- ===== CUP BRACKET (MP) ===== -->
+    <div id="pt-cup-knockout-view" class="pt-screen" style="display:none">
+      <div class="pt-overview-header" id="pt-knockout-header"></div>
+      <div id="pt-knockout-bracket"></div>
+      <div class="pt-actions">
+        <button class="pt-btn-start" id="pt-knockout-next">⚽ Đá trận tiếp</button>
+        <button class="pt-btn-back" id="pt-knockout-back" style="display:none" onclick="penaltyGame._mpBackToModeSelect()">🔄 Chọn chế độ khác</button>
+        <button class="pt-btn-quit" onclick="penaltyGame.quitToMenu()">🚪 Rời</button>
+      </div>
+    </div>
+
+    <!-- ===== MATCH SCREEN ===== -->
     <div id="pt-game" class="pt-screen" style="display:none">
 
       <div class="pt-match-info" id="pt-match-info" style="display:none">
@@ -86,49 +199,110 @@
         </div>
       </div>
 
+      <!-- Pitch / Goal with football scene -->
       <div class="pt-pitch" id="pt-pitch">
-        <div class="pt-stands" id="pt-stands">
-          <div class="pt-stands-crowd" id="pt-stands-crowd"></div>
-          <div class="pt-stands-shade" id="pt-stands-shade"></div>
-          <div class="pt-stand-flags" id="pt-stand-flags"></div>
-        </div>
-        <div class="pt-billboard-strip" id="pt-billboard-strip"></div>
 
-        <div class="pt-turn-box shoot-turn" id="pt-turn-box">SÚT!!!</div>
+        <!-- Khu khung thành — giữ nguyên tỉ lệ gốc, KHÔNG bị kéo giãn -->
+        <div class="pt-goal-zone">
 
-        <div class="pt-goal-frame" id="pt-goal-frame">
-          <div class="pt-goal-net" id="pt-goal-net"></div>
-          <div class="pt-goal-flag" id="pt-goal-flag" style="display:none"></div>
-          <div class="pt-goal-grid" id="pt-goal-grid">
-            <div class="pt-zone" data-zone="top-left"></div><div class="pt-zone" data-zone="top-center"></div><div class="pt-zone" data-zone="top-right"></div>
-            <div class="pt-zone" data-zone="mid-left"></div><div class="pt-zone" data-zone="mid-center"></div><div class="pt-zone" data-zone="mid-right"></div>
-            <div class="pt-zone" data-zone="bot-left"></div><div class="pt-zone" data-zone="bot-center"></div><div class="pt-zone" data-zone="bot-right"></div>
+          <!-- Khán đài (crowd) -->
+          <div class="pt-stands" id="pt-stands">
+            <div class="pt-stands-crowd" id="pt-stands-crowd"></div>
+            <div class="pt-stands-shade" id="pt-stands-shade"></div>
+            <div class="pt-stand-flags" id="pt-stand-flags"></div>
           </div>
-          <div class="pt-goal-posts" id="pt-goal-posts"></div>
+          <!-- Biển quảng cáo -->
+          <div class="pt-billboard-strip" id="pt-billboard-strip">
+            <div class="pt-billboard pt-bb-1">VTWORLD</div>
+            <div class="pt-billboard pt-bb-2">PENALTY CUP</div>
+            <div class="pt-billboard pt-bb-3">⚽ LEAGUE 〄</div>
+          </div>
+
+          <!-- Turn tag / Kết quả — chữ to giữa sân -->
+          <div class="pt-turn-box shoot-turn" id="pt-turn-box">SÚT!!!</div>
+
+          <div class="pt-goal-area">
+            <div class="pt-goal-frame" id="pt-goal-frame">
+              <div class="pt-goal-net" id="pt-goal-net">
+                <div class="pt-goal-net-panel pt-net-top"></div>
+                <div class="pt-goal-net-panel pt-net-left"></div>
+                <div class="pt-goal-net-panel pt-net-right"></div>
+                <div class="pt-goal-net-panel pt-net-bottom"></div>
+                <div class="pt-goal-net-panel pt-net-back"></div>
+              </div>
+              <div class="pt-goal-flag" id="pt-goal-flag" style="display:none"></div>
+              <div class="pt-goal-grid" id="pt-goal-grid">
+                <div class="pt-zone" data-zone="top-left"></div>
+                <div class="pt-zone" data-zone="top-center"></div>
+                <div class="pt-zone" data-zone="top-right"></div>
+                <div class="pt-zone" data-zone="mid-left"></div>
+                <div class="pt-zone" data-zone="mid-center"></div>
+                <div class="pt-zone" data-zone="mid-right"></div>
+                <div class="pt-zone" data-zone="bot-left"></div>
+                <div class="pt-zone" data-zone="bot-center"></div>
+                <div class="pt-zone" data-zone="bot-right"></div>
+              </div>
+              <div class="pt-goal-posts" id="pt-goal-posts">
+                <svg class="pt-goal-back-frame" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <line x1="0" y1="0" x2="8" y2="5"></line>
+                  <line x1="100" y1="0" x2="92" y2="5"></line>
+                  <line x1="0" y1="100" x2="12" y2="80"></line>
+                  <line x1="100" y1="100" x2="88" y2="80"></line>
+                  <line x1="8" y1="5" x2="12" y2="80"></line>
+                  <line x1="92" y1="5" x2="88" y2="80"></line>
+                  <line x1="8" y1="5" x2="92" y2="5"></line>
+                  <line x1="12" y1="80" x2="88" y2="80"></line>
+                </svg>
+                <div class="pt-post-left"></div>
+                <div class="pt-post-right"></div>
+                <div class="pt-crossbar"></div>
+              </div>
+            </div>
+            <img class="pt-keeper" id="pt-keeper" src="img/gk/gk-mid-stand.png" alt="">
+          </div>
+
+        </div>
+        <!-- END pt-goal-zone -->
+
+        <!-- Grass markings -->
+        <div class="pt-pitch-markings">
+          <div class="pt-touchline-top"></div>
+          <div class="pt-box-lines"></div>
+          <div class="pt-box-arc"></div>
+          <div class="pt-arc-left"></div>
+          <div class="pt-arc-right"></div>
+          <div class="pt-center-circle"></div>
+          <div class="pt-penalty-spot" id="pt-penalty-spot"></div>
         </div>
 
-        <img class="pt-keeper" id="pt-keeper" src="img/gk/gk-mid-stand.png" alt="">
-        <div class="pt-penalty-spot" id="pt-penalty-spot"></div>
-
+        <!-- Football on the penalty spot -->
         <div class="pt-ball" id="pt-ball">⚽</div>
 
+        <!-- Shooter -->
         <div class="pt-shooter" id="pt-shooter">
           <img class="pt-shooter-body" id="pt-shooter-body" src="img/player/shooter-mid-stand.png" alt="">
           <img class="pt-shooter-hair" id="pt-shooter-hair" alt="">
           <img class="pt-shooter-shirt" id="pt-shooter-shirt" alt="">
           <img class="pt-shooter-shorts" id="pt-shooter-shorts" alt="">
           <img class="pt-shooter-socks" id="pt-shooter-socks" alt="">
-          <div><span class="pt-jersey-name" id="pt-jersey-name"></span><span class="pt-jersey-number" id="pt-jersey-number"></span></div>
+          <div class="pt-shooter-jersey">
+            <span class="pt-jersey-name" id="pt-jersey-name"></span>
+            <span class="pt-jersey-number" id="pt-jersey-number"></span>
+          </div>
           <div class="pt-shooter-flag" id="pt-shooter-flag"></div>
         </div>
 
+        <!-- Result scene: player (left) + AI (right) -->
         <div class="pt-shooter pt-shooter-player" id="pt-shooter-player" style="display:none">
           <img class="pt-shooter-body" id="pt-shooter-player-body" src="img/player/shooter-mid-stand.png" alt="">
           <img class="pt-shooter-hair" id="pt-shooter-player-hair" alt="">
           <img class="pt-shooter-shirt" id="pt-shooter-player-shirt" alt="">
           <img class="pt-shooter-shorts" id="pt-shooter-player-shorts" alt="">
           <img class="pt-shooter-socks" id="pt-shooter-player-socks" alt="">
-          <div><span class="pt-jersey-name" id="pt-shooter-player-name"></span><span class="pt-jersey-number" id="pt-shooter-player-number"></span></div>
+          <div class="pt-shooter-jersey">
+            <span class="pt-jersey-name" id="pt-shooter-player-name"></span>
+            <span class="pt-jersey-number" id="pt-shooter-player-number"></span>
+          </div>
           <div class="pt-shooter-flag" id="pt-shooter-player-flag"></div>
         </div>
         <div class="pt-shooter pt-shooter-ai" id="pt-shooter-ai" style="display:none">
@@ -137,20 +311,25 @@
           <img class="pt-shooter-shirt" id="pt-shooter-ai-shirt" alt="">
           <img class="pt-shooter-shorts" id="pt-shooter-ai-shorts" alt="">
           <img class="pt-shooter-socks" id="pt-shooter-ai-socks" alt="">
-          <div><span class="pt-jersey-name" id="pt-shooter-ai-name"></span><span class="pt-jersey-number" id="pt-shooter-ai-number"></span></div>
+          <div class="pt-shooter-jersey">
+            <span class="pt-jersey-name" id="pt-shooter-ai-name"></span>
+            <span class="pt-jersey-number" id="pt-shooter-ai-number"></span>
+          </div>
           <div class="pt-shooter-flag" id="pt-shooter-ai-flag"></div>
         </div>
+
       </div>
+      <!-- END pt-pitch -->
 
       <div class="pt-mp-role-note" id="pt-mp-role-note"></div>
 
-      <div class="pt-actions" id="pt-actions" style="display:none">
+      <div class="pt-mp-actions" id="pt-mp-game-actions">
         <button class="pt-btn-quit" onclick="penaltyGame.quitToMenu()">🚪 Rời</button>
       </div>
 
       <div class="pt-result-overlay" id="pt-result-overlay" style="display:none">
         <div class="pt-actions" id="pt-result-actions">
-          <button class="pt-btn-start" onclick="penaltyGame.onMatchDone()">Hoàn thành</button>
+          <button class="pt-btn-start" id="pt-mp-match-done-btn">Hoàn thành</button>
           <button class="pt-btn-quit" onclick="penaltyGame.quitToMenu()">Rời phòng</button>
         </div>
       </div>
@@ -159,7 +338,7 @@
 
   </div>
 
-  <!-- Country picker modal (host dùng để chọn đội) -->
+  <!-- Country picker modal -->
   <div class="pt-modal-overlay" id="pt-country-modal">
     <div class="pt-modal-box">
       <button class="pt-modal-close" id="pt-country-modal-close">✕</button>
