@@ -2,10 +2,11 @@
 // DỮ LIỆU HIỆU ỨNG CÚ SÚT
 // ============================
 export const PT_EFFECTS = [
-  { id:'wind', name:'Gió', icon:'💨', desc:'Xoáy lốc cuốn bóng', color:'#38bdf8', price:0 },
-  { id:'fire', name:'Lửa', icon:'🔥', desc:'Cháy bừng rực rỡ', color:'#f97316', price:0 },
-  { id:'ice', name:'Băng', icon:'❄️', desc:'Băng giá lạnh lẽo', color:'#67e8f9', price:0 },
-  { id:'leaf', name:'Lá', icon:'🍃', desc:'Lá cuốn theo cơn gió', color:'#84cc16', price:0 },
+  { id:'default', name:'Mặc định', icon:'🕊️', desc:'Đường sút trắng nhạt, bay thẳng, nhẹ nhàng — không hiệu ứng', color:'#f8fafc', price:0 },
+  { id:'wind', name:'Gió', icon:'💨', desc:'Xoáy lốc cuốn bóng', color:'#38bdf8', price:3000 },
+  { id:'fire', name:'Lửa', icon:'🔥', desc:'Cháy bừng rực rỡ', color:'#f97316', price:3000 },
+  { id:'ice', name:'Băng', icon:'❄️', desc:'Băng giá lạnh lẽo', color:'#67e8f9', price:3000 },
+  { id:'leaf', name:'Lá', icon:'🍃', desc:'Lá cuốn theo cơn gió', color:'#84cc16', price:3000 },
   { id:'rainbow', name:'Cầu vồng', icon:'🌈', desc:'Sắc màu rực rỡ', color:'#a78bfa', price:5000 },
   { id:'dark', name:'Hắc ám', icon:'💀', desc:'Bóng tối bao trùm', color:'#1a0000', price:20000 },
   { id:'thunder', name:'Sấm sét', icon:'⚡', desc:'Sét đánh rung trời', color:'#eab308', price:10000 },

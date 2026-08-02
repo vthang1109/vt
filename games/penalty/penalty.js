@@ -1,13 +1,13 @@
 // ===================== PENALTY SHOOTOUT - CUP EDITION =====================
 import { auth, addPoints } from '../../points.js';
-import { COUNTRIES, FIFA_CODE3, abbr3, TOURNAMENT_CONFIGS, CUP_TOURNAMENTS, LEAGUE_CONFIGS, LEAGUE_LIST, buildRoundRobin, MODES, KIT_COLORS, flagColorCache, getFlagColors, applyTeamKit, SHOOTER_POSES, HAIR_COLOR_PALETTE, pickRandomHairColor, JERSEY_SPECIAL_NUMBERS, randomJerseyNumber, _shooterImgCache, _loadImg, _hexToRgb, _rgbToHsl, _hslToRgb, _poseDataCache, _getPoseData, _dyeMaskLayer, _bodyLayerCache, _teamLayerCache, _hairLayerCache, _getSplitShooterLayers, renderShooterSprite, GK_POSITIONS, applyKeeperSprite, shuffle, getAllCountries, getRegionCountries, countryByCode, getTopCountries, flagImg } from './penalty-countries.js';
+import { COUNTRIES, FIFA_CODE3, abbr3, TOURNAMENT_CONFIGS, CUP_TOURNAMENTS, LEAGUE_CONFIGS, LEAGUE_LIST, buildRoundRobin, MODES, KIT_COLORS, flagColorCache, getFlagColors, applyTeamKit, SHOOTER_POSES, HAIR_COLOR_PALETTE, pickRandomHairColor, JERSEY_SPECIAL_NUMBERS, randomJerseyNumber, _shooterImgCache, _loadImg, _hexToRgb, _rgbToHsl, _hslToRgb, _poseDataCache, _getPoseData, _dyeMaskLayer, _bodyLayerCache, _teamLayerCache, _hairLayerCache, _getSplitShooterLayers, renderShooterSprite, GK_POSITIONS, applyKeeperSprite, applyKeeperKit, shuffle, getAllCountries, getRegionCountries, countryByCode, getTopCountries, flagImg } from './penalty-countries.js';
 import { PT_EFFECTS, PT_EFFECTS_STORAGE_KEY, loadPenaltyEffects, savePenaltyEffects, simAIPenalty, orientMatchScore } from './penalty-effects.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 
 
 const ZONES = ['top-left','top-center','top-right','mid-left','mid-center','mid-right','bot-left','bot-center','bot-right'];
-const FLIGHT_MS_BY_STYLE={wind:650,fire:650,ice:650,leaf:650,rainbow:650,dark:650,thunder:650,light:650,clone:650,butterfly:650,blackhole:650};
+const FLIGHT_MS_BY_STYLE={default:900,wind:650,fire:650,ice:650,leaf:650,rainbow:650,dark:650,thunder:650,light:650,clone:650,butterfly:650,blackhole:650};
 const KEEPER_REACT_DELAY_MS = 130;
 
 const AI_ACCURACY = 0.35;
@@ -56,6 +56,22 @@ export class PenaltyGame {
     this.state._effectOwned = Array.isArray(rawOwned) ? rawOwned : [];
     this.state._effectSelected = Array.isArray(rawSelected) ? rawSelected : [];
     this._pendingBuyEffectId = null;
+    // Hiệu ứng mặc định luôn miễn phí & tự sở hữu; tài khoản chưa chọn gì → mặc định chọn nó
+    let _effDirty = false;
+    if(!this.state._effectOwned.includes('default')){
+      this.state._effectOwned.push('default');
+      _effDirty = true;
+    }
+    if(!this.state._effectSelected.length){
+      this.state._effectSelected = ['default'];
+      _effDirty = true;
+    }
+    if(_effDirty){
+      const data = loadPenaltyEffects();
+      data.owned = [...this.state._effectOwned];
+      data.selected = [...this.state._effectSelected];
+      savePenaltyEffects(data);
+    }
     this._init();
   }
 
@@ -108,6 +124,9 @@ export class PenaltyGame {
     if(!countries.find(x=>x.code===this.state.playerCountry.code)){
       this.state.playerCountry=countries[0]||getAllCountries()[0];
       this.state.aiCountry=this.randomCountry(this.state.playerCountry.code);
+      // LƯU Ý: không gọi _invalidateProgressForTeamChange ở đây — việc tự đổi đội
+      // khi chuyển giải là hành động của hệ thống, không phải người chơi cố ý đổi
+      // đội → vẫn phải cho phép "Tiếp tục" tiến trình đang lưu của giải đó.
     }
 
     const q=(query||'').trim().toLowerCase();
@@ -200,6 +219,9 @@ export class PenaltyGame {
         this.state.playerCountry=found;
         this.state.aiCountry=this.randomCountry(found.code);
         this._updateCountryPicker();
+        // Chọn đội khác với đội trong tiến trình đang lưu → xoá tiến trình cũ để
+        // nút Play không bị kẹt ở chế độ "Tiếp tục" (restore về đội cũ, ví dụ VN)
+        this._invalidateProgressForTeamChange();
         this.closeCountryPopup();
       }
     });
@@ -1478,7 +1500,7 @@ export class PenaltyGame {
 
     // Points for quick mode
     if(this.state._matchContext && this.state._matchContext.type==='quick'){
-      const pts=isWin?50:isDraw?20:10;
+      const pts=isWin?150:isDraw?60:30;
       addPoints('Penalty',isWin?'Thắng penalty':isDraw?'Hòa penalty':'Thua penalty',pts).catch(()=>{});
       if(window.VTQuests)window.VTQuests.trackPlay('penalty');
     }
@@ -2274,8 +2296,8 @@ export class PenaltyGame {
     if(valid.length > 0){
       return valid[Math.floor(Math.random()*valid.length)];
     }
-    const styles=['wind','fire','ice','leaf','rainbow','dark','thunder','light','clone','butterfly','blackhole'];
-    return styles[Math.floor(Math.random()*styles.length)];
+    // Không chọn gì → đường sút mặc định (trắng nhạt, thẳng, không hiệu ứng)
+    return 'default';
   }
 
   // Màu tóc cho cầu thủ đang sút — mặc định random. Lớp MP override để 2 client
@@ -2288,6 +2310,7 @@ export class PenaltyGame {
 
   // Điều phối hiệu ứng bay theo đúng kiểu đã chọn cho cú sút hiện tại
   _spawnBallTrail(pitch,x,y,angleDeg,team,style){
+    if(style==='default') return; // mặc định: không rắc hạt, chỉ đường trắng nhạt thẳng
     if(style==='fire')    return this._spawnFireTrail(pitch,x,y);
     if(style==='ice')     return this._spawnIceTrail(pitch,x,y);
     if(style==='leaf')    return this._spawnLeafTrail(pitch,x,y);
@@ -2305,6 +2328,7 @@ export class PenaltyGame {
   // class cũ trước để không bị chồng hiệu ứng của lần sút trước
   _setBallFx(ball,style,team){
     ball.classList.remove('ball-fx-wind-mine','ball-fx-wind-theirs','ball-fx-fire','ball-fx-ice','ball-fx-leaf','ball-fx-rainbow','ball-fx-dark','ball-fx-thunder','ball-fx-light','ball-fx-clone','ball-fx-butterfly','ball-fx-blackhole');
+    if(style==='default'||!style) return; // mặc định: bóng sạch, không ánh sáng
     if(style==='wind'){
       ball.classList.add(team==='theirs'?'ball-fx-wind-theirs':'ball-fx-wind-mine');
     }else{
@@ -2330,6 +2354,7 @@ export class PenaltyGame {
       case 'clone':     return [['0%','#4c1d95'],['40%','#7b2ff7'],['75%','#b48cfa'],['100%','#ffffff']];
       case 'butterfly': return [['0%','#ffffff'],['30%','#fbcfe8'],['60%','#f9a8d4'],['100%','#ec4899']];
       case 'blackhole': return [['0%','#000000'],['25%','#0c4a6e'],['50%','#06b6d4'],['75%','#a855f7'],['100%','#ffffff']];
+      case 'default': return [['0%','#e2e8f0'],['35%','#f8fafc'],['70%','#f1f5f9'],['100%','#ffffff']]; // trắng nhạt nhẹ nhàng
       default:        return null; // wind dùng màu đặc theo team, không cần gradient
     }
   }
@@ -2897,6 +2922,11 @@ export class PenaltyGame {
     // Giờ mới xoá class — transition sẽ animate từ vị trí đang bay về giữa
     k.classList.remove('diving','save');
     applyKeeperSprite(k,'mid-stand');
+    // Thủ môn thuộc đội KHÔNG sút ở lượt hiện tại → lấy màu đội đó để nhuộm áo GK.
+    const defendingCode = this.state.currentShooter==='player'
+      ? (this.state.aiCountry && this.state.aiCountry.code)
+      : (this.state.playerCountry && this.state.playerCountry.code);
+    if(defendingCode) applyKeeperKit(k, defendingCode);
     k.style.setProperty('--flip',1);
     k.style.transform='translate(0,0) scale(var(--gk-scale,1))';
     k.style.setProperty('--dx','0px');k.style.setProperty('--dy','0px');
@@ -3094,6 +3124,24 @@ export class PenaltyGame {
     const key = saveKeyFor(mode, configId);
     if(!key)return;
     try{localStorage.removeItem(key)}catch(e){}
+  }
+
+  // Khi người chơi đổi đội khác với đội đang lưu trong tiến trình của Cup/League
+  // đang chọn → xoá tiến trình cũ để nút Play không còn ở chế độ "Tiếp tục"
+  // (nếu không, bấm Play sẽ restore về đội cũ — ví dụ luôn ra Việt Nam dù đã
+  // chọn đội khác). Tiến trình mới sẽ được lưu lại khi vào giải.
+  _invalidateProgressForTeamChange(){
+    const mode=this.state.modeId;
+    if(mode!=='cup'&&mode!=='league')return;
+    const configId = mode==='league' ? this.state.league.id : this.state.tournament.id;
+    const d=this.loadProgress(mode, configId);
+    if(!d || d._mode!==mode)return;
+    if(!d.playerCountry || !this.state.playerCountry)return;
+    if(d.playerCountry.code !== this.state.playerCountry.code){
+      this.clearProgress(mode, configId);
+      this._updateContinueCard();
+      this._updatePlayButton();
+    }
   }
 
   restoreProgress(mode, configId){

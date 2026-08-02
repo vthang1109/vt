@@ -131,31 +131,31 @@ export const TOURNAMENT_CONFIGS = {
     id:'worldcup', name:'FIFA WC', icon:'🏆', region:null,
     teamCount:32, groups:8, advancePerGroup:2,
     knockoutRoundNames:['Vòng 16 đội','Tứ kết','Bán kết','Chung kết'],
-    pointsWin:500, pointsLose:100,
+    pointsWin:1500, pointsLose:300,
   },
   euro: {
     id:'euro', name:'Euro', icon:'🇪🇺', region:'chau_eu',
     teamCount:16, groups:4, advancePerGroup:2,
     knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
-    pointsWin:400, pointsLose:80,
+    pointsWin:1200, pointsLose:240,
   },
   copa: {
     id:'copa', name:'Copa A', icon:'🌎', region:'chau_my',
     teamCount:16, groups:4, advancePerGroup:2,
     knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
-    pointsWin:400, pointsLose:80,
+    pointsWin:1200, pointsLose:240,
   },
   afcon: {
     id:'afcon', name:'CAN', icon:'🌍', region:'chau_phi',
     teamCount:16, groups:4, advancePerGroup:2,
     knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
-    pointsWin:400, pointsLose:80,
+    pointsWin:1200, pointsLose:240,
   },
   asiancup: {
     id:'asiancup', name:'AFC', icon:'🌏', region:'chau_a',
     teamCount:16, groups:4, advancePerGroup:2,
     knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
-    pointsWin:400, pointsLose:80,
+    pointsWin:1200, pointsLose:240,
   },
 };
 export const CUP_TOURNAMENTS = Object.values(TOURNAMENT_CONFIGS);
@@ -164,11 +164,11 @@ export const CUP_TOURNAMENTS = Object.values(TOURNAMENT_CONFIGS);
 // LEAGUE CONFIGURATIONS (5 giải)
 // ============================
 export const LEAGUE_CONFIGS = {
-  world: { id:'world', name:'World', icon:'🌐', region:null, teamCount:8, pointsWin:200, pointsDraw:80, pointsLose:50 },
-  eu: { id:'eu', name:'EU', icon:'🇪🇺', region:'chau_eu', teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40 },
-  copa: { id:'copa', name:'America', icon:'🌎', region:'chau_my', teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40 },
-  africa: { id:'africa', name:'African', icon:'🌍', region:'chau_phi', teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40 },
-  asia: { id:'asia', name:'Asian', icon:'🌏', region:'chau_a', teamCount:8, pointsWin:180, pointsDraw:70, pointsLose:40 },
+  world: { id:'world', name:'World', icon:'🌐', region:null, teamCount:8, pointsWin:600, pointsDraw:240, pointsLose:150 },
+  eu: { id:'eu', name:'EU', icon:'🇪🇺', region:'chau_eu', teamCount:8, pointsWin:500, pointsDraw:200, pointsLose:120 },
+  copa: { id:'copa', name:'America', icon:'🌎', region:'chau_my', teamCount:8, pointsWin:500, pointsDraw:200, pointsLose:120 },
+  africa: { id:'africa', name:'African', icon:'🌍', region:'chau_phi', teamCount:8, pointsWin:500, pointsDraw:200, pointsLose:120 },
+  asia: { id:'asia', name:'Asian', icon:'🌏', region:'chau_a', teamCount:8, pointsWin:500, pointsDraw:200, pointsLose:120 },
 };
 export const LEAGUE_LIST = Object.values(LEAGUE_CONFIGS);
 
@@ -499,20 +499,50 @@ export async function renderShooterSprite(pose, kit, prefix){
 
 export const GK_POSITIONS = {
   'mid-stand':  { img: 'img/gk/gk-mid-stand.png', flip: false, scale: 1 },
+  'mid-center': { img: 'img/gk/gk-mid-mid.png',   flip: false, scale: 1 },
   'top-center': { img: 'img/gk/gk-mid-high.png',  flip: false, scale: 1.15, offsetY: 14 },
   'bot-center': { img: 'img/gk/gk-mid-low.png',   flip: false, scale: 1 },
   'mid-left':   { img: 'img/gk/gk-left-mid.png',  flip: false, scale: 1 },
   'top-left':   { img: 'img/gk/gk-left-high.png', flip: false, scale: 1 },
-  'bot-left':   { img: 'img/gk/gk-left-mid.png',  flip: false, scale: 1 },
+  'bot-left':   { img: 'img/gk/gk-left-low.png',  flip: false, scale: 1 },
   'mid-right':  { img: 'img/gk/gk-left-mid.png',  flip: true,  scale: 1 },
   'top-right':  { img: 'img/gk/gk-left-high.png', flip: true,  scale: 1 },
-  'bot-right':  { img: 'img/gk/gk-left-mid.png',  flip: true,  scale: 1 },
+  'bot-right':  { img: 'img/gk/gk-left-low.png',  flip: true,  scale: 1 },
 };
 export function applyKeeperSprite(keeper, zone){
   const pos = GK_POSITIONS[zone] || GK_POSITIONS['mid-stand'];
   keeper.src = pos.img;
   keeper.dataset.flip = pos.flip ? '1' : '0';
   keeper.style.setProperty('--gk-scale', pos.scale ?? 1);
+}
+
+// Nhuộm màu áo thủ môn theo màu đội đang PHÒNG NGỰ, bằng CSS filter (không cần
+// vẽ thêm lớp mask riêng cho áo — đổi lại: tóc/da cũng bị ám màu nhẹ theo filter,
+// đây là đánh đổi đã chọn để làm nhanh, không cần thêm asset).
+const _gkTintCache = {};
+export async function applyKeeperKit(keeper, countryCode){
+  if(!keeper || !countryCode) return;
+  if(_gkTintCache[countryCode]){ keeper.style.setProperty('--gk-tint', _gkTintCache[countryCode]); return; }
+  const { primary } = await getFlagColors(countryCode);
+  const { r, g, b } = _hexToRgb(primary);
+  const [h, s, l] = _rgbToHsl(r, g, b);
+  let filterStr;
+  // Trắng/rất sáng hoặc gần như không màu (s thấp) → giữ nguyên áo trắng gốc, không tint.
+  // Lưu ý: để rỗng chứ không phải 'none' — 'none' không hợp lệ khi ghép chung filter chain.
+  if(l > 0.85 || s < 0.12){
+    filterStr = '';
+  }else if(l < 0.14){
+    // Màu quá tối (đen) → chỉ hạ sáng nhẹ, tránh xám xịt mất chi tiết.
+    filterStr = 'brightness(0.8) saturate(1.1)';
+  }else{
+    // sepia() cho ảnh 1 tông nâu có độ bão hoà (áo trắng vốn s=0 không tint được
+    // trực tiếp bằng hue-rotate) → hue-rotate xoay từ tông nâu sepia (~30deg) sang
+    // đúng hue của màu đội → saturate/brightness chỉnh lại cường độ.
+    const rotate = Math.round(h - 30);
+    filterStr = `sepia(0.85) saturate(3.2) hue-rotate(${rotate}deg) brightness(${l<0.35?0.85:1})`;
+  }
+  _gkTintCache[countryCode] = filterStr;
+  keeper.style.setProperty('--gk-tint', filterStr);
 }
 
 // ============================

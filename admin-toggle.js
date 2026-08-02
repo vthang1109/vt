@@ -1044,16 +1044,12 @@ window.__ADMIN_GAME_HACKS = [];
                     document.getElementById('mpCardStatus').textContent = '🗑️ Đã xoá ' + rm.v + rm.s;
                     return;
                   }
-                  // Xoá khỏi Firestore
+                  // Xoá khỏi Firestore (arrayRemove — atomic, không cần getDoc trước)
                   try {
-                    const sn = await _mpFs.getDoc(_mpRoomRef);
-                    if (!sn.exists()) return;
-                    const gs2 = sn.data().gameState || {};
-                    const cur = gs2.preselectedCards?.[_mpMyUid] || [];
-                    if (idx >= cur.length) return;
-                    const rm = cur[idx];
-                    const upd = [...cur]; upd.splice(idx, 1);
-                    await _mpFs.updateDoc(_mpRoomRef, { ['gameState.preselectedCards.' + _mpMyUid]: upd });
+                    if (idx >= myInitialCards.length) return;
+                    const rm = myInitialCards[idx];
+                    const upd = [...myInitialCards]; upd.splice(idx, 1);
+                    await _mpFs.updateDoc(_mpRoomRef, { ['gameState.preselectedCards.' + _mpMyUid]: _mpFs.arrayRemove(rm) });
                     myInitialCards = upd;
                     usedCards.delete(rm.v + rm.s);
                     renderInitialHand();
@@ -1117,14 +1113,10 @@ window.__ADMIN_GAME_HACKS = [];
                     return;
                   }
                   try {
-                    const sn = await _mpFs.getDoc(_mpRoomRef);
-                    if (!sn.exists()) return;
-                    const gs2 = sn.data().gameState || {};
-                    const cur = gs2.preselectedHitCards?.[_mpMyUid] || [];
-                    if (idx >= cur.length) return;
-                    const rm = cur[idx];
-                    const upd = [...cur]; upd.splice(idx, 1);
-                    await _mpFs.updateDoc(_mpRoomRef, { ['gameState.preselectedHitCards.' + _mpMyUid]: upd });
+                    if (idx >= myHitCards.length) return;
+                    const rm = myHitCards[idx];
+                    const upd = [...myHitCards]; upd.splice(idx, 1);
+                    await _mpFs.updateDoc(_mpRoomRef, { ['gameState.preselectedHitCards.' + _mpMyUid]: _mpFs.arrayRemove(rm) });
                     myHitCards = upd;
                     window.__vt_hitCards = upd;
                     usedCards.delete(rm.v + rm.s);
@@ -1215,13 +1207,9 @@ window.__ADMIN_GAME_HACKS = [];
             document.getElementById('mpHitConfirm')?.addEventListener('click', async () => {
               if (pendingHitCards.length === 0) return;
               try {
-                const snap = await _mpFs.getDoc(_mpRoomRef);
-                if (!snap.exists()) return;
-                const gs2 = snap.data().gameState || {};
-                const currentList = gs2.preselectedHitCards?.[_mpMyUid] || [];
-                const newList = [...currentList, ...pendingHitCards];
+                const newList = [...myHitCards, ...pendingHitCards];
                 await _mpFs.updateDoc(_mpRoomRef, {
-                  ['gameState.preselectedHitCards.' + _mpMyUid]: newList
+                  ['gameState.preselectedHitCards.' + _mpMyUid]: _mpFs.arrayUnion(...pendingHitCards)
                 });
                 myHitCards = newList;
                 window.__vt_hitCards = newList;
