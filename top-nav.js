@@ -28,6 +28,15 @@ window.TopNav = (() => {
     : '';
   const LOGO_SRC = _basePath + 'logo.png';
 
+  // Đường dẫn điều hướng được giải theo thư mục chứa top-nav.js (thay cho đường
+  // dẫn tuyệt đối "/..." gây 404 khi trang được host trong thư mục con / subdomain
+  // hoặc GitHub Pages project site). Dùng document.baseURI làm fallback an toàn.
+  const navHref = (path) => new URL(path, _basePath || document.baseURI).href;
+  const NAV_HOME     = navHref('index.html');
+  const NAV_SETTINGS = navHref('app/settings.html');
+  const NAV_PROFILE  = navHref('app/profile.html');
+  const NAV_ROOMS    = navHref('app/rooms.html');
+
   async function listenBalance() {
     try {
       // Dùng _basePath (thư mục chứa top-nav.js) để import đúng từ mọi thư mục con
@@ -430,7 +439,7 @@ window.TopNav = (() => {
     const isMpGame = new URLSearchParams(location.search).has('room');
     return `
       <div class="vt-top-nav" id="vtTopNav">
-        <a class="vt-nav-logo" href="/index.html">
+        <a class="vt-nav-logo" href="${NAV_HOME}">
           <span class="vt-logo-content" id="vtLogoContent" style="${isMpGame ? 'display:none' : ''}"><img src="${LOGO_SRC}" alt="logo"><span class="logo-vt">VT</span><span class="logo-world">World</span></span>
           <span class="vt-room-id${isMpGame ? ' visible' : ''}" id="vtRoomId"></span>
         </a>
@@ -445,7 +454,7 @@ window.TopNav = (() => {
         <button class="vt-dd-action back-btn" onclick="history.back()">
           <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" fill="currentColor"><path d="M256 64c-56.8 0-107.9 24.7-143.1 64l47.1 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 192c-17.7 0-32-14.3-32-32L0 32C0 14.3 14.3 0 32 0S64 14.3 64 32l0 54.7C110.9 33.6 179.5 0 256 0 397.4 0 512 114.6 512 256S397.4 512 256 512c-87 0-163.9-43.4-210.1-109.7-10.1-14.5-6.6-34.4 7.9-44.6s34.4-6.6 44.6 7.9c34.8 49.8 92.4 82.3 157.6 82.3 106 0 192-86 192-192S362 64 256 64z"/></svg></span> Quay lại
         </button>
-        <button class="vt-dd-action settings-btn" onclick="window.location.href='/app/settings.html'">
+        <button class="vt-dd-action settings-btn" onclick="window.location.href='${NAV_SETTINGS}'">
           <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" fill="currentColor"><path d="M195.1 9.5C198.1-5.3 211.2-16 226.4-16l59.8 0c15.2 0 28.3 10.7 31.3 25.5L332 79.5c14.1 6 27.3 13.7 39.3 22.8l67.8-22.5c14.4-4.8 30.2 1.2 37.8 14.4l29.9 51.8c7.6 13.2 4.9 29.8-6.5 39.9L447 233.3c.9 7.4 1.3 15 1.3 22.7s-.5 15.3-1.3 22.7l53.4 47.5c11.4 10.1 14 26.8 6.5 39.9l-29.9 51.8c-7.6 13.1-23.4 19.2-37.8 14.4l-67.8-22.5c-12.1 9.1-25.3 16.7-39.3 22.8l-14.4 69.9c-3.1 14.9-16.2 25.5-31.3 25.5l-59.8 0c-15.2 0-28.3-10.7-31.3-25.5l-14.4-69.9c-14.1-6-27.2-13.7-39.3-22.8L73.5 432.3c-14.4 4.8-30.2-1.2-37.8-14.4L5.8 366.1c-7.6-13.2-4.9-29.8 6.5-39.9l53.4-47.5c-.9-7.4-1.3-15-1.3-22.7s.5-15.3 1.3-22.7L12.3 185.8c-11.4-10.1-14-26.8-6.5-39.9L35.7 94.1c7.6-13.2 23.4-19.2 37.8-14.4l67.8 22.5c12.1-9.1 25.3-16.7 39.3-22.8L195.1 9.5zM256.3 336a80 80 0 1 0 -.6-160 80 80 0 1 0 .6 160z"/></svg></span> Cài đặt
         </button>
         <button class="vt-dd-action room-settings-btn" id="vtDdRoomSettings">
@@ -507,7 +516,7 @@ window.TopNav = (() => {
         if (typeof window.showPage === 'function') {
           window.showPage('login');
         } else {
-          window.location.href = '/index.html';
+          window.location.href = NAV_HOME;
         }
       });
     }
@@ -516,7 +525,7 @@ window.TopNav = (() => {
       profileBtn.addEventListener('click', () => {
         dd.classList.remove('open');
         btn.classList.remove('open');
-        window.location.href = '/app/profile.html';
+        window.location.href = NAV_PROFILE;
       });
     }
     
@@ -540,7 +549,7 @@ window.TopNav = (() => {
             }
           } catch(e) {}
           await signOut(auth);
-          window.location.href = '/index.html';
+          window.location.href = NAV_HOME;
         } catch(e) {
           console.error('Logout failed:', e);
           alert('Đăng xuất thất bại!');
@@ -563,7 +572,7 @@ window.TopNav = (() => {
           dd.classList.remove('open');
           btn.classList.remove('open');
           window.__navigated = true;
-          window.location.href = '/app/rooms.html';
+          window.location.href = NAV_ROOMS;
         };
       }
       const settingsBtn = document.getElementById('vtDdRoomSettings');

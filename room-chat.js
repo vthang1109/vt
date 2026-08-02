@@ -8,6 +8,11 @@
 // ============================================================
 import { collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// Đường dẫn điều hướng được giải theo thư mục chứa room-chat.js (root project),
+// thay cho đường dẫn tuyệt đối "/app/..." gây 404 khi host trong thư mục con.
+const ROOM_CHAT_BASE = new URL('.', import.meta.url).href;
+const ROOMS_HREF = new URL('app/rooms.html', ROOM_CHAT_BASE).href;
+
 let _chatUnsub = null;
 let _roomUnsub = null;
 let _prevMembers = [];
@@ -459,7 +464,7 @@ export function showRoomDeletedPopup() {
       <div style="font-size:44px;margin-bottom:10px">🗑️</div>
       <div style="color:#e0f2fe;font-weight:700;font-size:20px;margin-bottom:8px">Phòng đã bị xoá</div>
       <div style="color:#94a3b8;font-size:14px;margin-bottom:20px;line-height:1.4">Phòng này đã bị chủ phòng xoá hoặc đã hết hạn.</div>
-      <button onclick="window.location.href='/app/rooms.html'" style="padding:10px 28px;border-radius:10px;border:none;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(124,58,237,.4);transition:transform .15s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">✕ Đóng</button>
+      <button onclick="window.location.href='${ROOMS_HREF}'" style="padding:10px 28px;border-radius:10px;border:none;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(124,58,237,.4);transition:transform .15s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">✕ Đóng</button>
     </div>`;
   document.body.appendChild(overlay);
 }
