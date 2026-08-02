@@ -498,16 +498,16 @@ export async function renderShooterSprite(pose, kit, prefix){
 }
 
 export const GK_POSITIONS = {
-  'mid-stand':  { img: 'img/gk/gk-mid-stand.png', flip: false, scale: 1 },
-  'mid-center': { img: 'img/gk/gk-mid-mid.png',   flip: false, scale: 1 },
-  'top-center': { img: 'img/gk/gk-mid-high.png',  flip: false, scale: 1.15, offsetY: 14 },
-  'bot-center': { img: 'img/gk/gk-mid-low.png',   flip: false, scale: 1 },
-  'mid-left':   { img: 'img/gk/gk-left-mid.png',  flip: false, scale: 1 },
-  'top-left':   { img: 'img/gk/gk-left-high.png', flip: false, scale: 1 },
-  'bot-left':   { img: 'img/gk/gk-left-low.png',  flip: false, scale: 1 },
-  'mid-right':  { img: 'img/gk/gk-left-mid.png',  flip: true,  scale: 1 },
-  'top-right':  { img: 'img/gk/gk-left-high.png', flip: true,  scale: 1 },
-  'bot-right':  { img: 'img/gk/gk-left-low.png',  flip: true,  scale: 1 },
+  'mid-stand':  { img: 'img/gk/gk-mid-stand.webp', flip: false, scale: 1 },
+  'mid-center': { img: 'img/gk/gk-mid-mid.webp',   flip: false, scale: 1 },
+  'top-center': { img: 'img/gk/gk-mid-high.webp',  flip: false, scale: 1.15, offsetY: 14 },
+  'bot-center': { img: 'img/gk/gk-mid-low.webp',   flip: false, scale: 1 },
+  'mid-left':   { img: 'img/gk/gk-left-mid.webp',  flip: false, scale: 1 },
+  'top-left':   { img: 'img/gk/gk-left-high.webp', flip: false, scale: 1 },
+  'bot-left':   { img: 'img/gk/gk-left-low.webp',  flip: false, scale: 1 },
+  'mid-right':  { img: 'img/gk/gk-left-mid.webp',  flip: true,  scale: 1 },
+  'top-right':  { img: 'img/gk/gk-left-high.webp', flip: true,  scale: 1 },
+  'bot-right':  { img: 'img/gk/gk-left-low.webp',  flip: true,  scale: 1 },
 };
 export function applyKeeperSprite(keeper, zone){
   const pos = GK_POSITIONS[zone] || GK_POSITIONS['mid-stand'];
