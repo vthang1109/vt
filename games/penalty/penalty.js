@@ -2878,9 +2878,17 @@ export class PenaltyGame {
     requestAnimationFrame(step);
   }
 
+  // Thủ môn thuộc đội KHÔNG sút ở lượt hiện tại → dùng màu đội đó để nhuộm áo GK.
+  _defendingCountryCode(){
+    return this.state.currentShooter==='player'
+      ? (this.state.aiCountry && this.state.aiCountry.code)
+      : (this.state.playerCountry && this.state.playerCountry.code);
+  }
+
   _keeperDive(zone,cls,flightMs){
     const keeper=document.getElementById('pt-keeper');
     applyKeeperSprite(keeper,zone);
+    applyKeeperKit(keeper, zone, this._defendingCountryCode());
     keeper.style.setProperty('--flip',keeper.dataset.flip==='1'?-1:1);
     const keeperMs=(flightMs||900)*1.5;
     keeper.style.setProperty('--dive-ms',keeperMs+'ms');
@@ -2922,11 +2930,7 @@ export class PenaltyGame {
     // Giờ mới xoá class — transition sẽ animate từ vị trí đang bay về giữa
     k.classList.remove('diving','save');
     applyKeeperSprite(k,'mid-stand');
-    // Thủ môn thuộc đội KHÔNG sút ở lượt hiện tại → lấy màu đội đó để nhuộm áo GK.
-    const defendingCode = this.state.currentShooter==='player'
-      ? (this.state.aiCountry && this.state.aiCountry.code)
-      : (this.state.playerCountry && this.state.playerCountry.code);
-    if(defendingCode) applyKeeperKit(k, defendingCode);
+    applyKeeperKit(k, 'mid-stand', this._defendingCountryCode());
     k.style.setProperty('--flip',1);
     k.style.transform='translate(0,0) scale(var(--gk-scale,1))';
     k.style.setProperty('--dx','0px');k.style.setProperty('--dy','0px');

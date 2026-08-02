@@ -516,33 +516,66 @@ export function applyKeeperSprite(keeper, zone){
   keeper.style.setProperty('--gk-scale', pos.scale ?? 1);
 }
 
-// Nhuộm màu áo thủ môn theo màu đội đang PHÒNG NGỰ, bằng CSS filter (không cần
-// vẽ thêm lớp mask riêng cho áo — đổi lại: tóc/da cũng bị ám màu nhẹ theo filter,
-// đây là đánh đổi đã chọn để làm nhanh, không cần thêm asset).
-const _gkTintCache = {};
-export async function applyKeeperKit(keeper, countryCode){
-  if(!keeper || !countryCode) return;
-  if(_gkTintCache[countryCode]){ keeper.style.setProperty('--gk-tint', _gkTintCache[countryCode]); return; }
+// Nhuộm ÁO thủ môn theo màu đội đang PHÒNG NGỰ — chỉ tác động đúng những pixel
+// TRẮNG trong ảnh (áo/quần/tất/tóc trắng), da/má hồng/viền đen/giày/dây găng đen
+// giữ nguyên 100% vì không phải màu trắng. Kết quả được vẽ ra canvas 1 lần rồi
+// cache theo (ảnh gốc + màu đội) để các lần sau set src tức thì, không phải tính lại.
+const _gkTintSrcCache = {};
+function _gkColorizeWhite(img, hex){
+  const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+  const canvas = document.createElement('canvas'); canvas.width=w; canvas.height=h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img,0,0,w,h);
+  let imgData;
+  try{ imgData = ctx.getImageData(0,0,w,h); } catch(e){ return null; }
+  const d = imgData.data;
+  const { r:tr, g:tg, b:tb } = _hexToRgb(hex);
+  const [th, ts, targetL] = _rgbToHsl(tr,tg,tb);
+  const tsBoost = Math.min(1, ts*1.15);
+  for(let i=0;i<d.length;i+=4){
+    const a = d[i+3];
+    if(a<10) continue;
+    const r=d[i], g=d[i+1], b=d[i+2];
+    const maxc=Math.max(r,g,b), minc=Math.min(r,g,b);
+    const val = maxc/255;
+    const sat = maxc>0 ? (maxc-minc)/maxc : 0;
+    // "Trắng" = vừa sáng (val cao) vừa gần như không màu (sat thấp). Ngưỡng siết
+    // rất chặt (val>0.78, sat<0.12) để chỉ bắt đúng vải trắng, không dính da/găng/bóng.
+    let wv = Math.max(0, Math.min(1,(val-0.78)/0.22));
+    let ws = Math.max(0, Math.min(1,(0.12-sat)/0.12));
+    wv = wv*wv*(3-2*wv); ws = ws*ws*(3-2*ws);
+    const whiteness = wv*ws;
+    if(whiteness<=0.12) continue;
+    const [,,bl] = _rgbToHsl(r,g,b);
+    // Màu đặc, ít ăn theo bóng đổ gốc — chỉ giữ chút sắc thái nếp gấp nhẹ.
+    let outL = targetL + (bl-0.85)*0.18;
+    outL = Math.max(targetL-0.08, Math.min(targetL+0.08, outL));
+    const [nr,ng,nb] = _hslToRgb(th, tsBoost, outL);
+    d[i]   = Math.round(r + (nr-r)*whiteness);
+    d[i+1] = Math.round(g + (ng-g)*whiteness);
+    d[i+2] = Math.round(b + (nb-b)*whiteness);
+  }
+  ctx.putImageData(imgData,0,0);
+  return canvas.toDataURL('image/png');
+}
+export async function applyKeeperKit(keeper, zone, countryCode){
+  if(!keeper) return;
+  const pos = GK_POSITIONS[zone] || GK_POSITIONS['mid-stand'];
+  if(!countryCode){ keeper.src = pos.img; return; }
   const { primary } = await getFlagColors(countryCode);
   const { r, g, b } = _hexToRgb(primary);
-  const [h, s, l] = _rgbToHsl(r, g, b);
-  let filterStr;
-  // Trắng/rất sáng hoặc gần như không màu (s thấp) → giữ nguyên áo trắng gốc, không tint.
-  // Lưu ý: để rỗng chứ không phải 'none' — 'none' không hợp lệ khi ghép chung filter chain.
-  if(l > 0.85 || s < 0.12){
-    filterStr = '';
-  }else if(l < 0.14){
-    // Màu quá tối (đen) → chỉ hạ sáng nhẹ, tránh xám xịt mất chi tiết.
-    filterStr = 'brightness(0.8) saturate(1.1)';
-  }else{
-    // sepia() cho ảnh 1 tông nâu có độ bão hoà (áo trắng vốn s=0 không tint được
-    // trực tiếp bằng hue-rotate) → hue-rotate xoay từ tông nâu sepia (~30deg) sang
-    // đúng hue của màu đội → saturate/brightness chỉnh lại cường độ.
-    const rotate = Math.round(h - 30);
-    filterStr = `sepia(0.85) saturate(3.2) hue-rotate(${rotate}deg) brightness(${l<0.35?0.85:1})`;
-  }
-  _gkTintCache[countryCode] = filterStr;
-  keeper.style.setProperty('--gk-tint', filterStr);
+  const [, s, l] = _rgbToHsl(r, g, b);
+  // Màu đội gần như trắng luôn (VD Iraq/UAE) → tint xong cũng không khác gì bản
+  // gốc, khỏi tốn công vẽ canvas, dùng luôn ảnh gốc.
+  if(l > 0.88 && s < 0.25){ keeper.src = pos.img; return; }
+  const cacheKey = pos.img+'|'+primary;
+  if(_gkTintSrcCache[cacheKey]){ keeper.src = _gkTintSrcCache[cacheKey]; return; }
+  const img = await _loadImg(pos.img);
+  if(!img){ keeper.src = pos.img; return; }
+  const url = _gkColorizeWhite(img, primary);
+  if(!url){ keeper.src = pos.img; return; }
+  _gkTintSrcCache[cacheKey] = url;
+  keeper.src = url;
 }
 
 // ============================
