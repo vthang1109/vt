@@ -322,6 +322,10 @@ export const HAIR_COLOR_PALETTE = [
 export function pickRandomHairColor(){
   return HAIR_COLOR_PALETTE[Math.floor(Math.random()*HAIR_COLOR_PALETTE.length)];
 }
+// Tóc CỐ ĐỊNH theo đội (thay vì random — hết lag cú sút đầu): đội nhà TRẮNG,
+// đối thủ ĐEN. Chỉ 2 màu nên mỗi pose nhuộm đúng 1 lần rồi cache vĩnh viễn.
+export const HAIR_HOME_HEX = '#f5f5f5';
+export const HAIR_AWAY_HEX = '#141414';
 
 export const JERSEY_SPECIAL_NUMBERS = [30, 80];
 export function randomJerseyNumber(){
@@ -440,7 +444,7 @@ export const _hairLayerCache = {};
 export async function _getSplitShooterLayers(pose, primaryHex, secondaryHex, hairHex, socksHex){
   secondaryHex = secondaryHex || primaryHex;
   socksHex = socksHex || secondaryHex;
-  hairHex = hairHex || pickRandomHairColor();
+  hairHex = hairHex || HAIR_HOME_HEX; // fallback cố định (trắng) — không random
   const poseData = await _getPoseData(pose);
   const p = SHOOTER_POSES[pose] || SHOOTER_POSES['mid-stand'];
   const fallback = {body:p.img, hair:'', shirt:'', shorts:'', socks:''};
@@ -558,54 +562,43 @@ function _gkColorizeWhite(img, hex){
   ctx.putImageData(imgData,0,0);
   return canvas.toDataURL('image/png');
 }
-export async function applyKeeperKit(keeper, zone, countryCode){
+// Để GIẢM LAG: không nhuộm thủ môn theo màu quốc gia nữa (vòng lặp từng pixel
+// getImageData + HSL + toDataURL rất nặng). Cố định chỉ 2 màu:
+// - side='home' (thủ môn đội nhà)  → ảnh gốc TRẮNG, không nhuộm, chi phí 0.
+// - side='away' (thủ môn đối thủ)  → nhuộm ĐEN đúng 1 lần, cache vĩnh viễn.
+const GK_BLACK_HEX = '#141414';
+export async function applyKeeperKit(keeper, zone, side){
   if(!keeper) return;
   const pos = GK_POSITIONS[zone] || GK_POSITIONS['mid-stand'];
-  if(!countryCode){ keeper.src = pos.img; return; }
-  const { primary } = await getFlagColors(countryCode);
-  const { r, g, b } = _hexToRgb(primary);
-  const [, s, l] = _rgbToHsl(r, g, b);
-  // Màu đội gần như trắng luôn (VD Iraq/UAE) → tint xong cũng không khác gì bản
-  // gốc, khỏi tốn công vẽ canvas, dùng luôn ảnh gốc.
-  if(l > 0.88 && s < 0.25){ keeper.src = pos.img; return; }
-  const cacheKey = pos.img+'|'+primary;
+  // Đội nhà (và fallback mặc định) → ảnh gốc trắng, không tốn công nhuộm
+  if(side !== 'away'){ keeper.src = pos.img; return; }
+  const cacheKey = pos.img+'|BLACK';
   if(_gkTintSrcCache[cacheKey]){ keeper.src = _gkTintSrcCache[cacheKey]; return; }
   const img = await _loadImg(pos.img);
   if(!img){ keeper.src = pos.img; return; }
-  const url = _gkColorizeWhite(img, primary);
+  const url = _gkColorizeWhite(img, GK_BLACK_HEX);
   if(!url){ keeper.src = pos.img; return; }
   _gkTintSrcCache[cacheKey] = url;
   keeper.src = url;
 }
 
-// Pre-warm: nhuộm áo thủ môn cho CẢ 2 đội ở MỌI tư thế bay ngay khi vào trận.
-// Vòng lặp xử lý từng pixel trên ảnh WebP (getImageData + HSL + toDataURL) chạy
-// ĐỒNG BỘ rất nặng — nếu để nó chạy lần đầu đúng lúc cú sút đang bay sẽ gây giật.
-// Gọi hàm này trước trận → _gkColorizeWhite chạy 1 lần, cache sẵn toàn bộ tư thế.
-export async function prewarmKeeperKit(countryCode){
-  if(!countryCode) return;
-  let primary;
-  try{
-    const kit = await getFlagColors(countryCode);
-    primary = kit && kit.primary;
-  }catch(e){ return; }
-  if(!primary) return;
-  const { r, g, b } = _hexToRgb(primary);
-  const [, s, l] = _rgbToHsl(r, g, b);
-  // Màu đội gần như trắng → dùng ảnh gốc, không cần tint (giống applyKeeperKit)
-  if(l > 0.88 && s < 0.25) return;
+// Pre-warm: nhuộm áo thủ môn MÀU ĐEN cố định cho MỌI tư thế bay đúng 1 lần rồi
+// cache vĩnh viễn. Đội nhà dùng ảnh gốc trắng nên không cần nhuộm. Chạy TRƯỚC
+// trận để vòng lặp pixel nặng (getImageData + HSL + toDataURL) không rơi vào lúc
+// cú sút đang bay gây giật. Không phụ thuộc đội/ quốc gia — luôn chỉ nhuộm đen.
+export async function prewarmKeeperKit(){
   const positions = Object.values(GK_POSITIONS);
   // Preload decode ảnh WebP trước (tránh decode lần đầu ngay lúc sút)
   for(const p of positions){
     try{ await _loadImg(p.img); }catch(e){}
   }
   for(const p of positions){
-    const cacheKey = p.img+'|'+primary;
+    const cacheKey = p.img+'|BLACK';
     if(_gkTintSrcCache[cacheKey]) continue;
     const img = await _loadImg(p.img);
     if(!img) continue;
     try{
-      const url = _gkColorizeWhite(img, primary);
+      const url = _gkColorizeWhite(img, GK_BLACK_HEX);
       if(url) _gkTintSrcCache[cacheKey] = url;
     }catch(e){}
   }

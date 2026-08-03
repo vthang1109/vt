@@ -12,7 +12,7 @@ import {
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import {
   getAllCountries, countryByCode, getFlagColors, _getSplitShooterLayers,
-  pickRandomHairColor, HAIR_COLOR_PALETTE, getTopCountries, shuffle, flagImg, abbr3,
+  HAIR_HOME_HEX, HAIR_AWAY_HEX, getTopCountries, shuffle, flagImg, abbr3,
   CUP_TOURNAMENTS, LEAGUE_LIST, buildRoundRobin, prewarmKeeperKit,
   getRegionCountries
 } from './penalty-countries.js';
@@ -257,32 +257,26 @@ class PenaltyMP extends PenaltyGame {
   _prefetchKits(){
     [this.state.playerCountry, this.state.aiCountry].forEach(team=>{
       if(!team) return;
-      // Lay mau toc deterministic TRUOC khi goi async de cache lam nong dung
-      // mau se render (khop voi lượt sút dau tien) khong phu thuoc thoi diem resolve.
-      const hair = this._pickShooterHair();
+      // Tóc cố định 2 màu (nhà trắng / khách đen) — pre-warm cả 2 cho cache nóng
+      // trước lượt sút đầu, không còn phụ thuộc random.
       getFlagColors(team.code).then(kit=>{
         if(!kit) return;
         ['mid-stand','kick','celebrate','disappoint'].forEach(pose=>{
-          _getSplitShooterLayers(pose, kit.primary, kit.secondary, hair, kit.socks).catch(()=>{});
+          [HAIR_HOME_HEX, HAIR_AWAY_HEX].forEach(hairHex=>{
+            _getSplitShooterLayers(pose, kit.primary, kit.secondary, hairHex, kit.socks).catch(()=>{});
+          });
         });
       });
       // Pre-warm áo thủ môn WebP cho cả 2 đội — tránh _gkColorizeWhite chạy
       // đồng bộ đúng lúc cú sút đang bay (nguyên nhân giật mỗi lượt sút).
-      prewarmKeeperKit(team.code).catch(()=>{});
+      prewarmKeeperKit().catch(()=>{});
     });
   }
 
-  // Màu tóc đồng bộ 2 bên: suy ra từ seq của gameState (2 client nhận cùng 1
-  // snapshot) thay vì random độc lập từng máy → cả host lẫn guest thấy cầu thủ
-  // cùng 1 màu tóc trong mọi lượt sút / màn kết quả.
+  // Màu tóc CỐ ĐỊNH theo đội — giống hệt SP nên 2 client luôn khớp không cần
+  // băm seq nữa: seed 0 = đội nhà (TRẮNG), seed 1 = đối thủ (ĐEN).
   _pickShooterHair(seed = 0){
-    const palette = HAIR_COLOR_PALETTE || [];
-    if(palette.length === 0) return pickRandomHairColor();
-    const seq = (this._gs && this._gs.seq) || 1;
-    // Băm nhẹ seq + seed: 2 client cùng nhận 1 snapshot → cùng màu tóc; seed
-    // tách riêng player vs AI (các nhân vật màn kết quả không dính chung màu).
-    const idx = (seq * 7 + 3 + (seed || 0) * 5) % palette.length;
-    return palette[idx];
+    return seed ? HAIR_AWAY_HEX : HAIR_HOME_HEX;
   }
 
   // ===== SETUP SCREEN =====

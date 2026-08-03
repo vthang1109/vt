@@ -1,6 +1,6 @@
 // ===================== PENALTY SHOOTOUT - CUP EDITION =====================
 import { auth, addPoints } from '../../points.js';
-import { COUNTRIES, FIFA_CODE3, abbr3, TOURNAMENT_CONFIGS, CUP_TOURNAMENTS, LEAGUE_CONFIGS, LEAGUE_LIST, buildRoundRobin, MODES, KIT_COLORS, flagColorCache, getFlagColors, applyTeamKit, SHOOTER_POSES, HAIR_COLOR_PALETTE, pickRandomHairColor, JERSEY_SPECIAL_NUMBERS, randomJerseyNumber, _shooterImgCache, _loadImg, _hexToRgb, _rgbToHsl, _hslToRgb, _poseDataCache, _getPoseData, _dyeMaskLayer, _bodyLayerCache, _teamLayerCache, _hairLayerCache, _getSplitShooterLayers, renderShooterSprite, GK_POSITIONS, applyKeeperSprite, applyKeeperKit, prewarmKeeperKit, shuffle, getAllCountries, getRegionCountries, countryByCode, getTopCountries, flagImg } from './penalty-countries.js';
+import { COUNTRIES, FIFA_CODE3, abbr3, TOURNAMENT_CONFIGS, CUP_TOURNAMENTS, LEAGUE_CONFIGS, LEAGUE_LIST, buildRoundRobin, MODES, KIT_COLORS, flagColorCache, getFlagColors, applyTeamKit, SHOOTER_POSES, HAIR_HOME_HEX, HAIR_AWAY_HEX, JERSEY_SPECIAL_NUMBERS, randomJerseyNumber, _shooterImgCache, _loadImg, _hexToRgb, _rgbToHsl, _hslToRgb, _poseDataCache, _getPoseData, _dyeMaskLayer, _bodyLayerCache, _teamLayerCache, _hairLayerCache, _getSplitShooterLayers, renderShooterSprite, GK_POSITIONS, applyKeeperSprite, applyKeeperKit, prewarmKeeperKit, shuffle, getAllCountries, getRegionCountries, countryByCode, getTopCountries, flagImg } from './penalty-countries.js';
 import { PT_EFFECTS, PT_EFFECTS_STORAGE_KEY, loadPenaltyEffects, savePenaltyEffects, simAIPenalty, orientMatchScore } from './penalty-effects.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -101,7 +101,26 @@ export class PenaltyGame {
       data.selected = [...this.state._effectSelected];
       savePenaltyEffects(data);
     }
+    // Pre-warm sớm toàn bộ ảnh sprite KHÔNG phụ thuộc đội tuyển (4 tư thế cầu
+    // thủ + thủ môn đen) ngay khi mở trang — không chờ đến lúc vào trận mới tải.
+    // MP: guest nhận snapshot phase 'shooting' đầu tiên là lúc phải tải + decode
+    // ~20 ảnh + vòng pixel nhuộm — chính là lý do "bên kia load trễ 3-5s sau khi
+    // host bắt đầu". Pre-warm từ constructor làm mọi ảnh đã nóng trong cache
+    // (_shooterImgCache/_poseDataCache/_gkTintSrcCache), vào trận chỉ còn nhuộm
+    // màu theo đội (nhanh hơn nhiều).
+    this._prewarmStaticAssets();
     this._init();
+  }
+
+  // Tải + decode trước ảnh sprite dùng chung cho MỌI trận đấu:
+  // - 4 tư thế cầu thủ (base + 4 mask) qua _getPoseData
+  // - 7 WebP thủ môn + nhuộm đen qua prewarmKeeperKit
+  // Fire-and-forget — mọi promise đều có .catch để không vỡ luồng khởi tạo.
+  _prewarmStaticAssets(){
+    Object.keys(SHOOTER_POSES).forEach(pose=>{
+      _getPoseData(pose).catch(()=>{});
+    });
+    prewarmKeeperKit().catch(()=>{});
   }
 
   _init() {
@@ -679,7 +698,7 @@ export class PenaltyGame {
     document.getElementById('pt-result-overlay').style.display='none';
   }
 
-  showMatch(opponent,label, context){
+  async showMatch(opponent,label, context){
     this.showScreen('pt-game');
     const mi=document.getElementById('pt-match-info');
     mi.style.display='';
@@ -694,25 +713,42 @@ export class PenaltyGame {
     this.state._matchLabel = label||'';
     getFlagColors(pc.code); getFlagColors(ac.code); // prefetch màu áo cho cả 2 đội, tránh chớp trắng ở lượt sút đầu
     // Làm nóng trước cache sprite cho các pose sẽ dùng lúc sút (kick/celebrate/
-    // disappoint) ngay khi vào trận, thay vì để việc tính pixel (nặng) rơi đúng
-    // vào lúc bắt đầu animation sút + thủ môn bay → đây là nguyên nhân chính
-    // gây giật hình ở 2 thời điểm đó.
+    // disappoint) — và giờ ĐỢI xong hẳn trước khi bắt đầu lượt 1, thay vì để
+    // decode WebP + vòng pixel nặng rơi đúng lúc bóng bay cú sút đầu (nguyên
+    // nhân "đứng đứng" ở cú sút đầu tiên trên máy yếu).
+    const prewarmJobs=[];
     [pc,ac].forEach(team=>{
       if(!team) return;
-      getFlagColors(team.code).then(kit=>{
+      prewarmJobs.push(getFlagColors(team.code).then(kit=>{
         if(!kit) return;
+        const poseJobs=[];
         ['mid-stand','kick','celebrate','disappoint'].forEach(pose=>{
-          _getSplitShooterLayers(pose, kit.primary, kit.secondary, pickRandomHairColor(), kit.socks).catch(()=>{});
+          // Tóc cố định 2 màu (nhà trắng / khách đen) → pre-warm cả 2, hết miss random.
+          [HAIR_HOME_HEX, HAIR_AWAY_HEX].forEach(hairHex=>{
+            poseJobs.push(_getSplitShooterLayers(pose, kit.primary, kit.secondary, hairHex, kit.socks).catch(()=>{}));
+          });
         });
-      });
-      // Pre-warm áo thủ môn WebP cho cả 2 đội — tránh _gkColorizeWhite (vòng lặp
-      // từng pixel đồng bộ) chạy đúng lúc cú sút đang bay gây giật.
-      prewarmKeeperKit(team.code).catch(()=>{});
+        return Promise.all(poseJobs);
+      }).catch(()=>{}));
     });
+    // Pre-warm áo thủ môn WebP — nhuộm ĐEN cố định 1 lần cho mọi tư thế bay (không
+    // phụ thuộc đội), tránh vòng lặp từng pixel đồng bộ (_gkColorizeWhite) chạy lúc
+    // bóng đang bay. Đội nhà dùng ảnh gốc trắng nên chỉ cần pre-warm đen 1 lần là đủ.
+    prewarmJobs.push(prewarmKeeperKit().catch(()=>{}));
     document.getElementById('pt-actions').style.display='none';
     document.getElementById('pt-match-done-btn').style.display='none';
     this.renderStatusBar();
     this._populateStandFlags([pc, ac]);
+    // Đợi toàn bộ pre-warm hoàn tất (tối đa 4s cho máy cực chậm/mạng treo) rồi
+    // mới bắt đầu lượt — mọi công việc nặng đã xong từ trước, cú sút đầu mượt.
+    // Khóa bấm zone trong lúc chờ (startRound() sẽ mở khóa lại) — nếu không,
+    // người chơi click vào pitch giữa khoảng chờ sẽ gọi playerShoot khi bóng/
+    // chân sút chưa được reset về vị trí.
+    this.state.shotLocked=true;
+    const matchPrewarmP = Promise.all(prewarmJobs);
+    // .catch để đề phòng 1 job pre-warm reject (dù mọi job đã có catch riêng) —
+    // nếu throw thì startRound() không chạy → shotLocked kẹt true, game đơ vĩnh viễn.
+    await Promise.race([matchPrewarmP, new Promise(r=>setTimeout(r,4000))]).catch(()=>{});
     this.startRound();
   }
 
@@ -1863,7 +1899,7 @@ export class PenaltyGame {
     box.style.display='';
   }
 
-  animateShot(zoneId,aiZone,isGoal,styleOverride){
+  async animateShot(zoneId,aiZone,isGoal,styleOverride){
     const zones=document.querySelectorAll('.pt-zone');
     zones.forEach(z=>z.classList.remove('zone-shot','zone-save','zone-goal','zone-keeper-save'));
     // Thủ môn (đội bạn) phản ứng trễ 1 nhịp sau khi bóng được sút
@@ -1871,6 +1907,9 @@ export class PenaltyGame {
     if(keeper){keeper.classList.remove('mine');keeper.classList.add('theirs');}
     // LowPerf: ép 'default' để keeper dive khớp thời gian bay của _animateBallToZone
     const _trailStyle=this._lowPerf?'default':(styleOverride||this._pickTrailStyle());
+    // Đợi pre-warm sprite (dye mask pixel nặng) hoàn tất TRƯỚC khi bóng bay —
+    // tránh lag cú sút đầu do _hairLayerCache miss màu tóc random.
+    await this._waitShotPrewarm();
     setTimeout(()=>this._keeperDive(aiZone,isGoal&&zoneId!==aiZone?'diving':'save',FLIGHT_MS_BY_STYLE[_trailStyle]||900), KEEPER_REACT_DELAY_MS);
     this._shooterKick();
     this._animateBallToZone(zoneId,()=>{
@@ -1892,7 +1931,7 @@ export class PenaltyGame {
     },'mine',_trailStyle);
   }
 
-  animateAIShot(zoneId,saveZone,isGoal,styleOverride){
+  async animateAIShot(zoneId,saveZone,isGoal,styleOverride){
     const zones=document.querySelectorAll('.pt-zone');
     zones.forEach(z=>z.classList.remove('zone-shot','zone-save','zone-goal','zone-keeper-save'));
     // Thủ môn (đội mình) phản ứng trễ 1 nhịp sau khi bóng được sút
@@ -1900,6 +1939,9 @@ export class PenaltyGame {
     if(keeper){keeper.classList.remove('theirs');keeper.classList.add('mine');}
     // LowPerf: ép 'default' để keeper dive khớp thời gian bay của _animateBallToZone
     const _trailStyle=this._lowPerf?'default':(styleOverride||this._pickTrailStyle());
+    // Đợi pre-warm sprite (dye mask pixel nặng) hoàn tất TRƯỚC khi bóng bay —
+    // tránh lag cú sút đầu do _hairLayerCache miss màu tóc random.
+    await this._waitShotPrewarm();
     setTimeout(()=>this._keeperDive(saveZone,isGoal?'diving':'save',FLIGHT_MS_BY_STYLE[_trailStyle]||900), KEEPER_REACT_DELAY_MS);
     this._shooterKick();
     this._animateBallToZone(zoneId,()=>{
@@ -2468,12 +2510,12 @@ export class PenaltyGame {
     return 'default';
   }
 
-  // Màu tóc cho cầu thủ đang sút — mặc định random. Lớp MP override để 2 client
-  // cùng suy ra 1 màu tóc (đồng bộ giữa 2 bên) dựa trên gameState đã sync.
-  // `seed` giúp các vị trí/cầu thủ khác nhau (vd: 2 nhân vật màn kết quả) có màu
-  // khác nhau dù cùng chung một lượt — lớp MP dùng seed trong phép băm.
+  // Màu tóc CỐ ĐỊNH theo đội — không random nữa: seed 0 = đội nhà (TRẮNG),
+  // seed 1 = đối thủ (ĐEN). Chỉ 2 màu nên _hairLayerCache nhuộm đúng 1 lần
+  // rồi cache vĩnh viễn → không còn miss màu tóc random lúc sút (hết lag đầu).
+  // Lớp MP override nhưng cũng chỉ trả 1 trong 2 màu này → 2 client luôn khớp.
   _pickShooterHair(seed){
-    return pickRandomHairColor();
+    return seed ? HAIR_AWAY_HEX : HAIR_HOME_HEX;
   }
 
   // Điều phối hiệu ứng bay theo đúng kiểu đã chọn cho cú sút hiện tại
@@ -3074,17 +3116,17 @@ export class PenaltyGame {
     requestAnimationFrame(step);
   }
 
-  // Thủ môn thuộc đội KHÔNG sút ở lượt hiện tại → dùng màu đội đó để nhuộm áo GK.
-  _defendingCountryCode(){
-    return this.state.currentShooter==='player'
-      ? (this.state.aiCountry && this.state.aiCountry.code)
-      : (this.state.playerCountry && this.state.playerCountry.code);
+  // Thủ môn thuộc đội KHÔNG sút ở lượt hiện tại.
+  // GIẢM LAG: không nhuộm theo quốc gia nữa — cố định 2 màu:
+  // đội nhà (player sút, đối thủ bắt) = 'away' → ĐEN; AI sút (đội nhà bắt) = 'home' → TRẮNG.
+  _defendingKeeperSide(){
+    return this.state.currentShooter==='player' ? 'away' : 'home';
   }
 
   _keeperDive(zone,cls,flightMs){
     const keeper=document.getElementById('pt-keeper');
     applyKeeperSprite(keeper,zone);
-    applyKeeperKit(keeper, zone, this._defendingCountryCode());
+    applyKeeperKit(keeper, zone, this._defendingKeeperSide());
     keeper.style.setProperty('--flip',keeper.dataset.flip==='1'?-1:1);
     const keeperMs=(flightMs||900)*1.5;
     keeper.style.setProperty('--dive-ms',keeperMs+'ms');
@@ -3126,7 +3168,7 @@ export class PenaltyGame {
     // Giờ mới xoá class — transition sẽ animate từ vị trí đang bay về giữa
     k.classList.remove('diving','save');
     applyKeeperSprite(k,'mid-stand');
-    applyKeeperKit(k, 'mid-stand', this._defendingCountryCode());
+    applyKeeperKit(k, 'mid-stand', this._defendingKeeperSide());
     k.style.setProperty('--flip',1);
     k.style.transform='translate(0,0) scale(var(--gk-scale,1))';
     k.style.setProperty('--dx','0px');k.style.setProperty('--dy','0px');
@@ -3186,29 +3228,43 @@ export class PenaltyGame {
       // Pre-warm kick/celebrate/disappoint với ĐÚNG màu tóc của cú sút này.
       // showMatch pre-warm dùng màu random khác → _hairLayerCache miss khi sút
       // → _dyeMaskLayer chạy pixel đồng bộ đúng lúc bóng bay (lag cú sút đầu).
-      this._prewarmShotPoses(kit);
+      // LƯU promise để animateShot AWAIT — đảm bảo dye xong trước khi bóng bay.
+      this._shotPrewarmP = this._prewarmShotPoses(kit);
       return;
     }
     // Chưa có cache: hiện ảnh gốc tạm trong lúc chờ tải màu cờ, TUYỆT ĐỐI
     // không dùng lại _shooterKit cũ (của đội trước đó) kẻo tô nhầm màu đội kia.
     renderShooterSprite('mid-stand', null);
-    getFlagColors(team.code).then((kitRaw)=>{
+    // Gán promise NGAY (không đợi resolve) → animateShot await sẽ chờ cả
+    // getFlagColors lẫn prewarm hoàn tất. Vá khe hở: đội không có trong KIT_COLORS
+    // nếu sút trước khi màu cờ resolve thì trước đây _shotPrewarmP undefined → vẫn lag.
+    this._shotPrewarmP = getFlagColors(team.code).then((kitRaw)=>{
       if(reqId!==this._shooterReq) return; // đội đang hiện đã đổi trong lúc chờ → bỏ kết quả cũ
       const kit = {...kitRaw, hair:hairHex};
       this.state._shooterKit = kit;
       if(this.state._shooterPose==='mid-stand') renderShooterSprite('mid-stand', kit);
-      this._prewarmShotPoses(kit);
+      return this._prewarmShotPoses(kit);
     });
   }
 
   // Làm nóng trước các pose sẽ dùng lúc sút (kick/celebrate/disappoint) với
   // ĐÚNG màu áo + màu tóc của lượt sút sắp diễn ra — tránh tính pixel đồng bộ
   // ngay giữa animation cú sút đầu tiên gây giật.
+  async _waitShotPrewarm(){
+    // Chờ pre-warm hoàn tất trước khi bóng bay, NHƯNG không bao giờ kẹt vĩnh viễn:
+    // nếu getFlagColors treo (mạng chậm, không timeout) thì sau 1.5s cú sút
+    // vẫn diễn ra bình thường — prewarm thất bại chỉ mất lợi ích chống lag, không block game.
+    try{ await Promise.race([this._shotPrewarmP||Promise.resolve(), new Promise(r=>setTimeout(r,1500))]); }catch(e){}
+  }
   _prewarmShotPoses(kit){
-    if(!kit) return;
-    ['kick','celebrate','disappoint'].forEach(pose=>{
-      _getSplitShooterLayers(pose, kit.primary, kit.secondary, kit.hair, kit.socks).catch(()=>{});
-    });
+    if(!kit) return Promise.resolve();
+    // Trả về Promise.all để animateShot có thể AWAIT — đảm bảo mọi tính toán
+    // pixel (dye mask) đã xong TRƯỚC khi bóng bay, không rơi vào giữa đường bay.
+    return Promise.all([
+      _getSplitShooterLayers('kick', kit.primary, kit.secondary, kit.hair, kit.socks).catch(()=>{}),
+      _getSplitShooterLayers('celebrate', kit.primary, kit.secondary, kit.hair, kit.socks).catch(()=>{}),
+      _getSplitShooterLayers('disappoint', kit.primary, kit.secondary, kit.hair, kit.socks).catch(()=>{}),
+    ]);
   }
 
   // ===== RENDER — Status Bar with 5-shot circles =====
