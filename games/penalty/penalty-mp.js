@@ -56,6 +56,8 @@ class PenaltyMP extends PenaltyGame {
     this.mpMatchContext = null;
 
     onAuthStateChanged(auth, async (u)=>{
+      // Đẩy trạng thái đăng nhập cho admin-toggle (nút admin hiện đúng trên mobile)
+      if(window.__VT_ADMIN_ONAUTH__){ try{ window.__VT_ADMIN_ONAUTH__(u); }catch(e){} }
       if(!u){ location.href='../../index.html'; return; }
       this.uid = u.uid;
       this.roomId = ROOM_ID;
@@ -1028,13 +1030,15 @@ class PenaltyMP extends PenaltyGame {
         const pts = (isWin ? (config.pointsWin||600) : (config.pointsLose||120)) * REWARD_BOOST;
         addPoints('Vt Football '+config.name, isWin?'Vô địch '+config.name:'Á quân '+config.name, pts).catch(()=>{});
         // Ghi lịch sử thành tích — Cúp kết thúc (dùng chung _estimateCupRank từ PenaltyGame)
+        // Bị loại vòng bảng (không vào knock-out) → result 'group', KHÔNG tính huy chương bạc
+        const _inKnockout = (rounds||[]).some(r=>r.matches.some(m=>(m.home===0||m.away===0)));
         this._recordHistory({
           ts: Date.now(),
           kind: 'tournament',
           mode: 'cup',
           mp: true,
-          result: isWin ? 'champion' : 'rank',
-          rank: this._estimateCupRank(rounds, isWin, finalMatch),
+          result: isWin ? 'champion' : (_inKnockout ? 'rank' : 'group'),
+          rank: isWin ? 1 : (_inKnockout ? this._estimateCupRank(rounds, isWin, finalMatch) : null),
           player: { code: this.state.playerCountry.code, name: this.state.playerCountry.name },
           label: config.name
         });

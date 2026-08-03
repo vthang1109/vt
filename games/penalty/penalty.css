@@ -3894,3 +3894,100 @@
 .pt-thb-d{color:#f8fafc;font-weight:700}
 .pt-thb-l{color:#f87171;font-weight:700}
 .pt-lt-gold, .pt-gt-gold{color:#fbbf24;font-weight:700}
+
+/* Các nút bật/tắt âm thanh + hiệu suất thấp đã gộp vào FAB (nút mũi tên ↑) — ẩn khỏi menu chính */
+#pt-lowperf-btn, #pt-sound-btn{ display: none; }
+
+/* ===== FAB — cụm nút tròn (cài đặt game / fullscreen / admin) ===== */
+.pt-fab{
+  position: fixed;
+  right: 14px;
+  bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+  z-index: 99998;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pt-fab-main{
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 1px solid rgba(56,189,248,0.35);
+  background: rgba(4,20,40,0.94);
+  color: #7dd3fc;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: all .25s;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  line-height: 1;
+}
+.pt-fab-main:hover{
+  border-color: rgba(56,189,248,0.6);
+  background: rgba(56,189,248,0.15);
+  transform: scale(1.1);
+}
+.pt-fab-main svg{ transition: transform .3s; }
+.pt-fab.open .pt-fab-main svg{ transform: rotate(180deg); }
+.pt-fab-btns{
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+  opacity: 0; transform: translateY(8px); pointer-events: none;
+  transition: all .22s;
+}
+.pt-fab.open .pt-fab-btns{ opacity: 1; transform: translateY(0); pointer-events: auto; }
+.pt-fab-btn{
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(8,13,28,0.95);
+  color: #e0f2fe; font-size: 17px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  transition: all .2s;
+  line-height: 1;
+}
+.pt-fab-btn:hover{ transform: scale(1.12); }
+.pt-fab-fs{ border-color: rgba(56,189,248,0.4); color: #7dd3fc; }
+.pt-fab-settings{ border-color: rgba(167,139,250,0.4); color: #c4b5fd; }
+.pt-fab-admin{ border-color: rgba(251,191,36,0.45); color: #fbbf24; }
+.pt-fab-panel{
+  position: fixed;
+  right: 14px;
+  bottom: calc(150px + env(safe-area-inset-bottom, 0px));
+  z-index: 99999;
+  background: rgba(8,13,28,0.98);
+  border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 14px;
+  min-width: 230px;
+  padding: 6px 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  transform: translateY(-6px) scale(.97); opacity: 0;
+  pointer-events: none;
+  transition: transform .18s ease, opacity .18s ease;
+}
+.pt-fab-panel.open{ transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+.pt-fab.panel-open .pt-fab-btns{ opacity: 0; transform: translateY(8px); pointer-events: none; }
+.pt-fab-row{
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 10px 14px;
+  background: none; border: none;
+  color: #e0f2fe; font-size: 13px;
+  cursor: pointer; font-family: inherit; text-align: left;
+  transition: background .15s;
+}
+.pt-fab-row:hover{ background: rgba(255,255,255,0.06); }
+.pt-fab-row .pt-fab-switch{ margin-left: auto; }
+.pt-fab-row-icon{ display: flex; align-items: center; color: inherit; opacity: .9; }
+.pt-fab-switch{
+  width: 38px; height: 21px; border-radius: 12px;
+  background: rgba(255,255,255,0.12);
+  position: relative; flex-shrink: 0;
+  transition: background .2s;
+}
+.pt-fab-knob{
+  position: absolute; top: 2px; left: 2px;
+  width: 17px; height: 17px; border-radius: 50%;
+  background: #fff;
+  transition: left .2s;
+}
+.pt-fab-row.on .pt-fab-switch{ background: #22c55e; }
+.pt-fab-row.on .pt-fab-knob{ left: 19px; }

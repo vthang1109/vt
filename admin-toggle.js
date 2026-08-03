@@ -696,28 +696,37 @@ window.__ADMIN_GAME_HACKS = [];
   }
 
   // ========== Auth check ==========
+  // Áp dụng trạng thái admin từ bất kỳ nguồn auth nào (dynamic import hoặc hook
+  // game tự đẩy) — tách riêng để cả 2 con đường dùng chung 1 logic.
+  function applyAdminState(user) {
+    if (user && user.email === ADMIN_EMAIL) {
+      _isAdmin = true;
+      if (btn) btn.classList.add('visible');
+      if (btn && popup) setForce(_currentForce);
+      // expose auth for debug
+      updateGameHacks();
+      registerMpAdminHack();
+    } else {
+      _isAdmin = false;
+      if (btn) btn.classList.remove('visible');
+      if (btn) btn.classList.remove('force-win', 'force-lose', 'auto-mode');
+      if (badge) badge.className = 'vt-admin-badge';
+      window.__ADMIN_FORCED_RESULT = null;
+      window.auth = null;
+      if (isAutoPlaying()) toggleAutoPlay();
+    }
+  }
+
+  // Hook cho game (penalty.js / penalty-mp.js) tự đẩy user vào — chắc chắn chạy
+  // trên mobile vì game vốn đã có onAuthStateChanged riêng (không phụ thuộc dynamic
+  // import của admin-toggle, vốn dễ fail/block trên mạng mobile).
+  window.__VT_ADMIN_ONAUTH__ = applyAdminState;
+
   function checkAdmin() {
     import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js').then(({ onAuthStateChanged }) => {
       import('../../points.js').then(({ auth }) => {
-        onAuthStateChanged(auth, (user) => {
-          if (user && user.email === ADMIN_EMAIL) {
-            _isAdmin = true;
-            btn.classList.add('visible');
-            setForce(_currentForce);
-            // expose auth for debug
-            window.auth = auth;
-            updateGameHacks();
-            registerMpAdminHack();
-          } else {
-            _isAdmin = false;
-            btn.classList.remove('visible');
-            btn.classList.remove('force-win', 'force-lose', 'auto-mode');
-            badge.className = 'vt-admin-badge';
-            window.__ADMIN_FORCED_RESULT = null;
-            window.auth = null;
-            if (isAutoPlaying()) toggleAutoPlay();
-          }
-        });
+        window.auth = auth;
+        onAuthStateChanged(auth, applyAdminState);
       });
     }).catch(e => {
       console.warn('Admin toggle: Auth not available', e);
@@ -820,7 +829,12 @@ window.__ADMIN_GAME_HACKS = [];
   // ── MP CARD PICKER HACK (chỉ cho xidach) ──────────────
   // Chỉ hiển thị với game xidach MP
   // Kết nối tới cùng Firestore instance của game (points.js) để tránh conflict
+  let _mpHackRegistered = false;
   function registerMpAdminHack() {
+    // Guard idempotent — applyAdminState có thể chạy 2 lần (hook game + dynamic
+    // import đều fire) → tránh push hack 'mp_admin' trùng lặp.
+    if (_mpHackRegistered) return;
+    _mpHackRegistered = true;
     const roomId = (typeof ROOM_ID !== 'undefined' && ROOM_ID)
       || new URLSearchParams(window.location.search).get('room');
     if (!roomId) return;

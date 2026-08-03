@@ -93,14 +93,14 @@ function _ac() {
   if (!_ctx) return null;
   if (_ctx.state === 'suspended') {
     try {
+      // iOS: resume() chỉ thành công trong user gesture. Nếu thất bại TUYỆT ĐỐI
+      // không recreate — context mới tạo ngoài gesture sẽ bị iOS khóa suspended
+      // vĩnh viễn (nguyên nhân "không bật được âm thanh" trên mobile). Cứ giữ
+      // context cũ, unlock listener (giữ vĩnh viễn bên dưới) sẽ resume lại ở
+      // lần chạm kế tiếp.
       const p = _ctx.resume();
-      // Chỉ gắn catch MỘT lần cho mỗi context — burst âm (vd _cheer ~6 giọng)
-      // không kích 23 recreate tuần tự; context mới tạo sẽ tự có cơ hội gắn lại.
-      if (p && p.catch && !_ctx._resumeWarned) {
-        _ctx._resumeWarned = true;
-        p.catch(() => { _recreate(); });
-      }
-    } catch (e) { _recreate(); }
+      if (p && p.catch) p.catch(() => {});
+    } catch (e) {}
   }
   return _ctx;
 }
@@ -310,14 +310,10 @@ export const sfx = {
 // Mở khóa AudioContext ngay khi người dùng tương tác lần đầu (iOS/autoplay
 // policy). Lắng nghe nhiều loại event để chắc chắn bắt được gesture đầu tiên.
 if (typeof window !== 'undefined') {
-  const unlockOnce = () => {
-    unlock();
-    window.removeEventListener('pointerdown', unlockOnce);
-    window.removeEventListener('touchstart', unlockOnce);
-    window.removeEventListener('mousedown', unlockOnce);
-    window.removeEventListener('click', unlockOnce);
-    window.removeEventListener('keydown', unlockOnce);
-  };
+  // Giữ listener VĨNH VIỄN (không gỡ sau lần đầu): iOS có thể suspend AudioContext
+  // bất kỳ lúc nào — mỗi lần chạm là một cơ hội resume lại trong user gesture.
+  // Chi phí ~0 khi context đã chạy bình thường (state !== 'suspended').
+  const unlockOnce = () => { unlock(); };
   window.addEventListener('pointerdown', unlockOnce);
   window.addEventListener('touchstart', unlockOnce);
   window.addEventListener('mousedown', unlockOnce);
@@ -444,6 +440,7 @@ export class PenaltyGame {
     if('requestIdleCallback' in window){ requestIdleCallback(runPrewarm, {timeout:1500}); }
     else{ setTimeout(runPrewarm, 60); }
     this._init();
+    this._initFab();
   }
 
   // Tải + decode trước ảnh sprite dùng chung cho MỌI trận đấu:
@@ -451,14 +448,27 @@ export class PenaltyGame {
   // - 7 WebP thủ môn + nhuộm đen qua prewarmKeeperKit
   // Fire-and-forget — mọi promise đều có .catch để không vỡ luồng khởi tạo.
   _prewarmStaticAssets(){
-    Object.keys(SHOOTER_POSES).forEach(pose=>{
-      _getPoseData(pose).catch(()=>{});
-    });
-    prewarmKeeperKit().catch(()=>{});
+    // Nạp TỪNG pose một (thay vì bắn tất cả cùng lúc) — mỗi pose nạp 5 ảnh + decode
+    // canvas rất nặng. Chia nhỏ và nhường main thread giữa các bước (idle callback)
+    // để máy yếu không bị đơ đúng lúc vào game — giảm lag khi chọn chế độ / bấm
+    // nút mũi tên / bật âm thanh ở những giây đầu tiên.
+    const poses = Object.keys(SHOOTER_POSES);
+    let i = 0;
+    const next = () => {
+      if(i >= poses.length){ prewarmKeeperKit().catch(()=>{}); return; }
+      const pose = poses[i++];
+      _getPoseData(pose).catch(()=>{}).then(()=>{
+        if('requestIdleCallback' in window) requestIdleCallback(next, {timeout:500});
+        else setTimeout(next, 60);
+      });
+    };
+    next();
   }
 
   _init() {
     onAuthStateChanged(auth, u=>{
+      // Đẩy trạng thái đăng nhập cho admin-toggle (nút admin hiện đúng trên mobile)
+      if(window.__VT_ADMIN_ONAUTH__){ try{ window.__VT_ADMIN_ONAUTH__(u); }catch(e){} }
       if(!u){location.href='../../index.html';return}
       this.renderModes(); this.renderTeamType(); this.renderTournaments(); this.renderLeagues(); this.renderFlags(); this.bindEvents(); this.showMenu();
     });
@@ -757,9 +767,10 @@ export class PenaltyGame {
     if(lpBtn) lpBtn.addEventListener('click',()=>this._toggleLowPerf());
     this._renderLowPerfToggle();
 
-    // Âm thanh bật/tắt
+    // Âm thanh bật/tắt — unlock() TRONG gesture của nút bấm để iOS tạo/resume
+    // AudioContext đúng lúc người dùng chạm (bắt buộc, nếu không sẽ câm lặng).
     const sndBtn=document.getElementById('pt-sound-btn');
-    if(sndBtn) sndBtn.addEventListener('click',()=>{ toggle(); sfx.click(); this._renderSoundToggle(); });
+    if(sndBtn) sndBtn.addEventListener('click',()=>{ unlock(); toggle(); sfx.click(); this._renderSoundToggle(); });
     this._renderSoundToggle();
 
     // Lịch sử thành tích
@@ -1075,7 +1086,7 @@ export class PenaltyGame {
     const date = d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'2-digit'}) + ' ' + d.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
     const modeIcon = e.mode==='cup' ? '🏆' : '📊';
     const isChamp = e.result==='champion';
-    const rankTxt = isChamp ? '🏆 Vô địch!' : (e.rank===2 ? '🥈 Hạng 2' : (e.rank===3 ? '🥉 Hạng 3' : 'Hạng '+(e.rank||'?')));
+    const rankTxt = isChamp ? '🏆 Vô địch!' : (e.result==='group' ? '❌ Bị loại vòng bảng' : (e.rank===2 ? '🥈 Hạng 2' : (e.rank===3 ? '🥉 Hạng 3' : 'Hạng '+(e.rank||'?'))));
     return `<div class="pt-hrow pt-hrow-tour ${isChamp?'pt-hrow-champ':''}">
       <div class="pt-hrow-icon">${modeIcon}</div>
       <div class="pt-hrow-main">
@@ -1958,13 +1969,14 @@ export class PenaltyGame {
     if (isWin) {
       //window.showToast(`🏆 Chức vô địch ${config.name} thuộc về ${flagImg(teams[0].code, teams[0].name)} ${teams[0].name}!`, 'success');
     }
-    // Ghi lịch sử thành tích: vô địch / á quân (hoặc hạng nếu không vào chung kết)
+    // Ghi lịch sử thành tích: vô địch / á quân / hạng (hoặc bị loại vòng bảng — không tính huy chương)
+    const _inKnockout = (rounds||[]).some(r=>r.matches.some(m=>(m.home===0||m.away===0)));
     this._recordHistory({
       ts: Date.now(),
       kind: 'tournament',
       mode: 'cup',
-      result: isWin ? 'champion' : 'rank',
-      rank: this._estimateCupRank(this.state.cupKnockoutRounds, isWin, finalMatch),
+      result: isWin ? 'champion' : (_inKnockout ? 'rank' : 'group'),
+      rank: isWin ? 1 : (_inKnockout ? this._estimateCupRank(this.state.cupKnockoutRounds, isWin, finalMatch) : null),
       player: { code: this.state.playerCountry.code, name: this.state.playerCountry.name },
       label: config.name
     });
@@ -2968,11 +2980,111 @@ export class PenaltyGame {
   _renderLowPerfToggle(){
     const btn = document.getElementById('pt-lowperf-btn');
     if(btn) btn.classList.toggle('on', !!this._lowPerf);
+    const row = document.getElementById('pt-fab-lowperf');
+    if(row) row.classList.toggle('on', !!this._lowPerf);
   }
 
   _renderSoundToggle(){
     const btn = document.getElementById('pt-sound-btn');
     if(btn) btn.classList.toggle('on', isOn());
+    const row = document.getElementById('pt-fab-sound');
+    if(row) row.classList.toggle('on', isOn());
+  }
+
+  // ===== FAB — cụm nút tròn (cài đặt game / fullscreen / admin) =====
+  // Nút chính hình mũi tên lên; bấm mở ra 3 nút tròn: Admin, Toàn màn hình, Cài đặt.
+  // Nút Cài đặt mở panel bật/tắt Chế độ hiệu suất thấp + Âm thanh.
+  _initFab(){
+    if(document.getElementById('pt-fab')) return;
+    const fab = document.createElement('div');
+    fab.id = 'pt-fab';
+    fab.className = 'pt-fab';
+    fab.innerHTML = `
+      <div class="pt-fab-btns">
+        <button class="pt-fab-btn pt-fab-admin" id="pt-fab-admin" title="Admin" aria-label="Admin">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+        </button>
+        <button class="pt-fab-btn pt-fab-fs" id="pt-fab-fs" title="Toàn màn hình" aria-label="Toàn màn hình">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+        </button>
+        <button class="pt-fab-btn pt-fab-settings" id="pt-fab-settings" title="Cài đặt game" aria-label="Cài đặt game">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        </button>
+      </div>
+      <button class="pt-fab-main" id="pt-fab-main" title="Công cụ" aria-label="Công cụ">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+      </button>
+      <div class="pt-fab-panel" id="pt-fab-panel">
+        <button class="pt-fab-row" id="pt-fab-lowperf">
+          <span class="pt-fab-row-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M20.38 8.57l-1.23 1.85a8 8 0 0 1-.22 7.58H5.07A8 8 0 0 1 15.58 6.85l1.85-1.23A10 10 0 0 0 3.35 19a2 2 0 0 0 1.72 1h13.85a2 2 0 0 0 1.74-1 10 10 0 0 0-.27-10.44zm-9.79 6.84a2 2 0 0 0 2.83 0l5.66-8.49-8.49 5.66a2 2 0 0 0 0 2.83z"/></svg></span>
+          <span>Chế độ hiệu suất thấp</span>
+          <span class="pt-fab-switch"><span class="pt-fab-knob"></span></span>
+        </button>
+        <button class="pt-fab-row" id="pt-fab-sound">
+          <span class="pt-fab-row-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></span>
+          <span>Âm thanh</span>
+          <span class="pt-fab-switch"><span class="pt-fab-knob"></span></span>
+        </button>
+      </div>
+    `;
+    document.body.appendChild(fab);
+    // Ẩn nút fullscreen + admin độc lập (đã gộp vào FAB)
+    const fsBtn = document.getElementById('vt-fs-btn');
+    if(fsBtn) fsBtn.style.display = 'none';
+    const adBtn = document.getElementById('vt-admin-btn');
+    if(adBtn) adBtn.style.display = 'none';
+
+    const main = document.getElementById('pt-fab-main');
+    const panel = document.getElementById('pt-fab-panel');
+    const adminBtn = document.getElementById('pt-fab-admin');
+    // Đóng FAB phải gỡ CẢ 'panel-open' — nếu không class này bị kẹt, CSS
+    // `.pt-fab.panel-open .pt-fab-btns{opacity:0}` sẽ giấu menu mãi dù đã mở lại
+    // (nguyên nhân "nút mũi tên lâu lâu bấm không hiện tab").
+    const closeFab = () => { fab.classList.remove('open'); panel.classList.remove('open'); fab.classList.remove('panel-open'); };
+    const syncAdmin = () => {
+      const real = document.getElementById('vt-admin-btn');
+      adminBtn.style.display = (real && real.classList.contains('visible')) ? '' : 'none';
+    };
+    syncAdmin();
+
+    main.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if(!fab.classList.contains('open')) syncAdmin();
+      fab.classList.toggle('open');
+      panel.classList.remove('open');
+      fab.classList.remove('panel-open');
+    });
+
+    document.getElementById('pt-fab-settings').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this._renderLowPerfToggle();
+      this._renderSoundToggle();
+      panel.classList.toggle('open');
+      fab.classList.toggle('panel-open', panel.classList.contains('open'));
+    });
+    document.getElementById('pt-fab-fs').addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeFab();
+      if(window.FS && window.FS.toggle) window.FS.toggle();
+    });
+    adminBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeFab();
+      const real = document.getElementById('vt-admin-btn');
+      if(real) real.click(); // bật/tắt popup admin
+    });
+    document.getElementById('pt-fab-lowperf').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this._toggleLowPerf();
+    });
+    document.getElementById('pt-fab-sound').addEventListener('click', (e) => {
+      e.stopPropagation();
+      unlock(); toggle(); sfx.click(); this._renderSoundToggle();
+    });
+    // Bấm ngoài FAB / popup admin → đóng
+    document.addEventListener('click', (e) => {
+      if(!e.target.closest('.pt-fab') && !e.target.closest('.vt-admin-popup')) closeFab();
+    });
   }
 
   // Chọn hiệu ứng cú sút — random từ danh sách đã chọn, fallback random toàn bộ
