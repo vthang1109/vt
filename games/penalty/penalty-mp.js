@@ -4,7 +4,7 @@
 // Cấu trúc: 2 người chơi cùng đội, 1 sút 1 bắt — vai cố định trong trận,
 // luân phiên sút/bắt giữa các trận đấu.
 // Tiến trình Cup/League được chủ phòng quản lý local, chỉ match state đồng bộ Firestore.
-import { PenaltyGame } from './penalty.js';
+import { PenaltyGame, simAIPenalty, orientMatchScore, sfx, toggle as soundToggle, REWARD_BOOST } from './penalty.js';
 import { auth, db, addPoints } from '../../points.js';
 import {
   doc, getDoc, updateDoc, deleteDoc, onSnapshot, arrayRemove
@@ -15,9 +15,8 @@ import {
   HAIR_HOME_HEX, HAIR_AWAY_HEX, getTopCountries, shuffle, flagImg, abbr3,
   CUP_TOURNAMENTS, LEAGUE_LIST, buildRoundRobin, prewarmKeeperKit,
   getRegionCountries, clubByCode, getAllClubs, getCupsByType, getLeaguesByType,
-  cupById, leagueById, CLUB_MAP
+  cupById, leagueById, clubCountry, CLUB_MAP
 } from './penalty-countries.js';
-import { simAIPenalty, orientMatchScore } from './penalty-effects.js';
 import { initRoomChat, getMyNickname, showRoomDeletedPopup } from '../../room-chat.js';
 
 const ROOM_ID = new URLSearchParams(location.search).get('room');
@@ -103,6 +102,11 @@ class PenaltyMP extends PenaltyGame {
     const lpBtn=document.getElementById('pt-lowperf-btn');
     if(lpBtn) lpBtn.addEventListener('click',()=>this._toggleLowPerf());
     this._renderLowPerfToggle();
+
+    // Âm thanh bật/tắt — kế thừa _renderSoundToggle từ cha
+    const sndBtn=document.getElementById('pt-sound-btn');
+    if(sndBtn) sndBtn.addEventListener('click',()=>{ soundToggle(); sfx.click(); this._renderSoundToggle(); });
+    this._renderSoundToggle();
 
     // Hiệu ứng cú sút — mỗi người chọn riêng từ modal (kế thừa PenaltyGame).
     // Client đang sút ghi shotEffect lên gameState → cả 2 bên animate cùng hiệu ứng.
@@ -587,8 +591,8 @@ class PenaltyMP extends PenaltyGame {
       // Thưởng CẢ 2 người khi giải kết thúc — mỗi client cộng điểm cho tài khoản của mình
       if(!this._mpLeagueRewarded){
         this._mpLeagueRewarded = true;
-        const pts = isWin ? (config.pointsWin||200) : (config.pointsLose||50);
-        addPoints('Penalty '+config.name, isWin?'Vô địch '+config.name:'Hết '+config.name, pts).catch(()=>{});
+        const pts = (isWin ? (config.pointsWin||200) : (config.pointsLose||50)) * REWARD_BOOST;
+        addPoints('Vt Football '+config.name, isWin?'Vô địch '+config.name:'Hết '+config.name, pts).catch(()=>{});
         // Ghi lịch sử thành tích — giải kết thúc
         this._recordHistory({
           ts: Date.now(),
@@ -618,7 +622,9 @@ class PenaltyMP extends PenaltyGame {
     this.mpMatchCount = 0; // giai moi — bat dau vai sut cho thanh vien dau
     this._mpCupRewarded = false; // giai moi — reset co cong diem
     const config = this.mpCupConfig || CUP_TOURNAMENTS[0];
-    const basePool = config.region ? getRegionCountries(config.region) : getAllCountries();
+    let basePool = config.region ? getRegionCountries(config.region) : getAllCountries();
+    if(config.country) basePool = basePool.filter(c=>clubCountry(c.code)===config.country);
+    if(config.rankMin!=null||config.rankMax!=null) basePool = basePool.filter(c=>(config.rankMin==null||c.rank>=config.rankMin)&&(config.rankMax==null||c.rank<=config.rankMax));
     // Dam bao doi minh thuoc khu vuc cua giai — neu chon nham thi tu dong doi
     // sang doi hop le trong khu vuc (khong cho doi ngoai khu vuc tham gia cup).
     if(!basePool.find(c=>c.code===pc.code)){
@@ -627,7 +633,9 @@ class PenaltyMP extends PenaltyGame {
       this._updateCountryPicker();
       window.showToast?.(`⚠️ Đội không tham gia ${config.name} — đã chọn ${pc.name}`, 'warn');
     }
-    const pool = shuffle(getTopCountries(basePool, config.teamCount - 1, pc.code));
+    // Pool xếp theo rank (bỏ shuffle) để chia hạt giống bên dưới
+    const pool = getTopCountries(basePool, config.teamCount - 1, pc.code)
+      .sort((a,b)=>(a.rank!=null?a.rank:999)-(b.rank!=null?b.rank:999));
     const numGroups = config.groups;
     const totalTeams = config.teamCount;
     const teamsPerGroup = Math.ceil(totalTeams / numGroups);
@@ -641,12 +649,26 @@ class PenaltyMP extends PenaltyGame {
     }
     this.mpCupTeams = teams;
     this.mpCupPhase = 'group';
+    // Xếp hạt giống (pot seeding) — mỗi bảng nhận 1 đội từ mỗi pot theo rank
+    const seeded = teams.map((t,i)=>({i, rank:(t&&t.rank!=null)?t.rank:999})).sort((a,b)=>a.rank-b.rank);
+    const groupAlloc = Array.from({length:numGroups},()=>[]);
+    const numPots = Math.ceil(seeded.length/numGroups);
+    for(let p=0;p<numPots;p++){
+      // Xáo nhẹ TRONG pot: vẫn đảm bảo mỗi bảng 1 đội mạnh từ mỗi pot (hạt giống),
+      // nhưng cặp đấu cụ thể thay đổi mỗi lần chơi (không lặp y hệt từng trận).
+      const pot=shuffle(seeded.slice(p*numGroups,(p+1)*numGroups));
+      pot.forEach((e,j)=>{ if(groupAlloc[(j+p)%numGroups].length<teamsPerGroup) groupAlloc[(j+p)%numGroups].push(e.i); });
+    }
+    seeded.forEach(e=>{
+      if(!groupAlloc.some(g=>g.includes(e.i))){
+        const g=groupAlloc.findIndex(x=>x.length<teamsPerGroup);
+        if(g>=0) groupAlloc[g].push(e.i);
+      }
+    });
     const groups = [];
-    let teamIdx = 0;
     const groupNames = 'ABCDEFGH'.split('');
     for(let g=0; g<numGroups; g++){
-      const groupTeams = [];
-      for(let t=0; t<teamsPerGroup && teamIdx<teams.length; t++){ groupTeams.push(teamIdx++); }
+      const groupTeams = groupAlloc[g];
       const roundFixtures = this._generateRoundRobinRounds(groupTeams);
       const matches = [];
       const rounds = [];
@@ -1003,8 +1025,8 @@ class PenaltyMP extends PenaltyGame {
           const winner = finalMatch.result[0] > finalMatch.result[1] ? finalMatch.home : finalMatch.away;
           isWin = winner === 0;
         }
-        const pts = isWin ? (config.pointsWin||500) : (config.pointsLose||100);
-        addPoints('Penalty '+config.name, isWin?'Vô địch '+config.name:'Á quân '+config.name, pts).catch(()=>{});
+        const pts = (isWin ? (config.pointsWin||600) : (config.pointsLose||120)) * REWARD_BOOST;
+        addPoints('Vt Football '+config.name, isWin?'Vô địch '+config.name:'Á quân '+config.name, pts).catch(()=>{});
         // Ghi lịch sử thành tích — Cúp kết thúc (dùng chung _estimateCupRank từ PenaltyGame)
         this._recordHistory({
           ts: Date.now(),
@@ -1523,8 +1545,8 @@ class PenaltyMP extends PenaltyGame {
     this._displayResultOverlay();
     // Giao hữu MP: thưởng CẢ 2 người như penalty 1 người — mỗi client cộng điểm cho tài khoản của mình
     if(this.mpMatchContext && this.mpMatchContext.type==='quick'){
-      const pts = isWin?150:isDraw?60:30;
-      addPoints('Penalty', isWin?'Thắng penalty':isDraw?'Hòa penalty':'Thua penalty', pts).catch(()=>{});
+      const pts = isWin?300:isDraw?120:60;
+      addPoints('Vt Football', isWin?'Thắng penalty':isDraw?'Hòa penalty':'Thua penalty', pts).catch(()=>{});
       if(window.VTQuests) window.VTQuests.trackPlay('penalty');
     }
     // NOT: saveProgress() — MP không dùng localStorage

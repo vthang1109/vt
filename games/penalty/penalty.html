@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>VTWorld — Penalty Shootout</title>
+  <title>VTWorld — Vt Football</title>
   <link rel="stylesheet" href="../../style.css"/>
   <link rel="stylesheet" href="../../status-bar.css"/>
   <link rel="stylesheet" href="penalty.css"/>
@@ -103,7 +103,7 @@
 
       <button class="pt-play-btn" id="pt-play-btn">
         <svg class="pt-play-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        <span>Đá Penalty!</span>
+        <span>Vt Football!</span>
       </button>
 
       <button class="pt-history-btn" id="pt-history-btn">📜 Lịch sử thành tích</button>
@@ -111,6 +111,12 @@
       <button class="pt-lowperf-btn" id="pt-lowperf-btn" title="Giảm hạt & bỏ đường bay SVG — mượt hơn trên máy yếu">
         <span class="pt-lowperf-icon">🐢</span>
         <span class="pt-lowperf-text">Chế độ hiệu suất thấp</span>
+        <span class="pt-lowperf-switch"><span class="pt-lowperf-knob"></span></span>
+      </button>
+
+      <button class="pt-lowperf-btn" id="pt-sound-btn" title="Bật/tắt âm thanh (sút, bàn thắng, còi, cổ động viên...)">
+        <span class="pt-lowperf-icon" id="pt-sound-icon">🔊</span>
+        <span class="pt-lowperf-text">Âm thanh</span>
         <span class="pt-lowperf-switch"><span class="pt-lowperf-knob"></span></span>
       </button>
     </div>
@@ -202,7 +208,7 @@
           <!-- Biển quảng cáo -->
           <div class="pt-billboard-strip" id="pt-billboard-strip">
             <div class="pt-billboard pt-bb-1">VTWORLD</div>
-            <div class="pt-billboard pt-bb-2">PENALTY CUP</div>
+            <div class="pt-billboard pt-bb-2">VT FOOTBALL CUP</div>
             <div class="pt-billboard pt-bb-3">⚽ LEAGUE 〄</div>
           </div>
 

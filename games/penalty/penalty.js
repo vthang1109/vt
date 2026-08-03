@@ -1,8 +1,329 @@
 // ===================== PENALTY SHOOTOUT - CUP EDITION =====================
 import { auth, addPoints } from '../../points.js';
-import { COUNTRIES, FIFA_CODE3, abbr3, CUP_TOURNAMENTS, LEAGUE_LIST, buildRoundRobin, MODES, KIT_COLORS, flagColorCache, getFlagColors, applyTeamKit, SHOOTER_POSES, HAIR_HOME_HEX, HAIR_AWAY_HEX, JERSEY_SPECIAL_NUMBERS, randomJerseyNumber, _shooterImgCache, _loadImg, _hexToRgb, _rgbToHsl, _hslToRgb, _poseDataCache, _getPoseData, _dyeMaskLayer, _bodyLayerCache, _teamLayerCache, _hairLayerCache, _getSplitShooterLayers, renderShooterSprite, GK_POSITIONS, applyKeeperSprite, applyKeeperKit, prewarmKeeperKit, shuffle, getAllCountries, getRegionCountries, countryByCode, getTopCountries, flagImg, CLUB_MAP, clubByCode, getAllClubs, teamFlagSrc, getCupsByType, getLeaguesByType, cupById, leagueById, CLUB_COUNTRIES, clubCountry } from './penalty-countries.js';
-import { PT_EFFECTS, PT_EFFECTS_STORAGE_KEY, loadPenaltyEffects, savePenaltyEffects, simAIPenalty, orientMatchScore } from './penalty-effects.js';
+import { COUNTRIES, abbr3, CUP_TOURNAMENTS, LEAGUE_LIST, buildRoundRobin, MODES, KIT_COLORS, flagColorCache, getFlagColors, SHOOTER_POSES, HAIR_HOME_HEX, HAIR_AWAY_HEX, randomJerseyNumber, _shooterImgCache, _poseDataCache, _getPoseData, _dyeMaskLayer, _hairLayerCache, _getSplitShooterLayers, renderShooterSprite, GK_POSITIONS, applyKeeperSprite, applyKeeperKit, prewarmKeeperKit, shuffle, getAllCountries, getRegionCountries, countryByCode, getTopCountries, flagImg, CLUB_MAP, clubByCode, getAllClubs, teamFlagSrc, getCupsByType, getLeaguesByType, cupById, leagueById, CLUB_COUNTRIES, clubCountry } from './penalty-countries.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+// ============================
+// DỮ LIỆU HIỆU ỨNG CÚ SÚT (gộp từ penalty-effects.js)
+// ============================
+export const PT_EFFECTS = [
+  { id:'default', name:'Mặc định', icon:'🕊️', desc:'Đường sút trắng nhạt, bay thẳng, nhẹ nhàng — không hiệu ứng', color:'#f8fafc', price:0 },
+  { id:'wind', name:'Gió', icon:'💨', desc:'Xoáy lốc cuốn bóng', color:'#38bdf8', price:3000 },
+  { id:'fire', name:'Lửa', icon:'🔥', desc:'Cháy bừng rực rỡ', color:'#f97316', price:3000 },
+  { id:'ice', name:'Băng', icon:'❄️', desc:'Băng giá lạnh lẽo', color:'#67e8f9', price:3000 },
+  { id:'leaf', name:'Lá', icon:'🍃', desc:'Lá cuốn theo cơn gió', color:'#84cc16', price:3000 },
+  { id:'rainbow', name:'Cầu vồng', icon:'🌈', desc:'Sắc màu rực rỡ', color:'#a78bfa', price:5000 },
+  { id:'dark', name:'Hắc ám', icon:'💀', desc:'Bóng tối bao trùm', color:'#1a0000', price:20000 },
+  { id:'thunder', name:'Sấm sét', icon:'⚡', desc:'Sét đánh rung trời', color:'#eab308', price:10000 },
+  { id:'light', name:'Ánh sáng', icon:'✨', desc:'Chói lòa không gian', color:'#fef08a', price:10000 },
+  { id:'clone', name:'Phân thân', icon:'👻', desc:'Bóng ma lập lòe', color:'#b48cfa', price:10000 },
+  { id:'butterfly', name:'Hoa sen', icon:'🪷', desc:'Cánh sen bay theo bóng', color:'#ec4899', price:12000 },
+  { id:'blackhole', name:'Hố đen', icon:'🕳️', desc:'Xuyên không qua hố đen', color:'#06b6d4', price:15000 },
+  { id:'dragon', name:'Rồng thiên', icon:'🐉', desc:'Rồng vàng lượn theo bóng, vảy rơi lấp lánh', color:'#f59e0b', price:25000 },
+];
+export const PT_EFFECTS_STORAGE_KEY = 'vt_penalty_effects';
+// Cache trong bộ nhớ — tránh localStorage.getItem + JSON.parse 5 lần/phiên
+// (constructor + các thao tác modal hiệu ứng). Mọi thay đổi đều đi qua
+// savePenaltyEffects nên cache luôn khớp với đĩa.
+let _effectsCache = null;
+export function loadPenaltyEffects(){
+  if(_effectsCache) return _effectsCache;
+  try{ const raw = localStorage.getItem(PT_EFFECTS_STORAGE_KEY); if(raw) return (_effectsCache = JSON.parse(raw)); }catch(e){}
+  return (_effectsCache = { owned:[], selected:[] });
+}
+export function savePenaltyEffects(data){
+  _effectsCache = data;
+  try{ localStorage.setItem(PT_EFFECTS_STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+}
+
+export function simAIPenalty() {
+  const base = 2;
+  const h = base + Math.floor(Math.random() * 4);
+  const a = base + Math.floor(Math.random() * 4);
+  return [h, a];
+}
+
+export function orientMatchScore(fixture, playerGoals, oppGoals){
+  return fixture.home===0 ? [playerGoals, oppGoals] : [oppGoals, playerGoals];
+}
+
+// ============================
+// ÂM THANH (gộp từ penalty-sound.js)
+// ============================
+// Tổng hợp âm thanh bằng Web Audio API (không cần file ngoài), có nút bật/tắt
+// lưu localStorage. Chống autoplay policy: AudioContext chỉ được tạo trong
+// user gesture; nếu browser khóa context (state 'suspended' + resume bị reject)
+// thì tự đóng và tạo context MỚI ở lần tương tác kế tiếp — không câm im lặng.
+const SOUND_STORAGE_KEY = 'vt_penalty_sound';
+let _ctx = null;
+let _master = null;
+let _enabled = true;
+let _recreating = false;
+try { _enabled = localStorage.getItem(SOUND_STORAGE_KEY) !== '0'; } catch (e) {}
+
+function _makeContext() {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  const c = new AC();
+  const m = c.createGain();
+  m.gain.value = 1.0;
+  m.connect(c.destination);
+  return { c, m };
+}
+
+// Đóng context cũ (nếu có) và tạo hẳn context MỚI — dùng khi context bị khóa
+// bởi autoplay policy (resume() reject mãi mãi, đừng cố hồi sinh nó nữa).
+function _recreate() {
+  if (_recreating) return _ctx; // chặn recreate chồng lấn khi nhiều âm cháy cùng lúc
+  _recreating = true;
+  try { if (_ctx && _ctx.state !== 'closed') _ctx.close(); } catch (e) {}
+  try {
+    const built = _makeContext();
+    if (!built) { _ctx = null; _master = null; return null; }
+    _ctx = built.c; _master = built.m;
+  } catch (e) { _ctx = null; _master = null; return null; }
+  finally { _recreating = false; }
+  return _ctx;
+}
+
+// Đảm bảo có context ĐANG CHẠY: nếu chưa có thì tạo, nếu bị suspend thì resume,
+// nếu resume thất bại thì recreate (sẽ thành công ở lần tương tác có gesture).
+function _ac() {
+  if (!_ctx) { _recreate(); }
+  if (!_ctx) return null;
+  if (_ctx.state === 'suspended') {
+    try {
+      const p = _ctx.resume();
+      // Chỉ gắn catch MỘT lần cho mỗi context — burst âm (vd _cheer ~6 giọng)
+      // không kích 23 recreate tuần tự; context mới tạo sẽ tự có cơ hội gắn lại.
+      if (p && p.catch && !_ctx._resumeWarned) {
+        _ctx._resumeWarned = true;
+        p.catch(() => { _recreate(); });
+      }
+    } catch (e) { _recreate(); }
+  }
+  return _ctx;
+}
+
+function _noiseBuffer(ctx, dur) {
+  const len = Math.max(1, Math.floor(ctx.sampleRate * dur));
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  return buf;
+}
+
+function _env(g, t0, a, d, peak) {
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), t0 + a);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + a + d);
+}
+
+function _tone(type, freq, t0, dur, vol, freqEnd) {
+  const ctx = _ac(); if (!ctx) return;
+  try {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t0);
+    if (freqEnd) o.frequency.exponentialRampToValueAtTime(Math.max(20, freqEnd), t0 + dur);
+    _env(g, t0, Math.min(0.012, dur * 0.3), dur, vol);
+    o.connect(g); g.connect(_master);
+    o.start(t0); o.stop(t0 + dur + 0.06);
+  } catch (e) {}
+}
+
+function _noise(t0, dur, vol, filterFreq, filterType, q) {
+  const ctx = _ac(); if (!ctx) return;
+  try {
+    const src = ctx.createBufferSource();
+    src.buffer = _noiseBuffer(ctx, dur);
+    const f = ctx.createBiquadFilter();
+    f.type = filterType || 'lowpass';
+    f.frequency.value = filterFreq;
+    f.Q.value = q || 1;
+    const g = ctx.createGain();
+    _env(g, t0, Math.min(0.02, dur * 0.4), dur, vol);
+    src.connect(f); f.connect(g); g.connect(_master);
+    src.start(t0); src.stop(t0 + dur + 0.06);
+  } catch (e) {}
+}
+
+// ——— Tiếng đám đông (tổng hợp formant, không cần file) ———
+// Nguồn noise chạy qua 3 filter bandpass đặt đúng formant của nguyên âm:
+//  "ah/ey" (hét vui) cao ~700/1200/2300Hz · "oo" (oh buồn) thấp ~420/760/1380Hz
+// Kèm LFO 2.5-4Hz làm rung "giọng" — nghe giống người hét hơn noise trắng.
+function _vowel(t0, dur, vol, formants, slideHz) {
+  const ctx = _ac(); if (!ctx) return;
+  try {
+    const d = Math.max(0.06, dur);
+    const src = ctx.createBufferSource();
+    src.buffer = _noiseBuffer(ctx, d + 0.1);
+    // Rung giọng: LFO mod nhẹ vào gain (quanh mức 1.0 → không nuốt envelope)
+    const wob = ctx.createGain();
+    wob.gain.value = 1;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 2.5 + Math.random() * 1.5;
+    const lfoG = ctx.createGain();
+    lfoG.gain.value = 0.12;
+    lfo.connect(lfoG); lfoG.connect(wob.gain);
+    lfo.start(t0); lfo.stop(t0 + d + 0.1);
+    const g = ctx.createGain();
+    _env(g, t0, Math.min(0.09, d * 0.3), d, vol);
+    src.connect(wob); wob.connect(g);
+    formants.forEach(f => {
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.setValueAtTime(f, t0);
+      if (slideHz) bp.frequency.exponentialRampToValueAtTime(Math.max(60, f + slideHz), t0 + d);
+      bp.Q.value = 9;
+      g.connect(bp); bp.connect(_master);
+    });
+    src.start(t0); src.stop(t0 + d + 0.1);
+  } catch (e) {}
+}
+
+// Hét cổ vũ "vầyyyy" — 6 giọng chồng nhau lệch thời gian + ngẫu nhiên tần số,
+// formant cao như đám đông hét mừng bàn thắng.
+function _cheer(t0, dur, vol) {
+  const voices = 6;
+  for (let i = 0; i < voices; i++) {
+    const st = t0 + (i / voices) * dur * 0.55 + Math.random() * 0.06;
+    const vd = dur * (0.65 + Math.random() * 0.5);
+    const fBase = 620 + Math.random() * 280;
+    _vowel(st, vd, vol * (0.5 + Math.random() * 0.5), [fBase, fBase * 1.75, fBase * 3.3], 0);
+  }
+}
+
+// Tiếng "ohhh" buồn khi không ghi bàn — formant "oo" thấp + giáng xuống cuối.
+function _aww(t0, dur, vol) {
+  const voices = 4;
+  for (let i = 0; i < voices; i++) {
+    const st = t0 + (i / voices) * 0.13 + Math.random() * 0.09;
+    _vowel(st, dur, vol * (0.6 + Math.random() * 0.4), [420, 760, 1380], -70);
+  }
+}
+
+// Pháo giấy bung khi vô địch: tiếng "pạch" giòn (highpass ngắn) + tia giấy
+// xào xạc (bandpass) + tiếng "ting" long lanh — một ống pháo = 1 lần gọi.
+function _confettiPop(t0) {
+  const ctx = _ac(); if (!ctx) return;
+  try {
+    _noise(t0, 0.08, 0.35, 3000, 'highpass', 2); // tiếng nổ giòn
+    _noise(t0 + 0.02, 0.25, 0.1, 1200, 'bandpass', 3); // tia giấy bay
+    _tone('sine', 1800, t0, 0.12, 0.09, 2400); // "ting" long lanh
+  } catch (e) {}
+}
+
+// Tiếng hét "GOOOOALLLLL" — bình luận viên ăn mừng: nguyên âm "o" trầm mạnh
+// (formant ~430/820/2400Hz) rồi MỞ dần sang "a" (formant trượt lên +180Hz)
+// như người hét vang kéo dài; vài giọng hòa lệch nhau + nền giọng trầm tạo
+// "cơ thể" cho tiếng hét + phụ âm "G" bật đầu.
+function _goalChant(t0, dur, vol) {
+  const voices = 3;
+  for (let i = 0; i < voices; i++) {
+    const st = t0 + i * 0.045 + Math.random() * 0.02;
+    const vd = dur * (0.9 + Math.random() * 0.2);
+    const fBase = 430 + Math.random() * 60;
+    _vowel(st, vd, vol * (0.5 + Math.random() * 0.3), [fBase, fBase * 1.9, fBase * 5.6], 180);
+  }
+  _tone('sine', 115, t0, dur, vol * 0.3, 150); // nền giọng trầm (formant lên nhẹ = hét to dần)
+  _noise(t0, 0.06, vol * 0.7, 420, 'bandpass', 1.4); // phụ âm "G" bật đầu
+}
+
+export function isOn() { return _enabled; }
+export function setOn(v) {
+  _enabled = !!v;
+  try { localStorage.setItem(SOUND_STORAGE_KEY, _enabled ? '1' : '0'); } catch (e) {}
+}
+export function toggle() { setOn(!_enabled); return _enabled; }
+export function unlock() { _ac(); }
+
+export const sfx = {
+  kick() { // cú sút: tiếng chạm bóng giòn (bandpass cao) + thump trầm nghe rõ
+    if (!_enabled) return; const ctx = _ac(); if (!ctx) return;
+    const t = ctx.currentTime;
+    _tone('sine', 250, t, 0.1, 0.5, 95);
+    _noise(t, 0.05, 0.34, 1900, 'bandpass', 1.2);
+    _noise(t + 0.02, 0.08, 0.24, 330, 'lowpass');
+  },
+  goal() { // vào lưới: "GOOOOALLLLL" hét vang + đám đông reo hò phía dưới
+    if (!_enabled) return; const ctx = _ac(); if (!ctx) return;
+    const t = ctx.currentTime;
+    _goalChant(t, 1.5, 0.35); // bình luận viên hét "goooaaalllll"
+    _cheer(t + 0.12, 2.0, 0.13); // đám đông hét mừng bên dưới
+    _tone('sine', 190, t, 0.16, 0.3, 70); // thump lưới nhẹ
+  },
+  goalAgainst() { // đối thủ ghi bàn: ngược hẳn với goal() — "ohhh" buồn dài + trầm tụt + la ó nhẹ
+    if (!_enabled) return; const ctx = _ac(); if (!ctx) return;
+    const t = ctx.currentTime;
+    _aww(t, 1.7, 0.2); // đám đông nhà thở dài "ohhh" dài
+    _tone('sawtooth', 200, t, 0.6, 0.16, 90); // âm trầm tụt xuống = thất vọng
+    _noise(t + 0.25, 0.55, 0.07, 300, 'bandpass', 1); // tiếng la ó xa xa
+  },
+  saveCheer() { // đối thủ sút TRƯỢT: khán giả nhà hô vang "goool" + reo hò (thủ môn bắt dính trước)
+    if (!_enabled) return; const ctx = _ac(); if (!ctx) return;
+    const t = ctx.currentTime;
+    _tone('sine', 170, t, 0.12, 0.5, 70); // tiếng ôm gọn bóng
+    _noise(t, 0.07, 0.4, 850, 'lowpass'); // thud găng tay
+    _goalChant(t + 0.15, 1.5, 0.3); // khán giả hô "goooaaalllll"
+    _cheer(t + 0.25, 2.0, 0.12); // đám đông reo hò
+  },
+  save() { // thủ môn cản phá: thud găng tay + tiếng hú đám đông
+    if (!_enabled) return; const ctx = _ac(); if (!ctx) return;
+    const t = ctx.currentTime;
+    _tone('sine', 170, t, 0.12, 0.55, 70);
+    _noise(t, 0.07, 0.4, 850, 'lowpass');
+    _noise(t + 0.05, 0.12, 0.26, 420, 'lowpass');
+    _aww(t + 0.15, 1.1, 0.16); // "ohhh" buồn vì không ghi được
+  },
+  whistle() { // còi trọng tài 2 tiếng — to & dễ nghe hơn
+    if (!_enabled) return; const ctx = _ac(); if (!ctx) return;
+    const t = ctx.currentTime;
+    _tone('square', 2350, t, 0.18, 0.24);
+    _tone('square', 2350, t + 0.24, 0.3, 0.24);
+  },
+  win() { // thắng: khán giả hô GOOOL nhiều đợt + pháo giấy bung + hợp âm vô địch
+    if (!_enabled) return; const ctx = _ac(); if (!ctx) return;
+    const t = ctx.currentTime;
+    _goalChant(t, 1.6, 0.24); // đợt 1 hô "GOOOOALLLLL"
+    _goalChant(t + 0.35, 1.6, 0.18); // đợt 2 nối tiếp — sân vận động vỡ oà
+    _cheer(t, 2.6, 0.12); // reo hò kéo dài
+    // Hợp âm vô địch vang lên khi đợt hô đầu đã dịu bớt (tránh chồng âm vỡ tiếng)
+    [523, 659, 784, 1047].forEach((f, i) => _tone('triangle', f, t + 1.0 + i * 0.13, 0.4, 0.26));
+    // Pháo giấy bung liên tiếp quanh sân
+    [0, 0.5, 1.0, 1.5].forEach(d => _confettiPop(t + d));
+  },
+  lose() { // thua: tiếng đi xuống + đám đông thất vọng
+    if (!_enabled) return; const ctx = _ac(); if (!ctx) return;
+    const t = ctx.currentTime;
+    _tone('sawtooth', 220, t, 0.5, 0.18, 110);
+    _tone('triangle', 330, t, 0.4, 0.12, 165);
+    _aww(t + 0.1, 1.7, 0.14); // đám đông thở dài buồn bã
+  },
+  click() { // UI click nhẹ
+    if (!_enabled) return; const ctx = _ac(); if (!ctx) return;
+    _tone('sine', 760, ctx.currentTime, 0.06, 0.2, 560);
+  },
+};
+
+// Mở khóa AudioContext ngay khi người dùng tương tác lần đầu (iOS/autoplay
+// policy). Lắng nghe nhiều loại event để chắc chắn bắt được gesture đầu tiên.
+if (typeof window !== 'undefined') {
+  const unlockOnce = () => {
+    unlock();
+    window.removeEventListener('pointerdown', unlockOnce);
+    window.removeEventListener('touchstart', unlockOnce);
+    window.removeEventListener('mousedown', unlockOnce);
+    window.removeEventListener('click', unlockOnce);
+    window.removeEventListener('keydown', unlockOnce);
+  };
+  window.addEventListener('pointerdown', unlockOnce);
+  window.addEventListener('touchstart', unlockOnce);
+  window.addEventListener('mousedown', unlockOnce);
+  window.addEventListener('click', unlockOnce);
+  window.addEventListener('keydown', unlockOnce);
+}
 
 
 
@@ -15,6 +336,9 @@ const FLIGHT_MS_BY_STYLE={default:900,wind:650,fire:650,ice:650,leaf:650,rainbow
 const KEEPER_REACT_DELAY_MS = 130;
 
 const AI_ACCURACY = 0.35;
+// Phần thưởng hào phóng hơn: nhân điểm thắng/thua của League & Cúp lên 2 lần
+// (MP import chung hằng số này từ ./penalty.js để 2 người chơi nhận giống nhau).
+export const REWARD_BOOST = 2;
 // Mỗi giải (League hoặc Cup) có tiến trình lưu riêng biệt theo configId
 // → 5 League + 5 Cup = 10 tiến trình độc lập, không đè lên nhau.
 function saveKeyFor(mode, configId){
@@ -113,7 +437,12 @@ export class PenaltyGame {
     // host bắt đầu". Pre-warm từ constructor làm mọi ảnh đã nóng trong cache
     // (_shooterImgCache/_poseDataCache/_gkTintSrcCache), vào trận chỉ còn nhuộm
     // màu theo đội (nhanh hơn nhiều).
-    this._prewarmStaticAssets();
+    // Pre-warm dời sang lúc trình duyệt rảnh — chạy đồng bộ sẽ chặn paint màn
+    // hình chọn chế độ (nguyên nhân "load chế độ lâu") trên máy yếu. Vẫn kịp
+    // làm nóng cache trước khi người chơi vào trận (idle timeout 1.5s).
+    const runPrewarm=()=>this._prewarmStaticAssets();
+    if('requestIdleCallback' in window){ requestIdleCallback(runPrewarm, {timeout:1500}); }
+    else{ setTimeout(runPrewarm, 60); }
     this._init();
   }
 
@@ -198,6 +527,8 @@ export class PenaltyGame {
     if(this.state.modeId==='cup'){
       const tour=this.state.tournament;
       countries=tour.region?getRegionCountries(tour.region):getAllCountries();
+      if(tour.country) countries=countries.filter(c=>clubCountry(c.code)===tour.country);
+      if(tour.rankMin!=null||tour.rankMax!=null) countries=countries.filter(c=>(tour.rankMin==null||c.rank>=tour.rankMin)&&(tour.rankMax==null||c.rank<=tour.rankMax));
     }else if(this.state.modeId==='league'){
       const lg=this.state.league;
       countries=lg&&lg.clubs?lg.clubs.map(code=>CLUB_MAP[code]).filter(Boolean):(lg&&lg.region?getRegionCountries(lg.region):getAllCountries());
@@ -211,6 +542,10 @@ export class PenaltyGame {
       // khi chuyển giải là hành động của hệ thống, không phải người chơi cố ý đổi
       // đội → vẫn phải cho phép "Tiếp tục" tiến trình đang lưu của giải đó.
     }
+    // Lazy render: chỉ dựng lưới ~250 cờ/logo khi mở popup chọn đội — lúc mới
+    // vào game (menu) không dựng → vào màn hình chế độ nhanh hơn hẳn.
+    const _gridOpen=document.getElementById('pt-country-modal')?.classList.contains('active');
+    if(!_gridOpen){ c.innerHTML=''; this._updateCountryPicker(); return; }
 
     const q=(query||'').trim().toLowerCase();
     const matches=x=>!q||x.name.toLowerCase().includes(q);
@@ -266,9 +601,9 @@ export class PenaltyGame {
   openCountryPopup(){
     const search=document.getElementById('pt-country-search');
     if(search)search.value='';
-    this.renderFlags();
     const modal=document.getElementById('pt-country-modal');
     if(modal)modal.classList.add('active');
+    this.renderFlags();
     if(search)setTimeout(()=>search.focus(),150);
   }
 
@@ -421,6 +756,11 @@ export class PenaltyGame {
     const lpBtn=document.getElementById('pt-lowperf-btn');
     if(lpBtn) lpBtn.addEventListener('click',()=>this._toggleLowPerf());
     this._renderLowPerfToggle();
+
+    // Âm thanh bật/tắt
+    const sndBtn=document.getElementById('pt-sound-btn');
+    if(sndBtn) sndBtn.addEventListener('click',()=>{ toggle(); sfx.click(); this._renderSoundToggle(); });
+    this._renderSoundToggle();
 
     // Lịch sử thành tích
     const hb=document.getElementById('pt-history-btn');
@@ -634,7 +974,7 @@ export class PenaltyGame {
     if(owned.includes(effectId)) return; // đã mua rồi
     // Trừ points
     import('../../points.js').then(mod => {
-      mod.addPoints('Penalty', `Mua hiệu ứng ${effect.name}`, -effect.price).catch(()=>{});
+      mod.addPoints('Vt Football', `Mua hiệu ứng ${effect.name}`, -effect.price).catch(()=>{});
     });
     owned.push(effectId);
     this.state._effectOwned = owned;
@@ -808,6 +1148,7 @@ export class PenaltyGame {
     // .catch để đề phòng 1 job pre-warm reject (dù mọi job đã có catch riêng) —
     // nếu throw thì startRound() không chạy → shotLocked kẹt true, game đơ vĩnh viễn.
     await Promise.race([matchPrewarmP, new Promise(r=>setTimeout(r,4000))]).catch(()=>{});
+    sfx.whistle(); // còi khai cuộc
     this.startRound();
   }
 
@@ -972,8 +1313,8 @@ export class PenaltyGame {
     ov.innerHTML=`<span class="pt-ov-icon">🏆</span><span class="pt-ov-title">${config.name} · ${isWin?'Vô địch!':'Hạng '+rank}</span>`;
     document.getElementById('pt-league-next').style.display='none';
 
-    const pts=isWin?(config.pointsWin||200):(config.pointsLose||50);
-    addPoints('Penalty '+config.name,isWin?'Vô địch '+config.name:'Hết '+config.name,pts).catch(()=>{});
+    const pts=(isWin?(config.pointsWin||200):(config.pointsLose||50))*REWARD_BOOST;
+    addPoints('Vt Football '+config.name,isWin?'Vô địch '+config.name:'Hết '+config.name,pts).catch(()=>{});
     if(window.VTQuests)window.VTQuests.trackEarn(pts);
     // Ghi lịch sử thành tích: vô địch / hạng
     this._recordHistory({
@@ -994,8 +1335,18 @@ export class PenaltyGame {
 
   startCup() {
     const config = this.state.tournament;
-    const basePool = config.region ? getRegionCountries(config.region) : getAllCountries();
-    const pool = shuffle(getTopCountries(basePool, config.teamCount - 1, this.state.playerCountry.code));
+    let basePool = config.region ? getRegionCountries(config.region) : getAllCountries();
+    if(config.country) basePool = basePool.filter(c=>clubCountry(c.code)===config.country);
+    if(config.rankMin!=null||config.rankMax!=null) basePool = basePool.filter(c=>(config.rankMin==null||c.rank>=config.rankMin)&&(config.rankMax==null||c.rank<=config.rankMax));
+    // Đội không thuộc hạng/quốc gia của cúp → tự đổi sang đội hợp lệ (đội mạnh nhất trong pool)
+    if(!basePool.find(c=>c.code===this.state.playerCountry.code)){
+      this.state.playerCountry = basePool.find(c=>c.code==='vn') || basePool[0] || getAllCountries()[0];
+      this._updateCountryPicker();
+      window.showToast?.(`⚠️ Đội không tham gia ${config.name} — đã chọn ${this.state.playerCountry.name}`, 'warn');
+    }
+    // Pool xếp theo rank (bỏ shuffle) để chia hạt giống bên dưới
+    const pool = getTopCountries(basePool, config.teamCount - 1, this.state.playerCountry.code)
+      .sort((a,b)=>(a.rank!=null?a.rank:999)-(b.rank!=null?b.rank:999));
 
     const numGroups = config.groups;
     const totalTeams = config.teamCount;
@@ -1014,15 +1365,29 @@ export class PenaltyGame {
     this.state._mode = 'cup';
     this.state.cupPhase = 'group';
 
+    // Xếp hạt giống (pot seeding): chia teams theo rank thành các pot, mỗi bảng
+    // nhận đúng 1 đội từ mỗi pot → tránh 2 đội mạnh nhất gặp nhau ngay vòng bảng.
+    const seeded = teams.map((t,i)=>({i, rank:(t&&t.rank!=null)?t.rank:999})).sort((a,b)=>a.rank-b.rank);
+    const groupAlloc = Array.from({length:numGroups},()=>[]);
+    const numPots = Math.ceil(seeded.length/numGroups);
+    for(let p=0;p<numPots;p++){
+      // Xáo nhẹ TRONG pot: vẫn đảm bảo mỗi bảng 1 đội mạnh từ mỗi pot (hạt giống),
+      // nhưng cặp đấu cụ thể thay đổi mỗi lần chơi (không lặp y hệt từng trận).
+      const pot=shuffle(seeded.slice(p*numGroups,(p+1)*numGroups));
+      pot.forEach((e,j)=>{ if(groupAlloc[(j+p)%numGroups].length<teamsPerGroup) groupAlloc[(j+p)%numGroups].push(e.i); });
+    }
+    seeded.forEach(e=>{ // bù đội lẻ nếu chia không khớp
+      if(!groupAlloc.some(g=>g.includes(e.i))){
+        const g=groupAlloc.findIndex(x=>x.length<teamsPerGroup);
+        if(g>=0) groupAlloc[g].push(e.i);
+      }
+    });
+
     // Create groups with round-robin matches
     const groups = [];
-    let teamIdx = 0;
     const groupNames = 'ABCDEFGH'.split('');
     for (let g = 0; g < numGroups; g++) {
-      const groupTeams = [];
-      for (let t = 0; t < teamsPerGroup && teamIdx < teams.length; t++) {
-        groupTeams.push(teamIdx++);
-      }
+      const groupTeams = groupAlloc[g];
 
       // Build round-robin rounds using circle method (mỗi đội đá đúng 1 trận/vòng)
       const roundFixtures = this._generateRoundRobinRounds(groupTeams);
@@ -1578,8 +1943,8 @@ export class PenaltyGame {
       isWin = winner === 0;
     }
 
-    const pts = isWin ? config.pointsWin : config.pointsLose;
-    addPoints('Penalty ' + config.name, isWin ? 'Vô địch ' + config.name : 'Kết thúc ' + config.name, pts).catch(() => {});
+    const pts = (isWin ? (config.pointsWin||600) : (config.pointsLose||120)) * REWARD_BOOST;
+    addPoints('Vt Football ' + config.name, isWin ? 'Vô địch ' + config.name : 'Kết thúc ' + config.name, pts).catch(() => {});
     if (window.VTQuests) window.VTQuests.trackEarn(pts);
 
     const header = document.getElementById('pt-knockout-header');
@@ -1748,6 +2113,7 @@ export class PenaltyGame {
     }
     const ps=this.state.scores[0],as=this.state.scores[1];
     const isWin=ps>as,isDraw=ps===as;
+    if(isWin) sfx.win(); else if(isDraw) sfx.whistle(); else sfx.lose();
 
     this.state._lastMatchResult=isWin?'win':isDraw?'draw':'lose';
     this.state._lastMatchScore=[ps,as];
@@ -1758,8 +2124,8 @@ export class PenaltyGame {
 
     // Points for quick mode
     if(this.state._matchContext && this.state._matchContext.type==='quick'){
-      const pts=isWin?150:isDraw?60:30;
-      addPoints('Penalty',isWin?'Thắng penalty':isDraw?'Hòa penalty':'Thua penalty',pts).catch(()=>{});
+      const pts=isWin?300:isDraw?120:60;
+      addPoints('Vt Football',isWin?'Thắng penalty':isDraw?'Hòa penalty':'Thua penalty',pts).catch(()=>{});
       if(window.VTQuests)window.VTQuests.trackPlay('penalty');
     }
   }
@@ -1950,11 +2316,6 @@ export class PenaltyGame {
     return ZONES[Math.floor(Math.random()*ZONES.length)];
   }
 
-  playerDefendZone(){
-    if(Math.random()<0.25)return this.aiPickZone();
-    return ZONES[Math.floor(Math.random()*ZONES.length)];
-  }
-
   // ===== ANIMATIONS =====
   // Banner kết quả: VÀO!!! / KHÔNG VÀO!!! — màu theo lợi/hại cho đội nhà
   // team='mine': đội nhà sút. team='theirs': đối thủ sút.
@@ -1982,6 +2343,7 @@ export class PenaltyGame {
     await this._waitShotPrewarm();
     setTimeout(()=>this._keeperDive(aiZone,isGoal&&zoneId!==aiZone?'diving':'save',FLIGHT_MS_BY_STYLE[_trailStyle]||900), KEEPER_REACT_DELAY_MS);
     this._shooterKick();
+    sfx.kick();
     this._animateBallToZone(zoneId,()=>{
       const el=document.querySelector(`[data-zone="${zoneId}"]`);
       if(el){el.classList.add(isGoal?'zone-goal':'zone-shot');if(!isGoal)setTimeout(()=>el.classList.add('zone-save'),300)}
@@ -1991,8 +2353,8 @@ export class PenaltyGame {
         if(saveEl)setTimeout(()=>{saveEl.classList.remove('zone-shot','zone-save','zone-goal');saveEl.classList.add('zone-keeper-save')},400);
       }
       // Cập nhật tỉ số TRƯỚC — tránh renderStatusBar ghi đè banner
-      if(isGoal){this.state.scores[0]++;this.renderStatusBar();this._bumpScoreEl('pt-sb-you');}
-      else{this.renderStatusBar();}
+      if(isGoal){this.state.scores[0]++;this.renderStatusBar();this._bumpScoreEl('pt-sb-you');sfx.goal();}
+      else{this.renderStatusBar();sfx.save();}
       // Banner kết quả HIỆN SAU, không bị renderStatusBar xoá mất
       this.showShotResultBanner(isGoal,'mine');
       this._shooterResult(isGoal);
@@ -2014,6 +2376,7 @@ export class PenaltyGame {
     await this._waitShotPrewarm();
     setTimeout(()=>this._keeperDive(saveZone,isGoal?'diving':'save',FLIGHT_MS_BY_STYLE[_trailStyle]||900), KEEPER_REACT_DELAY_MS);
     this._shooterKick();
+    sfx.kick();
     this._animateBallToZone(zoneId,()=>{
       const el=document.querySelector(`[data-zone="${zoneId}"]`);
       if(el){el.classList.add(isGoal?'zone-goal':'zone-shot');if(!isGoal)setTimeout(()=>el.classList.add('zone-save'),300)}
@@ -2023,8 +2386,8 @@ export class PenaltyGame {
         if(saveEl)setTimeout(()=>{saveEl.classList.remove('zone-shot','zone-save','zone-goal');saveEl.classList.add('zone-keeper-save')},400);
       }
       // Cập nhật tỉ số TRƯỚC — tránh renderStatusBar ghi đè banner
-      if(isGoal){this.state.scores[1]++;this.renderStatusBar();this._bumpScoreEl('pt-sb-ai');}
-      else{this.renderStatusBar();}
+      if(isGoal){this.state.scores[1]++;this.renderStatusBar();this._bumpScoreEl('pt-sb-ai');sfx.goalAgainst();}
+      else{this.renderStatusBar();sfx.saveCheer();}
       // Banner kết quả HIỆN SAU, không bị renderStatusBar xoá mất
       this.showShotResultBanner(isGoal,'theirs');
       this._shooterResult(isGoal);
@@ -2605,6 +2968,11 @@ export class PenaltyGame {
   _renderLowPerfToggle(){
     const btn = document.getElementById('pt-lowperf-btn');
     if(btn) btn.classList.toggle('on', !!this._lowPerf);
+  }
+
+  _renderSoundToggle(){
+    const btn = document.getElementById('pt-sound-btn');
+    if(btn) btn.classList.toggle('on', isOn());
   }
 
   // Chọn hiệu ứng cú sút — random từ danh sách đã chọn, fallback random toàn bộ

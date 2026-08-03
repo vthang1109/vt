@@ -17,7 +17,7 @@ const GAMES = {
   catte:     { id: 'catte',     name: 'Cát Tê',      icon: '♣️', max: 4, min: 2, page: '../games/catte/catte-mp.html',          ready: true, category: 'casino' },
   tienlen:   { id: 'tienlen',   name: 'Tiến Lên',    icon: '♥️', max: 4, min: 2, page: '../games/tienlen/tienlen-mp.html',       ready: true, category: 'casino' },
   // === TRÍ TUỆ ===
-  penalty:   { id: 'penalty',   name: 'Đá Penalty',  icon: '⚽', max: 2, min: 2, page: '../games/penalty/penalty-mp.html',      ready: true, category: 'tritue' },
+  penalty:   { id: 'penalty',   name: 'Vt Football', icon: '⚽', max: 2, min: 2, page: '../games/penalty/penalty-mp.html',      ready: true, category: 'tritue' },
   caro:      { id: 'caro',      name: 'Caro',        icon: '⭕', max: 2, min: 2, page: '../games/caro/caro-mp.html',            ready: true, category: 'tritue' },
   tictactoe: { id: 'tictactoe', name: 'Tic-Tac-Toe', icon: '⭕', max: 2, min: 2, page: '../games/tictactoe/tictactoe-mp.html',    ready: true, category: 'tritue' },
   chess:     { id: 'chess',     name: 'Cờ Vua',      icon: '♟️', max: 2, min: 2, page: '../games/chess/chess-mp.html',            ready: true, category: 'tritue' },

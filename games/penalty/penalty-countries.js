@@ -175,6 +175,15 @@ export const CLUBS = [
   {code:'ren', name:'Rennes',           abbr:'REN', logoId:90,  rank:45},
   {code:'nic', name:'Nice',             abbr:'NIC', logoId:84,  rank:46},
   {code:'len', name:'Lens',             abbr:'LEN', logoId:1161,rank:47},
+  // CLB Việt Nam — V.League
+  {code:'hano', name:'Hà Nội FC',       abbr:'HNO', logoId:7450, rank:48},
+  {code:'cahn', name:'Công An HN',      abbr:'CAH', logoId:7462, rank:49},
+  {code:'nadi', name:'Nam Định',        abbr:'NAD', logoId:7461, rank:50},
+  {code:'vtel', name:'Viettel',         abbr:'VTL', logoId:7456, rank:51},
+  {code:'haip', name:'Hải Phòng',       abbr:'HPH', logoId:7458, rank:52},
+  {code:'bdu',  name:'B.Bình Dương',    abbr:'BBD', logoId:7452, rank:53},
+  {code:'slna', name:'SLNA',            abbr:'SLN', logoId:7455, rank:54},
+  {code:'hagl', name:'HAGL',            abbr:'HGL', logoId:7453, rank:55},
 ];
 export const CLUB_MAP = Object.fromEntries(CLUBS.map(c=>[c.code,c]));
 export function getAllClubs(){ return CLUBS; }
@@ -190,6 +199,7 @@ export const CLUB_COUNTRY = {
   psg:'fr',mar:'fr',lyo:'fr',mon:'fr',lil:'fr',ren:'fr',nic:'fr',len:'fr',
   ben:'pt',por:'pt',spo:'pt',bra:'pt',
   ajx:'nl',psv:'nl',fey:'nl',
+  hano:'vn',cahn:'vn',nadi:'vn',vtel:'vn',haip:'vn',bdu:'vn',slna:'vn',hagl:'vn',
 };
 export const CLUB_COUNTRIES = {
   en:{ name:'Anh',          flag:'\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}', order:1 },
@@ -199,6 +209,7 @@ export const CLUB_COUNTRIES = {
   fr:{ name:'Pháp',         flag:'🇫🇷', order:5 },
   pt:{ name:'Bồ Đào Nha',   flag:'🇵🇹', order:6 },
   nl:{ name:'Hà Lan',       flag:'🇳🇱', order:7 },
+  vn:{ name:'Việt Nam',     flag:'🇻🇳', order:0 },
 };
 export function clubCountry(code){ return CLUB_COUNTRY[code]||'other'; }
 
@@ -242,6 +253,24 @@ export const TOURNAMENT_CONFIGS = {
     knockoutRoundNames:['Vòng 16 đội','Tứ kết','Bán kết','Chung kết'],
     pointsWin:1500, pointsLose:300,
   },
+  clubwc: {
+    id:'clubwc', name:'Club WC', icon:'🌍', region:'clubs', rankMin:1, rankMax:16,
+    teamCount:16, groups:4, advancePerGroup:2,
+    knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
+    pointsWin:2000, pointsLose:400,
+  },
+  europa: {
+    id:'europa', name:'Cúp C2', icon:'🥈', region:'clubs', rankMin:9, rankMax:40,
+    teamCount:32, groups:8, advancePerGroup:2,
+    knockoutRoundNames:['Vòng 16 đội','Tứ kết','Bán kết','Chung kết'],
+    pointsWin:1000, pointsLose:200,
+  },
+  // Cúp quốc gia — mỗi cúp chỉ gồm đúng 8 CLB của nước đó
+  facup:   { id:'facup',   name:'FA Cup',          icon:'\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}', region:'clubs', country:'en', teamCount:8, groups:2, advancePerGroup:2, knockoutRoundNames:['Bán kết','Chung kết'], pointsWin:600, pointsLose:120 },
+  coparey: { id:'coparey', name:'Copa del Rey',    icon:'🇪🇸', region:'clubs', country:'es', teamCount:8, groups:2, advancePerGroup:2, knockoutRoundNames:['Bán kết','Chung kết'], pointsWin:600, pointsLose:120 },
+  coppait: { id:'coppait', name:'Coppa Italia',    icon:'🇮🇹', region:'clubs', country:'it', teamCount:8, groups:2, advancePerGroup:2, knockoutRoundNames:['Bán kết','Chung kết'], pointsWin:600, pointsLose:120 },
+  dfbpokal:{ id:'dfbpokal',name:'DFB-Pokal',       icon:'🇩🇪', region:'clubs', country:'de', teamCount:8, groups:2, advancePerGroup:2, knockoutRoundNames:['Bán kết','Chung kết'], pointsWin:600, pointsLose:120 },
+  coupefr: { id:'coupefr', name:'Coupe de France', icon:'🇫🇷', region:'clubs', country:'fr', teamCount:8, groups:2, advancePerGroup:2, knockoutRoundNames:['Bán kết','Chung kết'], pointsWin:600, pointsLose:120 },
 };
 export const CUP_TOURNAMENTS = Object.values(TOURNAMENT_CONFIGS);
 
@@ -267,6 +296,7 @@ export const CLUB_LEAGUE_CONFIGS = {
   seria:  { id:'seria',  name:'Serie A',  icon:'🇮🇹', region:'clubs', teamCount:8, pointsWin:500, pointsDraw:200, pointsLose:120, clubs:['int','mil','juv','nap','rom','laz','ata','fio'] },
   bundes: { id:'bundes', name:'Bundesliga', icon:'🇩🇪', region:'clubs', teamCount:8, pointsWin:500, pointsDraw:200, pointsLose:120, clubs:['bay','dor','rbl','lev','fra','stu','wol','mgl'] },
   ligue1: { id:'ligue1', name:'Ligue 1',  icon:'🇫🇷', region:'clubs', teamCount:8, pointsWin:500, pointsDraw:200, pointsLose:120, clubs:['psg','mar','lyo','mon','lil','ren','nic','len'] },
+  vleague:{ id:'vleague', name:'V.League', icon:'🇻🇳', region:'clubs', teamCount:8, pointsWin:600, pointsDraw:240, pointsLose:150, clubs:['hano','cahn','nadi','vtel','haip','bdu','slna','hagl'] },
 };
 export const CLUB_LEAGUE_LIST = Object.values(CLUB_LEAGUE_CONFIGS);
 
@@ -377,6 +407,11 @@ export const KIT_COLORS = {
   len:{primary:'#b51e24',secondary:'#ffd700'},
   spo:{primary:'#008152',secondary:'#ffffff'}, psv:{primary:'#d71920',secondary:'#ffffff'},
   fey:{primary:'#c8102e',secondary:'#ffffff'}, bra:{primary:'#d1151b',secondary:'#ffffff'},
+  // CLB Việt Nam
+  hano:{primary:'#5b2d8e',secondary:'#ffffff'}, cahn:{primary:'#c8102e',secondary:'#ffffff'},
+  nadi:{primary:'#ffd400',secondary:'#000000'}, vtel:{primary:'#5c0e2e',secondary:'#ffd400'},
+  haip:{primary:'#e2231a',secondary:'#ffffff'}, bdu:{primary:'#da251d',secondary:'#ffffff'},
+  slna:{primary:'#ffd400',secondary:'#1e3a8a'}, hagl:{primary:'#ffffff',secondary:'#00843d'},
 };
 
 export const flagColorCache = {};
@@ -763,7 +798,12 @@ export function flagImg(code, name, size) {
   let html;
   const club = CLUB_MAP[code];
   if(club){
-    html = `<img src="https://media.api-sports.io/football/teams/${club.logoId}.png" alt="${name||club.name}" class="pt-club-logo" style="width:${s}px;height:${s}px;object-fit:contain;vertical-align:middle;" loading="lazy" decoding="async"/>`;
+    if(club.logoId){
+      const fc=CLUB_COUNTRY[code]||'vn';
+      html = `<img src="https://media.api-sports.io/football/teams/${club.logoId}.png" onerror="this.onerror=null;this.src='https://flagcdn.com/${fc}.svg'" alt="${name||club.name}" class="pt-club-logo" style="width:${s}px;height:${s}px;object-fit:contain;vertical-align:middle;" loading="lazy" decoding="async"/>`;
+    }else{
+      html = `<img src="https://flagcdn.com/${CLUB_COUNTRY[code]||'vn'}.svg" alt="${name||club.name}" class="pt-club-logo" style="width:${s}px;height:auto;vertical-align:middle;" loading="lazy" decoding="async"/>`;
+    }
   }else{
     html = `<img src="https://flagcdn.com/${code}.svg" alt="${name||code}" class="pt-flag-svg" style="width:${s}px;height:auto;vertical-align:middle;" loading="lazy" decoding="async"/>`;
   }
@@ -774,5 +814,6 @@ export function flagImg(code, name, size) {
 export function teamFlagSrc(code){
   if(!code || code.startsWith('gen_')) return '';
   const club = CLUB_MAP[code];
-  return club ? `https://media.api-sports.io/football/teams/${club.logoId}.png` : `https://flagcdn.com/${code}.svg`;
+  if(club) return club.logoId ? `https://media.api-sports.io/football/teams/${club.logoId}.png` : `https://flagcdn.com/${CLUB_COUNTRY[code]||'vn'}.svg`;
+  return `https://flagcdn.com/${code}.svg`;
 }

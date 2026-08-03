@@ -34,13 +34,13 @@ window.__ADMIN_GAME_HACKS = [];
     const style = document.createElement('style');
     style.textContent = `
     .vt-admin-btn {
-      position: fixed; bottom: 70px; left: 14px;
+      position: fixed; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); left: 14px;
       width: 44px; height: 44px; border-radius: 50%;
       border: 1px solid rgba(251, 191, 36, 0.3);
       background: rgba(20, 10, 4, 0.92); color: #fbbf24;
       font-size: 18px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      z-index: 9997; backdrop-filter: blur(8px);
+      z-index: 999999; backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       transition: all 0.25s;
       box-shadow: 0 2px 12px rgba(0,0,0,0.4); line-height: 1;
@@ -53,8 +53,8 @@ window.__ADMIN_GAME_HACKS = [];
     .vt-admin-btn.auto-mode { border-color: rgba(167, 139, 250, 0.6); color: #a78bfa; }
 
     .vt-admin-popup {
-      position: fixed; bottom: 124px; left: 14px;
-      z-index: 9997;
+      position: fixed; bottom: calc(140px + env(safe-area-inset-bottom, 0px)); left: 14px;
+      z-index: 999999;
       background: rgba(8, 13, 28, 0.98);
       border: 1px solid rgba(251, 191, 36, 0.2);
       border-radius: 14px; min-width: 200px;

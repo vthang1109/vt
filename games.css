@@ -17,6 +17,7 @@
 .game-lobby-card:hover { transform: translateY(-6px); border-color: rgba(56,189,248,0.4); box-shadow: 0 16px 40px rgba(56,189,248,0.15); }
 .game-lobby-card.pinned { border-color: rgba(251,191,36,0.5); box-shadow: 0 0 16px rgba(251,191,36,0.15); }
 .glc-emoji { font-size: 40px; line-height: 1; }
+.glc-img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto; border-radius: 10px; }
 .glc-name { font-weight: 800; font-size: 14px; color: #e0f2fe; text-align: center; }
 .glc-pts { font-size: 11px; font-weight: 700; color: #38bdf8; opacity: 0.8; }
 .glc-badge { position: absolute; top: 10px; right: 10px; padding: 3px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
@@ -27,6 +28,7 @@
 
 .game-lobby-grid:not(.grid-2col) .game-lobby-card { aspect-ratio: 1 / 1; justify-content: center; padding: 10px 6px; }
 .game-lobby-grid:not(.grid-2col) .glc-emoji { font-size: 26px; }
+.game-lobby-grid:not(.grid-2col) .glc-img { width: 26px; height: 26px; }
 .game-lobby-grid:not(.grid-2col) .glc-name { font-size: 11px; }
 .game-lobby-grid:not(.grid-2col) .glc-pts { font-size: 9px; }
 .game-lobby-grid:not(.grid-2col) .glc-badge { top: 6px; right: 6px; padding: 1px 6px; font-size: 9px; min-width: 14px; text-align: center; }
@@ -47,7 +49,8 @@
     border-color: rgba(251,191,36,0.6);
     box-shadow: 0 14px 50px rgba(251,191,36,0.22);
 }
-.game-lobby-card.card-feature-gold .glc-emoji { font-size: 48px; }
+.game-lobby-card.card-feature-gold .glc-emoji, .game-lobby-card.card-feature-purple .glc-emoji { font-size: 48px; }
+.game-lobby-card.card-feature-gold .glc-img, .game-lobby-card.card-feature-purple .glc-img { width: 48px; height: 48px; }
 .game-lobby-card.card-feature-gold .glc-name { font-size: 18px; color: #fbbf24; font-family: 'Science Gothic', sans-serif; font-weight: 500; }
 .game-lobby-card.card-feature-gold .glc-pts { font-size: 13px; color: #fcd34d; font-weight: 600; }
 
@@ -62,7 +65,6 @@
     border-color: rgba(167,139,250,0.6);
     box-shadow: 0 14px 50px rgba(167,139,250,0.22);
 }
-.game-lobby-card.card-feature-purple .glc-emoji { font-size: 48px; }
 .game-lobby-card.card-feature-purple .glc-name { font-size: 18px; color: #a78bfa; font-family: 'Science Gothic', sans-serif; font-weight: 500; }
 .game-lobby-card.card-feature-purple .glc-pts { font-size: 13px; color: #c4b5fd; font-weight: 600; }
 
