@@ -7,7 +7,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 
 
 const ZONES = ['top-left','top-center','top-right','mid-left','mid-center','mid-right','bot-left','bot-center','bot-right'];
-const FLIGHT_MS_BY_STYLE={default:900,wind:650,fire:650,ice:650,leaf:650,rainbow:650,dark:650,thunder:650,light:650,clone:650,butterfly:650,blackhole:650};
+const FLIGHT_MS_BY_STYLE={default:900,wind:650,fire:650,ice:650,leaf:650,rainbow:650,dark:650,thunder:650,light:650,clone:650,butterfly:650,blackhole:650,dragon:650};
 const KEEPER_REACT_DELAY_MS = 130;
 
 const AI_ACCURACY = 0.35;
@@ -2016,7 +2016,7 @@ export class PenaltyGame {
     ball.style.transform=`translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(1) rotate(0deg)`;
     ball.style.opacity='1';
     ball.style.display='';
-    ball.classList.remove('ball-fx-wind-mine','ball-fx-wind-theirs','ball-fx-fire','ball-fx-ice','ball-fx-leaf','ball-fx-rainbow','ball-fx-dark','ball-fx-thunder','ball-fx-light','ball-fx-clone','ball-fx-butterfly','ball-fx-blackhole');
+    ball.classList.remove('ball-fx-wind-mine','ball-fx-wind-theirs','ball-fx-fire','ball-fx-ice','ball-fx-leaf','ball-fx-rainbow','ball-fx-dark','ball-fx-thunder','ball-fx-light','ball-fx-clone','ball-fx-butterfly','ball-fx-blackhole','ball-fx-dragon');
   }
 
   // Tạo vệt gió theo đường bay của bóng — 3 đường lệch tâm banh, 2 đường ngoài ngắn hơn
@@ -2477,6 +2477,48 @@ export class PenaltyGame {
     }
   }
 
+  // Rồng thiên — vảy vàng rơi + hạt lửa vàng/xanh ngọc + rồng con bay lượn
+  _spawnDragonTrail(pitch,x,y){
+    const colors=['#fbbf24','#f59e0b','#fde68a','#22d3ee','#a5f3fc','#ffffff'];
+    for(let i=0;i<5;i++){
+      const p=document.createElement('div');
+      p.className='pt-trail-dragon';
+      p.style.left=(x+(Math.random()-0.5)*20)+'px';
+      p.style.top=(y+(Math.random()-0.5)*20)+'px';
+      p.style.background=`radial-gradient(circle, ${colors[i%colors.length]} 40%, transparent 80%)`;
+      p.style.setProperty('--dr-sx',((Math.random()-0.5)*30).toFixed(1));
+      p.style.setProperty('--dr-sy',((-8-Math.random()*16)).toFixed(1));
+      pitch.appendChild(p);
+      setTimeout(()=>p.remove(),560);
+    }
+    // Hạt neon vàng-xanh toả xung quanh
+    const neonCount=3+Math.floor(Math.random()*2);
+    for(let i=0;i<neonCount;i++){
+      const n=document.createElement('div');
+      n.className='pt-dragon-neon';
+      const angle=Math.random()*360;
+      const dist=8+Math.random()*20;
+      n.style.left=(x+Math.cos(angle*Math.PI/180)*dist)+'px';
+      n.style.top=(y+Math.sin(angle*Math.PI/180)*dist)+'px';
+      n.style.setProperty('--dn-color',Math.random()>0.5?'#fbbf24':'#22d3ee');
+      n.style.setProperty('--dn-delay',String(Math.random()*0.15));
+      n.style.setProperty('--dn-scale',String(0.5+Math.random()*1.1));
+      pitch.appendChild(n);
+      setTimeout(()=>n.remove(),450);
+    }
+    // Rồng con bay lượn theo bóng
+    if(Math.random()<0.7){
+      const d=document.createElement('span');
+      d.className='pt-trail-dragon-icon';
+      d.textContent='🐉';
+      d.style.left=(x+(Math.random()-0.5)*10)+'px';
+      d.style.top=(y+(Math.random()-0.5)*10)+'px';
+      d.style.setProperty('--dr-rot',String(Math.random()*360)+'deg');
+      pitch.appendChild(d);
+      setTimeout(()=>d.remove(),620);
+    }
+  }
+
   // Hạt ma trơi tím — cho cú sút phân thân, bay lập loè rồi tắt
   _spawnCloneTrail(pitch,x,y){
     const p=document.createElement('div');
@@ -2535,13 +2577,14 @@ export class PenaltyGame {
     if(style==='clone')     return this._spawnCloneTrail(pitch,x,y);
     if(style==='butterfly') return this._spawnButterflyTrail(pitch,x,y);
     if(style==='blackhole') return this._spawnBlackholeTrail(pitch,x,y);
+    if(style==='dragon')    return this._spawnDragonTrail(pitch,x,y);
     return this._spawnWindStreak(pitch,x,y,angleDeg,team);
   }
 
   // Gán ánh sáng bao quanh bóng khớp với kiểu hiệu ứng đang bay; luôn gỡ các
   // class cũ trước để không bị chồng hiệu ứng của lần sút trước
   _setBallFx(ball,style,team){
-    ball.classList.remove('ball-fx-wind-mine','ball-fx-wind-theirs','ball-fx-fire','ball-fx-ice','ball-fx-leaf','ball-fx-rainbow','ball-fx-dark','ball-fx-thunder','ball-fx-light','ball-fx-clone','ball-fx-butterfly','ball-fx-blackhole');
+    ball.classList.remove('ball-fx-wind-mine','ball-fx-wind-theirs','ball-fx-fire','ball-fx-ice','ball-fx-leaf','ball-fx-rainbow','ball-fx-dark','ball-fx-thunder','ball-fx-light','ball-fx-clone','ball-fx-butterfly','ball-fx-blackhole','ball-fx-dragon');
     if(style==='default'||!style) return; // mặc định: bóng sạch, không ánh sáng
     if(style==='wind'){
       ball.classList.add(team==='theirs'?'ball-fx-wind-theirs':'ball-fx-wind-mine');
@@ -2568,6 +2611,7 @@ export class PenaltyGame {
       case 'clone':     return [['0%','#4c1d95'],['40%','#7b2ff7'],['75%','#b48cfa'],['100%','#ffffff']];
       case 'butterfly': return [['0%','#ffffff'],['30%','#fbcfe8'],['60%','#f9a8d4'],['100%','#ec4899']];
       case 'blackhole': return [['0%','#000000'],['25%','#0c4a6e'],['50%','#06b6d4'],['75%','#a855f7'],['100%','#ffffff']];
+      case 'dragon':    return [['0%','#000000'],['20%','#0e7490'],['45%','#f59e0b'],['75%','#fde68a'],['100%','#ffffff']];
       case 'default': return [['0%','#e2e8f0'],['35%','#f8fafc'],['70%','#f1f5f9'],['100%','#ffffff']]; // trắng nhạt nhẹ nhàng
       default:        return null; // wind dùng màu đặc theo team, không cần gradient
     }

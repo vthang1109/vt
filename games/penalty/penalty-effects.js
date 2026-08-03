@@ -14,6 +14,7 @@ export const PT_EFFECTS = [
   { id:'clone', name:'Phân thân', icon:'👻', desc:'Bóng ma lập lòe', color:'#b48cfa', price:10000 },
   { id:'butterfly', name:'Hoa sen', icon:'🪷', desc:'Cánh sen bay theo bóng', color:'#ec4899', price:12000 },
   { id:'blackhole', name:'Hố đen', icon:'🕳️', desc:'Xuyên không qua hố đen', color:'#06b6d4', price:15000 },
+  { id:'dragon', name:'Rồng thiên', icon:'🐉', desc:'Rồng vàng lượn theo bóng, vảy rơi lấp lánh', color:'#f59e0b', price:25000 },
 ];
 export const PT_EFFECTS_STORAGE_KEY = 'vt_penalty_effects';
 export function loadPenaltyEffects(){

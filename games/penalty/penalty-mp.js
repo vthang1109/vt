@@ -16,7 +16,7 @@ import {
   CUP_TOURNAMENTS, LEAGUE_LIST, buildRoundRobin, prewarmKeeperKit,
   getRegionCountries
 } from './penalty-countries.js';
-import { simAIPenalty } from './penalty-effects.js';
+import { simAIPenalty, orientMatchScore } from './penalty-effects.js';
 import { initRoomChat, getMyNickname, showRoomDeletedPopup } from '../../room-chat.js';
 
 const ROOM_ID = new URLSearchParams(location.search).get('room');
@@ -101,6 +101,42 @@ class PenaltyMP extends PenaltyGame {
     const lpBtn=document.getElementById('pt-lowperf-btn');
     if(lpBtn) lpBtn.addEventListener('click',()=>this._toggleLowPerf());
     this._renderLowPerfToggle();
+
+    // Hiệu ứng cú sút — mỗi người chọn riêng từ modal (kế thừa PenaltyGame).
+    // Client đang sút ghi shotEffect lên gameState → cả 2 bên animate cùng hiệu ứng.
+    const effPanel=document.getElementById('pt-effect-panel');
+    if(effPanel) effPanel.addEventListener('click',()=>this.openEffectModal());
+    const effGrid=document.getElementById('pt-effect-modal-grid');
+    if(effGrid) effGrid.addEventListener('click',e=>{
+      const btn=e.target.closest('.pt-effect-modal-btn');
+      if(btn) return this._handleEffectModalClick(btn.dataset.effectId);
+      const sug=e.target.closest('.pt-effect-suggestion span');
+      if(sug && sug.dataset.effectId) return this._handleEffectModalClick(sug.dataset.effectId);
+      const cb=e.target.closest('.pt-select-all-cb');
+      if(cb) return this._handleSelectAll(cb.checked);
+    });
+    const effApply=document.getElementById('pt-effect-apply-btn');
+    if(effApply) effApply.addEventListener('click',()=>this._applyEffectSelection());
+    const effClose=document.getElementById('pt-effect-modal-close');
+    if(effClose) effClose.addEventListener('click',()=>this.closeEffectModal());
+    const effCancel=document.getElementById('pt-effect-modal-cancel');
+    if(effCancel) effCancel.addEventListener('click',()=>this.closeEffectModal());
+    const effModal=document.getElementById('pt-effect-modal');
+    if(effModal) effModal.addEventListener('click',e=>{
+      if(e.target===e.currentTarget) this.closeEffectModal();
+    });
+    // Confirm mua hiệu ứng
+    const bcBtn=document.getElementById('pt-buy-confirm-btn');
+    if(bcBtn) bcBtn.addEventListener('click',()=>this._confirmBuy());
+    const bcCancel=document.getElementById('pt-buy-confirm-cancel');
+    if(bcCancel) bcCancel.addEventListener('click',()=>this._cancelBuy());
+    const bcClose=document.getElementById('pt-buy-confirm-close');
+    if(bcClose) bcClose.addEventListener('click',()=>this._cancelBuy());
+    const bcModal=document.getElementById('pt-buy-confirm-modal');
+    if(bcModal) bcModal.addEventListener('click',e=>{
+      if(e.target===e.currentTarget) this._cancelBuy();
+    });
+    this.renderEffectsPanel();
 
     document.getElementById('pt-mp-mode-row').addEventListener('click', e=>{
       const b=e.target.closest('.pt-mp-mode-btn'); if(!b) return;
@@ -205,11 +241,14 @@ class PenaltyMP extends PenaltyGame {
     this.state._dotsBaseP = gs.dotsBaseP || 0;
     this.state._dotsBaseA = gs.dotsBaseA || 0;
     this.state._mode = this.mpMode;
-    // Chỉ đồng bộ đội từ gameState khi ĐANG TRONG TRẬN (phase khác 'setup').
-    // Ở màn hình setup, gameState vẫn giữ playerCountry CŨ từ trận trước (VD 'vn')
-    // — nếu ghi đè ở đây, host vừa chọn đội khác sẽ bị reset về đội cũ ngay khi
-    // snapshot mới đến (guest join / chat / presence) → vào trận vẫn là Việt Nam.
-    if(gs.phase !== 'setup'){
+    // Chỉ đồng bộ đội từ gameState khi ĐANG TRONG TRẬN THỰC SỰ (phase
+    // shooting/anim-shot/defending/anim-defend/finished). Ở màn hình setup lẫn
+    // màn hình giải đấu (tournament), gameState vẫn giữ playerCountry CŨ từ
+    // trận trước (VD 'vn') — nếu ghi đè ở đây, host vừa chọn đội khác (VD
+    // Brazil) sẽ bị reset về đội cũ ngay khi snapshot mới đến (guest join /
+    // chat / presence / màn hình giải) → vào trận vẫn là Việt Nam.
+    const _ptMatchPhase = ['shooting','anim-shot','defending','anim-defend','finished'].includes(gs.phase);
+    if(_ptMatchPhase){
       if(gs.playerCountry) this.state.playerCountry = countryByCode(gs.playerCountry) || getAllCountries()[0];
       if(gs.aiCountry) this.state.aiCountry = countryByCode(gs.aiCountry) || this.randomCountry(gs.playerCountry);
     }
@@ -283,6 +322,7 @@ class PenaltyMP extends PenaltyGame {
   _showSetupScreen(){
     this.showScreen('pt-menu');
     document.getElementById('pt-match-info').style.display='none';
+    this.renderEffectsPanel(); // cập nhật thanh hiệu ứng cú sút khi vào màn hình chờ
     const hostBox=document.getElementById('pt-mp-setup-host');
     const guestBox=document.getElementById('pt-mp-setup-guest');
     if(this.isHost){
@@ -1109,6 +1149,11 @@ class PenaltyMP extends PenaltyGame {
     if(snap.leagueRounds) this.mpLeagueRounds = snap.leagueRounds;
     if(typeof snap.leagueRoundIdx === 'number') this.mpLeagueRoundIdx = snap.leagueRoundIdx;
     if(snap.leagueTable) this.mpLeagueTable = snap.leagueTable;
+    // Đội người chơi LUÔN nằm ở index 0 trong cupTeams/leagueTeams (teams=[pc,...])
+    // — khôi phục lại để host/guest reload giữa giải không bị rơi về đội mặc định
+    // (VN) ở trận sau; nếu không, trận kế tiếp lại đá nhầm đội cũ.
+    if(Array.isArray(snap.cupTeams) && snap.cupTeams[0]) this.state.playerCountry = snap.cupTeams[0];
+    if(Array.isArray(snap.leagueTeams) && snap.leagueTeams[0]) this.state.playerCountry = snap.leagueTeams[0];
     // Luan phien vai sut/bat moi tran — luu lai de sau khi host reload van
     // tiep tuc dung thu tu (khong bi lap lai nguoi sut o tran ke tiep).
     if(typeof snap.matchCount === 'number') this.mpMatchCount = snap.matchCount;
@@ -1485,9 +1530,14 @@ class PenaltyMP extends PenaltyGame {
       if(ctx.type === 'league'){
         const round = this.mpLeagueRounds[ctx.roundIdx];
         if(round && round[ctx.matchIdx]){
-          round[ctx.matchIdx].result = [pScore, aScore];
-          this._mpUpdateLeagueTable(0, pScore, aScore);
           const f = round[ctx.matchIdx];
+          // Định hướng kết quả theo home/away THẬT của fixture — người chơi
+          // (index 0) có thể đá ở vai KHÁCH (f.home !== 0). Nếu ghi thẳng
+          // [pScore, aScore] thì kết quả bị đảo ngược → thua 13-14 (luân lưu
+          // tử thần) bị tính thành thắng, sai bảng xếp hạng & thưởng.
+          const oriented = orientMatchScore(f, pScore, aScore);
+          f.result = oriented;
+          this._mpUpdateLeagueTable(0, pScore, aScore);
           const oppIdx = f.home === 0 ? f.away : f.home;
           this._mpUpdateLeagueTable(oppIdx, aScore, pScore);
         }
@@ -1505,9 +1555,12 @@ class PenaltyMP extends PenaltyGame {
         const group = this.mpCupGroups && this.mpCupGroups[ctx.groupIdx];
         const match = group && group.matches && group.matches[ctx.matchIdx];
         if(match){
-          match.result = [pScore, aScore];
-          this._mpUpdateCupGroupTable(ctx.groupIdx, match.home, pScore, aScore);
-          this._mpUpdateCupGroupTable(ctx.groupIdx, match.away, aScore, pScore);
+          // Định hướng home/away thật của trận — người chơi có thể là đội KHÁCH
+          // (match.away === 0). Ghi sai chiều → bảng xếp hạng + đi tiếp sai.
+          const oriented = orientMatchScore(match, pScore, aScore);
+          match.result = oriented;
+          this._mpUpdateCupGroupTable(ctx.groupIdx, match.home, oriented[0], oriented[1]);
+          this._mpUpdateCupGroupTable(ctx.groupIdx, match.away, oriented[1], oriented[0]);
         }
         // Sau khi doi choi da xong tran o vong nay, tu dong mo phong cac tran AI
         // con lai CUNG vong do o TAT CA cac bang — de moi bang luon cung tien do
@@ -1532,7 +1585,9 @@ class PenaltyMP extends PenaltyGame {
       } else if(ctx.type === 'cup-knockout'){
         const round = this.mpCupKnockoutRounds && this.mpCupKnockoutRounds[ctx.roundIdx];
         const match = round && round.matches && round.matches[ctx.matchIdx];
-        if(match) match.result = [pScore, aScore];
+        // Định hướng home/away — knockout dùng result để tìm winner, ghi sai
+        // chiều sẽ khiến người THUA (VD thua 13-14) đi tiếp / nhận Cúp.
+        if(match) match.result = orientMatchScore(match, pScore, aScore);
         this.mpCupKnockoutDisplayRoundIdx = ctx.roundIdx;
         if(this.mpCupKnockoutRounds && ctx.roundIdx + 1 < this.mpCupKnockoutRounds.length){
           this._mpResolveMatch(ctx.roundIdx + 1, 0);
