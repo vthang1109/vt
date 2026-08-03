@@ -1,6 +1,6 @@
 // ===================== PENALTY SHOOTOUT - CUP EDITION =====================
 import { auth, addPoints } from '../../points.js';
-import { COUNTRIES, FIFA_CODE3, abbr3, TOURNAMENT_CONFIGS, CUP_TOURNAMENTS, LEAGUE_CONFIGS, LEAGUE_LIST, buildRoundRobin, MODES, KIT_COLORS, flagColorCache, getFlagColors, applyTeamKit, SHOOTER_POSES, HAIR_COLOR_PALETTE, pickRandomHairColor, JERSEY_SPECIAL_NUMBERS, randomJerseyNumber, _shooterImgCache, _loadImg, _hexToRgb, _rgbToHsl, _hslToRgb, _poseDataCache, _getPoseData, _dyeMaskLayer, _bodyLayerCache, _teamLayerCache, _hairLayerCache, _getSplitShooterLayers, renderShooterSprite, GK_POSITIONS, applyKeeperSprite, applyKeeperKit, shuffle, getAllCountries, getRegionCountries, countryByCode, getTopCountries, flagImg } from './penalty-countries.js';
+import { COUNTRIES, FIFA_CODE3, abbr3, TOURNAMENT_CONFIGS, CUP_TOURNAMENTS, LEAGUE_CONFIGS, LEAGUE_LIST, buildRoundRobin, MODES, KIT_COLORS, flagColorCache, getFlagColors, applyTeamKit, SHOOTER_POSES, HAIR_COLOR_PALETTE, pickRandomHairColor, JERSEY_SPECIAL_NUMBERS, randomJerseyNumber, _shooterImgCache, _loadImg, _hexToRgb, _rgbToHsl, _hslToRgb, _poseDataCache, _getPoseData, _dyeMaskLayer, _bodyLayerCache, _teamLayerCache, _hairLayerCache, _getSplitShooterLayers, renderShooterSprite, GK_POSITIONS, applyKeeperSprite, applyKeeperKit, prewarmKeeperKit, shuffle, getAllCountries, getRegionCountries, countryByCode, getTopCountries, flagImg } from './penalty-countries.js';
 import { PT_EFFECTS, PT_EFFECTS_STORAGE_KEY, loadPenaltyEffects, savePenaltyEffects, simAIPenalty, orientMatchScore } from './penalty-effects.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -17,6 +17,28 @@ function saveKeyFor(mode, configId){
   if(mode==='league') return 'vt_penalty_save_league_'+(configId||'world')+'_v1';
   if(mode==='cup') return 'vt_penalty_save_cup_'+(configId||'worldcup')+'_v1';
   return null;
+}
+
+// ===== LỊCH SỬ THÀNH TÍCH =====
+const PT_HISTORY_KEY = 'vt_penalty_history_v1';
+const PT_HISTORY_MAX = 100;
+function loadPenaltyHistory(){
+  try{
+    const raw = localStorage.getItem(PT_HISTORY_KEY);
+    if(raw){
+      const list = JSON.parse(raw);
+      // Chỉ giữ kết quả giải đấu (vô địch/hạng); bỏ các trận đấu lẻ ghi trước đây
+      if(Array.isArray(list)){
+        const clean = list.filter(e => e && e.kind === 'tournament');
+        if(clean.length !== list.length) savePenaltyHistory(clean);
+        return clean;
+      }
+    }
+  }catch(e){}
+  return [];
+}
+function savePenaltyHistory(list){
+  try{ localStorage.setItem(PT_HISTORY_KEY, JSON.stringify(list.slice(0, PT_HISTORY_MAX))); }catch(e){}
 }
 
 export class PenaltyGame {
@@ -49,6 +71,13 @@ export class PenaltyGame {
       _effectOwned: [],
       _effectSelected: [],
     };
+    // Chế độ hiệu suất thấp — máy yếu: giảm hạt + bỏ trail SVG đường bay
+    this._lowPerf = localStorage.getItem('vt_penalty_lowperf') === '1';
+    // Flush tiến trình đang chờ debounce ngay khi đóng/ẩn tab — đặt ở CONSTRUCTOR
+    // để MP (override _init mà không gọi super._init) cũng nhận được listener.
+    window.addEventListener('pagehide', ()=>{
+      if(this._saveTimer){ clearTimeout(this._saveTimer); this._saveTimer=null; this._writeProgress(); }
+    });
     // Load effects from localStorage — normalize dữ liệu cũ (string → array)
     const saved = loadPenaltyEffects();
     const rawOwned = saved.owned;
@@ -309,6 +338,24 @@ export class PenaltyGame {
     document.getElementById('pt-buy-confirm-modal').addEventListener('click',e=>{
       if(e.target===e.currentTarget) this._cancelBuy();
     });
+
+    // Chế độ hiệu suất thấp
+    const lpBtn=document.getElementById('pt-lowperf-btn');
+    if(lpBtn) lpBtn.addEventListener('click',()=>this._toggleLowPerf());
+    this._renderLowPerfToggle();
+
+    // Lịch sử thành tích
+    const hb=document.getElementById('pt-history-btn');
+    if(hb) hb.addEventListener('click',()=>this.openHistoryModal());
+    const hc=document.getElementById('pt-history-modal-close');
+    if(hc) hc.addEventListener('click',()=>this.closeHistoryModal());
+    const hClose=document.getElementById('pt-history-close');
+    if(hClose) hClose.addEventListener('click',()=>this.closeHistoryModal());
+    const hcl=document.getElementById('pt-history-clear');
+    if(hcl) hcl.addEventListener('click',(e)=>{e.stopPropagation();this.clearHistory();});
+    const hm=document.getElementById('pt-history-modal');
+    if(hm) hm.addEventListener('click',e=>{if(e.target===e.currentTarget)this.closeHistoryModal();});
+
     setTimeout(()=>{
       if(window.TopNav?.setLeaveAction)window.TopNav.setLeaveAction(()=>this.showScreen('pt-menu'));
     },100);
@@ -539,6 +586,88 @@ export class PenaltyGame {
     this.closeEffectModal();
   }
 
+  // ===== LỊCH SỬ THÀNH TÍCH =====
+  _recordHistory(entry){
+    if(!entry) return;
+    const list = loadPenaltyHistory();
+    list.unshift(entry);
+    savePenaltyHistory(list);
+  }
+
+  // Ước lượng hạng Cup khi đội nhà (index 0) không vô địch:
+  // vào chung kết → 2; bị loại ở vòng r → matches.length+1 (R16→9, QF→5, SF→3).
+  _estimateCupRank(rounds, isWin, finalMatch){
+    if(isWin) return 1;
+    if(finalMatch && (finalMatch.home===0 || finalMatch.away===0)) return 2;
+    for(let r=0;r<(rounds||[]).length;r++){
+      const lost = rounds[r].matches.some(m=>{
+        if(m.home!==0 && m.away!==0) return false;
+        if(!m.result) return false;
+        const pScore = m.home===0 ? m.result[0] : m.result[1];
+        const aScore = m.home===0 ? m.result[1] : m.result[0];
+        return pScore < aScore;
+      });
+      if(lost) return rounds[r].matches.length + 1;
+    }
+    return 2; // mặc định á quân
+  }
+
+  openHistoryModal(){
+    const modal = document.getElementById('pt-history-modal');
+    if(!modal) return;
+    this.renderHistoryModal();
+    modal.classList.add('active');
+  }
+
+  closeHistoryModal(){
+    const modal = document.getElementById('pt-history-modal');
+    if(modal) modal.classList.remove('active');
+  }
+
+  clearHistory(){
+    savePenaltyHistory([]);
+    this.renderHistoryModal();
+  }
+
+  renderHistoryModal(){
+    const statsEl = document.getElementById('pt-history-stats');
+    const listEl = document.getElementById('pt-history-list');
+    if(!statsEl || !listEl) return;
+    const list = loadPenaltyHistory();
+    // Thống kê thành tích giải đấu
+    const total = list.length;
+    const champs = list.filter(e=>e.result==='champion').length;
+    const silver = list.filter(e=>e.result==='rank' && e.rank===2).length;
+    const bronze = list.filter(e=>e.result==='rank' && e.rank===3).length;
+    statsEl.innerHTML = `
+      <div class="pt-hstat"><b>${total}</b><span>Giải</span></div>
+      <div class="pt-hstat pt-hstat-cup"><b>${champs}</b><span>Vô địch</span></div>
+      <div class="pt-hstat pt-hstat-silver"><b>${silver}</b><span>Hạng 2</span></div>
+      <div class="pt-hstat pt-hstat-bronze"><b>${bronze}</b><span>Hạng 3</span></div>
+    `;
+    if(!list.length){
+      listEl.innerHTML = `<div class="pt-history-empty">Chưa có thành tích giải đấu. Hãy tham gia League/Cúp ngay! 🏆</div>`;
+      return;
+    }
+    listEl.innerHTML = list.slice(0, PT_HISTORY_MAX).map(e=>this._historyRowHtml(e)).join('');
+  }
+
+  _historyRowHtml(e){
+    const d = new Date(e.ts);
+    const date = d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'2-digit'}) + ' ' + d.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+    const modeIcon = e.mode==='cup' ? '🏆' : '📊';
+    const isChamp = e.result==='champion';
+    const rankTxt = isChamp ? '🏆 Vô địch!' : (e.rank===2 ? '🥈 Hạng 2' : (e.rank===3 ? '🥉 Hạng 3' : 'Hạng '+(e.rank||'?')));
+    return `<div class="pt-hrow pt-hrow-tour ${isChamp?'pt-hrow-champ':''}">
+      <div class="pt-hrow-icon">${modeIcon}</div>
+      <div class="pt-hrow-main">
+        <div class="pt-hrow-title">${e.label||''}</div>
+        <div class="pt-hrow-sub">${flagImg(e.player.code, e.player.name, 13)} ${e.player.name} · ${rankTxt}</div>
+      </div>
+      <div class="pt-hrow-date">${date}</div>
+    </div>`;
+  }
+
   showScreen(id){
     this._hideResultShooters();
     ['pt-menu','pt-game','pt-league-view','pt-cup-group-view','pt-cup-transition','pt-cup-knockout-view'].forEach(x=>{
@@ -576,6 +705,9 @@ export class PenaltyGame {
           _getSplitShooterLayers(pose, kit.primary, kit.secondary, pickRandomHairColor(), kit.socks).catch(()=>{});
         });
       });
+      // Pre-warm áo thủ môn WebP cho cả 2 đội — tránh _gkColorizeWhite (vòng lặp
+      // từng pixel đồng bộ) chạy đúng lúc cú sút đang bay gây giật.
+      prewarmKeeperKit(team.code).catch(()=>{});
     });
     document.getElementById('pt-actions').style.display='none';
     document.getElementById('pt-match-done-btn').style.display='none';
@@ -737,6 +869,16 @@ export class PenaltyGame {
     const pts=isWin?(config.pointsWin||200):(config.pointsLose||50);
     addPoints('Penalty '+config.name,isWin?'Vô địch '+config.name:'Hết '+config.name,pts).catch(()=>{});
     if(window.VTQuests)window.VTQuests.trackEarn(pts);
+    // Ghi lịch sử thành tích: vô địch / hạng
+    this._recordHistory({
+      ts: Date.now(),
+      kind: 'tournament',
+      mode: 'league',
+      result: isWin ? 'champion' : 'rank',
+      rank: rank,
+      player: { code: this.state.playerCountry.code, name: this.state.playerCountry.name },
+      label: config.name
+    });
     this.clearProgress('league', config.id);
   }
 
@@ -1345,6 +1487,16 @@ export class PenaltyGame {
     if (isWin) {
       //window.showToast(`🏆 Chức vô địch ${config.name} thuộc về ${flagImg(teams[0].code, teams[0].name)} ${teams[0].name}!`, 'success');
     }
+    // Ghi lịch sử thành tích: vô địch / á quân (hoặc hạng nếu không vào chung kết)
+    this._recordHistory({
+      ts: Date.now(),
+      kind: 'tournament',
+      mode: 'cup',
+      result: isWin ? 'champion' : 'rank',
+      rank: this._estimateCupRank(this.state.cupKnockoutRounds, isWin, finalMatch),
+      player: { code: this.state.playerCountry.code, name: this.state.playerCountry.name },
+      label: config.name
+    });
     this.clearProgress('cup', config.id);
   }
 
@@ -1717,7 +1869,8 @@ export class PenaltyGame {
     // Thủ môn (đội bạn) phản ứng trễ 1 nhịp sau khi bóng được sút
     const keeper=document.getElementById('pt-keeper');
     if(keeper){keeper.classList.remove('mine');keeper.classList.add('theirs');}
-    const _trailStyle=styleOverride||this._pickTrailStyle();
+    // LowPerf: ép 'default' để keeper dive khớp thời gian bay của _animateBallToZone
+    const _trailStyle=this._lowPerf?'default':(styleOverride||this._pickTrailStyle());
     setTimeout(()=>this._keeperDive(aiZone,isGoal&&zoneId!==aiZone?'diving':'save',FLIGHT_MS_BY_STYLE[_trailStyle]||900), KEEPER_REACT_DELAY_MS);
     this._shooterKick();
     this._animateBallToZone(zoneId,()=>{
@@ -1745,7 +1898,8 @@ export class PenaltyGame {
     // Thủ môn (đội mình) phản ứng trễ 1 nhịp sau khi bóng được sút
     const keeper=document.getElementById('pt-keeper');
     if(keeper){keeper.classList.remove('theirs');keeper.classList.add('mine');}
-    const _trailStyle=styleOverride||this._pickTrailStyle();
+    // LowPerf: ép 'default' để keeper dive khớp thời gian bay của _animateBallToZone
+    const _trailStyle=this._lowPerf?'default':(styleOverride||this._pickTrailStyle());
     setTimeout(()=>this._keeperDive(saveZone,isGoal?'diving':'save',FLIGHT_MS_BY_STYLE[_trailStyle]||900), KEEPER_REACT_DELAY_MS);
     this._shooterKick();
     this._animateBallToZone(zoneId,()=>{
@@ -1843,7 +1997,7 @@ export class PenaltyGame {
       setTimeout(()=>s.remove(),450);
     });
     // ===== Hạt neon gió xoáy — xanh-trắng bay cuốn theo chiều gió (mới) =====
-    const neonCount=6+Math.floor(Math.random()*5);
+    const neonCount=4+Math.floor(Math.random()*3);
     for(let i=0;i<neonCount;i++){
       const n=document.createElement('div');
       n.className='pt-wind-neon';
@@ -1875,7 +2029,7 @@ export class PenaltyGame {
       setTimeout(()=>p.remove(),520);
     }
     // Tàn lửa neon đỏ-vàng-đen bay xung quanh (6-10 hạt)
-    const emberCount=6+Math.floor(Math.random()*5);
+    const emberCount=4+Math.floor(Math.random()*3);
     const emberColors=['#ef4444','#fb923c','#fde68a','#dc2626','#000000'];
     for(let i=0;i<emberCount;i++){
       const n=document.createElement('div');
@@ -1912,7 +2066,7 @@ export class PenaltyGame {
     pitch.appendChild(sp);
     setTimeout(()=>sp.remove(),500);
     // ===== Tinh thể băng neon — 8-12 hạt toả xung quanh (mới) =====
-    const crystalCount=8+Math.floor(Math.random()*5);
+    const crystalCount=5+Math.floor(Math.random()*3);
     const crystalSizes=[4,5,7];
     for(let i=0;i<crystalCount;i++){
       const n=document.createElement('div');
@@ -1930,7 +2084,7 @@ export class PenaltyGame {
       setTimeout(()=>n.remove(),800);
     }
     // ===== Icon băng ❄️ bay xung quanh (giống lá 🍃) =====
-    const iconCount=2+Math.floor(Math.random()*3);
+    const iconCount=2+Math.floor(Math.random()*2);
     for(let i=0;i<iconCount;i++){
       const ic=document.createElement('div');
       ic.className='pt-ice-icon';
@@ -1972,7 +2126,7 @@ export class PenaltyGame {
     pitch.appendChild(glow);
     setTimeout(()=>glow.remove(),550);
     // Lá cây — tăng từ 2 lên 3-5
-    const leafCount=3+Math.floor(Math.random()*3);
+    const leafCount=3+Math.floor(Math.random()*2);
     for(let i=0;i<leafCount;i++){
       const p=document.createElement('span');
       p.className='pt-trail-leaf';
@@ -1986,7 +2140,7 @@ export class PenaltyGame {
       setTimeout(()=>p.remove(),800);
     }
     // ===== Hạt neon xanh-vàng — linh hồn lá bay xung quanh (mới) =====
-    const spiritCount=6+Math.floor(Math.random()*5);
+    const spiritCount=4+Math.floor(Math.random()*3);
     for(let i=0;i<spiritCount;i++){
       const n=document.createElement('div');
       n.className='pt-leaf-spirit';
@@ -2031,7 +2185,7 @@ export class PenaltyGame {
       setTimeout(()=>s.remove(),480);
     });
     // ===== Hạt neon cầu vồng đa sắc — bay xung quanh (mới) =====
-    const neonCount=6+Math.floor(Math.random()*5);
+    const neonCount=4+Math.floor(Math.random()*3);
     const rbHues=[0,30,55,130,210,280];
     for(let i=0;i<neonCount;i++){
       const n=document.createElement('div');
@@ -2066,7 +2220,7 @@ export class PenaltyGame {
     }
     // ===== Tàn hắc ám — đen-đỏ, lõi đen, giống .pt-fire-ember =====
     const emberColors=['#000000','#dc2626','#6b21a8','#000000'];
-    const emberCount=6+Math.floor(Math.random()*5);
+    const emberCount=4+Math.floor(Math.random()*3);
     for(let i=0;i<emberCount;i++){
       const n=document.createElement('div');
       n.className='pt-dark-ember';
@@ -2095,7 +2249,7 @@ export class PenaltyGame {
     pitch.appendChild(p);
     setTimeout(()=>p.remove(),380);
     // Neon đen-vàng — 5-7 hạt glow toả xung quanh tia sét
-    const neonCount=5+Math.floor(Math.random()*3);
+    const neonCount=4+Math.floor(Math.random()*2);
     for(let i=0;i<neonCount;i++){
       const n=document.createElement('div');
       n.className='pt-thunder-neon';
@@ -2148,7 +2302,7 @@ export class PenaltyGame {
     pitch.appendChild(flare);
     setTimeout(()=>flare.remove(),530);
     // ===== Hạt neon lấp lánh — trắng-vàng toả ra mọi hướng =====
-    const sparkleCount=8+Math.floor(Math.random()*7);
+    const sparkleCount=6+Math.floor(Math.random()*4);
     for(let i=0;i<sparkleCount;i++){
       const n=document.createElement('div');
       n.className='pt-light-neon';
@@ -2169,7 +2323,7 @@ export class PenaltyGame {
     }
     // ===== Tàn dư va chạm — đỏ/cam/vàng/trắng bắn ra từ điểm giao tia =====
     const emberColors=['#ef4444','#fb923c','#facc15','#ffffff'];
-    const emberCount=6+Math.floor(Math.random()*5);
+    const emberCount=4+Math.floor(Math.random()*3);
     for(let i=0;i<emberCount;i++){
       const e=document.createElement('div');
       e.className='pt-light-ember';
@@ -2206,7 +2360,7 @@ export class PenaltyGame {
   // Bươm bướm — nhiều hạt màu hồng/tím/cam bay rập rờn
   _spawnButterflyTrail(pitch,x,y){
     const colors=['#ffffff','#fce7f3','#fbcfe8','#f9a8d4','#ec4899'];
-    for(let i=0;i<6;i++){
+    for(let i=0;i<4;i++){
       const p=document.createElement('div');
       p.className='pt-trail-butterfly';
       p.style.left=(x+(Math.random()-0.5)*18)+'px';
@@ -2218,7 +2372,7 @@ export class PenaltyGame {
       setTimeout(()=>p.remove(),600);
     }
     // ===== Neon hồng-trắng — cánh sen lấp lánh (mới) =====
-    const neonCount=6+Math.floor(Math.random()*5);
+    const neonCount=4+Math.floor(Math.random()*3);
     for(let i=0;i<neonCount;i++){
       const n=document.createElement('div');
       n.className='pt-butterfly-neon';
@@ -2264,7 +2418,7 @@ export class PenaltyGame {
   // Hố đen — xoáy hạt tím/đen cuốn vào lỗ sâu
   _spawnBlackholeTrail(pitch,x,y){
     const colors=['#000000','#0c4a6e','#06b6d4','#a855f7','#d8b4fe','#ffffff'];
-    for(let i=0;i<4;i++){
+    for(let i=0;i<3;i++){
       const p=document.createElement('div');
       p.className='pt-trail-blackhole';
       p.style.left=(x+(Math.random()-0.5)*20)+'px';
@@ -2287,8 +2441,22 @@ export class PenaltyGame {
     setTimeout(()=>p.remove(),600);
   }
 
+  // Bật/tắt chế độ hiệu suất thấp — lưu localStorage + cập nhật nút
+  _toggleLowPerf(){
+    this._lowPerf = !this._lowPerf;
+    try{ localStorage.setItem('vt_penalty_lowperf', this._lowPerf ? '1' : '0'); }catch(e){}
+    this._renderLowPerfToggle();
+  }
+
+  _renderLowPerfToggle(){
+    const btn = document.getElementById('pt-lowperf-btn');
+    if(btn) btn.classList.toggle('on', !!this._lowPerf);
+  }
+
   // Chọn hiệu ứng cú sút — random từ danh sách đã chọn, fallback random toàn bộ
   _pickTrailStyle(){
+    // Chế độ hiệu suất thấp: luôn dùng đường sút mặc định (thẳng, không hiệu ứng)
+    if(this._lowPerf) return 'default';
     const selected = this.state._effectSelected || [];
     const owned = this.state._effectOwned || [];
     // Lọc chỉ lấy hiệu ứng hợp lệ
@@ -2397,50 +2565,72 @@ export class PenaltyGame {
       stroke='#38bdf8';
     }
 
-    // Nhóm glow ngoài — to, mờ, tạo hào quang (vẽ theo từng đoạn để vuốt nhỏ dần)
+    // Nhóm glow ngoài — to, mờ, tạo hào quang. KHÔNG dùng filter blur: SVG filter
+    // buộc trình duyệt render lại toàn bộ khối mỗi khi path thay đổi theo frame
+    // (rất tốn GPU) — thay bằng nét rộng + opacity thấp, vẫn ra hào quang mà rẻ hơn.
     const glowGroup=document.createElementNS(svgNS,'g');
-    glowGroup.setAttribute('opacity','0.4');
-    glowGroup.style.filter='blur(5px)';
+    glowGroup.setAttribute('opacity','0.35');
 
-    // Nhóm lõi — sáng rõ, vuốt nhỏ dần về phía đuôi như hình chóp dài
+    // Nhóm lõi — sáng rõ
     const coreGroup=document.createElementNS(svgNS,'g');
     coreGroup.setAttribute('opacity','0.95');
+
+    // POOL phân đoạn CỐ ĐỊNH: tạo path 1 lần duy nhất, mỗi frame chỉ set lại
+    // thuộc tính d trên các path có sẵn — KHÔNG còn createElement + xoá innerHTML
+    // từng frame như cũ (chính là nguồn gây O(n²) DOM churn → giật hình).
+    const TIERS=4;
+    const CORE_W=[3,8,16,22];
+    const GLOW_W=[9,18,30,36];
+    const mkPath=(w)=>{
+      const p=document.createElementNS(svgNS,'path');
+      p.setAttribute('fill','none');
+      p.setAttribute('stroke',stroke);
+      p.setAttribute('stroke-width',String(w));
+      p.setAttribute('stroke-linecap','round');
+      p.setAttribute('d','');
+      return p;
+    };
+    const glowSegs=[], coreSegs=[];
+    for(let t=0;t<TIERS;t++){
+      const gs=mkPath(GLOW_W[t]); glowGroup.appendChild(gs); glowSegs.push(gs);
+      const cs=mkPath(CORE_W[t]); coreGroup.appendChild(cs); coreSegs.push(cs);
+    }
 
     svg.appendChild(glowGroup);
     svg.appendChild(coreGroup);
     pitch.appendChild(svg);
 
-    return {svg,glowGroup,coreGroup,stroke,points:[{x:startX,y:startY}]};
+    return {svg,glowSegs,coreSegs,stroke,points:[{x:startX,y:startY}]};
   }
 
   _updateTrailLineObj(tl,x,y){
     if(!tl) return;
     tl.points.push({x,y});
-    const svgNS='http://www.w3.org/2000/svg';
-    // To bằng quả bóng ngay sát bóng, nhỏ dần về phía đuôi — hình chóp dài
-    const CORE_MAX=22, CORE_MIN=2, GLOW_MAX=34, GLOW_MIN=6;
-    tl.glowGroup.innerHTML='';
-    tl.coreGroup.innerHTML='';
-    const n=tl.points.length-1;
-    for(let i=0;i<n;i++){
-      const p1=tl.points[i], p2=tl.points[i+1];
-      const t=(i+1)/n; // 0 = đuôi, 1 = ngay sát bóng
-      const coreW=CORE_MIN+(CORE_MAX-CORE_MIN)*t;
-      const glowW=GLOW_MIN+(GLOW_MAX-GLOW_MIN)*t;
-      const glowSeg=document.createElementNS(svgNS,'path');
-      glowSeg.setAttribute('d',`M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`);
-      glowSeg.setAttribute('fill','none');
-      glowSeg.setAttribute('stroke',tl.stroke);
-      glowSeg.setAttribute('stroke-width',glowW.toFixed(1));
-      glowSeg.setAttribute('stroke-linecap','round');
-      tl.glowGroup.appendChild(glowSeg);
-      const coreSeg=document.createElementNS(svgNS,'path');
-      coreSeg.setAttribute('d',`M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`);
-      coreSeg.setAttribute('fill','none');
-      coreSeg.setAttribute('stroke',tl.stroke);
-      coreSeg.setAttribute('stroke-width',coreW.toFixed(1));
-      coreSeg.setAttribute('stroke-linecap','round');
-      tl.coreGroup.appendChild(coreSeg);
+    let pts=tl.points;
+    // Decimate: giữ tối đa ~30 điểm — path không phình vô hạn, chi phí mỗi frame
+    // chỉ là O(1) thay vì rebuild toàn bộ từng frame (O(n²) khi điểm tăng dần).
+    if(pts.length>30){
+      const dec=[];
+      for(let i=0;i<pts.length;i+=2) dec.push(pts[i]);
+      const last=pts[pts.length-1];
+      if(dec[dec.length-1]!==last) dec.push(last);
+      tl.points=dec; pts=dec;
+    }
+    const n=pts.length;
+    if(n<2) return;
+    const TIERS=tl.glowSegs.length;
+    // Tier 0 = đuôi (mảnh), tier cuối = đầu sát bóng (dày) — giữ hiệu ứng vuốt
+    // nhỏ dần về đuôi, nhưng chỉ set thuộc tính trên các path có sẵn trong pool.
+    for(let t=0;t<TIERS;t++){
+      const from=Math.floor((t/TIERS)*(n-1));
+      const to=Math.max(from+1, Math.floor(((t+1)/TIERS)*(n-1)));
+      let d='';
+      for(let i=from;i<=to && i<n;i++){
+        const p=pts[i];
+        d+=(i===from?`M ${p.x.toFixed(1)} ${p.y.toFixed(1)}`:` L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`);
+      }
+      tl.glowSegs[t].setAttribute('d',d);
+      tl.coreSegs[t].setAttribute('d',d);
     }
   }
 
@@ -2556,12 +2746,15 @@ export class PenaltyGame {
     // + setInterval riêng lẻ (2 timeline khác nhau chạy độc lập là nguyên nhân
     // chính gây giật hình/giật đường bay) — giờ tất cả đồng bộ theo đúng 1 vòng
     // rAF, luôn khớp với frame vẽ thực tế của trình duyệt.
-    const trailStyle=preTrailStyle||this._pickTrailStyle();
+    // LowPerf: ép 'default' dù MP có sync hiệu ứng từ client kia (gs.shotEffect)
+    // — nếu không, các nhánh dark/light/clone/butterfly/blackhole vẫn tạo bóng phụ.
+    const trailStyle=this._lowPerf ? 'default' : (preTrailStyle||this._pickTrailStyle());
     const flightMs=FLIGHT_MS_BY_STYLE[trailStyle]||900;
     const t0=performance.now();
     let lastAccentT=-1;
     this._setBallFx(ball,trailStyle,team);
-    this._startTrailLine(pitch,trailStyle,team,startX,startY,endX,endY);
+    // Chế độ hiệu suất thấp: bỏ trail SVG đường bay (giảm DOM + setAttribute/frame)
+    if(!this._lowPerf) this._startTrailLine(pitch,trailStyle,team,startX,startY,endX,endY);
 
     // "Hắc ám" — phân thân ra 2 quả bóng, xoáy đối pha rồi hợp nhất lại tại
     // điểm rơi (biên độ lệch giảm dần về 0 đúng lúc raw→1).
@@ -2831,13 +3024,16 @@ export class PenaltyGame {
       // Vẽ nối thêm điểm vào đường path — luôn liền mạch theo đúng khung hình
       // thực tế, không còn đứt quãng như cách rắc từng đoạn rời trước đây.
       // Hố đen: Phase 2 thì trail đã giậm chân ở portal1, Phase 3 dùng vệt riêng
-      if(trailStyle!=='blackhole' || raw<portal1Raw) this._updateTrailLine(x,y);
-      // Hạt điểm nhấn (lửa/băng/lá/hắc ám/sấm sét) rắc thưa hơn để tô thêm
-      // chi tiết trên nền đường path liên tục, không đóng vai trò chính nữa.
-      const bhGap = trailStyle==='blackhole' && raw>=portal1Raw && raw<portal2Raw;
-      if((trailStyle==='wind'||trailStyle==='rainbow'||trailStyle==='fire'||trailStyle==='ice'||trailStyle==='leaf'||trailStyle==='dark'||trailStyle==='thunder'||trailStyle==='light'||trailStyle==='clone'||trailStyle==='butterfly'||trailStyle==='blackhole') && !bhGap && (raw-lastAccentT>=0.14 || raw>=1)){
-        lastAccentT=raw;
-        this._spawnBallTrail(pitch,x,y,angleDeg,team,trailStyle);
+      // Chế độ hiệu suất thấp: bỏ luôn phần này (không tạo hạt, không set path).
+      if(!this._lowPerf){
+        if(trailStyle!=='blackhole' || raw<portal1Raw) this._updateTrailLine(x,y);
+        // Hạt điểm nhấn (lửa/băng/lá/hắc ám/sấm sét) rắc thưa hơn để tô thêm
+        // chi tiết trên nền đường path liên tục, không đóng vai trò chính nữa.
+        const bhGap = trailStyle==='blackhole' && raw>=portal1Raw && raw<portal2Raw;
+        if((trailStyle==='wind'||trailStyle==='rainbow'||trailStyle==='fire'||trailStyle==='ice'||trailStyle==='leaf'||trailStyle==='dark'||trailStyle==='thunder'||trailStyle==='light'||trailStyle==='clone'||trailStyle==='butterfly'||trailStyle==='blackhole') && !bhGap && (raw-lastAccentT>=0.22 || raw>=1)){
+          lastAccentT=raw;
+          this._spawnBallTrail(pitch,x,y,angleDeg,team,trailStyle);
+        }
       }
       if(raw<1){
         requestAnimationFrame(step);
@@ -2987,6 +3183,10 @@ export class PenaltyGame {
       const kit = {...cached, hair:hairHex};
       this.state._shooterKit = kit;
       renderShooterSprite('mid-stand', kit);
+      // Pre-warm kick/celebrate/disappoint với ĐÚNG màu tóc của cú sút này.
+      // showMatch pre-warm dùng màu random khác → _hairLayerCache miss khi sút
+      // → _dyeMaskLayer chạy pixel đồng bộ đúng lúc bóng bay (lag cú sút đầu).
+      this._prewarmShotPoses(kit);
       return;
     }
     // Chưa có cache: hiện ảnh gốc tạm trong lúc chờ tải màu cờ, TUYỆT ĐỐI
@@ -2997,6 +3197,17 @@ export class PenaltyGame {
       const kit = {...kitRaw, hair:hairHex};
       this.state._shooterKit = kit;
       if(this.state._shooterPose==='mid-stand') renderShooterSprite('mid-stand', kit);
+      this._prewarmShotPoses(kit);
+    });
+  }
+
+  // Làm nóng trước các pose sẽ dùng lúc sút (kick/celebrate/disappoint) với
+  // ĐÚNG màu áo + màu tóc của lượt sút sắp diễn ra — tránh tính pixel đồng bộ
+  // ngay giữa animation cú sút đầu tiên gây giật.
+  _prewarmShotPoses(kit){
+    if(!kit) return;
+    ['kick','celebrate','disappoint'].forEach(pose=>{
+      _getSplitShooterLayers(pose, kit.primary, kit.secondary, kit.hair, kit.socks).catch(()=>{});
     });
   }
 
@@ -3086,7 +3297,17 @@ export class PenaltyGame {
 
 
   // ===== SAVE / RESUME PROGRESS =====
+  // Debounce: saveProgress có thể được gọi nhiều lần liên tiếp (mỗi lượt sút /
+  // mỗi lần renderStatusBar / chuyển màn) — chỉ thực sự ghi localStorage 1 lần
+  // sau khi đã yên ~500ms để tránh JSON.stringify + setItem hàng chục lần/trận.
   saveProgress(){
+    if(this._saveTimer) clearTimeout(this._saveTimer);
+    this._saveTimer = setTimeout(()=>{ this._saveTimer=null; this._writeProgress(); }, 500);
+  }
+
+  _writeProgress(){
+    // MP sync qua Firestore, không dùng localStorage progress — bỏ ghi vô ích
+    if(this.mpMode !== undefined) return;
     const mode=this.state._mode;
     const configId = mode==='league' ? (this.state.league&&this.state.league.id)
                     : mode==='cup' ? (this.state.cupConfig&&this.state.cupConfig.id)
@@ -3127,6 +3348,9 @@ export class PenaltyGame {
   clearProgress(mode, configId){
     const key = saveKeyFor(mode, configId);
     if(!key)return;
+    // Hủy timer debounce còn treo — nếu không, timer 500ms sẽ ghi LẠI tiến trình
+    // cũ ngay sau khi ta vừa xóa nó (endLeague/endCup gọi saveProgress trước đó).
+    if(this._saveTimer){ clearTimeout(this._saveTimer); this._saveTimer=null; }
     try{localStorage.removeItem(key)}catch(e){}
   }
 

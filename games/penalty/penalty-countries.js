@@ -578,6 +578,39 @@ export async function applyKeeperKit(keeper, zone, countryCode){
   keeper.src = url;
 }
 
+// Pre-warm: nhuộm áo thủ môn cho CẢ 2 đội ở MỌI tư thế bay ngay khi vào trận.
+// Vòng lặp xử lý từng pixel trên ảnh WebP (getImageData + HSL + toDataURL) chạy
+// ĐỒNG BỘ rất nặng — nếu để nó chạy lần đầu đúng lúc cú sút đang bay sẽ gây giật.
+// Gọi hàm này trước trận → _gkColorizeWhite chạy 1 lần, cache sẵn toàn bộ tư thế.
+export async function prewarmKeeperKit(countryCode){
+  if(!countryCode) return;
+  let primary;
+  try{
+    const kit = await getFlagColors(countryCode);
+    primary = kit && kit.primary;
+  }catch(e){ return; }
+  if(!primary) return;
+  const { r, g, b } = _hexToRgb(primary);
+  const [, s, l] = _rgbToHsl(r, g, b);
+  // Màu đội gần như trắng → dùng ảnh gốc, không cần tint (giống applyKeeperKit)
+  if(l > 0.88 && s < 0.25) return;
+  const positions = Object.values(GK_POSITIONS);
+  // Preload decode ảnh WebP trước (tránh decode lần đầu ngay lúc sút)
+  for(const p of positions){
+    try{ await _loadImg(p.img); }catch(e){}
+  }
+  for(const p of positions){
+    const cacheKey = p.img+'|'+primary;
+    if(_gkTintSrcCache[cacheKey]) continue;
+    const img = await _loadImg(p.img);
+    if(!img) continue;
+    try{
+      const url = _gkColorizeWhite(img, primary);
+      if(url) _gkTintSrcCache[cacheKey] = url;
+    }catch(e){}
+  }
+}
+
 // ============================
 // HELPERS
 // ============================

@@ -127,6 +127,14 @@
       <div class="pt-mp-setup-box" id="pt-mp-setup-guest" style="display:none">
         <div class="pt-mp-hint">⏳ Đang chờ chủ phòng chọn chế độ và bắt đầu trận...</div>
       </div>
+
+      <button class="pt-history-btn" id="pt-history-btn" style="margin-top:12px">📜 Lịch sử thành tích</button>
+
+      <button class="pt-lowperf-btn" id="pt-lowperf-btn" title="Giảm hạt & bỏ đường bay SVG — mượt hơn trên máy yếu">
+        <span class="pt-lowperf-icon">🐢</span>
+        <span class="pt-lowperf-text">Chế độ hiệu suất thấp</span>
+        <span class="pt-lowperf-switch"><span class="pt-lowperf-knob"></span></span>
+      </button>
     </div>
 
     <!-- ===== LEAGUE VIEW (MP) ===== -->
@@ -347,6 +355,22 @@
     </div>
   </div>
 
+  <!-- Lịch sử thành tích popup modal -->
+  <div class="pt-modal-overlay" id="pt-history-modal">
+    <div class="pt-modal-box">
+      <div class="pt-modal-header">
+        <h3>📜 Lịch sử thành tích</h3>
+        <button class="pt-modal-close" id="pt-history-modal-close">✕</button>
+      </div>
+      <div class="pt-history-stats" id="pt-history-stats"></div>
+      <div class="pt-history-list" id="pt-history-list"></div>
+      <div class="pt-modal-actions">
+        <button class="btn-secondary" id="pt-history-clear">🗑️ Xóa lịch sử</button>
+        <button class="btn-primary" id="pt-history-close">Đóng</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999"></div>
 
   <script>
@@ -355,12 +379,15 @@
     let particles = [];
     function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
     resize(); addEventListener('resize', resize);
-    for(let i=0;i<25;i++) particles.push({
+    // Ít hạt hơn (25→14) + bỏ qua frame khi tab bị ẩn → giảm tải GPU cho game animation
+    for(let i=0;i<14;i++) particles.push({
       x:Math.random()*canvas.width, y:Math.random()*canvas.height,
       vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4,
       r:Math.random()*1.5+.5
     });
     (function loop(){
+      requestAnimationFrame(loop);
+      if(document.hidden) return; // tab ẩn: không vẽ, tiết kiệm CPU/GPU
       ctx.clearRect(0,0,canvas.width,canvas.height);
       particles.forEach(p=>{
         p.x+=p.vx; p.y+=p.vy;
@@ -369,7 +396,6 @@
         ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
         ctx.fillStyle='rgba(74,222,128,0.4)'; ctx.fill();
       });
-      requestAnimationFrame(loop);
     })();
     window.showToast = function(msg, type='info'){
       const colors = {info:'#38bdf8',success:'#4ade80',warn:'#fbbf24',error:'#f87171'};

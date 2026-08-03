@@ -13,7 +13,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 import {
   getAllCountries, countryByCode, getFlagColors, _getSplitShooterLayers,
   pickRandomHairColor, HAIR_COLOR_PALETTE, getTopCountries, shuffle, flagImg, abbr3,
-  CUP_TOURNAMENTS, LEAGUE_LIST, buildRoundRobin,
+  CUP_TOURNAMENTS, LEAGUE_LIST, buildRoundRobin, prewarmKeeperKit,
   getRegionCountries
 } from './penalty-countries.js';
 import { simAIPenalty } from './penalty-effects.js';
@@ -97,6 +97,11 @@ class PenaltyMP extends PenaltyGame {
       if(e.target===e.currentTarget) this.closeCountryPopup();
     });
 
+    // Chế độ hiệu suất thấp — kế thừa _toggleLowPerf/_renderLowPerfToggle từ cha
+    const lpBtn=document.getElementById('pt-lowperf-btn');
+    if(lpBtn) lpBtn.addEventListener('click',()=>this._toggleLowPerf());
+    this._renderLowPerfToggle();
+
     document.getElementById('pt-mp-mode-row').addEventListener('click', e=>{
       const b=e.target.closest('.pt-mp-mode-btn'); if(!b) return;
       if(!this.isHost) return;
@@ -135,6 +140,18 @@ class PenaltyMP extends PenaltyGame {
     document.getElementById('pt-group-next').addEventListener('click', ()=>this._mpPlayGroupMatch());
     document.getElementById('pt-transition-next').addEventListener('click', ()=>this._mpAdvanceToKnockout());
     document.getElementById('pt-knockout-next').addEventListener('click', ()=>this._mpPlayKnockoutMatch());
+
+    // Lịch sử thành tích (kế thừa modal từ PenaltyGame)
+    const hb=document.getElementById('pt-history-btn');
+    if(hb) hb.addEventListener('click', ()=>this.openHistoryModal());
+    const hc=document.getElementById('pt-history-modal-close');
+    if(hc) hc.addEventListener('click', ()=>this.closeHistoryModal());
+    const hClose=document.getElementById('pt-history-close');
+    if(hClose) hClose.addEventListener('click', ()=>this.closeHistoryModal());
+    const hcl=document.getElementById('pt-history-clear');
+    if(hcl) hcl.addEventListener('click', (e)=>{e.stopPropagation();this.clearHistory();});
+    const hm=document.getElementById('pt-history-modal');
+    if(hm) hm.addEventListener('click', e=>{if(e.target===e.currentTarget)this.closeHistoryModal();});
   }
 
   // ===== FIRESTORE =====
@@ -249,6 +266,9 @@ class PenaltyMP extends PenaltyGame {
           _getSplitShooterLayers(pose, kit.primary, kit.secondary, hair, kit.socks).catch(()=>{});
         });
       });
+      // Pre-warm áo thủ môn WebP cho cả 2 đội — tránh _gkColorizeWhite chạy
+      // đồng bộ đúng lúc cú sút đang bay (nguyên nhân giật mỗi lượt sút).
+      prewarmKeeperKit(team.code).catch(()=>{});
     });
   }
 
@@ -504,6 +524,17 @@ class PenaltyMP extends PenaltyGame {
         this._mpLeagueRewarded = true;
         const pts = isWin ? (config.pointsWin||200) : (config.pointsLose||50);
         addPoints('Penalty '+config.name, isWin?'Vô địch '+config.name:'Hết '+config.name, pts).catch(()=>{});
+        // Ghi lịch sử thành tích — giải kết thúc
+        this._recordHistory({
+          ts: Date.now(),
+          kind: 'tournament',
+          mode: 'league',
+          mp: true,
+          result: isWin ? 'champion' : 'rank',
+          rank: rank,
+          player: { code: this.state.playerCountry.code, name: this.state.playerCountry.name },
+          label: config.name
+        });
       }
     }
     this._setTournamentBackVisible(allDone);
@@ -909,6 +940,17 @@ class PenaltyMP extends PenaltyGame {
         }
         const pts = isWin ? (config.pointsWin||500) : (config.pointsLose||100);
         addPoints('Penalty '+config.name, isWin?'Vô địch '+config.name:'Á quân '+config.name, pts).catch(()=>{});
+        // Ghi lịch sử thành tích — Cúp kết thúc (dùng chung _estimateCupRank từ PenaltyGame)
+        this._recordHistory({
+          ts: Date.now(),
+          kind: 'tournament',
+          mode: 'cup',
+          mp: true,
+          result: isWin ? 'champion' : 'rank',
+          rank: this._estimateCupRank(rounds, isWin, finalMatch),
+          player: { code: this.state.playerCountry.code, name: this.state.playerCountry.name },
+          label: config.name
+        });
       }
       // Chỉ host hiện toast — tránh guest chạy lại _mpEndCup
       if(this.isHost && !this._mpCupEnded){ this._mpCupEnded = true; this._mpEndCup(); }
