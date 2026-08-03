@@ -249,6 +249,13 @@ export const KIT_COLORS = {
 export const flagColorCache = {};
 export function getFlagColors(code){
   if(flagColorCache[code]) return Promise.resolve(flagColorCache[code]);
+  // Đội giả trong Cup (gen_...) không có cờ thật — trả fallback NGAY, không
+  // gửi request 404 vô ích tới flagcdn (làm trễ prewarm màu áo mỗi lượt).
+  if(!code || code.startsWith('gen_')){
+    const fb={primary:'#dc2626',secondary:'#1e3a8a',socks:'#1e3a8a',tertiary:'#ffffff'};
+    flagColorCache[code]=fb;
+    return Promise.resolve(fb);
+  }
   if(KIT_COLORS[code]){
     const k=KIT_COLORS[code];
     const result={primary:k.primary,secondary:k.secondary,socks:k.socks||k.secondary,tertiary:k.secondary,hasWhite:k.secondary==='#ffffff'};
@@ -614,8 +621,13 @@ export function countryByCode(code){for(const r of Object.values(COUNTRIES)){con
 export function getTopCountries(pool, n, excludeCode){
   return pool.filter(c=>c.code!==excludeCode).slice().sort((a,b)=>(a.rank||999)-(b.rank||999)).slice(0,n);
 }
+const _flagImgCache = {};
 export function flagImg(code, name, size) {
   if (!code || code.startsWith('gen_')) return '🏳️';
   const s = size || 20;
-  return `<img src="https://flagcdn.com/${code}.svg" alt="${name||code}" class="pt-flag-svg" style="width:${s}px;height:auto;vertical-align:middle;" loading="lazy"/>`;
+  const key = code+'|'+s;
+  if(_flagImgCache[key]) return _flagImgCache[key];
+  const html = `<img src="https://flagcdn.com/${code}.svg" alt="${name||code}" class="pt-flag-svg" style="width:${s}px;height:auto;vertical-align:middle;" loading="lazy" decoding="async"/>`;
+  _flagImgCache[key] = html;
+  return html;
 }

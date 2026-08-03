@@ -765,6 +765,10 @@ export class PenaltyGame {
       el.className='pt-stand-flag';
       el.src=`https://flagcdn.com/${team.code}.svg`;
       el.alt=team.name||'';
+      // decoding=async + loading=lazy: cờ nền trang trí không được chặn vẽ
+      // main thread lúc vào trận (12 ảnh SVG cùng lúc là gánh nặng thật trên máy yếu)
+      el.decoding='async';
+      el.loading='lazy';
       container.appendChild(el);
     }
   }
@@ -3290,11 +3294,17 @@ export class PenaltyGame {
     const _p=this.state.phase;
     this._setRoleBlink((_p==='shooting'||_p==='defending') && !this.state.shotLocked, _p==='defending' ? 'keeper' : 'ball');
     const pc=this.state.playerCountry,ac=this.state.aiCountry;
-    // Flags + names
-    document.getElementById('pt-sb-pflag').innerHTML=flagImg(pc.code, pc.name, 24);
-    document.getElementById('pt-sb-pname').textContent=pc.name;
-    document.getElementById('pt-sb-aflag').innerHTML=flagImg(ac.code, ac.name, 24);
-    document.getElementById('pt-sb-aname').textContent=ac.name;
+    // Flags + names — chỉ cập nhật khi ĐỔI ĐỘI (mỗi trận 1 lần). renderStatusBar
+    // được gọi nhiều lần mỗi lượt sút; bỏ qua write DOM thừa khi đội không đổi
+    // giúp giảm layout/repaint đáng kể trên máy yếu.
+    const teamKey=pc.code+'|'+ac.code;
+    if(this._sbTeamKey!==teamKey){
+      this._sbTeamKey=teamKey;
+      document.getElementById('pt-sb-pflag').innerHTML=flagImg(pc.code, pc.name, 24);
+      document.getElementById('pt-sb-pname').textContent=pc.name;
+      document.getElementById('pt-sb-aflag').innerHTML=flagImg(ac.code, ac.name, 24);
+      document.getElementById('pt-sb-aname').textContent=ac.name;
+    }
     // Score
     document.getElementById('pt-sb-you').textContent=this.state.scores[0];
     document.getElementById('pt-sb-ai').textContent=this.state.scores[1];
