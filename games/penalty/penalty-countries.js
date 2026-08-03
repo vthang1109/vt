@@ -120,8 +120,87 @@ export const FIFA_CODE3 = {
   zw:'ZIM',
 };
 export function abbr3(team){
+  if(team && CLUB_MAP[team.code]) return CLUB_MAP[team.code].abbr;
   return (team && FIFA_CODE3[team.code]) || (team ? team.name.slice(0,3).toUpperCase() : '');
 }
+
+// ============================
+// CÂU LẠC BỘ — giải Cúp C1 riêng (logo thật từ media.api-sports.io)
+// ============================
+export const CLUBS = [
+  {code:'rma', name:'Real Madrid',      abbr:'RMA', logoId:541, rank:1},
+  {code:'mci', name:'Man City',         abbr:'MCI', logoId:50,  rank:2},
+  {code:'bay', name:'Bayern Munich',    abbr:'BAY', logoId:157, rank:3},
+  {code:'liv', name:'Liverpool',        abbr:'LIV', logoId:40,  rank:4},
+  {code:'psg', name:'PSG',              abbr:'PSG', logoId:85,  rank:5},
+  {code:'bar', name:'Barcelona',        abbr:'BAR', logoId:529, rank:6},
+  {code:'ars', name:'Arsenal',          abbr:'ARS', logoId:42,  rank:7},
+  {code:'int', name:'Inter Milan',      abbr:'INT', logoId:505, rank:8},
+  {code:'mun', name:'Man United',       abbr:'MUN', logoId:33,  rank:9},
+  {code:'dor', name:'Dortmund',         abbr:'DOR', logoId:165, rank:10},
+  {code:'mil', name:'AC Milan',         abbr:'MIL', logoId:489, rank:11},
+  {code:'juv', name:'Juventus',         abbr:'JUV', logoId:496, rank:12},
+  {code:'che', name:'Chelsea',          abbr:'CHE', logoId:49,  rank:13},
+  {code:'ben', name:'Benfica',          abbr:'BEN', logoId:211, rank:14},
+  {code:'spo', name:'Sporting CP',      abbr:'SPO', logoId:620, rank:15},
+  {code:'por', name:'Porto',            abbr:'POR', logoId:212, rank:16},
+  {code:'psv', name:'PSV',              abbr:'PSV', logoId:663, rank:17},
+  {code:'ajx', name:'Ajax',             abbr:'AJX', logoId:94,  rank:18},
+  {code:'fey', name:'Feyenoord',        abbr:'FEY', logoId:665, rank:19},
+  {code:'atm', name:'Atlético Madrid',  abbr:'ATM', logoId:530, rank:20},
+  {code:'tot', name:'Tottenham',        abbr:'TOT', logoId:47,  rank:21},
+  {code:'nap', name:'Napoli',           abbr:'NAP', logoId:492, rank:22},
+  {code:'rom', name:'Roma',             abbr:'ROM', logoId:497, rank:23},
+  {code:'laz', name:'Lazio',            abbr:'LAZ', logoId:487, rank:24},
+  {code:'ata', name:'Atalanta',         abbr:'ATA', logoId:499, rank:25},
+  {code:'rbl', name:'RB Leipzig',       abbr:'RBL', logoId:173, rank:26},
+  {code:'lev', name:'Leverkusen',       abbr:'LEV', logoId:168, rank:27},
+  {code:'sev', name:'Sevilla',          abbr:'SEV', logoId:536, rank:28},
+  {code:'mar', name:'Marseille',        abbr:'MAR', logoId:81,  rank:29},
+  {code:'lyo', name:'Lyon',             abbr:'LYO', logoId:80,  rank:30},
+  {code:'mon', name:'Monaco',           abbr:'MON', logoId:91,  rank:31},
+  {code:'bra', name:'Braga',            abbr:'BRA', logoId:626, rank:32},
+  {code:'val', name:'Valencia',         abbr:'VAL', logoId:532, rank:33},
+  {code:'vil', name:'Villarreal',       abbr:'VIL', logoId:533, rank:34},
+  {code:'whu', name:'West Ham',         abbr:'WHU', logoId:48,  rank:35},
+  {code:'new', name:'Newcastle',        abbr:'NEW', logoId:34,  rank:36},
+  {code:'soc', name:'Real Sociedad',    abbr:'SOC', logoId:548, rank:37},
+  {code:'ath', name:'Athletic Bilbao',  abbr:'ATH', logoId:531, rank:38},
+  {code:'fio', name:'Fiorentina',       abbr:'FIO', logoId:502, rank:39},
+  {code:'fra', name:'Frankfurt',        abbr:'FRA', logoId:169, rank:40},
+  {code:'stu', name:'Stuttgart',        abbr:'STU', logoId:172, rank:41},
+  {code:'wol', name:'Wolfsburg',        abbr:'WOL', logoId:164, rank:42},
+  {code:'mgl', name:'Gladbach',         abbr:'MGL', logoId:163, rank:43},
+  {code:'lil', name:'Lille',            abbr:'LIL', logoId:79,  rank:44},
+  {code:'ren', name:'Rennes',           abbr:'REN', logoId:90,  rank:45},
+  {code:'nic', name:'Nice',             abbr:'NIC', logoId:84,  rank:46},
+  {code:'len', name:'Lens',             abbr:'LEN', logoId:1161,rank:47},
+];
+export const CLUB_MAP = Object.fromEntries(CLUBS.map(c=>[c.code,c]));
+export function getAllClubs(){ return CLUBS; }
+export function clubByCode(code){ return CLUB_MAP[code]||null; }
+
+// CLB thuộc nước nào — dùng để xếp CLB theo nước trong picker đội
+// (Benfica/Porto → Bồ Đào Nha, Ajax → Hà Lan nằm ngoài 5 giải chính)
+export const CLUB_COUNTRY = {
+  mci:'en',liv:'en',ars:'en',mun:'en',che:'en',tot:'en',whu:'en',new:'en',
+  rma:'es',bar:'es',atm:'es',sev:'es',val:'es',vil:'es',soc:'es',ath:'es',
+  int:'it',mil:'it',juv:'it',nap:'it',rom:'it',laz:'it',ata:'it',fio:'it',
+  bay:'de',dor:'de',rbl:'de',lev:'de',fra:'de',stu:'de',wol:'de',mgl:'de',
+  psg:'fr',mar:'fr',lyo:'fr',mon:'fr',lil:'fr',ren:'fr',nic:'fr',len:'fr',
+  ben:'pt',por:'pt',spo:'pt',bra:'pt',
+  ajx:'nl',psv:'nl',fey:'nl',
+};
+export const CLUB_COUNTRIES = {
+  en:{ name:'Anh',          flag:'\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}', order:1 },
+  es:{ name:'Tây Ban Nha',  flag:'🇪🇸', order:2 },
+  it:{ name:'Ý',            flag:'🇮🇹', order:3 },
+  de:{ name:'Đức',          flag:'🇩🇪', order:4 },
+  fr:{ name:'Pháp',         flag:'🇫🇷', order:5 },
+  pt:{ name:'Bồ Đào Nha',   flag:'🇵🇹', order:6 },
+  nl:{ name:'Hà Lan',       flag:'🇳🇱', order:7 },
+};
+export function clubCountry(code){ return CLUB_COUNTRY[code]||'other'; }
 
 // ============================
 // TOURNAMENT CONFIGURATIONS
@@ -157,6 +236,12 @@ export const TOURNAMENT_CONFIGS = {
     knockoutRoundNames:['Tứ kết','Bán kết','Chung kết'],
     pointsWin:1200, pointsLose:240,
   },
+  champions: {
+    id:'champions', name:'Cúp C1', icon:'⭐', region:'clubs',
+    teamCount:32, groups:8, advancePerGroup:2,
+    knockoutRoundNames:['Vòng 16 đội','Tứ kết','Bán kết','Chung kết'],
+    pointsWin:1500, pointsLose:300,
+  },
 };
 export const CUP_TOURNAMENTS = Object.values(TOURNAMENT_CONFIGS);
 
@@ -171,6 +256,29 @@ export const LEAGUE_CONFIGS = {
   asia: { id:'asia', name:'Asian', icon:'🌏', region:'chau_a', teamCount:8, pointsWin:500, pointsDraw:200, pointsLose:120 },
 };
 export const LEAGUE_LIST = Object.values(LEAGUE_CONFIGS);
+
+// ============================
+// LEAGUE CONFIGURATIONS — CÂU LẠC BỘ (5 giải riêng)
+// ============================
+export const CLUB_LEAGUE_CONFIGS = {
+  // Mỗi giải chỉ gồm đúng CLB của nước đó — không rút từ pool chung (tránh lỗi "Premier League có Real Madrid").
+  epl:    { id:'epl',    name:'Premier',  icon:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', region:'clubs', teamCount:8, pointsWin:600, pointsDraw:240, pointsLose:150, clubs:['mci','liv','ars','mun','che','tot','whu','new'] },
+  laliga: { id:'laliga', name:'La Liga',  icon:'🇪🇸', region:'clubs', teamCount:8, pointsWin:500, pointsDraw:200, pointsLose:120, clubs:['rma','bar','atm','sev','val','vil','soc','ath'] },
+  seria:  { id:'seria',  name:'Serie A',  icon:'🇮🇹', region:'clubs', teamCount:8, pointsWin:500, pointsDraw:200, pointsLose:120, clubs:['int','mil','juv','nap','rom','laz','ata','fio'] },
+  bundes: { id:'bundes', name:'Bundesliga', icon:'🇩🇪', region:'clubs', teamCount:8, pointsWin:500, pointsDraw:200, pointsLose:120, clubs:['bay','dor','rbl','lev','fra','stu','wol','mgl'] },
+  ligue1: { id:'ligue1', name:'Ligue 1',  icon:'🇫🇷', region:'clubs', teamCount:8, pointsWin:500, pointsDraw:200, pointsLose:120, clubs:['psg','mar','lyo','mon','lil','ren','nic','len'] },
+};
+export const CLUB_LEAGUE_LIST = Object.values(CLUB_LEAGUE_CONFIGS);
+
+// Lọc theo loại: 'national' (quốc gia) hoặc 'club' (câu lạc bộ)
+export function getCupsByType(type){
+  return CUP_TOURNAMENTS.filter(t=>type==='club' ? t.region==='clubs' : t.region!=='clubs');
+}
+export function getLeaguesByType(type){
+  return type==='club' ? CLUB_LEAGUE_LIST : LEAGUE_LIST;
+}
+export function cupById(id){ return CUP_TOURNAMENTS.find(t=>t.id===id)||null; }
+export function leagueById(id){ return LEAGUE_LIST.find(l=>l.id===id)||CLUB_LEAGUE_LIST.find(l=>l.id===id)||null; }
 
 export function buildRoundRobin(n){
   let arr=[...Array(n).keys()];
@@ -244,6 +352,31 @@ export const KIT_COLORS = {
   ca:{primary:'#dc2626',secondary:'#dc2626'}, py:{primary:'#dc2626',secondary:'#1e3a8a'},
   ve:{primary:'#7b1c3d',secondary:'#ffffff'}, cr:{primary:'#dc2626',secondary:'#1e3a8a'},
   jm:{primary:'#000000',secondary:'#000000'},
+  // Câu lạc bộ (Cúp C1 + league CLB)
+  rma:{primary:'#ffffff',secondary:'#febe10'}, mci:{primary:'#6cabdd',secondary:'#1c2c5b'},
+  bay:{primary:'#dc052d',secondary:'#ffffff'}, liv:{primary:'#c8102e',secondary:'#000000'},
+  psg:{primary:'#004170',secondary:'#da291c'}, bar:{primary:'#a50044',secondary:'#004d98'},
+  ars:{primary:'#ef0107',secondary:'#ffffff'}, int:{primary:'#0068a8',secondary:'#000000'},
+  mun:{primary:'#da291c',secondary:'#000000'}, dor:{primary:'#fde100',secondary:'#000000'},
+  mil:{primary:'#fb090b',secondary:'#000000'}, juv:{primary:'#000000',secondary:'#ffffff'},
+  che:{primary:'#034694',secondary:'#ffffff'}, ben:{primary:'#e7332a',secondary:'#ffffff'},
+  por:{primary:'#00418c',secondary:'#ffffff'}, ajx:{primary:'#d2122e',secondary:'#ffffff'},
+  atm:{primary:'#cb3524',secondary:'#ffffff'}, tot:{primary:'#132257',secondary:'#ffffff'},
+  nap:{primary:'#12a0d7',secondary:'#ffffff'}, rom:{primary:'#8e1f2f',secondary:'#f0bc42'},
+  laz:{primary:'#87d8f7',secondary:'#ffffff'}, ata:{primary:'#1e71b8',secondary:'#000000'},
+  rbl:{primary:'#dd0741',secondary:'#ffffff'}, lev:{primary:'#e32221',secondary:'#000000'},
+  sev:{primary:'#d40e14',secondary:'#ffffff'}, val:{primary:'#ee3524',secondary:'#000000'},
+  vil:{primary:'#ffd400',secondary:'#005187'}, mar:{primary:'#2faee0',secondary:'#ffffff'},
+  lyo:{primary:'#1a2f5c',secondary:'#e60d2e'}, mon:{primary:'#e63312',secondary:'#ffffff'},
+  whu:{primary:'#7a263a',secondary:'#1bb1e7'}, new:{primary:'#241f20',secondary:'#ffffff'},
+  soc:{primary:'#0067b1',secondary:'#ffffff'}, ath:{primary:'#ee2523',secondary:'#ffffff'},
+  fio:{primary:'#582c83',secondary:'#ffffff'}, fra:{primary:'#e1000f',secondary:'#000000'},
+  stu:{primary:'#ffffff',secondary:'#e32219'}, wol:{primary:'#65b32e',secondary:'#ffffff'},
+  mgl:{primary:'#1a7a3f',secondary:'#ffffff'}, lil:{primary:'#e01e13',secondary:'#0055a5'},
+  ren:{primary:'#e13327',secondary:'#000000'}, nic:{primary:'#cc0000',secondary:'#000000'},
+  len:{primary:'#b51e24',secondary:'#ffd700'},
+  spo:{primary:'#008152',secondary:'#ffffff'}, psv:{primary:'#d71920',secondary:'#ffffff'},
+  fey:{primary:'#c8102e',secondary:'#ffffff'}, bra:{primary:'#d1151b',secondary:'#ffffff'},
 };
 
 export const flagColorCache = {};
@@ -616,7 +749,7 @@ export async function prewarmKeeperKit(){
 // ============================
 export function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 export function getAllCountries(){const a=[];for(const r of Object.values(COUNTRIES))a.push(...r.list);return a}
-export function getRegionCountries(region){return region?COUNTRIES[region]?.list||[]:getAllCountries()}
+export function getRegionCountries(region){return region==='clubs'?getAllClubs():(region?COUNTRIES[region]?.list||[]:getAllCountries())}
 export function countryByCode(code){for(const r of Object.values(COUNTRIES)){const f=r.list.find(c=>c.code===code);if(f)return f}return null}
 export function getTopCountries(pool, n, excludeCode){
   return pool.filter(c=>c.code!==excludeCode).slice().sort((a,b)=>(a.rank||999)-(b.rank||999)).slice(0,n);
@@ -627,7 +760,19 @@ export function flagImg(code, name, size) {
   const s = size || 20;
   const key = code+'|'+s;
   if(_flagImgCache[key]) return _flagImgCache[key];
-  const html = `<img src="https://flagcdn.com/${code}.svg" alt="${name||code}" class="pt-flag-svg" style="width:${s}px;height:auto;vertical-align:middle;" loading="lazy" decoding="async"/>`;
+  let html;
+  const club = CLUB_MAP[code];
+  if(club){
+    html = `<img src="https://media.api-sports.io/football/teams/${club.logoId}.png" alt="${name||club.name}" class="pt-club-logo" style="width:${s}px;height:${s}px;object-fit:contain;vertical-align:middle;" loading="lazy" decoding="async"/>`;
+  }else{
+    html = `<img src="https://flagcdn.com/${code}.svg" alt="${name||code}" class="pt-flag-svg" style="width:${s}px;height:auto;vertical-align:middle;" loading="lazy" decoding="async"/>`;
+  }
   _flagImgCache[key] = html;
   return html;
+}
+// URL logo/cờ cho một đội (CLB → media.api-sports.io, quốc gia → flagcdn)
+export function teamFlagSrc(code){
+  if(!code || code.startsWith('gen_')) return '';
+  const club = CLUB_MAP[code];
+  return club ? `https://media.api-sports.io/football/teams/${club.logoId}.png` : `https://flagcdn.com/${code}.svg`;
 }

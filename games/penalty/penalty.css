@@ -864,11 +864,27 @@
   pointer-events: none;
 }
 
+/* Club logo (Cúp C1) — huy hiệu tròn, không nền */
+.pt-club-logo {
+  display: inline-block;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  vertical-align: middle;
+  pointer-events: none;
+  object-fit: contain;
+}
+
 /* Flags in tables */
 .pt-lt-name .pt-flag-svg,
 .pt-gt-name .pt-flag-svg {
   width: 18px;
   height: auto;
+  margin-right: 3px;
+}
+.pt-lt-name .pt-club-logo,
+.pt-gt-name .pt-club-logo {
+  width: 18px;
+  height: 18px;
   margin-right: 3px;
 }
 
@@ -878,11 +894,21 @@
   height: auto;
   margin-right: 2px;
 }
+.pt-kr-team .pt-club-logo {
+  width: 16px;
+  height: 16px;
+  margin-right: 2px;
+}
 
 /* Flags in group match results */
 .pt-gm-item .pt-flag-svg {
   width: 14px;
   height: auto;
+  vertical-align: text-bottom;
+}
+.pt-gm-item .pt-club-logo {
+  width: 14px;
+  height: 14px;
   vertical-align: text-bottom;
 }
 
@@ -892,11 +918,19 @@
   height: auto;
   border-radius: 3px;
 }
+.pt-qual-flag .pt-club-logo {
+  width: 24px;
+  height: 24px;
+}
 .pt-score-flag .pt-flag-svg {
   width: 28px;
   height: auto;
   border-radius: 3px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.pt-score-flag .pt-club-logo {
+  width: 28px;
+  height: 28px;
 }
 
 .pt-flag-label {
@@ -940,6 +974,52 @@
 }
 .pt-tournament-btn:hover { border-color: rgba(251,191,36,0.3); color: #fbbf24; }
 .pt-tournament-btn.selected { border-color: #fbbf24; color: #fbbf24; background: rgba(251,191,36,0.08); }
+
+/* Team type toggle (Quốc Gia / CLB) */
+.pt-teamtype-row {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto 10px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.pt-teamtype-tab {
+  flex: 1;
+  position: relative;
+  padding: 8px 10px 7px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Science Gothic', sans-serif;
+  cursor: pointer;
+  transition: color 0.25s;
+  text-align: center;
+  line-height: 1.2;
+}
+.pt-teamtype-tab:hover { color: #e0f2fe; }
+.pt-teamtype-tab.selected { color: #38bdf8; }
+.pt-teamtype-tab.selected::after {
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #38bdf8, #4ade80);
+  box-shadow: 0 0 8px rgba(56,189,248,0.5);
+  animation: ptTabUnderline 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes ptTabUnderline {
+  from { transform: scaleX(0); opacity: 0; }
+  to   { transform: scaleX(1); opacity: 1; }
+}
 
 /* Mode selection */
 .pt-mode-row {

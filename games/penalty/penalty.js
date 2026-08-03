@@ -1,12 +1,16 @@
 // ===================== PENALTY SHOOTOUT - CUP EDITION =====================
 import { auth, addPoints } from '../../points.js';
-import { COUNTRIES, FIFA_CODE3, abbr3, TOURNAMENT_CONFIGS, CUP_TOURNAMENTS, LEAGUE_CONFIGS, LEAGUE_LIST, buildRoundRobin, MODES, KIT_COLORS, flagColorCache, getFlagColors, applyTeamKit, SHOOTER_POSES, HAIR_HOME_HEX, HAIR_AWAY_HEX, JERSEY_SPECIAL_NUMBERS, randomJerseyNumber, _shooterImgCache, _loadImg, _hexToRgb, _rgbToHsl, _hslToRgb, _poseDataCache, _getPoseData, _dyeMaskLayer, _bodyLayerCache, _teamLayerCache, _hairLayerCache, _getSplitShooterLayers, renderShooterSprite, GK_POSITIONS, applyKeeperSprite, applyKeeperKit, prewarmKeeperKit, shuffle, getAllCountries, getRegionCountries, countryByCode, getTopCountries, flagImg } from './penalty-countries.js';
+import { COUNTRIES, FIFA_CODE3, abbr3, CUP_TOURNAMENTS, LEAGUE_LIST, buildRoundRobin, MODES, KIT_COLORS, flagColorCache, getFlagColors, applyTeamKit, SHOOTER_POSES, HAIR_HOME_HEX, HAIR_AWAY_HEX, JERSEY_SPECIAL_NUMBERS, randomJerseyNumber, _shooterImgCache, _loadImg, _hexToRgb, _rgbToHsl, _hslToRgb, _poseDataCache, _getPoseData, _dyeMaskLayer, _bodyLayerCache, _teamLayerCache, _hairLayerCache, _getSplitShooterLayers, renderShooterSprite, GK_POSITIONS, applyKeeperSprite, applyKeeperKit, prewarmKeeperKit, shuffle, getAllCountries, getRegionCountries, countryByCode, getTopCountries, flagImg, CLUB_MAP, clubByCode, getAllClubs, teamFlagSrc, getCupsByType, getLeaguesByType, cupById, leagueById, CLUB_COUNTRIES, clubCountry } from './penalty-countries.js';
 import { PT_EFFECTS, PT_EFFECTS_STORAGE_KEY, loadPenaltyEffects, savePenaltyEffects, simAIPenalty, orientMatchScore } from './penalty-effects.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 
 
 const ZONES = ['top-left','top-center','top-right','mid-left','mid-center','mid-right','bot-left','bot-center','bot-right'];
+const TEAMTYPE_TABS = [
+  { id:'national', icon:'🌍', name:'Quốc Gia' },
+  { id:'club',     icon:'⚽', name:'CLB' },
+];
 const FLIGHT_MS_BY_STYLE={default:900,wind:650,fire:650,ice:650,leaf:650,rainbow:650,dark:650,thunder:650,light:650,clone:650,butterfly:650,blackhole:650,dragon:650};
 const KEEPER_REACT_DELAY_MS = 130;
 
@@ -46,6 +50,7 @@ export class PenaltyGame {
     this._shooterReq = 0; // token chống race giữa 2 promise màu cờ đội nhà/đội khách
     this.state = {
       modeId: 'nhanh',
+      teamType: 'national', // 'national' | 'club' — tab Quốc Gia / CLB
       playerCountry: getAllCountries().find(c=>c.code==='vn') || getAllCountries()[0],
       aiCountry: this.randomCountry(null),
       tournament: CUP_TOURNAMENTS[0],
@@ -126,15 +131,30 @@ export class PenaltyGame {
   _init() {
     onAuthStateChanged(auth, u=>{
       if(!u){location.href='../../index.html';return}
-      this.renderModes(); this.renderTournaments(); this.renderLeagues(); this.renderFlags(); this.bindEvents(); this.showMenu();
+      this.renderModes(); this.renderTeamType(); this.renderTournaments(); this.renderLeagues(); this.renderFlags(); this.bindEvents(); this.showMenu();
     });
   }
 
   randomCountry(excludeCode) {
-    const all=getAllCountries();
+    // LƯU Ý: constructor gọi randomCountry() trong lúc object literal state đang được tạo,
+    // nên this.state CHƯA tồn tại — phải guard bằng (this.state && ...) để không vỡ.
+    const all = (this.state && this.state.teamType==='club') ? getAllClubs() : getAllCountries();
     let c;
     do{c=all[Math.floor(Math.random()*all.length)]}while(c.code===excludeCode);
     return c;
+  }
+
+  // ===== TEAM TYPE =====
+  setTeamType(type){
+    if(!type || type===this.state.teamType) return;
+    this.state.teamType = type;
+    this.renderTeamType();
+    this.renderTournaments();
+    this.renderLeagues();
+    // Đổi hệ thống đội → ép về đội hợp lệ của loại mới (renderFlags tự chuyển)
+    this.renderFlags();
+    this._updateContinueCard();
+    this._updatePlayButton();
   }
 
   // ===== RENDER UI =====
@@ -145,15 +165,30 @@ export class PenaltyGame {
     </button>`).join('');
   }
 
+  renderTeamType() {
+    const c=document.getElementById('pt-teamtype-row');
+    if(!c)return;
+    const t=this.state.teamType||'national';
+    c.innerHTML=TEAMTYPE_TABS.map(x=>`<button class="pt-teamtype-tab ${x.id===t?'selected':''}" data-teamtype="${x.id}">${x.icon} ${x.name}</button>`).join('');
+  }
+
   renderTournaments() {
     const c=document.getElementById('pt-tournament-row');
-    c.innerHTML=CUP_TOURNAMENTS.map((t,i)=>`<button class="pt-tournament-btn ${i===0?'selected':''}" data-id="${t.id}">${t.icon} ${t.name}</button>`).join('');
+    const list=getCupsByType(this.state.teamType||'national');
+    if(!list.find(t=>t.id===(this.state.tournament&&this.state.tournament.id))){
+      this.state.tournament=list[0]||CUP_TOURNAMENTS[0];
+    }
+    c.innerHTML=list.map(t=>`<button class="pt-tournament-btn ${t.id===this.state.tournament.id?'selected':''}" data-id="${t.id}">${t.icon} ${t.name}</button>`).join('');
   }
 
   renderLeagues() {
     const c=document.getElementById('pt-league-row');
     if(!c)return;
-    c.innerHTML=LEAGUE_LIST.map((l,i)=>`<button class="pt-tournament-btn ${i===0?'selected':''}" data-id="${l.id}">${l.icon} ${l.name}</button>`).join('');
+    const list=getLeaguesByType(this.state.teamType||'national');
+    if(!list.find(l=>l.id===(this.state.league&&this.state.league.id))){
+      this.state.league=list[0]||LEAGUE_LIST[0];
+    }
+    c.innerHTML=list.map(l=>`<button class="pt-tournament-btn ${l.id===this.state.league.id?'selected':''}" data-id="${l.id}">${l.icon} ${l.name}</button>`).join('');
   }
 
   renderFlags(query) {
@@ -165,9 +200,9 @@ export class PenaltyGame {
       countries=tour.region?getRegionCountries(tour.region):getAllCountries();
     }else if(this.state.modeId==='league'){
       const lg=this.state.league;
-      countries=lg&&lg.region?getRegionCountries(lg.region):getAllCountries();
+      countries=lg&&lg.clubs?lg.clubs.map(code=>CLUB_MAP[code]).filter(Boolean):(lg&&lg.region?getRegionCountries(lg.region):getAllCountries());
     }else{
-      countries=getAllCountries();
+      countries = this.state.teamType==='club' ? getAllClubs() : getAllCountries();
     }
     if(!countries.find(x=>x.code===this.state.playerCountry.code)){
       this.state.playerCountry=countries[0]||getAllCountries()[0];
@@ -196,6 +231,24 @@ export class PenaltyGame {
       if(!list.length)continue;
       html+=`<div class="pt-flag-group-label">${region.name}</div><div class="pt-flag-group">${list.map(btn).join('')}</div>`;
     }
+    // Câu lạc bộ — xếp theo nước (Anh, Tây Ban Nha, Ý, Đức, Pháp, Bồ Đào Nha, Hà Lan)
+    const clubList=countries.filter(x=>CLUB_MAP[x.code] && x.code!=='vn' && matches(x));
+    if(clubList.length){
+      const groups={};
+      for(const club of clubList){
+        const ctry=clubCountry(club.code);
+        (groups[ctry]=groups[ctry]||[]).push(club);
+      }
+      const order=Object.keys(CLUB_COUNTRIES);
+      const keys=Object.keys(groups).sort((a,b)=>{
+        const ia=order.indexOf(a), ib=order.indexOf(b);
+        return (ia<0?99:ia)-(ib<0?99:ib);
+      });
+      for(const ctry of keys){
+        const info=CLUB_COUNTRIES[ctry]||{name:'Khác',flag:'⚽'};
+        html+=`<div class="pt-flag-group-label">${info.flag} ${info.name}</div><div class="pt-flag-group">${groups[ctry].map(btn).join('')}</div>`;
+      }
+    }
     c.innerHTML=html || `<div class="pt-flag-empty">Không tìm thấy quốc gia</div>`;
     // Update country picker
     this._updateCountryPicker();
@@ -206,7 +259,7 @@ export class PenaltyGame {
     const name=document.getElementById('pt-country-name');
     if(!flag||!name)return;
     const pc=this.state.playerCountry;
-    flag.innerHTML=`<img src="https://flagcdn.com/${pc.code}.svg" alt="${pc.name}" class="pt-flag-svg" style="width:32px;height:auto;vertical-align:middle"/>`;
+    flag.innerHTML=flagImg(pc.code, pc.name, 32);
     name.textContent=pc.name;
   }
 
@@ -241,11 +294,17 @@ export class PenaltyGame {
       this.renderFlags();
     });
 
+    // Team type (Quốc Gia / CLB)
+    document.getElementById('pt-teamtype-row').addEventListener('click',e=>{
+      const b=e.target.closest('.pt-teamtype-tab');if(!b)return;
+      this.setTeamType(b.dataset.teamtype);
+    });
+
     // Tournaments
     document.getElementById('pt-tournament-row').addEventListener('click',e=>{
       const b=e.target.closest('.pt-tournament-btn');if(!b)return;
       document.querySelectorAll('#pt-tournament-row .pt-tournament-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');
-      this.state.tournament=CUP_TOURNAMENTS.find(t=>t.id===b.dataset.id)||CUP_TOURNAMENTS[0];
+      this.state.tournament=cupById(b.dataset.id)||getCupsByType(this.state.teamType||'national')[0];
       if(this.state.modeId==='cup'){this.renderFlags();this._updateContinueCard();this._updatePlayButton();}
     });
 
@@ -254,7 +313,7 @@ export class PenaltyGame {
     if(lgRow)lgRow.addEventListener('click',e=>{
       const b=e.target.closest('.pt-tournament-btn');if(!b)return;
       document.querySelectorAll('#pt-league-row .pt-tournament-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');
-      this.state.league=LEAGUE_LIST.find(l=>l.id===b.dataset.id)||LEAGUE_LIST[0];
+      this.state.league=leagueById(b.dataset.id)||getLeaguesByType(this.state.teamType||'national')[0];
       if(this.state.modeId==='league'){this.renderFlags();this._updateContinueCard();this._updatePlayButton();}
     });
 
@@ -262,7 +321,7 @@ export class PenaltyGame {
     document.getElementById('pt-flag-grid').addEventListener('click',e=>{
       const b=e.target.closest('.pt-flag-btn');if(!b)return;
       document.querySelectorAll('.pt-flag-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');
-      const found=countryByCode(b.dataset.code);
+      const found=countryByCode(b.dataset.code)||clubByCode(b.dataset.code);
       if(found){
         this.state.playerCountry=found;
         this.state.aiCountry=this.randomCountry(found.code);
@@ -763,7 +822,7 @@ export class PenaltyGame {
       if(!team || !team.code) continue;
       const el=document.createElement('img');
       el.className='pt-stand-flag';
-      el.src=`https://flagcdn.com/${team.code}.svg`;
+      el.src=teamFlagSrc(team.code);
       el.alt=team.name||'';
       // decoding=async + loading=lazy: cờ nền trang trí không được chặn vẽ
       // main thread lúc vào trận (12 ảnh SVG cùng lúc là gánh nặng thật trên máy yếu)
@@ -797,7 +856,14 @@ export class PenaltyGame {
   // các cặp còn lại của CÙNG vòng đó tự động resolve (AI vs AI) ngay khi mình đá xong.
   startLeague(){
     const config=this.state.league||LEAGUE_LIST[0];
-    const pool=config.region?getRegionCountries(config.region):getAllCountries();
+    const pool=config.clubs?config.clubs.map(code=>CLUB_MAP[code]).filter(Boolean):(config.region?getRegionCountries(config.region):getAllCountries());
+    // Đội không thuộc giải (vd vừa chọn PSG ở Cúp C1 rồi sang Premier) → tự đổi
+    // sang đội hợp lệ trong giải, tránh "sai đội ở các giải đấu".
+    if(!pool.find(c=>c.code===this.state.playerCountry.code)){
+      this.state.playerCountry=pool.find(c=>c.code==='vn')||pool[0]||getAllCountries()[0];
+      this._updateCountryPicker();
+      window.showToast?.(`⚠️ Đội không tham gia ${config.name} — đã chọn ${this.state.playerCountry.name}`,'warn');
+    }
     const n=config.teamCount||8;
     const top=getTopCountries(pool, n-1, this.state.playerCountry.code);
     const teams=[this.state.playerCountry,...shuffle(top)];
@@ -1725,7 +1791,7 @@ export class PenaltyGame {
   _showGoalFlag(code){
     const el=document.getElementById('pt-goal-flag');
     if(!el || !code) return;
-    el.style.backgroundImage=`url(https://flagcdn.com/${code}.svg)`;
+    el.style.backgroundImage=`url(${teamFlagSrc(code)})`;
     el.style.display='';
   }
 
@@ -1764,7 +1830,7 @@ export class PenaltyGame {
     if(!pitch || !code || code.startsWith('gen_')) return;
     // Preload ảnh cờ
     const preload=new Image();
-    preload.src=`https://flagcdn.com/${code}.svg`;
+    preload.src=teamFlagSrc(code);
     // Hàm rắc 1 đợt (8-12 lá)
     const spawnWave=()=>{
       if(!document.getElementById('pt-pitch')) return; // sân đã biến mất
@@ -1776,7 +1842,7 @@ export class PenaltyGame {
         el.className='pt-victory-flag';
         const size=24+Math.floor(Math.random()*30); // 24-54px
         const img=document.createElement('img');
-        img.src=`https://flagcdn.com/${code}.svg`;
+        img.src=teamFlagSrc(code);
         img.alt=name||code;
         img.style.cssText=`width:${size}px;height:auto;display:block;`;
         el.appendChild(img);
@@ -3487,15 +3553,15 @@ export class PenaltyGame {
     if(!d||!d._mode)return false;
     Object.assign(this.state,{
       modeId:d.modeId, playerCountry:d.playerCountry, aiCountry:d.aiCountry,
-      tournament: d.tournamentId ? (TOURNAMENT_CONFIGS[d.tournamentId]||this.state.tournament) : this.state.tournament,
-      league: d.leagueId ? (LEAGUE_CONFIGS[d.leagueId]||this.state.league) : this.state.league,
+      tournament: d.tournamentId ? (cupById(d.tournamentId)||this.state.tournament) : this.state.tournament,
+      league: d.leagueId ? (leagueById(d.leagueId)||this.state.league) : this.state.league,
       is2Player:d.is2Player,
       round:d.round, maxRounds:d.maxRounds, scores:d.scores, history:d.history,
       currentShooter:d.currentShooter, phase:d.phase, _pendingAiZone:d._pendingAiZone,
       shotLocked:false,
       leagueTeams:d.leagueTeams, leagueTable:d.leagueTable,
       leagueRounds:d.leagueRounds||[], leagueRoundIdx:d.leagueRoundIdx||0,
-      cupConfig: d.cupConfigId ? (TOURNAMENT_CONFIGS[d.cupConfigId]||null) : null,
+      cupConfig: d.cupConfigId ? (cupById(d.cupConfigId)||null) : null,
       cupTeams:d.cupTeams, cupGroups:d.cupGroups, cupGroupMatchQueue:d.cupGroupMatchQueue,
       cupGroupMatchPtr:d.cupGroupMatchPtr, cupQualifiers:d.cupQualifiers, cupPhase:d.cupPhase,
       cupKnockoutRounds:d.cupKnockoutRounds, cupKnockoutMatchPtr:d.cupKnockoutMatchPtr,
@@ -3503,6 +3569,13 @@ export class PenaltyGame {
       _mode:d._mode, _matchContext:d._matchContext, _matchLabel:d._matchLabel,
       _lastMatchResult:d._lastMatchResult, _lastMatchScore:d._lastMatchScore,
     });
+
+    // Khôi phục teamType theo giải đang tiếp tục (Quốc Gia / CLB)
+    const restoredRegion = (this.state.cupConfig&&this.state.cupConfig.region) || (this.state.tournament&&this.state.tournament.region) || (this.state.league&&this.state.league.region);
+    this.state.teamType = restoredRegion==='clubs' ? 'club' : 'national';
+    this.renderTeamType();
+    this.renderTournaments();
+    this.renderLeagues();
 
     document.querySelectorAll('.pt-mode-btn').forEach(x=>x.classList.toggle('selected',x.dataset.mode===this.state.modeId));
     if(this.state.tournament){
@@ -3563,7 +3636,9 @@ export class PenaltyGame {
     const d=this.loadProgress(mode, configId);
     if(d && d._mode===mode){
       card.style.display='';
-      const modeName = mode==='league' ? `${(LEAGUE_CONFIGS[configId]||{}).icon||'📊'} ${(LEAGUE_CONFIGS[configId]||{}).name||'League'}` : `🏆 ${(TOURNAMENT_CONFIGS[configId]||{}).name||'Cúp'}`;
+      const lgCfg = leagueById(configId);
+      const cupCfg = cupById(configId);
+      const modeName = mode==='league' ? `${lgCfg.icon||'📊'} ${lgCfg.name||'League'}` : `🏆 ${cupCfg.name||'Cúp'}`;
       const pc=d.playerCountry||{},ac=d.aiCountry||{},sc=d.scores||[0,0];
       const desc=document.getElementById('pt-continue-desc-'+mode);
       if(desc)desc.innerHTML=`${modeName} · ${flagImg(pc.code,pc.name,14)} ${pc.name||''} vs ${flagImg(ac.code,ac.name,14)} ${ac.name||''} · ${sc[0]}-${sc[1]}`;
@@ -3586,7 +3661,7 @@ export class PenaltyGame {
       if(d && d._mode===mode){
         hasContinue=true;
         const sc=d.scores||[0,0];
-        const cfgName = mode==='league' ? (LEAGUE_CONFIGS[configId]||{}).name : (TOURNAMENT_CONFIGS[configId]||{}).name;
+        const cfgName = mode==='league' ? (leagueById(configId)||{}).name : (cupById(configId)||{}).name;
         label=`▶️ Tiếp tục ${cfgName||''} (${sc[0]}-${sc[1]})`;
       }
     }

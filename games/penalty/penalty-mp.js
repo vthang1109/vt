@@ -14,7 +14,8 @@ import {
   getAllCountries, countryByCode, getFlagColors, _getSplitShooterLayers,
   HAIR_HOME_HEX, HAIR_AWAY_HEX, getTopCountries, shuffle, flagImg, abbr3,
   CUP_TOURNAMENTS, LEAGUE_LIST, buildRoundRobin, prewarmKeeperKit,
-  getRegionCountries
+  getRegionCountries, clubByCode, getAllClubs, getCupsByType, getLeaguesByType,
+  cupById, leagueById, CLUB_MAP
 } from './penalty-countries.js';
 import { simAIPenalty, orientMatchScore } from './penalty-effects.js';
 import { initRoomChat, getMyNickname, showRoomDeletedPopup } from '../../room-chat.js';
@@ -36,6 +37,7 @@ class PenaltyMP extends PenaltyGame {
     this.mpMatchCount = 0; // dem so tran da bat dau — luan phien vai sut/bat moi tran
     // MP-specific state (local, not in Firestore)
     this.mpMode = 'quick';
+    this.mpTeamType = 'national'; // 'national' | 'club' — tab Quốc Gia / CLB
     this.mpCupConfig = null;
     this.mpLeagueConfig = null;
     this.mpLeagueTeams = [];
@@ -84,7 +86,7 @@ class PenaltyMP extends PenaltyGame {
       const b=e.target.closest('.pt-flag-btn'); if(!b) return;
       document.querySelectorAll('.pt-flag-btn').forEach(x=>x.classList.remove('selected'));
       b.classList.add('selected');
-      const found=countryByCode(b.dataset.code);
+      const found=countryByCode(b.dataset.code)||clubByCode(b.dataset.code);
       if(found){
         this.state.playerCountry=found;
         this._updateCountryPicker();
@@ -150,12 +152,19 @@ class PenaltyMP extends PenaltyGame {
       this.renderFlags();
     });
 
+    // Team type (Quốc Gia / CLB)
+    const ttRow=document.getElementById('pt-teamtype-row');
+    if(ttRow) ttRow.addEventListener('click', e=>{
+      const b=e.target.closest('.pt-teamtype-tab'); if(!b) return;
+      this.setTeamType(b.dataset.teamtype);
+    });
+
     document.getElementById('pt-mp-cup-pick').addEventListener('click', e=>{
       const b=e.target.closest('.pt-mp-pick-btn'); if(!b) return;
       if(!this.isHost) return;
       document.querySelectorAll('#pt-mp-cup-pick .pt-mp-pick-btn').forEach(x=>x.classList.remove('selected'));
       b.classList.add('selected');
-      this.mpCupConfig = CUP_TOURNAMENTS.find(t=>t.id===b.dataset.id) || CUP_TOURNAMENTS[0];
+      this.mpCupConfig = cupById(b.dataset.id) || getCupsByType(this.mpTeamType||'national')[0];
       // Cap nhat danh sach quoc gia theo khu vuc cua cup moi chon
       this.renderFlags();
     });
@@ -165,7 +174,7 @@ class PenaltyMP extends PenaltyGame {
       if(!this.isHost) return;
       document.querySelectorAll('#pt-mp-league-pick .pt-mp-pick-btn').forEach(x=>x.classList.remove('selected'));
       b.classList.add('selected');
-      this.mpLeagueConfig = LEAGUE_LIST.find(l=>l.id===b.dataset.id) || LEAGUE_LIST[0];
+      this.mpLeagueConfig = leagueById(b.dataset.id) || getLeaguesByType(this.mpTeamType||'national')[0];
       // Cap nhat danh sach quoc gia theo khu vuc cua league moi chon
       this.renderFlags();
     });
@@ -249,8 +258,8 @@ class PenaltyMP extends PenaltyGame {
     // chat / presence / màn hình giải) → vào trận vẫn là Việt Nam.
     const _ptMatchPhase = ['shooting','anim-shot','defending','anim-defend','finished'].includes(gs.phase);
     if(_ptMatchPhase){
-      if(gs.playerCountry) this.state.playerCountry = countryByCode(gs.playerCountry) || getAllCountries()[0];
-      if(gs.aiCountry) this.state.aiCountry = countryByCode(gs.aiCountry) || this.randomCountry(gs.playerCountry);
+      if(gs.playerCountry) this.state.playerCountry = countryByCode(gs.playerCountry) || clubByCode(gs.playerCountry) || getAllCountries()[0];
+      if(gs.aiCountry) this.state.aiCountry = countryByCode(gs.aiCountry) || clubByCode(gs.aiCountry) || this.randomCountry(gs.playerCountry);
     }
     if(gs.mpMatchContext) this.mpMatchContext = gs.mpMatchContext;
     // Luan phien vai sut/bat moi tran — khoi phuc bo dem tu gameState de sau
@@ -328,8 +337,9 @@ class PenaltyMP extends PenaltyGame {
     if(this.isHost){
       hostBox.style.display='';
       guestBox.style.display='none';
-      if(!this.state.playerCountry) this.state.playerCountry = getAllCountries().find(c=>c.code==='vn')||getAllCountries()[0];
+      if(!this.state.playerCountry) this.state.playerCountry = this.mpTeamType==='club' ? (getAllClubs()[0]||getAllCountries()[0]) : (getAllCountries().find(c=>c.code==='vn')||getAllCountries()[0]);
       this._updateCountryPicker();
+      this.renderTeamType();
       this._renderMPModes();
       // Tu chua tren man hinh setup: neu dang chon nham doi ngoai khu vuc cua
       // Cup/League thi renderFlags (override) tu dong chuyen ve doi hop le.
@@ -344,17 +354,19 @@ class PenaltyMP extends PenaltyGame {
     // GIU NGUYEN lua chon cua host (khong reset ve 'quick' moi snapshot setup —
     // neu reset, moi lan co snapshot moi (guest join, chat, presence) host se
     // mat chon Cup/League va chi choi duoc Giao huu).
+    const cups = getCupsByType(this.mpTeamType||'national');
     const cupEl = document.getElementById('pt-mp-cup-pick');
-    cupEl.innerHTML = CUP_TOURNAMENTS.map((t,i) =>
+    cupEl.innerHTML = cups.map((t,i) =>
       `<button class="pt-mp-pick-btn ${this.mpCupConfig&&t.id===this.mpCupConfig.id?'selected':(i===0&&!this.mpCupConfig?'selected':'')}" data-id="${t.id}">${t.icon} ${t.name}</button>`
     ).join('');
-    if(!this.mpCupConfig) this.mpCupConfig = CUP_TOURNAMENTS[0];
+    if(!this.mpCupConfig || !cups.find(c=>c.id===this.mpCupConfig.id)) this.mpCupConfig = cups[0]||CUP_TOURNAMENTS[0];
 
+    const lgs = getLeaguesByType(this.mpTeamType||'national');
     const lgEl = document.getElementById('pt-mp-league-pick');
-    lgEl.innerHTML = LEAGUE_LIST.map((l,i) =>
+    lgEl.innerHTML = lgs.map((l,i) =>
       `<button class="pt-mp-pick-btn ${this.mpLeagueConfig&&l.id===this.mpLeagueConfig.id?'selected':(i===0&&!this.mpLeagueConfig?'selected':'')}" data-id="${l.id}">${l.icon} ${l.name}</button>`
     ).join('');
-    if(!this.mpLeagueConfig) this.mpLeagueConfig = LEAGUE_LIST[0];
+    if(!this.mpLeagueConfig || !lgs.find(l=>l.id===this.mpLeagueConfig.id)) this.mpLeagueConfig = lgs[0]||LEAGUE_LIST[0];
 
     if(this.mpMode!=='cup' && this.mpMode!=='league') this.mpMode = 'quick';
     document.querySelectorAll('.pt-mp-mode-btn').forEach(b=>b.classList.toggle('selected', b.dataset.mode===this.mpMode));
@@ -370,10 +382,29 @@ class PenaltyMP extends PenaltyGame {
   // che do MP sang state truoc khi delegate cho parent (parent tu dong chuyen
   // ve quoc gia hop le cua khu vuc neu dang chon nham).
   renderFlags(query){
+    this.state.teamType = this.mpTeamType || 'national';
     this.state.modeId = this.mpMode==='cup' ? 'cup' : (this.mpMode==='league' ? 'league' : 'nhanh');
-    if(this.mpMode==='cup') this.state.tournament = this.mpCupConfig || CUP_TOURNAMENTS[0];
-    if(this.mpMode==='league') this.state.league = this.mpLeagueConfig || LEAGUE_LIST[0];
+    if(this.mpMode==='cup') this.state.tournament = this.mpCupConfig || getCupsByType(this.mpTeamType||'national')[0];
+    if(this.mpMode==='league') this.state.league = this.mpLeagueConfig || getLeaguesByType(this.mpTeamType||'national')[0];
     super.renderFlags(query);
+  }
+
+  renderTeamType(){
+    const c=document.getElementById('pt-teamtype-row');
+    if(!c)return;
+    const t=this.mpTeamType||'national';
+    c.innerHTML=[
+      {id:'national',icon:'🌍',name:'Quốc Gia'},
+      {id:'club',icon:'⚽',name:'CLB'},
+    ].map(x=>`<button class="pt-teamtype-tab ${x.id===t?'selected':''}" data-teamtype="${x.id}">${x.icon} ${x.name}</button>`).join('');
+  }
+
+  setTeamType(type){
+    if(!type || type===this.mpTeamType) return;
+    this.mpTeamType = type;
+    this.renderTeamType();
+    this._renderMPModes();
+    this.renderFlags();
   }
 
   // ===== HOST START =====
@@ -420,14 +451,14 @@ class PenaltyMP extends PenaltyGame {
     this.mpMatchCount = 0; // giai moi — bat dau vai sut cho thanh vien dau
     this._mpLeagueRewarded = false; // giai moi — reset co cong diem
     const config = this.mpLeagueConfig || LEAGUE_LIST[0];
-    const pool = config.region ? getRegionCountries(config.region) : getAllCountries();
+    const pool = config.clubs ? config.clubs.map(code=>CLUB_MAP[code]).filter(Boolean) : (config.region ? getRegionCountries(config.region) : getAllCountries());
     // Dam bao doi minh thuoc khu vuc cua giai — neu chon nham (vi du Brazil
     // cho giai EU) thi tu dong doi sang doi hop le trong khu vuc.
     if(!pool.find(c=>c.code===pc.code)){
       pc = pool.find(c=>c.code==='vn') || pool[0] || getAllCountries()[0];
       this.state.playerCountry = pc;
       this._updateCountryPicker();
-      window.showToast?.(`⚠️ Đội không thuộc khu vực ${config.name} — đã chọn ${pc.name}`, 'warn');
+      window.showToast?.(`⚠️ Đội không tham gia ${config.name} — đã chọn ${pc.name}`, 'warn');
     }
     const n = config.teamCount || 8;
     const top = getTopCountries(pool, n-1, pc.code);
@@ -594,7 +625,7 @@ class PenaltyMP extends PenaltyGame {
       pc = basePool.find(c=>c.code==='vn') || basePool[0] || getAllCountries()[0];
       this.state.playerCountry = pc;
       this._updateCountryPicker();
-      window.showToast?.(`⚠️ Đội không thuộc khu vực ${config.name} — đã chọn ${pc.name}`, 'warn');
+      window.showToast?.(`⚠️ Đội không tham gia ${config.name} — đã chọn ${pc.name}`, 'warn');
     }
     const pool = shuffle(getTopCountries(basePool, config.teamCount - 1, pc.code));
     const numGroups = config.groups;
@@ -1109,6 +1140,7 @@ class PenaltyMP extends PenaltyGame {
     return {
       cupConfigId: this.mpCupConfig ? this.mpCupConfig.id : null,
       leagueConfigId: this.mpLeagueConfig ? this.mpLeagueConfig.id : null,
+      teamType: this.mpTeamType || 'national',
       cupTeams: this.mpCupTeams || [],
       cupGroups: this.mpCupGroups || [],
       cupGroupMatchQueue: this.mpCupGroupMatchQueue || [],
@@ -1134,8 +1166,9 @@ class PenaltyMP extends PenaltyGame {
       try{ snap = JSON.parse(snap); }catch(e){ return; }
     }
     if(!snap || typeof snap !== 'object') return;
-    if(snap.cupConfigId) this.mpCupConfig = CUP_TOURNAMENTS.find(t=>t.id===snap.cupConfigId) || this.mpCupConfig || CUP_TOURNAMENTS[0];
-    if(snap.leagueConfigId) this.mpLeagueConfig = LEAGUE_LIST.find(l=>l.id===snap.leagueConfigId) || this.mpLeagueConfig || LEAGUE_LIST[0];
+    if(snap.cupConfigId) this.mpCupConfig = cupById(snap.cupConfigId) || this.mpCupConfig || getCupsByType(this.mpTeamType||'national')[0];
+    if(snap.leagueConfigId) this.mpLeagueConfig = leagueById(snap.leagueConfigId) || this.mpLeagueConfig || getLeaguesByType(this.mpTeamType||'national')[0];
+    if(snap.teamType) this.mpTeamType = snap.teamType;
     if(snap.cupTeams) this.mpCupTeams = snap.cupTeams;
     if(snap.cupGroups) this.mpCupGroups = snap.cupGroups;
     if(snap.cupGroupMatchQueue) this.mpCupGroupMatchQueue = snap.cupGroupMatchQueue;
